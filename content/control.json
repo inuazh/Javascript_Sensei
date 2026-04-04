@@ -1,0 +1,841 @@
+{
+  "lessons": [
+    {
+      "id": "conditions-01",
+      "topicId": "conditions",
+      "title": "if и else",
+      "order": 0,
+      "questions": [
+        {
+          "id": "conditions-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let age = 20;\nif (age >= 18) {\n  console.log(\"adult\");\n} else {\n  console.log(\"minor\");\n}",
+          "options": ["minor", "adult", "Error", "undefined"],
+          "correct": 1,
+          "explanation": "20 >= 18 — истина, выполняется ветка if и выводится 'adult'"
+        },
+        {
+          "id": "conditions-01-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 0;\nif (x) {\n  console.log(\"truthy\");\n} else {\n  console.log(\"falsy\");\n}",
+          "options": ["truthy", "falsy", "0", "Error"],
+          "correct": 1,
+          "explanation": "0 — falsy-значение, поэтому выполняется ветка else"
+        },
+        {
+          "id": "conditions-01-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let score = 75;\n",
+          "codeAfter": " (score >= 60) {\n  console.log(\"passed\");\n}",
+          "options": ["when", "if", "check", "when"],
+          "correct": 1,
+          "explanation": "if — ключевое слово для условного выполнения кода"
+        },
+        {
+          "id": "conditions-01-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "if (\"\" || 0 || null) {\n  console.log(\"yes\");\n}",
+          "options": ["Выведет yes", "Ничего не выведет"],
+          "correct": 1,
+          "explanation": "Все три значения falsy, весь || = false, тело if не выполняется"
+        },
+        {
+          "id": "conditions-01-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let n = 7;",
+            "if (n % 2 === 0) {",
+            "  console.log(\"even\");",
+            "} else {",
+            "  console.log(\"odd\");",
+            "}"
+          ],
+          "shuffled": [3, 0, 4, 1, 5, 2],
+          "explanation": "Объявление переменной, затем условие, ветка if, else, тело else, закрытие"
+        }
+      ]
+    },
+    {
+      "id": "conditions-02",
+      "topicId": "conditions",
+      "title": "else if",
+      "order": 1,
+      "questions": [
+        {
+          "id": "conditions-02-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let grade = 75;\nif (grade >= 90) {\n  console.log(\"A\");\n} else if (grade >= 75) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}",
+          "options": ["A", "B", "C", "undefined"],
+          "correct": 1,
+          "explanation": "75 < 90, первое условие false; 75 >= 75, второе условие true — выводится 'B'"
+        },
+        {
+          "id": "conditions-02-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 5;\nif (x > 10) {\n  console.log(\"big\");\n} else if (x > 3) {\n  console.log(\"medium\");\n} else if (x > 1) {\n  console.log(\"small\");\n}",
+          "options": ["big", "small", "medium", "Ничего"],
+          "correct": 2,
+          "explanation": "5 > 10 false, 5 > 3 true — выполняется первая истинная ветка 'medium'"
+        },
+        {
+          "id": "conditions-02-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let n = 15;\nif (n > 10) {\n  console.log(\"big\");\n}\nif (n > 5) {\n  console.log(\"medium\");\n}",
+          "options": ["Выведет только 'big'", "Выведет 'big' и 'medium'"],
+          "correct": 1,
+          "explanation": "Два независимых if проверяются оба: оба true, поэтому выводятся оба"
+        },
+        {
+          "id": "conditions-02-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "if (score > 90) {\n  // ...\n} ",
+          "codeAfter": " (score > 70) {\n  console.log(\"good\");\n}",
+          "options": ["orif", "elif", "else if", "elseif"],
+          "correct": 2,
+          "explanation": "else if — ключевые слова для дополнительной ветки условия"
+        },
+        {
+          "id": "conditions-02-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let temp = -5;\nif (temp > 20) {\n  console.log(\"hot\");\n} else if (temp > 0) {\n  console.log(\"warm\");\n} else {\n  console.log(\"cold\");\n}",
+          "options": ["hot", "warm", "cold", "Error"],
+          "correct": 2,
+          "explanation": "-5 не больше 20 и не больше 0 — выполняется ветка else"
+        }
+      ]
+    },
+    {
+      "id": "conditions-03",
+      "topicId": "conditions",
+      "title": "Тернарный оператор",
+      "order": 2,
+      "questions": [
+        {
+          "id": "conditions-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let age = 16;\nlet status = age >= 18 ? \"adult\" : \"minor\";\nconsole.log(status);",
+          "options": ["adult", "minor", "undefined", "Error"],
+          "correct": 1,
+          "explanation": "16 >= 18 false, тернарный оператор возвращает 'minor'"
+        },
+        {
+          "id": "conditions-03-q2",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let max = a > b ",
+          "codeAfter": " a : b;",
+          "options": ["then", "?", "if", ":"],
+          "correct": 1,
+          "explanation": "Синтаксис тернарного оператора: условие ? если_true : если_false"
+        },
+        {
+          "id": "conditions-03-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let n = 0;\nconsole.log(n ? \"truthy\" : \"falsy\");",
+          "options": ["truthy", "falsy", "0", "null"],
+          "correct": 1,
+          "explanation": "0 — falsy, тернарный оператор возвращает 'falsy'"
+        },
+        {
+          "id": "conditions-03-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let x = true ? false : true;\nconsole.log(x);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "explanation": "Условие true, значит возвращается первый вариант — false"
+        },
+        {
+          "id": "conditions-03-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let score = 85;\nlet msg = score >= 90 ? \"A\" : score >= 70 ? \"B\" : \"C\";\nconsole.log(msg);",
+          "options": ["A", "B", "C", "Error"],
+          "correct": 1,
+          "explanation": "85 < 90, первый false; 85 >= 70, второй true — возвращается 'B'"
+        }
+      ]
+    },
+    {
+      "id": "conditions-04",
+      "topicId": "conditions",
+      "title": "switch",
+      "order": 3,
+      "questions": [
+        {
+          "id": "conditions-04-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let day = 2;\nswitch (day) {\n  case 1: console.log(\"Mon\"); break;\n  case 2: console.log(\"Tue\"); break;\n  default: console.log(\"?\");\n}",
+          "options": ["Mon", "Tue", "?", "Error"],
+          "correct": 1,
+          "explanation": "day === 2, выполняется case 2, выводится 'Tue', break прерывает switch"
+        },
+        {
+          "id": "conditions-04-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 1;\nswitch (x) {\n  case 1: console.log(\"one\");\n  case 2: console.log(\"two\");\n  default: console.log(\"other\");\n}",
+          "options": ["one", "one two other", "one two", "Error"],
+          "correct": 1,
+          "explanation": "Без break происходит «провал» (fall-through) в следующие case"
+        },
+        {
+          "id": "conditions-04-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "switch (color) {\n  case \"red\": console.log(\"red\"); break;\n  ",
+          "codeAfter": ": console.log(\"unknown\");\n}",
+          "options": ["else", "otherwise", "default", "fallback"],
+          "correct": 2,
+          "explanation": "default выполняется если ни один case не совпал"
+        },
+        {
+          "id": "conditions-04-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "switch (\"2\") {\n  case 2: console.log(\"number\"); break;\n  case \"2\": console.log(\"string\"); break;\n}",
+          "options": ["Выведет 'number'", "Выведет 'string'"],
+          "correct": 1,
+          "explanation": "switch использует строгое сравнение ===, строка '2' не равна числу 2"
+        },
+        {
+          "id": "conditions-04-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "switch (fruit) {",
+            "  case \"apple\":",
+            "    console.log(\"🍎\");",
+            "    break;",
+            "  default:",
+            "    console.log(\"?\");",
+            "}"
+          ],
+          "shuffled": [4, 0, 6, 2, 1, 3, 5],
+          "explanation": "switch, case с меткой, тело case, break, default, тело default, закрытие"
+        }
+      ]
+    },
+    {
+      "id": "conditions-05",
+      "topicId": "conditions",
+      "title": "Условия: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "conditions-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let a = 5, b = 10;\nif (a > 3 && b > 5) {\n  console.log(\"both\");\n} else {\n  console.log(\"not both\");\n}",
+          "options": ["not both", "both", "Error", "undefined"],
+          "correct": 1,
+          "explanation": "a > 3 = true, b > 5 = true; true && true = true, выводится 'both'"
+        },
+        {
+          "id": "conditions-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = null;\nif (x == null) {\n  console.log(\"empty\");\n}",
+          "options": ["Ничего", "empty", "null", "Error"],
+          "correct": 1,
+          "explanation": "null == null это true (нестрогое сравнение), тело if выполняется"
+        },
+        {
+          "id": "conditions-05-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let role = \"admin\";\nlet canEdit = role === \"admin\" ",
+          "codeAfter": " role === \"editor\";\nconsole.log(canEdit); // true",
+          "options": ["&&", "||", "??", "!"],
+          "correct": 1,
+          "explanation": "|| — ИЛИ: canEdit = true если роль admin ИЛИ editor"
+        },
+        {
+          "id": "conditions-05-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let user = { name: \"Alice\" };\nif (user) {\n  console.log(\"exists\");\n}",
+          "options": ["Выведет 'exists'", "Ничего не выведет"],
+          "correct": 0,
+          "explanation": "Объекты (даже пустые) — truthy-значения, условие выполняется"
+        },
+        {
+          "id": "conditions-05-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let n = 15;\nif (n % 3 === 0 && n % 5 === 0) {\n  console.log(\"FizzBuzz\");\n} else if (n % 3 === 0) {\n  console.log(\"Fizz\");\n} else if (n % 5 === 0) {\n  console.log(\"Buzz\");\n}",
+          "options": ["Fizz", "Buzz", "FizzBuzz", "undefined"],
+          "correct": 2,
+          "explanation": "15 % 3 = 0 и 15 % 5 = 0, оба условия true, выводится 'FizzBuzz'"
+        }
+      ]
+    },
+    {
+      "id": "loops-01",
+      "topicId": "loops",
+      "title": "Цикл for",
+      "order": 0,
+      "questions": [
+        {
+          "id": "loops-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "for (let i = 0; i < 3; i++) {\n  console.log(i);\n}",
+          "options": ["0 1 2", "1 2 3", "0 1 2 3", "1 2"],
+          "correct": 0,
+          "explanation": "i начинается с 0, увеличивается до 3 (не включая): 0, 1, 2"
+        },
+        {
+          "id": "loops-01-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let sum = 0;\nfor (let i = 1; i <= 4; i++) {\n  sum += i;\n}\nconsole.log(sum);",
+          "options": ["6", "10", "8", "4"],
+          "correct": 1,
+          "explanation": "1 + 2 + 3 + 4 = 10"
+        },
+        {
+          "id": "loops-01-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "for (let i = 0; i < 5; ",
+          "codeAfter": ") {\n  console.log(i);\n}",
+          "options": ["i++", "i--", "i+1", "i = i"],
+          "correct": 0,
+          "explanation": "i++ увеличивает счётчик на 1 каждую итерацию"
+        },
+        {
+          "id": "loops-01-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "for (let i = 5; i > 0; i -= 2) {\n  console.log(i);\n}",
+          "options": ["5 4 3 2 1", "5 3 1", "5 3", "Error"],
+          "correct": 1,
+          "explanation": "i начинается с 5, уменьшается на 2: 5, 3, 1 (после 1 следующий -1, условие false)"
+        },
+        {
+          "id": "loops-01-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "for (let i = 0; i < 0; i++) {\n  console.log(i);\n}",
+          "options": ["Выведет 0", "Ничего не выведет"],
+          "correct": 1,
+          "explanation": "Начальное условие 0 < 0 сразу false, тело цикла не выполняется"
+        }
+      ]
+    },
+    {
+      "id": "loops-02",
+      "topicId": "loops",
+      "title": "Цикл while",
+      "order": 1,
+      "questions": [
+        {
+          "id": "loops-02-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let i = 3;\nwhile (i > 0) {\n  console.log(i);\n  i--;\n}",
+          "options": ["3 2 1 0", "3 2 1", "2 1 0", "Error"],
+          "correct": 1,
+          "explanation": "while выполняется пока i > 0: 3, 2, 1; когда i = 0 условие false"
+        },
+        {
+          "id": "loops-02-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let n = 1;\nwhile (n < 20) {\n  n *= 2;\n}\nconsole.log(n);",
+          "options": ["16", "32", "20", "10"],
+          "correct": 1,
+          "explanation": "n: 1→2→4→8→16→32; 32 >= 20, цикл останавливается, выводится 32"
+        },
+        {
+          "id": "loops-02-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let x = 10;\n",
+          "codeAfter": " (x > 0) {\n  x -= 3;\n}",
+          "options": ["for", "do", "while", "loop"],
+          "correct": 2,
+          "explanation": "while проверяет условие перед каждой итерацией"
+        },
+        {
+          "id": "loops-02-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let i = 0;\nwhile (true) {\n  i++;\n  if (i >= 3) break;\n}\nconsole.log(i); // 3",
+          "options": ["Выведет 3", "Бесконечный цикл"],
+          "correct": 0,
+          "explanation": "break прерывает цикл когда i >= 3, поэтому цикл завершается"
+        },
+        {
+          "id": "loops-02-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let count = 0;",
+            "while (count < 5) {",
+            "  count++;",
+            "}",
+            "console.log(count);"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Инициализация, условие цикла, тело с инкрементом, закрытие, вывод"
+        }
+      ]
+    },
+    {
+      "id": "loops-03",
+      "topicId": "loops",
+      "title": "do...while и break/continue",
+      "order": 2,
+      "questions": [
+        {
+          "id": "loops-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let i = 5;\ndo {\n  console.log(i);\n  i++;\n} while (i < 5);",
+          "options": ["Ничего", "5", "5 6", "Error"],
+          "correct": 1,
+          "explanation": "do...while выполняет тело хотя бы раз, затем проверяет условие: 5 < 5 = false, стоп"
+        },
+        {
+          "id": "loops-03-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "for (let i = 0; i < 5; i++) {\n  if (i === 3) break;\n  console.log(i);\n}",
+          "options": ["0 1 2 3 4", "0 1 2 3", "0 1 2", "1 2 3"],
+          "correct": 2,
+          "explanation": "break при i=3 прерывает цикл, до этого выводятся 0, 1, 2"
+        },
+        {
+          "id": "loops-03-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "for (let i = 0; i < 5; i++) {\n  if (i % 2 === 0) continue;\n  console.log(i);\n}",
+          "options": ["0 2 4", "1 3", "0 1 2 3 4", "1 2 3 4"],
+          "correct": 1,
+          "explanation": "continue пропускает чётные числа, выводятся только нечётные: 1, 3"
+        },
+        {
+          "id": "loops-03-q4",
+          "type": "fill",
+          "title": "Заполни пропуск — пропустить итерацию",
+          "codeBefore": "for (let i = 0; i < 5; i++) {\n  if (i === 2) ",
+          "codeAfter": ";\n  console.log(i);\n}",
+          "options": ["break", "continue", "skip", "return"],
+          "correct": 1,
+          "explanation": "continue пропускает текущую итерацию и переходит к следующей"
+        },
+        {
+          "id": "loops-03-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let i = 0;\ndo {\n  i++;\n} while (false);\nconsole.log(i); // 1",
+          "options": ["Выведет 1", "Выведет 0"],
+          "correct": 0,
+          "explanation": "do...while всегда выполняет тело хотя бы раз, i становится 1"
+        }
+      ]
+    },
+    {
+      "id": "loops-04",
+      "topicId": "loops",
+      "title": "for...of и for...in",
+      "order": 3,
+      "questions": [
+        {
+          "id": "loops-04-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const arr = [10, 20, 30];\nfor (const val of arr) {\n  console.log(val);\n}",
+          "options": ["0 1 2", "10 20 30", "arr[0] arr[1]", "Error"],
+          "correct": 1,
+          "explanation": "for...of перебирает значения итерируемого объекта"
+        },
+        {
+          "id": "loops-04-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const obj = { a: 1, b: 2 };\nfor (const key in obj) {\n  console.log(key);\n}",
+          "options": ["1 2", "a b", "a: 1 b: 2", "Error"],
+          "correct": 1,
+          "explanation": "for...in перебирает ключи объекта"
+        },
+        {
+          "id": "loops-04-q3",
+          "type": "fill",
+          "title": "Заполни пропуск — перебор значений",
+          "codeBefore": "const nums = [1, 2, 3];\nfor (const n ",
+          "codeAfter": " nums) {\n  console.log(n * 2);\n}",
+          "options": ["in", "of", "from", "at"],
+          "correct": 1,
+          "explanation": "for...of используется для перебора значений массивов и строк"
+        },
+        {
+          "id": "loops-04-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "for (const ch of \"JS\") {\n  console.log(ch);\n}",
+          "options": ["JS", "J S", "0 1", "Error"],
+          "correct": 1,
+          "explanation": "Строка итерируемая: for...of перебирает каждый символ"
+        },
+        {
+          "id": "loops-04-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const obj = { a: 1 };\nfor (const v of obj) {\n  console.log(v);\n}",
+          "options": ["Выведет 1", "Вызовет TypeError"],
+          "correct": 1,
+          "explanation": "Обычный объект не является итерируемым — for...of вызовет TypeError"
+        }
+      ]
+    },
+    {
+      "id": "loops-05",
+      "topicId": "loops",
+      "title": "Циклы: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "loops-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let result = \"\";\nfor (let i = 1; i <= 4; i++) {\n  result += i;\n}\nconsole.log(result);",
+          "options": ["10", "1234", "4321", "1 2 3 4"],
+          "correct": 1,
+          "explanation": "result — строка, += конкатенирует: '1' + '2' + '3' + '4' = '1234'"
+        },
+        {
+          "id": "loops-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let i = 1;\nwhile (i <= 16) {\n  i *= 2;\n}\nconsole.log(i);",
+          "options": ["16", "32", "8", "64"],
+          "correct": 1,
+          "explanation": "i: 1→2→4→8→16→32; при 32 условие 32 <= 16 false, выводится 32"
+        },
+        {
+          "id": "loops-05-q3",
+          "type": "fill",
+          "title": "Заполни пропуск — найти сумму",
+          "codeBefore": "const nums = [1, 2, 3, 4, 5];\nlet sum = 0;\nfor (const n of nums) {\n  sum ",
+          "codeAfter": " n;\n}\nconsole.log(sum); // 15",
+          "options": ["= sum +", "*=", "+=", "-="],
+          "correct": 2,
+          "explanation": "+= накапливает сумму: sum = sum + n"
+        },
+        {
+          "id": "loops-05-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "outer: for (let i = 0; i < 3; i++) {\n  for (let j = 0; j < 3; j++) {\n    if (j === 1) break outer;\n    console.log(i, j);\n  }\n}",
+          "options": ["0 0 0 1 0 2", "0 0", "0 0 1 0 2 0", "Error"],
+          "correct": 1,
+          "explanation": "break outer прерывает внешний цикл, выводится только 0 0"
+        },
+        {
+          "id": "loops-05-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let count = 0;\nfor (let i = 0; i < 100; i++) {\n  if (i % 7 === 0) count++;\n}\nconsole.log(count); // 15",
+          "options": ["Выведет 15", "Выведет 14"],
+          "correct": 0,
+          "explanation": "Числа кратные 7 от 0 до 99: 0,7,14,...,98 — всего 15 чисел"
+        }
+      ]
+    },
+    {
+      "id": "functions-01",
+      "topicId": "functions",
+      "title": "Объявление функций",
+      "order": 0,
+      "questions": [
+        {
+          "id": "functions-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function greet(name) {\n  return \"Hello, \" + name;\n}\nconsole.log(greet(\"Alice\"));",
+          "options": ["Hello, name", "Hello, Alice", "Alice", "undefined"],
+          "correct": 1,
+          "explanation": "Функция принимает name='Alice' и возвращает 'Hello, Alice'"
+        },
+        {
+          "id": "functions-01-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function add(a, b) {\n  return a + b;\n}\nconsole.log(add(3, 4));",
+          "options": ["ab", "34", "7", "Error"],
+          "correct": 2,
+          "explanation": "Функция возвращает сумму аргументов: 3 + 4 = 7"
+        },
+        {
+          "id": "functions-01-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function noReturn() {\n  let x = 5;\n}\nconsole.log(noReturn());",
+          "options": ["5", "null", "undefined", "Error"],
+          "correct": 2,
+          "explanation": "Функция без return возвращает undefined"
+        },
+        {
+          "id": "functions-01-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "sayHi();\nfunction sayHi() {\n  console.log(\"Hi!\");\n}",
+          "options": ["Вызовет ошибку", "Выведет 'Hi!'"],
+          "correct": 1,
+          "explanation": "function declaration поднимается (hoisting), можно вызвать до объявления"
+        },
+        {
+          "id": "functions-01-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "function square(n) {",
+            "  return n * n;",
+            "}",
+            "console.log(square(5));"
+          ],
+          "shuffled": [3, 0, 2, 1],
+          "explanation": "Объявление функции: имя, тело с return, закрытие, вызов"
+        }
+      ]
+    },
+    {
+      "id": "functions-02",
+      "topicId": "functions",
+      "title": "Параметры и аргументы",
+      "order": 1,
+      "questions": [
+        {
+          "id": "functions-02-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function greet(name = \"World\") {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet());",
+          "options": ["Hello, !", "Hello, name!", "Hello, World!", "Error"],
+          "correct": 2,
+          "explanation": "Параметр по умолчанию используется если аргумент не передан"
+        },
+        {
+          "id": "functions-02-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function sum(...nums) {\n  return nums.reduce((a, b) => a + b, 0);\n}\nconsole.log(sum(1, 2, 3, 4));",
+          "options": ["0", "10", "1234", "Error"],
+          "correct": 1,
+          "explanation": "...nums собирает все аргументы в массив, reduce суммирует: 1+2+3+4=10"
+        },
+        {
+          "id": "functions-02-q3",
+          "type": "fill",
+          "title": "Заполни пропуск — параметры по умолчанию",
+          "codeBefore": "function power(base, ",
+          "codeAfter": " = 2) {\n  return base ** exp;\n}",
+          "options": ["exponent", "exp", "e", "n"],
+          "correct": 1,
+          "explanation": "Имя параметра exp с = 2 задаёт значение по умолчанию"
+        },
+        {
+          "id": "functions-02-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function test(a, b, c) {\n  return a + b + c;\n}\nconsole.log(test(1, 2));",
+          "options": ["Error", "3", "NaN", "undefined"],
+          "correct": 2,
+          "explanation": "c не передан, c = undefined; 1 + 2 + undefined = NaN"
+        },
+        {
+          "id": "functions-02-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "function f(x = 10, y = x * 2) {\n  return y;\n}\nconsole.log(f()); // 20",
+          "options": ["Выведет 20", "Вызовет ошибку"],
+          "correct": 0,
+          "explanation": "Значения по умолчанию вычисляются слева направо: y = 10 * 2 = 20"
+        }
+      ]
+    },
+    {
+      "id": "functions-03",
+      "topicId": "functions",
+      "title": "Стрелочные функции",
+      "order": 2,
+      "questions": [
+        {
+          "id": "functions-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const double = x => x * 2;\nconsole.log(double(7));",
+          "options": ["7", "14", "undefined", "Error"],
+          "correct": 1,
+          "explanation": "Стрелочная функция с одним параметром: x => x * 2; double(7) = 14"
+        },
+        {
+          "id": "functions-03-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const add = (a, b) => a + b;\nconsole.log(add(3, 5));",
+          "options": ["35", "8", "ab", "Error"],
+          "correct": 1,
+          "explanation": "Краткая запись: тело является выражением, автоматически возвращается"
+        },
+        {
+          "id": "functions-03-q3",
+          "type": "fill",
+          "title": "Заполни пропуск — стрелочная функция",
+          "codeBefore": "const square = x ",
+          "codeAfter": " x * x;\nconsole.log(square(4)); // 16",
+          "options": ["=>", "->", "==>", ">>"],
+          "correct": 0,
+          "explanation": "=> стрелка — ключевой символ стрелочных функций"
+        },
+        {
+          "id": "functions-03-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const getObj = () => ({ key: \"value\" });\nconsole.log(getObj().key);",
+          "options": ["undefined", "value", "Error", "{}"],
+          "correct": 1,
+          "explanation": "() => ({}) — скобки вокруг объекта нужны чтобы { } не приняли за тело функции"
+        },
+        {
+          "id": "functions-03-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const f = () => {\n  return 42;\n};\nconsole.log(f()); // 42",
+          "options": ["Выведет 42", "Выведет undefined"],
+          "correct": 0,
+          "explanation": "Стрелочная функция с {} требует явного return"
+        }
+      ]
+    },
+    {
+      "id": "functions-04",
+      "topicId": "functions",
+      "title": "Функции высшего порядка",
+      "order": 3,
+      "questions": [
+        {
+          "id": "functions-04-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function apply(fn, value) {\n  return fn(value);\n}\nconsole.log(apply(x => x * 3, 5));",
+          "options": ["5", "3", "15", "Error"],
+          "correct": 2,
+          "explanation": "apply вызывает переданную функцию с значением 5: 5 * 3 = 15"
+        },
+        {
+          "id": "functions-04-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function multiplier(factor) {\n  return n => n * factor;\n}\nconst triple = multiplier(3);\nconsole.log(triple(7));",
+          "options": ["3", "7", "21", "Error"],
+          "correct": 2,
+          "explanation": "multiplier(3) возвращает функцию n => n * 3; triple(7) = 7 * 3 = 21"
+        },
+        {
+          "id": "functions-04-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "function twice(fn) {\n  return x => fn(",
+          "codeAfter": "(x));\n}",
+          "options": ["fn", "x", "twice", "fn"],
+          "correct": 0,
+          "explanation": "twice возвращает функцию, применяющую fn дважды: fn(fn(x))"
+        },
+        {
+          "id": "functions-04-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const arr = [1, 2, 3];\nconst mapped = arr.map(function(x) { return x * 2; });\nconsole.log(mapped[1]); // 4",
+          "options": ["Выведет 4", "Выведет 2"],
+          "correct": 0,
+          "explanation": "map применяет функцию к каждому элементу: [2, 4, 6]; индекс 1 = 4"
+        },
+        {
+          "id": "functions-04-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "function compose(f, g) {",
+            "  return x => f(g(x));",
+            "}",
+            "const inc = x => x + 1;",
+            "const dbl = x => x * 2;",
+            "console.log(compose(inc, dbl)(5));"
+          ],
+          "shuffled": [3, 0, 5, 2, 4, 1],
+          "explanation": "Объявление compose, вспомогательные функции inc и dbl, затем вызов"
+        }
+      ]
+    },
+    {
+      "id": "functions-05",
+      "topicId": "functions",
+      "title": "Функции: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "functions-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const fn = function named() {\n  return \"hi\";\n};\nconsole.log(typeof fn);",
+          "options": ["named", "function", "object", "string"],
+          "correct": 1,
+          "explanation": "typeof функции возвращает 'function'"
+        },
+        {
+          "id": "functions-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function outer() {\n  let x = 10;\n  function inner() {\n    return x * 2;\n  }\n  return inner();\n}\nconsole.log(outer());",
+          "options": ["undefined", "10", "20", "Error"],
+          "correct": 2,
+          "explanation": "inner() видит x из outer() — это замыкание: 10 * 2 = 20"
+        },
+        {
+          "id": "functions-05-q3",
+          "type": "fill",
+          "title": "Заполни пропуск — IIFE",
+          "codeBefore": "const result = (",
+          "codeAfter": " => 42)();\nconsole.log(result);",
+          "options": ["function", "()", "() ", "x"],
+          "correct": 2,
+          "explanation": "IIFE (Immediately Invoked Function Expression): (() => 42)()"
+        },
+        {
+          "id": "functions-05-q4",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const arrowFn = () => arguments;",
+          "options": ["Вернёт объект arguments", "Вызовет ReferenceError"],
+          "correct": 1,
+          "explanation": "Стрелочные функции не имеют своего arguments — он берётся из внешней области или ошибка"
+        },
+        {
+          "id": "functions-05-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "function counter() {\n  let n = 0;\n  return () => ++n;\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc());",
+          "options": ["1 1 1", "0 1 2", "1 2 3", "undefined"],
+          "correct": 2,
+          "explanation": "Каждый вызов inc() увеличивает n в замыкании на 1: 1, 2, 3"
+        }
+      ]
+    }
+  ]
+}

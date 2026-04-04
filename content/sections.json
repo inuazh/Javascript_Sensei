@@ -1,0 +1,40 @@
+{
+  "sections": [
+    {
+      "id": "basics",
+      "title": "Основы",
+      "icon": "🌱",
+      "color": "#34D399",
+      "order": 0,
+      "topics": [
+        { "id": "variables", "title": "Переменные", "subtitle": "let, const, var", "order": 0 },
+        { "id": "data-types", "title": "Типы данных", "subtitle": "string, number, boolean", "order": 1 },
+        { "id": "operators", "title": "Операторы", "subtitle": "арифметика, сравнение", "order": 2 }
+      ]
+    },
+    {
+      "id": "control",
+      "title": "Управление",
+      "icon": "🔀",
+      "color": "#60A5FA",
+      "order": 1,
+      "topics": [
+        { "id": "conditions", "title": "Условия", "subtitle": "if, else, switch", "order": 0 },
+        { "id": "loops", "title": "Циклы", "subtitle": "for, while, do...while", "order": 1 },
+        { "id": "functions", "title": "Функции", "subtitle": "объявление, стрелочные", "order": 2 }
+      ]
+    },
+    {
+      "id": "collections",
+      "title": "Коллекции",
+      "icon": "📦",
+      "color": "#FACC15",
+      "order": 2,
+      "topics": [
+        { "id": "arrays", "title": "Массивы", "subtitle": "map, filter, reduce", "order": 0 },
+        { "id": "objects", "title": "Объекты", "subtitle": "ключи, деструктуризация", "order": 1 },
+        { "id": "set-map", "title": "Set & Map", "subtitle": "уникальные коллекции", "order": 2 }
+      ]
+    }
+  ]
+}

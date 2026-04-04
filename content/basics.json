@@ -1,0 +1,839 @@
+{
+  "lessons": [
+    {
+      "id": "variables-01",
+      "topicId": "variables",
+      "title": "Основы переменных",
+      "order": 0,
+      "questions": [
+        {
+          "id": "variables-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 10;\nconsole.log(x);",
+          "options": ["undefined", "x", "10", "null"],
+          "correct": 2,
+          "explanation": "let объявляет переменную и присваивает ей значение 10, которое и выводится"
+        },
+        {
+          "id": "variables-01-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const a = 5;\na = 10;",
+          "options": ["Код выполнится без ошибок", "Код вызовет ошибку"],
+          "correct": 1,
+          "explanation": "const запрещает повторное присваивание — изменить её значение нельзя"
+        },
+        {
+          "id": "variables-01-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "",
+          "codeAfter": " name = \"Alice\";",
+          "options": ["var", "let", "const", "int"],
+          "correct": 1,
+          "explanation": "let объявляет переменную с блочной областью видимости"
+        },
+        {
+          "id": "variables-01-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "var city = \"Moscow\";\nvar city = \"London\";\nconsole.log(city);",
+          "options": ["Moscow", "London", "Error", "undefined"],
+          "correct": 1,
+          "explanation": "var позволяет повторное объявление, последнее значение перезаписывает предыдущее"
+        },
+        {
+          "id": "variables-01-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let score = 0;",
+            "score = score + 10;",
+            "console.log(score);"
+          ],
+          "shuffled": [1, 2, 0],
+          "explanation": "Сначала объявляем переменную, затем изменяем значение, потом выводим"
+        }
+      ]
+    },
+    {
+      "id": "variables-02",
+      "topicId": "variables",
+      "title": "let и const",
+      "order": 1,
+      "questions": [
+        {
+          "id": "variables-02-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let a = 1;\nlet b = 2;\nlet c = a + b;\nconsole.log(c);",
+          "options": ["12", "3", "ab", "undefined"],
+          "correct": 1,
+          "explanation": "Числа складываются арифметически: 1 + 2 = 3"
+        },
+        {
+          "id": "variables-02-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "const PI = 3.14;\nconsole.log(PI);",
+          "options": ["Выведет 3.14", "Вызовет ошибку"],
+          "correct": 0,
+          "explanation": "const позволяет читать значение, только запрещает перезапись"
+        },
+        {
+          "id": "variables-02-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "",
+          "codeAfter": " MAX = 100;\nconsole.log(MAX);",
+          "options": ["let", "var", "const", "set"],
+          "correct": 2,
+          "explanation": "const используют для констант — значений, которые не изменяются"
+        },
+        {
+          "id": "variables-02-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x;\nconsole.log(x);",
+          "options": ["null", "0", "undefined", "Error"],
+          "correct": 2,
+          "explanation": "Переменная, объявленная без значения, имеет значение undefined"
+        },
+        {
+          "id": "variables-02-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "const name = \"Bob\";",
+            "let greeting = \"Hello, \" + name;",
+            "console.log(greeting);"
+          ],
+          "shuffled": [2, 0, 1],
+          "explanation": "Сначала объявляем константу, затем строим строку, потом выводим результат"
+        }
+      ]
+    },
+    {
+      "id": "variables-03",
+      "topicId": "variables",
+      "title": "var и область видимости",
+      "order": 2,
+      "questions": [
+        {
+          "id": "variables-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(x);\nvar x = 5;",
+          "options": ["5", "Error", "undefined", "null"],
+          "correct": 2,
+          "explanation": "var поднимается (hoisting) наверх, но без значения — поэтому undefined"
+        },
+        {
+          "id": "variables-03-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "console.log(y);\nlet y = 5;",
+          "options": ["Выведет undefined", "Вызовет ReferenceError"],
+          "correct": 1,
+          "explanation": "let не поднимается — обращение до объявления вызывает ReferenceError"
+        },
+        {
+          "id": "variables-03-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "{\n  var a = 1;\n}\nconsole.log(a);",
+          "options": ["1", "undefined", "Error", "null"],
+          "correct": 0,
+          "explanation": "var игнорирует блочную область видимости и доступен вне блока"
+        },
+        {
+          "id": "variables-03-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "{\n  let b = 2;\n}\nconsole.log(b);",
+          "options": ["2", "undefined", "null", "ReferenceError"],
+          "correct": 3,
+          "explanation": "let ограничен блоком {} и недоступен снаружи"
+        },
+        {
+          "id": "variables-03-q5",
+          "type": "fill",
+          "title": "Заполни пропуск — какое ключевое слово поднимается?",
+          "codeBefore": "console.log(n); // undefined\n",
+          "codeAfter": " n = 10;",
+          "options": ["let", "const", "var", "function"],
+          "correct": 2,
+          "explanation": "Только var поднимается (hoisting) с значением undefined до инициализации"
+        }
+      ]
+    },
+    {
+      "id": "variables-04",
+      "topicId": "variables",
+      "title": "Именование переменных",
+      "order": 3,
+      "questions": [
+        {
+          "id": "variables-04-q1",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let 1name = \"error\";",
+          "options": ["Валидное имя переменной", "Вызовет SyntaxError"],
+          "correct": 1,
+          "explanation": "Имя переменной не может начинаться с цифры"
+        },
+        {
+          "id": "variables-04-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let _private = 42;\nlet $price = 9.99;",
+          "options": ["Оба имени валидны", "Оба вызовут ошибку"],
+          "correct": 0,
+          "explanation": "Имена могут начинаться с _ или $, это допустимые символы"
+        },
+        {
+          "id": "variables-04-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let firstName = \"Anna\";\nlet lastName = \"Smith\";\nconsole.log(firstName + \" \" + lastName);",
+          "options": ["firstName lastName", "Anna Smith", "AnnaSmith", "Error"],
+          "correct": 1,
+          "explanation": "camelCase — стандарт именования в JS; строки склеиваются через оператор +"
+        },
+        {
+          "id": "variables-04-q4",
+          "type": "fill",
+          "title": "Заполни пропуск — правильный стиль именования",
+          "codeBefore": "let ",
+          "codeAfter": " = 25;",
+          "options": ["UserAge", "user_age", "userAge", "user-age"],
+          "correct": 2,
+          "explanation": "В JavaScript принят стиль camelCase для имён переменных"
+        },
+        {
+          "id": "variables-04-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "const MAX_SIZE = 100;",
+            "let currentSize = 0;",
+            "currentSize = MAX_SIZE / 2;",
+            "console.log(currentSize);"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Сначала константа, затем переменная, изменение, вывод"
+        }
+      ]
+    },
+    {
+      "id": "variables-05",
+      "topicId": "variables",
+      "title": "Переменные: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "variables-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let a = 5;\nlet b = a;\na = 10;\nconsole.log(b);",
+          "options": ["10", "5", "undefined", "Error"],
+          "correct": 1,
+          "explanation": "Примитивы копируются по значению — b = 5 не меняется при изменении a"
+        },
+        {
+          "id": "variables-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "const arr = [1, 2, 3];\narr.push(4);\nconsole.log(arr.length);",
+          "options": ["3", "4", "Error", "undefined"],
+          "correct": 1,
+          "explanation": "const запрещает переприсвоение, но не запрещает изменять содержимое объектов и массивов"
+        },
+        {
+          "id": "variables-05-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "let x = 'hello';\nlet x = 'world';",
+          "options": ["Код выполнится", "Вызовет SyntaxError"],
+          "correct": 1,
+          "explanation": "let запрещает повторное объявление в той же области видимости"
+        },
+        {
+          "id": "variables-05-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let total = 100;\ntotal ",
+          "codeAfter": " 20;\nconsole.log(total); // 80",
+          "options": ["= -", "-=", "+ =", "remove"],
+          "correct": 1,
+          "explanation": "-= вычитает значение из переменной и сохраняет результат"
+        },
+        {
+          "id": "variables-05-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let price = 50;",
+            "const discount = 10;",
+            "let finalPrice = price - discount;",
+            "console.log(finalPrice);"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Объявляем переменные по порядку использования, затем вычисляем и выводим"
+        }
+      ]
+    },
+    {
+      "id": "data-types-01",
+      "topicId": "data-types",
+      "title": "Примитивные типы",
+      "order": 0,
+      "questions": [
+        {
+          "id": "data-types-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof 42);",
+          "options": ["int", "number", "integer", "num"],
+          "correct": 1,
+          "explanation": "typeof возвращает строку с именем типа; все числа в JS имеют тип 'number'"
+        },
+        {
+          "id": "data-types-01-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof \"hello\");",
+          "options": ["String", "text", "string", "char"],
+          "correct": 2,
+          "explanation": "typeof строки возвращает 'string' в нижнем регистре"
+        },
+        {
+          "id": "data-types-01-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "typeof null === \"object\"",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "Это историческая ошибка JS: typeof null возвращает 'object', хотя null — примитив"
+        },
+        {
+          "id": "data-types-01-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "console.log(",
+          "codeAfter": " true);",
+          "options": ["type", "typeOf", "typeof", "getType"],
+          "correct": 2,
+          "explanation": "typeof — оператор для определения типа значения"
+        },
+        {
+          "id": "data-types-01-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof undefined);",
+          "options": ["null", "void", "undefined", "nothing"],
+          "correct": 2,
+          "explanation": "typeof undefined возвращает строку 'undefined'"
+        }
+      ]
+    },
+    {
+      "id": "data-types-02",
+      "topicId": "data-types",
+      "title": "Строки (String)",
+      "order": 1,
+      "questions": [
+        {
+          "id": "data-types-02-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let s = \"Hello\";\nconsole.log(s.length);",
+          "options": ["4", "5", "6", "undefined"],
+          "correct": 1,
+          "explanation": "Свойство .length возвращает количество символов в строке; 'Hello' = 5 символов"
+        },
+        {
+          "id": "data-types-02-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let name = \"World\";\nconsole.log(`Hello, ${name}!`);",
+          "options": ["Hello, ${name}!", "Hello, World!", "Hello, name!", "Error"],
+          "correct": 1,
+          "explanation": "Шаблонные строки (template literals) подставляют переменные через ${}"
+        },
+        {
+          "id": "data-types-02-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let str = \"hello world\";\nconsole.log(str.",
+          "codeAfter": "());",
+          "options": ["upper", "toUpper", "toUpperCase", "uppercase"],
+          "correct": 2,
+          "explanation": ".toUpperCase() переводит строку в верхний регистр"
+        },
+        {
+          "id": "data-types-02-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(\"abc\".includes(\"b\"));",
+          "options": ["1", "\"b\"", "false", "true"],
+          "correct": 3,
+          "explanation": ".includes() возвращает true если подстрока найдена"
+        },
+        {
+          "id": "data-types-02-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "\"5\" + 5 === \"55\"",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "Когда один операнд строка, + делает конкатенацию: '5' + 5 = '55'"
+        }
+      ]
+    },
+    {
+      "id": "data-types-03",
+      "topicId": "data-types",
+      "title": "Number и Boolean",
+      "order": 2,
+      "questions": [
+        {
+          "id": "data-types-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(0.1 + 0.2 === 0.3);",
+          "options": ["true", "false", "Error", "NaN"],
+          "correct": 1,
+          "explanation": "Числа с плавающей точкой имеют проблемы точности: 0.1 + 0.2 = 0.30000000000000004"
+        },
+        {
+          "id": "data-types-03-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(10 / 0);",
+          "options": ["Error", "0", "NaN", "Infinity"],
+          "correct": 3,
+          "explanation": "Деление на ноль в JS не вызывает ошибку, а возвращает Infinity"
+        },
+        {
+          "id": "data-types-03-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "Boolean(0) === false",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "0 — falsy-значение, Boolean(0) возвращает false"
+        },
+        {
+          "id": "data-types-03-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(Number(\"42\"));",
+          "options": ["\"42\"", "42", "NaN", "Error"],
+          "correct": 1,
+          "explanation": "Number() конвертирует строку в число, если строка содержит число"
+        },
+        {
+          "id": "data-types-03-q5",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "console.log(",
+          "codeAfter": "(\"hello\"));",
+          "options": ["Boolean", "String", "Number", "Object"],
+          "correct": 0,
+          "explanation": "Boolean() конвертирует значение в true/false"
+        }
+      ]
+    },
+    {
+      "id": "data-types-04",
+      "topicId": "data-types",
+      "title": "null и undefined",
+      "order": 3,
+      "questions": [
+        {
+          "id": "data-types-04-q1",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "null == undefined",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "== с нестрогим сравнением: null и undefined равны только друг другу"
+        },
+        {
+          "id": "data-types-04-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "null === undefined",
+          "options": ["true", "false"],
+          "correct": 1,
+          "explanation": "=== строгое равенство: null и undefined разных типов, поэтому false"
+        },
+        {
+          "id": "data-types-04-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = null;\nconsole.log(x + 1);",
+          "options": ["null1", "Error", "1", "NaN"],
+          "correct": 2,
+          "explanation": "null преобразуется в 0 при арифметике: null + 1 = 0 + 1 = 1"
+        },
+        {
+          "id": "data-types-04-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let user;\nconsole.log(user ?? \"Гость\");",
+          "options": ["undefined", "null", "Гость", "Error"],
+          "correct": 2,
+          "explanation": "?? (nullish coalescing) возвращает правый операнд, если левый null или undefined"
+        },
+        {
+          "id": "data-types-04-q5",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let value = ",
+          "codeAfter": ";\nconsole.log(value === null); // true",
+          "options": ["undefined", "null", "0", "false"],
+          "correct": 1,
+          "explanation": "null — явное пустое значение, которое разработчик присваивает намеренно"
+        }
+      ]
+    },
+    {
+      "id": "data-types-05",
+      "topicId": "data-types",
+      "title": "Типы данных: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "data-types-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof typeof 42);",
+          "options": ["number", "string", "typeof", "undefined"],
+          "correct": 1,
+          "explanation": "typeof 42 = 'number', typeof 'number' = 'string' — typeof всегда возвращает строку"
+        },
+        {
+          "id": "data-types-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(Number(true) + Number(false));",
+          "options": ["NaN", "2", "1", "undefined"],
+          "correct": 2,
+          "explanation": "Number(true) = 1, Number(false) = 0; 1 + 0 = 1"
+        },
+        {
+          "id": "data-types-05-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "typeof NaN === \"number\"",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "NaN (Not a Number) имеет тип 'number' — ещё одна историческая особенность JS"
+        },
+        {
+          "id": "data-types-05-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let n = parseInt(",
+          "codeAfter": ");\nconsole.log(n); // 42",
+          "options": ["\"42.9\"", "42.9", "\"hello\"", "true"],
+          "correct": 0,
+          "explanation": "parseInt() парсит строку и возвращает целую часть числа"
+        },
+        {
+          "id": "data-types-05-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let raw = \"  42  \";",
+            "let num = Number(raw.trim());",
+            "console.log(num + 8);"
+          ],
+          "shuffled": [2, 0, 1],
+          "explanation": "Сначала строка, потом trim() убирает пробелы, Number() конвертирует, затем арифметика"
+        }
+      ]
+    },
+    {
+      "id": "operators-01",
+      "topicId": "operators",
+      "title": "Арифметические операторы",
+      "order": 0,
+      "questions": [
+        {
+          "id": "operators-01-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(17 % 5);",
+          "options": ["3", "2", "4", "0"],
+          "correct": 1,
+          "explanation": "% — остаток от деления: 17 / 5 = 3 остаток 2"
+        },
+        {
+          "id": "operators-01-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 5;\nconsole.log(x++);",
+          "options": ["6", "5", "4", "undefined"],
+          "correct": 1,
+          "explanation": "x++ (постфиксный инкремент) возвращает старое значение 5, потом увеличивает до 6"
+        },
+        {
+          "id": "operators-01-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let y = 5;\nconsole.log(++y);",
+          "options": ["4", "5", "6", "undefined"],
+          "correct": 2,
+          "explanation": "++y (префиксный инкремент) сначала увеличивает до 6, потом возвращает новое значение"
+        },
+        {
+          "id": "operators-01-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let result = 2 ",
+          "codeAfter": " 10;\nconsole.log(result); // 1024",
+          "options": ["*", "**", "^", "x"],
+          "correct": 1,
+          "explanation": "** — оператор возведения в степень: 2 ** 10 = 1024"
+        },
+        {
+          "id": "operators-01-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "10 % 2 === 0",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "10 делится на 2 без остатка: 10 % 2 = 0, поэтому это чётное число"
+        }
+      ]
+    },
+    {
+      "id": "operators-02",
+      "topicId": "operators",
+      "title": "Операторы сравнения",
+      "order": 1,
+      "questions": [
+        {
+          "id": "operators-02-q1",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "\"5\" == 5",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "== делает приведение типов: строка '5' преобразуется в число 5 перед сравнением"
+        },
+        {
+          "id": "operators-02-q2",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "\"5\" === 5",
+          "options": ["true", "false"],
+          "correct": 1,
+          "explanation": "=== строгое равенство без приведения типов: строка и число всегда не равны"
+        },
+        {
+          "id": "operators-02-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(3 > 2 > 1);",
+          "options": ["true", "false", "Error", "NaN"],
+          "correct": 1,
+          "explanation": "3 > 2 = true, затем true > 1 = 1 > 1 = false (true преобразуется в 1)"
+        },
+        {
+          "id": "operators-02-q4",
+          "type": "fill",
+          "title": "Заполни пропуск — строгое неравенство",
+          "codeBefore": "console.log(5 ",
+          "codeAfter": " \"5\"); // true",
+          "options": ["!=", "!==", "<>", "=/="],
+          "correct": 1,
+          "explanation": "!== строгое неравенство: число 5 и строка '5' не равны по типу"
+        },
+        {
+          "id": "operators-02-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(null > 0);\nconsole.log(null == 0);\nconsole.log(null >= 0);",
+          "options": [
+            "false, false, false",
+            "false, false, true",
+            "true, false, true",
+            "false, true, false"
+          ],
+          "correct": 1,
+          "explanation": "null >= 0 приводит null к 0; null == 0 — нет (null == только null/undefined)"
+        }
+      ]
+    },
+    {
+      "id": "operators-03",
+      "topicId": "operators",
+      "title": "Логические операторы",
+      "order": 2,
+      "questions": [
+        {
+          "id": "operators-03-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(true && false);",
+          "options": ["true", "false", "null", "undefined"],
+          "correct": 1,
+          "explanation": "&& возвращает false если хотя бы один операнд false"
+        },
+        {
+          "id": "operators-03-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(\"cat\" || \"dog\");",
+          "options": ["true", "cat", "dog", "catdog"],
+          "correct": 1,
+          "explanation": "|| возвращает первое truthy-значение: 'cat' — truthy, поэтому возвращается 'cat'"
+        },
+        {
+          "id": "operators-03-q3",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(0 || \"default\");",
+          "options": ["0", "false", "default", "null"],
+          "correct": 2,
+          "explanation": "0 — falsy, поэтому || переходит ко второму операнду и возвращает 'default'"
+        },
+        {
+          "id": "operators-03-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(!\"hello\");",
+          "options": ["true", "false", "\"hello\"", "null"],
+          "correct": 1,
+          "explanation": "! инвертирует булево значение: 'hello' — truthy, !truthy = false"
+        },
+        {
+          "id": "operators-03-q5",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "!!0 === false",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "!! — двойное отрицание конвертирует в boolean: !!0 = !true = ... нет, !false = false"
+        }
+      ]
+    },
+    {
+      "id": "operators-04",
+      "topicId": "operators",
+      "title": "Операторы присваивания",
+      "order": 3,
+      "questions": [
+        {
+          "id": "operators-04-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let x = 10;\nx += 5;\nconsole.log(x);",
+          "options": ["5", "10", "15", "105"],
+          "correct": 2,
+          "explanation": "+= увеличивает переменную на указанное значение: 10 + 5 = 15"
+        },
+        {
+          "id": "operators-04-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let s = \"Hello\";\ns += \" World\";\nconsole.log(s);",
+          "options": ["Hello", "World", "Hello World", "Error"],
+          "correct": 2,
+          "explanation": "+= для строк добавляет к концу: 'Hello' + ' World' = 'Hello World'"
+        },
+        {
+          "id": "operators-04-q3",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let n = 100;\nn ",
+          "codeAfter": " 4;\nconsole.log(n); // 25",
+          "options": ["*=", "/=", "-=", "%="],
+          "correct": 1,
+          "explanation": "/= делит переменную: 100 / 4 = 25"
+        },
+        {
+          "id": "operators-04-q4",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let a = 5;\na **= 2;\nconsole.log(a);",
+          "options": ["10", "25", "52", "Error"],
+          "correct": 1,
+          "explanation": "**= возводит переменную в степень: 5 ** 2 = 25"
+        },
+        {
+          "id": "operators-04-q5",
+          "type": "order",
+          "title": "Расставь строки по порядку",
+          "lines": [
+            "let count = 0;",
+            "count += 1;",
+            "count += 1;",
+            "console.log(count); // 2"
+          ],
+          "shuffled": [3, 0, 2, 1],
+          "explanation": "Инициализация, два инкремента, вывод результата"
+        }
+      ]
+    },
+    {
+      "id": "operators-05",
+      "topicId": "operators",
+      "title": "Операторы: закрепление",
+      "order": 4,
+      "questions": [
+        {
+          "id": "operators-05-q1",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(5 > 3 ? \"yes\" : \"no\");",
+          "options": ["yes", "no", "true", "false"],
+          "correct": 0,
+          "explanation": "Тернарный оператор: условие ? если_true : если_false; 5 > 3 = true, выводится 'yes'"
+        },
+        {
+          "id": "operators-05-q2",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "let a = 2, b = 3;\nconsole.log(a + b * 2);",
+          "options": ["10", "8", "7", "12"],
+          "correct": 1,
+          "explanation": "Приоритет операторов: умножение выполняется первым; 3 * 2 = 6, затем 2 + 6 = 8"
+        },
+        {
+          "id": "operators-05-q3",
+          "type": "trueFalse",
+          "title": "True или False?",
+          "code": "NaN === NaN",
+          "options": ["true", "false"],
+          "correct": 1,
+          "explanation": "NaN не равен ничему, включая самого себя — используй isNaN() для проверки"
+        },
+        {
+          "id": "operators-05-q4",
+          "type": "fill",
+          "title": "Заполни пропуск",
+          "codeBefore": "let x = 0;\nconsole.log(x ",
+          "codeAfter": " 5); // 5",
+          "options": ["||", "&&", "+", "??"],
+          "correct": 3,
+          "explanation": "?? (nullish coalescing) возвращает правый операнд только если левый null/undefined, а не 0"
+        },
+        {
+          "id": "operators-05-q5",
+          "type": "output",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof (1 + \"1\"));",
+          "options": ["number", "string", "Error", "boolean"],
+          "correct": 1,
+          "explanation": "1 + '1' = '11' (конкатенация строки), typeof '11' = 'string'"
+        }
+      ]
+    }
+  ]
+}
