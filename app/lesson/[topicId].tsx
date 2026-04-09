@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   ScrollView,
@@ -6,10 +6,12 @@ import {
   Text,
   StyleSheet,
   Animated,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { useAnswerSounds } from '../../src/utils/sounds';
 import { useContentStore } from '../../src/stores/useContentStore';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { ACHIEVEMENTS } from '../../src/constants/gamification';
@@ -97,16 +99,18 @@ function OptionButton({ label, index, selected, correct, revealed, onPress }: Op
         isWrong && styles.optionButtonWrong,
       ]}
     >
-      <Text
+      <View
         style={[
-          styles.optionLabel,
+          styles.optionLabelBox,
           selected && !revealed && styles.optionLabelSelected,
           isCorrect && styles.optionLabelCorrect,
           isWrong && styles.optionLabelWrong,
         ]}
       >
-        {isCorrect ? '✓' : isWrong ? '✗' : String.fromCharCode(65 + index)}
-      </Text>
+        <Text style={[styles.optionLabelText, isCorrect && { color: '#34D399' }, isWrong && { color: '#F87171' }, selected && !revealed && { color: '#FACC15' }]}>
+          {isCorrect ? '✓' : isWrong ? '✗' : String.fromCharCode(65 + index)}
+        </Text>
+      </View>
       <Text
         style={[
           styles.optionText,
@@ -126,27 +130,72 @@ function OptionButton({ label, index, selected, correct, revealed, onPress }: Op
 interface OrderQuestionProps {
   question: Question;
   onComplete: (isCorrect: boolean) => void;
+  onCorrect?: () => void;
+  onWrong?: () => void;
 }
 
-function OrderQuestion({ question, onComplete }: OrderQuestionProps) {
-  const [items, setItems] = useState(
+function OrderQuestion({ question, onComplete, onCorrect, onWrong }: OrderQuestionProps) {
+  const [items, setItems] = useState(() =>
     question.shuffled!.map((i) => ({ id: i, text: question.lines![i] }))
   );
-  const [dragging, setDragging] = useState<number | null>(null);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [correct, setCorrect] = useState(false);
 
-  const handleSwap = (fromIdx: number) => {
-    if (isRevealed) return;
-    if (dragging === null) {
-      setDragging(fromIdx);
-    } else {
-      const next = [...items];
-      [next[dragging], next[fromIdx]] = [next[fromIdx], next[dragging]];
-      setItems(next);
-      setDragging(null);
-    }
-  };
+  const dragY = useRef(new Animated.Value(0)).current;
+  const draggingIdxRef = useRef<number | null>(null);
+  const itemHeightRef = useRef(56);
+
+  const panHandlers = useMemo(
+    () =>
+      items.map((_, idx) =>
+        PanResponder.create({
+          onStartShouldSetPanResponder: () =>
+            !isRevealed && draggingIdxRef.current === null,
+          onPanResponderGrant: () => {
+            draggingIdxRef.current = idx;
+            dragY.setValue(0);
+            setDraggingIdx(idx);
+            setHoverIdx(idx);
+            Haptics.selectionAsync();
+          },
+          onPanResponderMove: (_, { dy }) => {
+            dragY.setValue(dy);
+            const newHover = Math.max(
+              0,
+              Math.min(items.length - 1, Math.round(idx + dy / itemHeightRef.current))
+            );
+            setHoverIdx(newHover);
+          },
+          onPanResponderRelease: (_, { dy }) => {
+            const toIdx = Math.max(
+              0,
+              Math.min(items.length - 1, Math.round(idx + dy / itemHeightRef.current))
+            );
+            dragY.setValue(0);
+            draggingIdxRef.current = null;
+            setDraggingIdx(null);
+            setHoverIdx(null);
+            if (toIdx !== idx) {
+              setItems((prev) => {
+                const next = [...prev];
+                const [item] = next.splice(idx, 1);
+                next.splice(toIdx, 0, item);
+                return next;
+              });
+            }
+          },
+          onPanResponderTerminate: () => {
+            dragY.setValue(0);
+            draggingIdxRef.current = null;
+            setDraggingIdx(null);
+            setHoverIdx(null);
+          },
+        }).panHandlers
+      ),
+    [items, isRevealed]
+  );
 
   const check = () => {
     const isCorrect = items.every((item, idx) => item.id === idx);
@@ -154,8 +203,10 @@ function OrderQuestion({ question, onComplete }: OrderQuestionProps) {
     setIsRevealed(true);
     if (isCorrect) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      onCorrect?.();
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      onWrong?.();
     }
     setTimeout(() => onComplete(isCorrect), 1200);
   };
@@ -163,26 +214,57 @@ function OrderQuestion({ question, onComplete }: OrderQuestionProps) {
   return (
     <View style={styles.answerArea}>
       <Text style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12, marginBottom: 8 }}>
-        {dragging !== null ? '👆 Нажми куда переставить' : '👆 Нажми строку чтобы выбрать'}
+        ☰ Перетащи строки в нужный порядок
       </Text>
-      {items.map((item, idx) => (
-        <Pressable
-          key={item.id}
-          onPress={() => handleSwap(idx)}
-          disabled={isRevealed}
-          style={[
-            styles.orderLine,
-            dragging === idx && styles.orderLineDragging,
-            isRevealed && item.id === idx && styles.orderLineCorrect,
-            isRevealed && item.id !== idx && styles.orderLineWrong,
-          ]}
-        >
-          <Text style={styles.orderLineIndex}>{idx + 1}</Text>
-          <Text style={[styles.orderLineText, dragging === idx && styles.orderLineTextDragging]}>
-            {item.text}
-          </Text>
-        </Pressable>
-      ))}
+      <View>
+        {items.map((item, idx) => {
+          const isDragging = draggingIdx === idx;
+          const isTarget =
+            hoverIdx === idx && draggingIdx !== null && draggingIdx !== idx;
+          return (
+            <Animated.View
+              key={item.id}
+              onLayout={
+                idx === 0
+                  ? (e) => { itemHeightRef.current = e.nativeEvent.layout.height + 8; }
+                  : undefined
+              }
+              style={[
+                { marginBottom: 8 },
+                {
+                  zIndex: isDragging ? 10 : 1,
+                  elevation: isDragging ? 8 : 0,
+                  transform: [
+                    { translateY: isDragging ? dragY : 0 },
+                    { scale: isDragging ? 1.03 : 1 },
+                  ],
+                },
+              ]}
+              {...(isRevealed ? {} : panHandlers[idx])}
+            >
+              <View
+                style={[
+                  styles.orderLine,
+                  isDragging && styles.orderLineDragging,
+                  isTarget && styles.orderLineTarget,
+                  isRevealed && item.id === idx && styles.orderLineCorrect,
+                  isRevealed && item.id !== idx && styles.orderLineWrong,
+                ]}
+              >
+                {!isRevealed && (
+                  <Text style={[styles.orderLineDragHandle, isDragging && { color: 'rgba(250,204,21,0.7)' }]}>
+                    ☰
+                  </Text>
+                )}
+                <Text style={styles.orderLineIndex}>{idx + 1}</Text>
+                <Text style={[styles.orderLineText, isDragging && styles.orderLineTextDragging]}>
+                  {item.text}
+                </Text>
+              </View>
+            </Animated.View>
+          );
+        })}
+      </View>
       {!isRevealed && (
         <Pressable style={[styles.checkButton, styles.checkButtonActive]} onPress={check}>
           <Text style={[styles.checkButtonText, styles.checkButtonTextActive]}>Проверить</Text>
@@ -206,10 +288,13 @@ interface ResultScreenProps {
   total: number;
   xp: number;
   newAchievements: string[];
+  hasNextLesson?: boolean;
+  nextLessonTitle?: string;
+  onNextLesson?: () => void;
   onComplete: () => void;
 }
 
-function ResultScreen({ score, total, xp, newAchievements, onComplete }: ResultScreenProps) {
+function ResultScreen({ score, total, xp, newAchievements, hasNextLesson, nextLessonTitle, onNextLesson, onComplete }: ResultScreenProps) {
   const percentage = Math.round((score / total) * 100);
   const stars = percentage === 100 ? 3 : percentage >= 60 ? 2 : 1;
   const scaleAnim = useRef(new Animated.Value(0.5)).current;
@@ -272,8 +357,17 @@ function ResultScreen({ score, total, xp, newAchievements, onComplete }: ResultS
         </View>
       </View>
 
-      <Pressable style={styles.resultButton} onPress={onComplete}>
-        <Text style={styles.resultButtonText}>Завершить</Text>
+      {hasNextLesson && onNextLesson && (
+        <Pressable style={[styles.resultButton, styles.resultButtonNext]} onPress={onNextLesson}>
+          <Text style={styles.resultButtonText}>
+            Следующий урок{nextLessonTitle ? `: ${nextLessonTitle}` : ''} →
+          </Text>
+        </Pressable>
+      )}
+      <Pressable style={[styles.resultButton, hasNextLesson && { backgroundColor: 'rgba(255,255,255,0.06)', marginTop: 8 }]} onPress={onComplete}>
+        <Text style={[styles.resultButtonText, hasNextLesson && { color: 'rgba(255,255,255,0.4)', fontSize: 13 }]}>
+          {hasNextLesson ? 'Закончить на сегодня' : 'Завершить'}
+        </Text>
       </Pressable>
     </View>
   );
@@ -283,10 +377,11 @@ function ResultScreen({ score, total, xp, newAchievements, onComplete }: ResultS
 
 export default function LessonScreen() {
   const router = useRouter();
-  const { topicId, isChallenge } = useLocalSearchParams<{ topicId: string; isChallenge?: string }>();
+  const { topicId, isChallenge, lessonIndex } = useLocalSearchParams<{ topicId: string; isChallenge?: string; lessonIndex?: string }>();
 
   const contentStore = useContentStore();
   const userStore = useUserStore();
+  const { playCorrect, playWrong } = useAnswerSounds();
 
   const [loading, setLoading] = useState(true);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -299,6 +394,13 @@ export default function LessonScreen() {
   const [startTime] = useState(Date.now());
   const [fadeKey, setFadeKey] = useState(0);
   const [newAchievements, setNewAchievements] = useState<string[]>([]);
+
+  // Refs to capture latest values inside effects without stale closures
+  const savedRef = useRef(false);
+  const scoreRef = useRef(score);
+  const xpEarnedRef = useRef(xpEarned);
+  scoreRef.current = score;
+  xpEarnedRef.current = xpEarned;
 
   // Load content on mount
   useEffect(() => {
@@ -315,19 +417,46 @@ export default function LessonScreen() {
 
   const lessons = contentStore.getLessonsForTopic(topicId || '');
 
-  // Find first incomplete lesson
+  // Set starting lesson index
   useEffect(() => {
     if (lessons.length === 0) return;
-    const userProgress = userStore.topicsProgress[topicId || ''];
-    if (!userProgress) {
-      setCurrentLessonIndex(0);
+    if (lessonIndex !== undefined) {
+      const idx = parseInt(lessonIndex, 10);
+      setCurrentLessonIndex(isNaN(idx) ? 0 : Math.min(idx, lessons.length - 1));
       return;
     }
-    const firstIncompleteIdx = lessons.findIndex(
-      (l) => !userProgress.completedLessons.includes(l.id)
-    );
+    const userProgress = userStore.topicsProgress[topicId || ''];
+    if (!userProgress) { setCurrentLessonIndex(0); return; }
+    const firstIncompleteIdx = lessons.findIndex((l) => !userProgress.completedLessons.includes(l.id));
     setCurrentLessonIndex(firstIncompleteIdx >= 0 ? firstIncompleteIdx : 0);
-  }, [lessons.length, topicId]);
+  }, [lessons.length, topicId, lessonIndex]);
+
+  // Save lesson result when finished — must be before any early return
+  useEffect(() => {
+    if (!finished || savedRef.current) return;
+    const lesson = lessons[currentLessonIndex];
+    if (!lesson) return;
+    savedRef.current = true;
+    const totalQ = lesson.questions.length;
+    const s = scoreRef.current;
+    const xp = xpEarnedRef.current;
+    const timeSec = Math.floor((Date.now() - startTime) / 1000);
+    try {
+      saveLessonResult({
+        lessonId: lesson.id,
+        topicId: topicId!,
+        completedAt: new Date().toISOString(),
+        stars: s === totalQ ? 3 : totalQ - s === 1 ? 2 : 1,
+        correctAnswers: s,
+        totalQuestions: totalQ,
+        timeSpentSec: timeSec,
+        xpEarned: xp,
+      });
+    } catch (e) { /* non-critical */ }
+    const unlocked = userStore.completeLesson(lesson.id, topicId!, s, totalQ, timeSec);
+    if (isChallenge === 'true') userStore.completeDailyChallenge();
+    if (unlocked.length > 0) setNewAchievements(unlocked);
+  }, [finished]);
 
   if (loading || !topicId) {
     return (
@@ -383,8 +512,10 @@ export default function LessonScreen() {
       setScore((s) => s + 1);
       setXpEarned((x) => x + XP_PER_QUESTION);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      playCorrect();
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      playWrong();
     }
     setTimeout(() => advance(), 1300);
   };
@@ -408,44 +539,22 @@ export default function LessonScreen() {
     setTimeout(() => advance(), 400);
   };
 
+  const hasNextLesson = currentLessonIndex + 1 < lessons.length;
+
+  const handleNextLesson = () => {
+    savedRef.current = false;
+    setCurrentLessonIndex((i) => i + 1);
+    setCurrentQuestionIndex(0);
+    setSelected(null);
+    setRevealed(false);
+    setScore(0);
+    setXpEarned(0);
+    setFinished(false);
+    setFadeKey((k) => k + 1);
+    setNewAchievements([]);
+  };
+
   const handleResultComplete = () => {
-    const timeSec = Math.floor((Date.now() - startTime) / 1000);
-
-    // Save to SQLite
-    try {
-      saveLessonResult({
-        lessonId: currentLesson.id,
-        topicId: topicId!,
-        completedAt: new Date().toISOString(),
-        stars: score === totalQuestions ? 3 : totalQuestions - score === 1 ? 2 : 1,
-        correctAnswers: score,
-        totalQuestions,
-        timeSpentSec: timeSec,
-        xpEarned,
-      });
-    } catch (e) {
-      // SQLite save failed — non-critical, proceed
-    }
-
-    // Save to Zustand + check achievements
-    const unlocked = userStore.completeLesson(
-      currentLesson.id,
-      topicId!,
-      score,
-      totalQuestions,
-      timeSec
-    );
-
-    // If daily challenge, award bonus XP
-    if (isChallenge === 'true') {
-      userStore.completeDailyChallenge();
-    }
-
-    if (unlocked.length > 0) {
-      setNewAchievements(unlocked);
-      return; // stay on result screen briefly to show toasts
-    }
-
     router.back();
   };
 
@@ -468,6 +577,9 @@ export default function LessonScreen() {
             total={totalQuestions}
             xp={xpEarned}
             newAchievements={newAchievements}
+            hasNextLesson={hasNextLesson}
+            nextLessonTitle={hasNextLesson ? lessons[currentLessonIndex + 1]?.title : undefined}
+            onNextLesson={handleNextLesson}
             onComplete={handleResultComplete}
           />
         </ScrollView>
@@ -506,6 +618,8 @@ export default function LessonScreen() {
           key={`order-${currentQuestionIndex}`}
           question={currentQuestion}
           onComplete={handleOrderComplete}
+          onCorrect={playCorrect}
+          onWrong={playWrong}
         />
       );
     }
@@ -747,13 +861,17 @@ const styles = StyleSheet.create({
   optionButtonSelected: { backgroundColor: 'rgba(250,204,21,0.1)', borderColor: 'rgba(250,204,21,0.6)', borderWidth: 1.5 },
   optionButtonCorrect: { backgroundColor: 'rgba(52,211,153,0.12)', borderColor: 'rgba(52,211,153,0.6)', borderWidth: 1.5 },
   optionButtonWrong: { backgroundColor: 'rgba(248,113,113,0.1)', borderColor: 'rgba(248,113,113,0.5)', borderWidth: 1.5 },
-  optionLabel: {
-    width: 28, height: 28, borderRadius: 8, justifyContent: 'center', alignItems: 'center',
-    fontWeight: '700', fontSize: 12, backgroundColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)',
+  optionLabelBox: {
+    width: 30, height: 30, borderRadius: 9, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  optionLabelSelected: { backgroundColor: 'rgba(250,204,21,0.2)', color: '#FACC15' },
-  optionLabelCorrect: { backgroundColor: 'rgba(52,211,153,0.2)', color: '#34D399' },
-  optionLabelWrong: { backgroundColor: 'rgba(248,113,113,0.15)', color: '#F87171' },
+  optionLabelText: {
+    fontWeight: '800', fontSize: 12, color: 'rgba(255,255,255,0.45)', textAlign: 'center',
+    includeFontPadding: false, textAlignVertical: 'center',
+  },
+  optionLabelSelected: { backgroundColor: 'rgba(250,204,21,0.2)' },
+  optionLabelCorrect: { backgroundColor: 'rgba(52,211,153,0.2)' },
+  optionLabelWrong: { backgroundColor: 'rgba(248,113,113,0.15)' },
   optionText: { fontFamily: 'monospace', fontSize: 14, color: 'rgba(255,255,255,0.9)', flex: 1 },
   optionTextSelected: { color: '#FACC15' },
   optionTextCorrect: { color: '#34D399' },
@@ -776,6 +894,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)',
   },
   orderLineDragging: { backgroundColor: 'rgba(250,204,21,0.1)', borderColor: 'rgba(250,204,21,0.5)' },
+  orderLineTarget: { borderColor: 'rgba(250,204,21,0.4)', borderStyle: 'dashed' },
+  orderLineDragHandle: { color: 'rgba(255,255,255,0.2)', fontSize: 14, marginRight: 2 },
   orderLineCorrect: { backgroundColor: 'rgba(52,211,153,0.1)', borderColor: 'rgba(52,211,153,0.5)' },
   orderLineWrong: { backgroundColor: 'rgba(248,113,113,0.08)', borderColor: 'rgba(248,113,113,0.4)' },
   orderLineIndex: {
@@ -813,6 +933,9 @@ const styles = StyleSheet.create({
   resultButton: {
     paddingHorizontal: 40, paddingVertical: 14, borderRadius: 14,
     backgroundColor: '#FACC15', justifyContent: 'center', alignItems: 'center',
+  },
+  resultButtonNext: {
+    backgroundColor: '#34D399',
   },
   resultButtonText: { fontSize: 16, fontWeight: '700', color: '#0A0A0A' },
   backButton: { marginRight: 12 },

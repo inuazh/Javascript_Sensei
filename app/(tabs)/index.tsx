@@ -43,15 +43,19 @@ interface Section {
   nodes: SkillNode[];
 }
 
-const DAILY_CHALLENGES: DayActivity[] = [
-  { label: 'Пн', done: true, today: false },
-  { label: 'Вт', done: true, today: false },
-  { label: 'Ср', done: true, today: false },
-  { label: 'Чт', done: false, today: true },
-  { label: 'Пт', done: false, today: false },
-  { label: 'Сб', done: false, today: false },
-  { label: 'Вс', done: false, today: false },
-];
+const WEEK_LABELS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+const WEEK_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+
+function buildWeekActivity(weekActivity: Partial<Record<string, boolean>>): DayActivity[] {
+  const todayDow = new Date().getDay(); // 0=Sun, 1=Mon … 6=Sat
+  // Show Mon–Sun (starting Monday): reorder so Mon is index 0
+  const ordered = [1, 2, 3, 4, 5, 6, 0]; // Mon..Sun day-of-week indices
+  return ordered.map((dow) => ({
+    label: WEEK_LABELS[dow],
+    done: weekActivity[WEEK_KEYS[dow]] === true,
+    today: dow === todayDow,
+  }));
+}
 
 // ───── Stars Component ─────
 function Stars({ count, max, size = 14 }: { count: number; max: number; size?: number }) {
@@ -174,13 +178,16 @@ function LessonModal({
   node: SkillNode | null;
   color: string;
   onClose: () => void;
-  onStartLesson: () => void;
+  onStartLesson: (lessonIndex?: number) => void;
 }) {
   if (!node) return null;
 
+  const contentStore = useContentStore();
+  const userStore = useUserStore();
+  const lessons = contentStore.getLessonsForTopic(node.id);
+  const completedLessonIds = userStore.topicsProgress[node.id]?.completedLessons || [];
   const isDone = node.status === 'done';
-  const lessonCount = 5;
-  const completedLessons = Math.min(node.stars >= 2 ? 5 : node.stars >= 1 ? 3 : 0, lessonCount);
+  const lessonCount = lessons.length > 0 ? lessons.length : 5;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -218,12 +225,15 @@ function LessonModal({
 
           {/* Lesson List */}
           <View style={styles.lessonList}>
-            {Array.from({ length: lessonCount }, (_, i) => {
-              const lessonNum = i + 1;
-              const completed = lessonNum <= completedLessons;
+            {(lessons.length > 0
+              ? lessons
+              : Array.from({ length: lessonCount }, (_, i) => ({ id: `${node.id}-${i}`, title: `Урок ${i + 1}`, order: i }))
+            ).map((lesson, i) => {
+              const completed = completedLessonIds.includes(lesson.id);
               return (
-                <View
-                  key={lessonNum}
+                <Pressable
+                  key={lesson.id}
+                  onPress={() => onStartLesson(i)}
                   style={[
                     styles.lessonItem,
                     {
@@ -235,40 +245,27 @@ function LessonModal({
                   <View
                     style={[
                       styles.lessonNumber,
-                      {
-                        backgroundColor: completed ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)',
-                      },
+                      { backgroundColor: completed ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)' },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.lessonNumberText,
-                        {
-                          color: completed ? '#34D399' : 'rgba(255,255,255,0.25)',
-                        },
-                      ]}
-                    >
-                      {completed ? '✓' : lessonNum}
+                    <Text style={[styles.lessonNumberText, { color: completed ? '#34D399' : 'rgba(255,255,255,0.25)' }]}>
+                      {completed ? '✓' : i + 1}
                     </Text>
                   </View>
-                  <Text
-                    style={[
-                      styles.lessonLabel,
-                      {
-                        color: completed ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.4)',
-                      },
-                    ]}
-                  >
-                    Урок {lessonNum}
+                  <Text style={[styles.lessonLabel, { color: completed ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.5)', flex: 1 }]}>
+                    {lesson.title}
                   </Text>
-                </View>
+                  {!completed && (
+                    <Text style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12 }}>▶</Text>
+                  )}
+                </Pressable>
               );
             })}
           </View>
 
           {/* Action Button */}
           <Pressable
-            onPress={onStartLesson}
+            onPress={() => onStartLesson()}
             style={[
               styles.actionButton,
               {
@@ -302,51 +299,45 @@ export default function HomeScreen() {
 
   const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
   const [selectedColor, setSelectedColor] = useState('#fff');
-  const [sections, setSections] = useState<Section[]>([]);
+  const [contentReady, setContentReady] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Load content on mount
+  // Load content once on mount
   useEffect(() => {
     const initContent = async () => {
       await contentStore.loadSections();
       await contentStore.loadLessonsForSection('basics');
       await contentStore.loadLessonsForSection('control');
       await contentStore.loadLessonsForSection('collections');
-
-      // Build sections with nodes
-      const sectionDefs = contentStore.sections;
-      const builtSections: Section[] = sectionDefs.map((sectionDef) => {
-        const sectionColor = SectionColors[sectionDef.id] || '#FFFFFF';
-        const topicsForSection = sectionDef.topics || [];
-
-        const nodes: SkillNode[] = topicsForSection.map((topic) => {
-          const progress = userStore.topicsProgress[topic.id];
-          return {
-            id: topic.id,
-            title: topic.title,
-            subtitle: topic.subtitle,
-            stars: progress?.bestStars || 0,
-            maxStars: 3,
-            xp: progress?.earnedXp || 0,
-            status: progress?.status || 'locked',
-            sectionId: sectionDef.id,
-          };
-        });
-
-        return {
-          sectionId: sectionDef.id,
-          name: sectionDef.title,
-          icon: sectionDef.icon,
-          color: sectionColor,
-          nodes,
-        };
-      });
-
-      setSections(builtSections);
+      setContentReady(true);
     };
-
     initContent();
   }, []);
+
+  // Re-derive sections whenever content or progress changes
+  const sections = React.useMemo(() => {
+    if (!contentReady) return [];
+    return contentStore.sections.map((sectionDef) => {
+      const sectionColor = SectionColors[sectionDef.id] || '#FFFFFF';
+      const nodes: SkillNode[] = (sectionDef.topics || []).map((topic) => {
+        const progress = userStore.topicsProgress[topic.id];
+        const completedCount = progress?.completedLessons.length || 0;
+        const totalLessonsForTopic = contentStore.getLessonsForTopic(topic.id).length || 5;
+        const isDone = completedCount >= totalLessonsForTopic;
+        return {
+          id: topic.id,
+          title: topic.title,
+          subtitle: topic.subtitle,
+          stars: progress?.bestStars || 0,
+          maxStars: 3,
+          xp: progress?.earnedXp || 0,
+          status: isDone ? 'done' : ('current' as 'done' | 'current' | 'locked'),
+          sectionId: sectionDef.id,
+        };
+      });
+      return { sectionId: sectionDef.id, name: sectionDef.title, icon: sectionDef.icon, color: sectionColor, nodes };
+    });
+  }, [contentReady, contentStore.sections, userStore.topicsProgress]);
 
   // Compute stats
   const totalXp = Object.values(userStore.topicsProgress).reduce((sum, tp) => sum + tp.earnedXp, 0);
@@ -355,7 +346,8 @@ export default function HomeScreen() {
     (sum, s) => sum + s.nodes.reduce((nodeSum, n) => nodeSum + n.maxStars, 0),
     0
   );
-  const streakCount = userStore.userProgress.currentStreak || 3; // Default to 3 for demo
+  const streakCount = userStore.userProgress.currentStreak;
+  const weekDays = buildWeekActivity(userStore.weekActivity as unknown as Partial<Record<string, boolean>>);
 
   const handleSelectNode = (node: SkillNode, color: string) => {
     setSelectedNode(node);
@@ -363,10 +355,10 @@ export default function HomeScreen() {
     setIsModalVisible(true);
   };
 
-  const handleStartLesson = () => {
+  const handleStartLesson = (lessonIndex?: number) => {
     if (selectedNode) {
-      // Navigate to lesson screen
-      router.push(`/lesson/${selectedNode.id}`);
+      const params = lessonIndex !== undefined ? `?lessonIndex=${lessonIndex}` : '';
+      router.push(`/lesson/${selectedNode.id}${params}`);
       setIsModalVisible(false);
     }
   };
@@ -409,7 +401,7 @@ export default function HomeScreen() {
           <View style={styles.weeklyBox}>
             <Text style={styles.weeklyLabel}>НЕДЕЛЬНЫЙ ПРОГРЕСС</Text>
             <View style={styles.weeklyDays}>
-              {DAILY_CHALLENGES.map((day, i) => (
+              {weekDays.map((day, i) => (
                 <View key={i} style={styles.dayContainer}>
                   <View
                     style={[

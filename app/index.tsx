@@ -1,15 +1,27 @@
-import { View, Text } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { Redirect } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useUserStore } from '../src/stores/useUserStore';
 
 export default function Index() {
+  const [hydrated, setHydrated] = useState(false);
   const isOnboarded = useUserStore(s => s.isOnboarded);
 
-  // Debug: показываем что-то пока решается редирект
-  return (
-    <View style={{ flex: 1, backgroundColor: '#0A0A0A', alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: '#fff', fontSize: 18 }}>JS Sensei loading...</Text>
-      <Redirect href={isOnboarded ? '/(tabs)' : '/onboarding'} />
-    </View>
-  );
+  useEffect(() => {
+    // Wait for Zustand to rehydrate from AsyncStorage before redirecting
+    const unsub = useUserStore.persist.onFinishHydration(() => setHydrated(true));
+    // If already hydrated (fast path), resolve immediately
+    if (useUserStore.persist.hasHydrated()) setHydrated(true);
+    return unsub;
+  }, []);
+
+  if (!hydrated) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0A0A0A', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color="#FACC15" />
+      </View>
+    );
+  }
+
+  return <Redirect href={isOnboarded ? '/(tabs)' : '/onboarding'} />;
 }
