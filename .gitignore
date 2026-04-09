@@ -44,7 +44,7 @@ coverage
 # Misc
 *.log
 .cache
-
+.claude/
 
 SETUP.md
 design/

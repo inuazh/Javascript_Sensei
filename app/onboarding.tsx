@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 import { useUserStore } from '../src/stores/useUserStore';
 import { Colors, Spacing, Radius } from '../src/constants/theme';
 
@@ -39,20 +40,20 @@ const GOAL_OPTIONS: GoalOption[] = [
 
 export default function OnboardingScreen() {
   const [step, setStep] = useState<OnboardingStep>(0);
-  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState<string>('beginner');
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
   const { setOnboarded } = useUserStore();
 
-  const handleFinish = () => {
-    const goal = GOAL_OPTIONS.find((g) => g.id === selectedGoal);
-    if (goal) {
-      setOnboarded(goal.minutes);
-      router.replace('/(tabs)');
+  const handleFinish = async (requestNotifications: boolean) => {
+    if (requestNotifications) {
+      await Notifications.requestPermissionsAsync();
     }
+    const goal = GOAL_OPTIONS.find((g) => g.id === selectedGoal);
+    setOnboarded(goal?.minutes ?? 5, selectedLevel);
+    router.replace('/(tabs)');
   };
 
   const canProceed = () => {
-    if (step === 1) return selectedLevel !== null;
     if (step === 2) return selectedGoal !== null;
     return true;
   };
@@ -68,10 +69,7 @@ export default function OnboardingScreen() {
             </View>
             <Text style={styles.title}>JS Sensei</Text>
             <Text style={styles.subtitle}>Учи JavaScript за 5 минут в день</Text>
-            <Pressable
-              style={styles.button}
-              onPress={() => setStep(1)}
-            >
+            <Pressable style={styles.button} onPress={() => setStep(1)}>
               <Text style={styles.buttonText}>Начать →</Text>
             </Pressable>
           </View>
@@ -91,20 +89,10 @@ export default function OnboardingScreen() {
                   ]}
                   onPress={() => setSelectedLevel(option.id)}
                 >
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      selectedLevel === option.id && styles.optionTextSelected,
-                    ]}
-                  >
+                  <Text style={[styles.optionTitle, selectedLevel === option.id && styles.optionTextSelected]}>
                     {option.title}
                   </Text>
-                  <Text
-                    style={[
-                      styles.optionSubtitle,
-                      selectedLevel === option.id && styles.optionTextSelected,
-                    ]}
-                  >
+                  <Text style={[styles.optionSubtitle, selectedLevel === option.id && styles.optionTextSelected]}>
                     {option.subtitle}
                   </Text>
                 </Pressable>
@@ -114,11 +102,7 @@ export default function OnboardingScreen() {
               <Pressable onPress={() => setStep(0)}>
                 <Text style={styles.backButton}>← Назад</Text>
               </Pressable>
-              <Pressable
-                style={[styles.button, !canProceed() && styles.buttonDisabled]}
-                onPress={() => setStep(2)}
-                disabled={!canProceed()}
-              >
+              <Pressable style={styles.button} onPress={() => setStep(2)}>
                 <Text style={styles.buttonText}>Далее →</Text>
               </Pressable>
             </View>
@@ -139,20 +123,10 @@ export default function OnboardingScreen() {
                   ]}
                   onPress={() => setSelectedGoal(option.id)}
                 >
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      selectedGoal === option.id && styles.optionTextSelected,
-                    ]}
-                  >
+                  <Text style={[styles.optionTitle, selectedGoal === option.id && styles.optionTextSelected]}>
                     {option.title}
                   </Text>
-                  <Text
-                    style={[
-                      styles.optionSubtitle,
-                      selectedGoal === option.id && styles.optionTextSelected,
-                    ]}
-                  >
+                  <Text style={[styles.optionSubtitle, selectedGoal === option.id && styles.optionTextSelected]}>
                     {option.subtitle}
                   </Text>
                 </Pressable>
@@ -176,20 +150,17 @@ export default function OnboardingScreen() {
         {/* Step 3: Notifications */}
         {step === 3 && (
           <View style={styles.stepContainer}>
+            <View style={styles.welcomeIcon}>
+              <Text style={styles.icon}>🔔</Text>
+            </View>
             <Text style={styles.stepTitle}>Не пропускай занятия</Text>
             <Text style={styles.stepSubtitle}>
-              Включи уведомления и мы напомним тебе учиться каждый день
+              Включи уведомления — мы напомним тебе учиться каждый день и поможем сохранить стрик
             </Text>
-            <Pressable
-              style={styles.button}
-              onPress={handleFinish}
-            >
+            <Pressable style={styles.button} onPress={() => handleFinish(true)}>
               <Text style={styles.buttonText}>Включить уведомления</Text>
             </Pressable>
-            <Pressable
-              style={styles.skipButton}
-              onPress={handleFinish}
-            >
+            <Pressable style={styles.skipButton} onPress={() => handleFinish(false)}>
               <Text style={styles.skipButtonText}>Пропустить</Text>
             </Pressable>
           </View>
@@ -199,13 +170,7 @@ export default function OnboardingScreen() {
       {/* Dots Indicator */}
       <View style={styles.dotsContainer}>
         {[0, 1, 2, 3].map((i) => (
-          <View
-            key={i}
-            style={[
-              styles.dot,
-              step === i && styles.dotActive,
-            ]}
-          />
+          <View key={i} style={[styles.dot, step === i && styles.dotActive]} />
         ))}
       </View>
     </SafeAreaView>
@@ -261,6 +226,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.xxl,
     textAlign: 'center',
+    lineHeight: 22,
   },
   optionsContainer: {
     width: '100%',
