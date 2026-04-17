@@ -7,6 +7,7 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { getLevelForXp, ACHIEVEMENTS } from '../../src/constants/gamification';
 import { getActivityHeatmap } from '../../src/db/database';
@@ -134,6 +135,7 @@ function AchievementCard({
 }
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('activity');
   const [heatmapGrid, setHeatmapGrid] = useState<number[][]>([]);
   const userStore = useUserStore();
@@ -338,6 +340,15 @@ export default function ProfileScreen() {
             </View>
           )}
         </View>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerVersion}>JS Sensei v1.0.0</Text>
+          <Pressable onPress={() => router.push('/privacy-policy')}>
+            <Text style={styles.footerLink}>Политика конфиденциальности</Text>
+          </Pressable>
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -437,4 +448,12 @@ const styles = StyleSheet.create({
   achievementBadge: { borderRadius: Radius.sm, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs },
   achievementBadgeText: { fontSize: 10, fontWeight: '700' },
   lockIcon: { fontSize: 16, marginTop: Spacing.xs },
+  footer: {
+    alignItems: 'center', paddingVertical: 24, gap: 8,
+  },
+  footerVersion: { fontSize: 12, color: 'rgba(255,255,255,0.2)' },
+  footerLink: {
+    fontSize: 13, color: 'rgba(255,255,255,0.35)',
+    textDecorationLine: 'underline',
+  },
 });

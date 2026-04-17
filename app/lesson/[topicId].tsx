@@ -16,6 +16,9 @@ import { useContentStore } from '../../src/stores/useContentStore';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { ACHIEVEMENTS } from '../../src/constants/gamification';
 import { saveLessonResult } from '../../src/db/database';
+import { uploadScore } from '../../src/utils/leaderboard';
+import { getDeviceId } from '../../src/utils/deviceId';
+import { getLevelForXp } from '../../src/constants/gamification';
 import type { Lesson, Question } from '../../src/stores/useContentStore';
 
 const XP_PER_QUESTION = 15;
@@ -456,6 +459,13 @@ export default function LessonScreen() {
     const unlocked = userStore.completeLesson(lesson.id, topicId!, s, totalQ, timeSec);
     if (isChallenge === 'true') userStore.completeDailyChallenge();
     if (unlocked.length > 0) setNewAchievements(unlocked);
+    // Upload score to global leaderboard in background (non-blocking)
+    getDeviceId().then(deviceId => {
+      const newXp = userStore.userProgress.totalXp;
+      const title = getLevelForXp(newXp).title;
+      const streak = userStore.userProgress.currentStreak;
+      uploadScore(deviceId, newXp, title, streak).catch(() => { /* non-critical */ });
+    }).catch(() => { /* non-critical */ });
   }, [finished]);
 
   if (loading || !topicId) {
