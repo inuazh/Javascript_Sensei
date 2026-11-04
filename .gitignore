@@ -28,6 +28,11 @@ ios/
 # Build artifacts
 build/
 dist/
+dist-e2e/
+
+# Playwright
+playwright-report/
+test-results/
 
 # Environment variables
 .env
