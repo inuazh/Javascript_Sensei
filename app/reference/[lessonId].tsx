@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { getLessonRef } from '../../src/content/repository';
+import { plural } from '../../src/domain/reminders';
 import { TheoryBlocks } from '../../src/features/lesson/TheoryBlocks';
 import { getTheoryIndex } from '../../src/features/reference/theoryIndex';
 import { BackButton, Button, Colors, Label, Screen, Spacing, Type } from '../../src/ui';
@@ -38,7 +39,7 @@ export default function ReferenceLessonScreen() {
             title="пройти урок"
             icon="arrow-right"
             onPress={() => router.push(`/lesson/${lesson.id}`)}
-            accessibilityHint={`теория и ${lesson.questions.length} заданий`}
+            accessibilityHint={`теория и ${lesson.questions.length} ${plural(lesson.questions.length, 'задание', 'задания', 'заданий')}`}
           />
         </View>
       }

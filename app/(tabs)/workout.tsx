@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { getContentLookup, getQuestion, questionExists } from '../../src/content/repository';
 import { plural } from '../../src/domain/reminders';
-import { BOX_INTERVALS, dueItems, weakItems } from '../../src/domain/review';
+import { BOX_INTERVALS, MAX_BOX, dueItems, weakItems } from '../../src/domain/review';
 import { XP } from '../../src/domain/rewards';
 import { placeOf } from '../../src/domain/stats';
 import { questionPreview } from '../../src/features/quiz/registry';
@@ -48,8 +48,8 @@ export default function WorkoutTab() {
     <Screen>
       <Text style={Type.h1}>тренировка</Text>
       <Text style={Type.small}>
-        вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
-        ошибки идут в первую очередь
+        вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')}{' '}
+        {plural(BOX_INTERVALS[MAX_BOX], 'день', 'дня', 'дней')}. ошибки идут в первую очередь
       </Text>
 
       <Card style={styles.hero}>
