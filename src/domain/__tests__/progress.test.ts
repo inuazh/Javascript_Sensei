@@ -1,4 +1,5 @@
 import {
+  completeDaily,
   completeLesson,
   completeWorkout,
   initialProgress,
@@ -222,5 +223,91 @@ describe('free practice', () => {
     );
     expect(outcome.xpEarned).toBe(0);
     expect(outcome.firstWorkoutToday).toBe(false);
+  });
+});
+
+describe('completeDaily', () => {
+  const daily = (correct: boolean, day = '2026-11-04') => ({
+    day,
+    questionId: 'c1-q3',
+    lessonId: 'c1',
+    correct,
+  });
+
+  it('pays XP, counts for the streak and records the day', () => {
+    const { state, outcome } = completeDaily(
+      initialProgress,
+      daily(true),
+      ctx('2026-11-04T09:00:00'),
+    );
+    expect(state.daily).toEqual({ '2026-11-04': { questionId: 'c1-q3', correct: true } });
+    expect(outcome).toMatchObject({
+      correct: true,
+      xpEarned: XP.dailyChallenge,
+      streakDays: 1,
+      streakExtended: true,
+      dailyStreak: 1,
+      alreadyDone: false,
+    });
+    expect(state.totalXp).toBe(XP.dailyChallenge + outcome.achievementXp);
+    expect(state.activity['2026-11-04'].xp).toBe(state.totalXp);
+    // A solved challenge from an unseen lesson does not flood the review queue.
+    expect(state.review).toEqual({});
+  });
+
+  it('a wrong answer keeps the streak, pays nothing and goes to spaced repetition', () => {
+    const { state, outcome } = completeDaily(
+      initialProgress,
+      daily(false),
+      ctx('2026-11-04T09:00:00'),
+    );
+    expect(outcome).toMatchObject({ correct: false, xpEarned: 0, streakDays: 1, dailyStreak: 0 });
+    expect(state.totalXp).toBe(outcome.achievementXp);
+    expect(state.streak.lastActiveDay).toBe('2026-11-04');
+    expect(state.review['c1-q3']).toMatchObject({ box: 0, due: '2026-11-04', lapses: 1 });
+  });
+
+  it('allows one attempt per day', () => {
+    const first = completeDaily(initialProgress, daily(false), ctx('2026-11-04T09:00:00')).state;
+    const { state, outcome } = completeDaily(first, daily(true), ctx('2026-11-04T10:00:00'));
+    expect(state).toBe(first);
+    expect(outcome).toMatchObject({ alreadyDone: true, correct: false, xpEarned: 0 });
+  });
+
+  it('counts solved days in a row alongside lessons', () => {
+    let state = completeLesson(
+      initialProgress,
+      { lessonId: 'b1', answers: answers('b1', perfect) },
+      ctx('2026-11-03T12:00:00'),
+    ).state;
+    state = completeDaily(state, daily(true, '2026-11-03'), ctx('2026-11-03T13:00:00')).state;
+    const { state: next, outcome } = completeDaily(
+      state,
+      daily(true, '2026-11-04'),
+      ctx('2026-11-04T08:00:00'),
+    );
+    expect(outcome.dailyStreak).toBe(2);
+    expect(outcome.streakDays).toBe(2);
+    expect(next.lessons.b1.stars).toBe(3);
+  });
+
+  it('files an answer given after midnight under the day it was shown', () => {
+    const { state } = completeDaily(
+      initialProgress,
+      daily(true, '2026-11-03'),
+      ctx('2026-11-04T00:01:00'),
+    );
+    expect(Object.keys(state.daily)).toEqual(['2026-11-03']);
+    expect(state.activity['2026-11-04'].xp).toBeGreaterThanOrEqual(XP.dailyChallenge);
+  });
+
+  it('works on progress saved before the field existed', () => {
+    const { daily: _omit, ...old } = initialProgress;
+    const { state } = completeDaily(
+      old as typeof initialProgress,
+      daily(true),
+      ctx('2026-11-04T09:00:00'),
+    );
+    expect(state.daily['2026-11-04'].correct).toBe(true);
   });
 });

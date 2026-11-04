@@ -75,6 +75,52 @@ describe('useUserStore persistence', () => {
     expect(saved.state).not.toHaveProperty('completeLesson');
   });
 
+  it('loads version 1 progress saved before «Задача дня» existed', async () => {
+    const { AsyncStorage } = load();
+    await AsyncStorage.clear();
+    await AsyncStorage.setItem(
+      'js-sensei-user',
+      JSON.stringify({
+        version: 1,
+        state: {
+          settings: { onboarded: true, dailyGoalXp: 100 },
+          progress: {
+            lessons: {},
+            totalXp: 120,
+            activity: {},
+            streak: { current: 3, longest: 5, lastActiveDay: '2026-11-03', freezes: 1 },
+            achievements: {},
+            review: {},
+            workoutsCompleted: 2,
+            mistakesFixed: 0,
+            lastWorkoutDay: '2026-11-03',
+          },
+        },
+      }),
+    );
+    const { useUserStore, waitForHydration } = require('../useUserStore');
+    await waitForHydration();
+    const { progress } = useUserStore.getState();
+    expect(progress.daily).toEqual({});
+    expect(progress.totalXp).toBe(120);
+    expect(progress.streak.current).toBe(3);
+
+    const outcome = useUserStore.getState().completeDaily({
+      day: '2026-11-04',
+      questionId: 'variables-01-q1',
+      lessonId: 'variables-01',
+      correct: true,
+    });
+    expect(outcome.correct).toBe(true);
+    await new Promise(r => setTimeout(r, 0));
+    const saved = JSON.parse((await AsyncStorage.getItem('js-sensei-user')) ?? '{}');
+    expect(saved.version).toBe(1);
+    expect(saved.state.progress.daily['2026-11-04']).toEqual({
+      questionId: 'variables-01-q1',
+      correct: true,
+    });
+  });
+
   it('does not hang when saved data is corrupt, and keeps a copy of it', async () => {
     const { AsyncStorage } = load();
     await AsyncStorage.clear();

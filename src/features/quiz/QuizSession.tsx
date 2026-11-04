@@ -15,6 +15,10 @@ interface QuizSessionProps {
   color?: string;
   onExit: () => void;
   onFinish: (answers: QuizAnswer[]) => void;
+  /** Called as soon as an answer is checked, before the explanation is read. */
+  onAnswer?: (answer: QuizAnswer) => void;
+  /** Ask before leaving a started session. Off when answers are saved as they come. */
+  confirmExitAfterAnswer?: boolean;
   /** Ends the session early, e.g. after too many mistakes in a placement test. */
   shouldStop?: (answers: QuizAnswer[]) => boolean;
 }
@@ -25,6 +29,8 @@ export function QuizSession({
   color = Colors.accent,
   onExit,
   onFinish,
+  onAnswer,
+  confirmExitAfterAnswer = true,
   shouldStop,
 }: QuizSessionProps) {
   const feedback = useFeedback();
@@ -63,6 +69,7 @@ export function QuizSession({
     if (correct) feedback.success();
     else feedback.error();
     dispatch({ type: 'CHECK', correct, item });
+    onAnswer?.({ questionId: question.id, lessonId: item.lessonId, correct });
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
   };
 
@@ -79,7 +86,7 @@ export function QuizSession({
   };
 
   const confirmExit = () => {
-    if (state.answers.length === 0) return onExit();
+    if (state.answers.length === 0 || !confirmExitAfterAnswer) return onExit();
     Alert.alert('Прервать?', 'Прогресс этой сессии не сохранится.', [
       { text: 'Остаться', style: 'cancel' },
       { text: 'Выйти', style: 'destructive', onPress: onExit },
