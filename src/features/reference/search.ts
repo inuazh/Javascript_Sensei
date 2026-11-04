@@ -158,9 +158,13 @@ export function makeSnippet(f: SearchField, start: number, length: number): Snip
   };
 }
 
-/** The query as it is matched: normalized, without markup, single spaces. */
+/**
+ * The query as it is matched: normalized, single spaces, without markup.
+ * A lone `**` stays, because it is also the exponent operator in code.
+ */
 export function normalizeQuery(query: string): string {
-  return normalize(plainText(query));
+  const unmarked = query.replace(/\*\*(\S(?:.*?\S)?)\*\*/g, '$1').replace(/`/g, '');
+  return normalize(unmarked.replace(/\s+/g, ' ').trim());
 }
 
 interface Found {

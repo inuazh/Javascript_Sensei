@@ -222,7 +222,7 @@ export default function HomeScreen() {
       {next ? (
         <Card style={styles.continueCard}>
           <Label dot>
-            {Object.keys(progress.lessons).length === 0 ? 'начни отсюда' : 'продолжить'}
+            {Object.values(progress.lessons).every(l => l.skipped) ? 'начни отсюда' : 'продолжить'}
           </Label>
           <Text style={styles.continueMeta}>
             {pad2(sections.findIndex(s => s.id === next.section.id) + 1)} · {next.section.title}

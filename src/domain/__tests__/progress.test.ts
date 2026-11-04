@@ -179,6 +179,36 @@ describe('completeWorkout', () => {
   });
 });
 
+describe('completeWorkout XP cap', () => {
+  it('pays review XP for at most paidReviewsPerDay answers a day', () => {
+    const ids = Array.from({ length: XP.paidReviewsPerDay + 5 }, (_, i) => `q${i}`);
+    const review = Object.fromEntries(
+      ids.map(id => [id, { questionId: id, lessonId: 'b1', box: 0, due: '2026-11-04', lapses: 1 }]),
+    );
+    const state = { ...initialProgress, review };
+    const all = ids.map(id => ({ questionId: id, lessonId: 'b1', correct: true }));
+    const first = completeWorkout(
+      state,
+      { answers: all.slice(0, 15), dueIds: ids.slice(0, 15) },
+      ctx('2026-11-04T10:00:00'),
+    );
+    expect(first.outcome.xpEarned).toBe(15 * XP.perCorrectReview + XP.dailyWorkoutBonus);
+    const second = completeWorkout(
+      first.state,
+      { answers: all.slice(15), dueIds: ids.slice(15) },
+      ctx('2026-11-04T11:00:00'),
+    );
+    // Only the remaining 5 paid answers of the day count.
+    expect(second.outcome.xpEarned).toBe((XP.paidReviewsPerDay - 15) * XP.perCorrectReview);
+    const nextDay = completeWorkout(
+      second.state,
+      { answers: all.slice(0, 3), dueIds: ids.slice(0, 3) },
+      ctx('2026-11-05T10:00:00'),
+    );
+    expect(nextDay.outcome.xpEarned).toBe(3 * XP.perCorrectReview + XP.dailyWorkoutBonus);
+  });
+});
+
 describe('skipLessons', () => {
   it('marks lessons as known without XP, and pays full XP when taken later', () => {
     const now = new Date('2026-11-04T12:00:00');

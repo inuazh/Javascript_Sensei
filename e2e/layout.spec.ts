@@ -133,15 +133,18 @@ test('lesson titles of a finished topic are not broken mid-word at 320px', async
   }
 });
 
-test('the reminder time in settings stays on one line', async ({ page }) => {
-  await seedVeteran(page);
+test('the reminder time in onboarding stays on one line', async ({ page }) => {
   for (const width of [320, 360]) {
     await page.setViewportSize({ width, height: 640 });
-    await page.goto('/settings');
+    await page.goto('/');
+    await page.getByRole('button', { name: 'начать', exact: true }).click();
+    await page.getByRole('button', { name: 'дальше' }).click();
+    await page.getByRole('button', { name: 'дальше' }).click();
     const time = page.getByLabel('время 19:00');
     await expect(time).toBeVisible();
     expect((await time.boundingBox())!.height, `at ${width}px`).toBeLessThan(70);
     const later = (await page.getByRole('button', { name: 'позже' }).boundingBox())!;
     expect(later.x + later.width).toBeLessThanOrEqual(width - 20);
+    await page.evaluate(() => localStorage.clear());
   }
 });

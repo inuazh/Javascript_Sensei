@@ -105,24 +105,31 @@ export default function SettingsScreen() {
         />
       ))}
 
-      <Label>напоминания</Label>
-      <Card style={styles.gap}>
-        <ToggleRow
-          label="напоминать заниматься"
-          value={settings.reminder.enabled}
-          onChange={enabled => setReminder({ enabled })}
-        />
-        {settings.reminder.enabled && (
-          <>
-            <TimePicker
-              hour={settings.reminder.hour}
-              minute={settings.reminder.minute}
-              onChange={t => setReminder(t)}
+      {/* Local notifications do not exist on the web. */}
+      {Platform.OS !== 'web' && (
+        <>
+          <Label>напоминания</Label>
+          <Card style={styles.gap}>
+            <ToggleRow
+              label="напоминать заниматься"
+              value={settings.reminder.enabled}
+              onChange={enabled => setReminder({ enabled })}
             />
-            <Text style={Type.small}>если ты уже позанимался сегодня, напоминание не придёт</Text>
-          </>
-        )}
-      </Card>
+            {settings.reminder.enabled && (
+              <>
+                <TimePicker
+                  hour={settings.reminder.hour}
+                  minute={settings.reminder.minute}
+                  onChange={t => setReminder(t)}
+                />
+                <Text style={Type.small}>
+                  если ты уже позанимался сегодня, напоминание не придёт
+                </Text>
+              </>
+            )}
+          </Card>
+        </>
+      )}
 
       <Label>звук и вибрация</Label>
       <Card style={styles.gap}>

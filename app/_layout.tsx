@@ -12,6 +12,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { CodeRunnerHost } from '../src/services/codeRunner';
 import { syncReminders } from '../src/services/notifications';
@@ -34,11 +35,19 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    waitForHydration().then(() => {
-      setHydrated(true);
+    const resync = () => {
       const { settings, progress } = useUserStore.getState();
       syncReminders(settings.reminder, progress);
+    };
+    waitForHydration().then(() => {
+      setHydrated(true);
+      resync();
     });
+    // Reminders are scheduled for absolute times: reschedule after a time zone change.
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active' && useUserStore.persist.hasHydrated()) resync();
+    });
+    return () => sub.remove();
   }, []);
 
   // A font that fails to load falls back to the system font rather than blocking the app.

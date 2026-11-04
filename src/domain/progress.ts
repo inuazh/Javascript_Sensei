@@ -310,8 +310,10 @@ export function completeWorkout(
   const fixed = correct.filter(a => (state.review[a.questionId]?.box ?? 1) === 0).length;
   // The daily bonus is for reviewing what was due, not for free practice.
   const firstWorkoutToday = state.lastWorkoutDay !== today && input.dueIds.length > 0;
+  const paidLeft = Math.max(0, XP.paidReviewsPerDay - (state.activity[today]?.reviews ?? 0));
   const xpEarned =
-    correctDue * XP.perCorrectReview + (firstWorkoutToday ? XP.dailyWorkoutBonus : 0);
+    Math.min(correctDue, paidLeft) * XP.perCorrectReview +
+    (firstWorkoutToday ? XP.dailyWorkoutBonus : 0);
 
   const updated = addActivity(
     {
