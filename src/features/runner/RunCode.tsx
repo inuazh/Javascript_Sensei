@@ -16,8 +16,12 @@ interface RunCodeProps {
 }
 
 /** «Запустить» button that runs `code` in the sandbox and shows its console output. */
+/** Most snippets finish in a few ms; show the spinner only for slower runs, so the button doesn't flicker. */
+const SPINNER_DELAY_MS = 300;
+
 export function RunCode({ code, earlier = [] }: RunCodeProps) {
   const [running, setRunning] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [result, setResult] = useState<RunResult | null>(null);
   const alive = useRef(true);
   useEffect(() => {
@@ -29,10 +33,13 @@ export function RunCode({ code, earlier = [] }: RunCodeProps) {
 
   const run = async () => {
     setRunning(true);
+    const timer = setTimeout(() => alive.current && setSlow(true), SPINNER_DELAY_MS);
     const next = await runInContext(runCode, code, earlier);
+    clearTimeout(timer);
     if (!alive.current) return;
     setResult(next);
     setRunning(false);
+    setSlow(false);
   };
 
   return (
@@ -45,12 +52,14 @@ export function RunCode({ code, earlier = [] }: RunCodeProps) {
         accessibilityState={{ busy: running, disabled: running }}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
       >
-        {running ? (
-          <ActivityIndicator size="small" color={Colors.textPrimary} />
-        ) : (
-          <Icon name="play" size={14} color={Colors.textPrimary} />
-        )}
-        <Text style={styles.buttonText}>{running ? 'Выполняется…' : 'Запустить'}</Text>
+        <View style={styles.icon}>
+          {slow ? (
+            <ActivityIndicator size="small" color={Colors.textPrimary} style={styles.spinner} />
+          ) : (
+            <Icon name="play" size={14} color={Colors.textPrimary} />
+          )}
+        </View>
+        <Text style={styles.buttonText}>Запустить</Text>
       </Pressable>
       {result ? <ConsoleOutput result={result} /> : null}
     </View>
@@ -103,6 +112,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderStrong,
   },
   pressed: { opacity: 0.7 },
+  icon: { width: 16, height: 16, alignItems: 'center', justifyContent: 'center' },
+  spinner: { transform: [{ scale: 0.7 }] },
   buttonText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: Colors.textPrimary },
   console: {
     alignSelf: 'stretch',
