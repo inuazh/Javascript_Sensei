@@ -1,17 +1,19 @@
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import {
   getDailyQuestion,
   getFirstUncompleted,
   getSectionLessons,
   getSections,
   getTopicLessons,
+  questionExists,
 } from '../../src/content/repository';
 import { dailyNumber, dailyStreak } from '../../src/domain/daily';
 import { todayActivity } from '../../src/domain/progress';
 import { plural } from '../../src/domain/reminders';
-import { dueItems } from '../../src/domain/review';
+import { countDue } from '../../src/domain/review';
 import { viewStreak } from '../../src/domain/streak';
 import { DailyShareButton } from '../../src/features/daily/DailyShare';
 import { questionTitle } from '../../src/features/quiz/registry';
@@ -32,9 +34,8 @@ import {
   Spacing,
   Stars,
   Type,
+  pad2,
 } from '../../src/ui';
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 function ActionRow({
   icon,
@@ -132,7 +133,17 @@ function DailyCard({ today }: { today: string }) {
 export default function HomeScreen() {
   const router = useRouter();
   const today = useToday();
-  const progress = useUserStore(s => s.progress);
+  // Primitive or stable slices only: a review answer or a daily result does not
+  // re-render the course map unless one of these changes.
+  const progress = useUserStore(
+    useShallow(s => ({
+      streak: s.progress.streak,
+      totalXp: s.progress.totalXp,
+      lessons: s.progress.lessons,
+      todayXp: todayActivity(s.progress, today).xp,
+      dueCount: countDue(s.progress.review, today, questionExists),
+    })),
+  );
   const dailyGoalXp = useUserStore(s => s.settings.dailyGoalXp);
   const showPlacement = useUserStore(
     s =>
@@ -142,9 +153,8 @@ export default function HomeScreen() {
   );
 
   const streak = viewStreak(progress.streak, today);
-  const todayXp = todayActivity(progress, today).xp;
+  const { todayXp, dueCount } = progress;
   const goal = Math.min(1, todayXp / dailyGoalXp);
-  const dueCount = dueItems(progress.review, today).length;
   const next = useMemo(() => getFirstUncompleted(id => id in progress.lessons), [progress.lessons]);
   const sections = getSections();
   const days = (n: number) => `${n} ${plural(n, 'день', 'дня', 'дней')}`;
@@ -211,7 +221,7 @@ export default function HomeScreen() {
             {Object.keys(progress.lessons).length === 0 ? 'начни отсюда' : 'продолжить'}
           </Label>
           <Text style={styles.continueMeta}>
-            {pad(sections.findIndex(s => s.id === next.section.id) + 1)} · {next.section.title}
+            {pad2(sections.findIndex(s => s.id === next.section.id) + 1)} · {next.section.title}
           </Text>
           <Text style={Type.h2}>{next.topic.title}</Text>
           <Text style={Type.small}>{next.lesson.title}</Text>
@@ -264,7 +274,7 @@ export default function HomeScreen() {
         return (
           <View key={section.id} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionNumber}>{pad(sIndex + 1)}</Text>
+              <Text style={styles.sectionNumber}>{pad2(sIndex + 1)}</Text>
               <Text style={[Type.h3, styles.flex]}>{section.title}</Text>
               <Text style={styles.count}>
                 {done}/{lessons.length}

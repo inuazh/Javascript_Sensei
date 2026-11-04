@@ -1,12 +1,86 @@
 /**
- * Migration of the persisted user state from the first app version
- * (persist key 'js-sensei-user', no version) to ProgressState + Settings.
+ * Versioned migrations of the persisted user state (persist key 'js-sensei-user').
+ *
+ * MIGRATIONS[n] turns a state saved by store version n into version n + 1.
+ * To change the persisted shape incompatibly: bump STORE_VERSION and add the
+ * step for the previous version. Fields that only get added with a default
+ * need no step: `sanitizePersistedState` (src/domain/persistence.ts) fills in
+ * missing fields after the migrations ran.
  */
 import { ACHIEVEMENTS_BY_ID } from './achievements';
 import { toDayKey } from './dates';
 import { initialProgress, type LessonProgress, type ProgressState } from './progress';
 import { lessonResultXp, starsFor, type Stars } from './rewards';
+import type { ExperienceLevel } from './settings';
 import { MAX_FREEZES } from './streak';
+
+export type { ExperienceLevel };
+
+/** Version of the persisted shape written by this build. */
+export const STORE_VERSION = 1;
+
+export type Migration = (state: unknown) => unknown;
+
+/** Keyed by the version the state was saved with; each step returns version + 1. */
+export const MIGRATIONS: Readonly<Record<number, Migration>> = {
+  /** v0: the first app version, before progress and settings were split. */
+  0: state => migrateLegacyState(cleanLegacyState(state)),
+};
+
+/**
+ * Runs every step from `fromVersion` up to STORE_VERSION. A state saved by a
+ * newer build (after a downgrade) is passed through for the sanitizer to read.
+ */
+export function migratePersistedState(state: unknown, fromVersion: number): unknown {
+  let migrated = state;
+  for (let v = Math.max(0, fromVersion); v < STORE_VERSION; v++) {
+    const step = MIGRATIONS[v];
+    if (!step) throw new Error(`No migration from store version ${v}`);
+    migrated = step(migrated);
+  }
+  return migrated;
+}
+
+const isObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** Drops the parts of a v0 state that would make the migration throw. */
+function cleanLegacyState(state: unknown): LegacyUserState {
+  if (!isObject(state)) return {};
+  const validTime = (t: unknown): t is string =>
+    typeof t === 'string' && !Number.isNaN(new Date(t).getTime());
+  const lessonResults = Array.isArray(state.lessonResults)
+    ? state.lessonResults.filter(
+        (r): r is NonNullable<LegacyUserState['lessonResults']>[number] =>
+          isObject(r) && typeof r.lessonId === 'string' && validTime(r.completedAt),
+      )
+    : undefined;
+  const topicsProgress: LegacyUserState['topicsProgress'] = {};
+  if (isObject(state.topicsProgress)) {
+    for (const [id, t] of Object.entries(state.topicsProgress)) {
+      if (!isObject(t)) continue;
+      topicsProgress[id] = {
+        completedLessons: Array.isArray(t.completedLessons)
+          ? t.completedLessons.filter((l): l is string => typeof l === 'string')
+          : [],
+        bestStars: typeof t.bestStars === 'number' ? t.bestStars : undefined,
+      };
+    }
+  }
+  const unlockedAchievements = Array.isArray(state.unlockedAchievements)
+    ? state.unlockedAchievements.filter(
+        (a): a is { id: string; unlockedAt: string } =>
+          isObject(a) && typeof a.id === 'string' && typeof a.unlockedAt === 'string',
+      )
+    : undefined;
+  return {
+    userProgress: isObject(state.userProgress) ? state.userProgress : undefined,
+    topicsProgress,
+    lessonResults,
+    isOnboarded: state.isOnboarded === true,
+    unlockedAchievements,
+  };
+}
 
 /** Shape of the v0 store, as far as the migration needs it. Everything is optional. */
 export interface LegacyUserState {
@@ -30,8 +104,6 @@ export interface LegacyUserState {
   isOnboarded?: boolean;
   unlockedAchievements?: { id: string; unlockedAt: string }[];
 }
-
-export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
 
 export interface MigratedSettings {
   onboarded: boolean;

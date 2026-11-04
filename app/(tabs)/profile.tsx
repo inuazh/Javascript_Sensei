@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import { ACHIEVEMENTS } from '../../src/domain/achievements';
 import { addDays, weekStart } from '../../src/domain/dates';
 import { getLevelInfo } from '../../src/domain/levels';
@@ -19,21 +20,14 @@ import {
   Radius,
   Screen,
   Spacing,
+  Stat,
+  StatRow,
   Type,
   alpha,
 } from '../../src/ui';
 
 const HEATMAP_WEEKS = 15;
 const DAY_LABELS = ['пн', '', 'ср', '', 'пт', '', 'вс'];
-
-function Stat({ value, label }: { value: number; label: string }) {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
 
 function intensity(xp: number): number {
   if (xp <= 0) return 0;
@@ -46,7 +40,18 @@ function intensity(xp: number): number {
 export default function ProfileScreen() {
   const router = useRouter();
   const today = useToday();
-  const progress = useUserStore(s => s.progress);
+  // Only the slices shown here: a finished daily or workout does not re-render the profile
+  // unless it changes one of them.
+  const progress = useUserStore(
+    useShallow(s => ({
+      totalXp: s.progress.totalXp,
+      streak: s.progress.streak,
+      lessons: s.progress.lessons,
+      activity: s.progress.activity,
+      achievements: s.progress.achievements,
+      review: s.progress.review,
+    })),
+  );
   const nickname = useUserStore(s => s.settings.nickname);
   const level = getLevelInfo(progress.totalXp);
   const streak = viewStreak(progress.streak, today);
@@ -106,12 +111,12 @@ export default function ProfileScreen() {
         <ProgressBar value={level.progress} style={styles.bar} />
       </Card>
 
-      <View style={styles.stats}>
+      <StatRow>
         <Stat value={streak.days} label="стрик" />
         <Stat value={progress.streak.longest} label="рекорд" />
         <Stat value={lessons.length} label="уроков" />
         <Stat value={lessons.filter(l => l.stars === 3).length} label="идеально" />
-      </View>
+      </StatRow>
 
       <Card>
         <Label style={styles.mb}>активность</Label>
@@ -204,18 +209,6 @@ const styles = StyleSheet.create({
   xpUnit: { fontSize: 14, color: Colors.textMuted },
   toNext: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   bar: { marginTop: Spacing.md },
-  stats: { flexDirection: 'row', gap: Spacing.sm },
-  stat: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Radius.xl,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  statValue: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 32, color: Colors.textPrimary },
-  statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mb: { marginBottom: Spacing.md },
   heatmap: { flexDirection: 'row', gap: 3 },
   dayLabels: { gap: 3, marginRight: 4 },

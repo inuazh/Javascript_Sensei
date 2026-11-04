@@ -1,8 +1,10 @@
 /**
  * «Задача дня»: one question per calendar day, the same for everyone.
  *
- * The question is picked by a hash of the local day key, so every device with
- * the same content shows the same challenge on the same date without a server.
+ * The question is picked by rendezvous hashing of the local day key and the
+ * question id, so every device with the same content shows the same challenge
+ * on the same date without a server, and adding content does not reshuffle
+ * the future days.
  * One attempt per day; results are kept in progress state by day key.
  */
 import { addDays, daysBetween, type DayKey } from './dates';
@@ -30,11 +32,11 @@ export function dailyNumber(day: DayKey): number {
   return daysBetween(DAILY_EPOCH, day) + 1;
 }
 
-/** 32-bit FNV-1a with a final avalanche, so neighbouring days land far apart. */
-export function hashDay(day: DayKey): number {
+/** 32-bit FNV-1a with a final avalanche, so neighbouring keys land far apart. */
+export function hashString(key: string): number {
   let h = 0x811c9dc5;
-  for (let i = 0; i < day.length; i++) {
-    h ^= day.charCodeAt(i);
+  for (let i = 0; i < key.length; i++) {
+    h ^= key.charCodeAt(i);
     h = Math.imul(h, 0x01000193);
   }
   h ^= h >>> 16;
@@ -47,14 +49,28 @@ export function hashDay(day: DayKey): number {
 
 /**
  * The question of the day. «Что выведет код?» questions are preferred: they
- * make the best puzzles. Candidates keep content order, so the pick is stable
- * as long as the content does not change.
+ * make the best puzzles.
+ *
+ * Rendezvous (highest random weight) hashing: every candidate gets the score
+ * hash(day + ':' + id) and the highest score wins. Unlike `hash(day) % length`,
+ * adding a question changes a day's pick only when the new question itself
+ * scores highest (about 1 day in pool size), removing a question only changes
+ * the days it had won, and the order of the content does not matter.
  */
 export function pickDailyQuestionId(candidates: DailyCandidate[], day: DayKey): string | null {
   const outputs = candidates.filter(c => c.type === 'output');
   const pool = outputs.length > 0 ? outputs : candidates;
-  if (pool.length === 0) return null;
-  return pool[hashDay(day) % pool.length].id;
+  let best: string | null = null;
+  let bestScore = -1;
+  for (const { id } of pool) {
+    const score = hashString(`${day}:${id}`);
+    // Ties (practically never) go to the smaller id, so candidate order never matters.
+    if (score > bestScore || (score === bestScore && best !== null && id < best)) {
+      best = id;
+      bestScore = score;
+    }
+  }
+  return best;
 }
 
 /**

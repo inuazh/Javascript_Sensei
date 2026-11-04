@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { questionExists } from '../content/repository';
 import { planReminders } from '../domain/reminders';
 import type { ProgressState } from '../domain/progress';
 import type { ReminderSettings } from '../stores/useUserStore';
@@ -51,7 +52,7 @@ async function scheduleReminders(
         importance: Notifications.AndroidImportance.DEFAULT,
       });
     }
-    for (const r of planReminders(progress, reminder, new Date())) {
+    for (const r of planReminders(progress, reminder, new Date(), questionExists)) {
       await Notifications.scheduleNotificationAsync({
         content: { title: r.title, body: r.body },
         trigger: {

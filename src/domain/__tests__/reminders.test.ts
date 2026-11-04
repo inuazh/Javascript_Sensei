@@ -25,6 +25,25 @@ describe('planReminders', () => {
       5,
     );
   });
+
+  it('does not count review items whose question is gone', () => {
+    const item = (questionId: string) => ({
+      questionId,
+      lessonId: 'l1',
+      box: 0,
+      due: '2026-11-04',
+      lapses: 1,
+    });
+    const progress: ProgressState = {
+      ...initialProgress,
+      review: { q1: item('q1'), gone: item('gone') },
+    };
+    const now = at('2026-11-04T10:00:00');
+    expect(planReminders(progress, time, now)[0].body).toMatch(/^2 вопроса ждут/);
+    expect(planReminders(progress, time, now, id => id !== 'gone')[0].body).toMatch(
+      /^1 вопрос ждёт/,
+    );
+  });
 });
 
 describe('plural', () => {

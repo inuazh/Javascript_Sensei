@@ -5,9 +5,8 @@ import { getStatsContent } from '../../content/repository';
 import type { ProgressState } from '../../domain/progress';
 import { plural } from '../../domain/reminders';
 import { computeSectionStats, type SectionStats, type StatsInsight } from '../../domain/stats';
-import { Card, Colors, Fonts, Label, ProgressBar, Spacing, Type } from '../../ui';
+import { Card, Colors, Fonts, Label, ProgressBar, Spacing, Type, pad2 } from '../../ui';
 
-const pad = (n: number) => String(n).padStart(2, '0');
 const lessonsWord = (n: number) => plural(n, 'урок', 'урока', 'уроков');
 
 function rowLabel(s: SectionStats): string {
@@ -49,7 +48,7 @@ function SectionRow({ stats, onPress }: { stats: SectionStats; onPress: () => vo
       accessibilityHint={topic ? `Открыть тему «${topic}»` : 'Открыть раздел'}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
-      <Text style={styles.number}>{pad(stats.number)}</Text>
+      <Text style={styles.number}>{pad2(stats.number)}</Text>
       <View style={styles.middle}>
         <View style={styles.titleRow}>
           <Text style={styles.title} numberOfLines={1}>

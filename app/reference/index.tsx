@@ -28,9 +28,8 @@ import {
   Screen,
   Spacing,
   Type,
+  pad2,
 } from '../../src/ui';
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 interface TopicGroup {
   key: string;
@@ -147,7 +146,7 @@ function TopicHeader({ group }: { group: TopicGroup }) {
     <View>
       {group.section ? (
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionNumber}>{pad(group.section.number)}</Text>
+          <Text style={styles.sectionNumber}>{pad2(group.section.number)}</Text>
           <Text style={[Type.h3, styles.flex]}>{group.section.title}</Text>
         </View>
       ) : null}

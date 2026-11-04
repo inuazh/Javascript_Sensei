@@ -3,6 +3,7 @@
  *
  *   npm run validate:content              # all sections
  *   npm run validate:content -- async     # run code only for the listed sections
+ *   npm run content:publish-ids           # validate, then lock new ids (--publish-ids)
  *
  * 1. Every file is parsed with the zod schema from src/content/schema.ts.
  * 2. Cross-file checks: sections.json ↔ content/index.ts ↔ lesson files,
@@ -11,6 +12,10 @@
  *    promises included) and compared with the option marked as correct.
  *    For `findBug` questions with `fixed`, both versions are run: the bug
  *    must change the output.
+ * 4. Every id in content/published-ids.json still exists: user progress and
+ *    spaced repetition refer to lessons and questions by id, so a published id
+ *    must never be removed or renamed. With --publish-ids, ids that are new in
+ *    the content are appended to the file (only when there are no errors).
  *
  * Exits with code 1 if any error is found. Warnings do not fail the run.
  */
@@ -29,6 +34,8 @@ import { checkFindBugFix, checkFindBugLines } from './lib/check-find-bug';
 import { candidateAnswers, normalizeOutput, runSnippet } from './lib/run-snippet';
 
 const CONTENT_DIR = path.join(__dirname, '..', 'content');
+const PUBLISHED_FILE = 'published-ids.json';
+const PUBLISH_FLAG = '--publish-ids';
 
 const errors: string[] = [];
 const warnings: string[] = [];
@@ -234,10 +241,74 @@ async function checkOutputQuestion(where: string, q: Question) {
   }
 }
 
+// ─── Published ids ──────────────────────────────────────────────────────────
+
+interface PublishedIds {
+  lessons: string[];
+  questions: string[];
+}
+
+function loadPublishedIds(publishing: boolean): PublishedIds | null {
+  if (publishing && !fs.existsSync(path.join(CONTENT_DIR, PUBLISHED_FILE))) {
+    return { lessons: [], questions: [] };
+  }
+  const data = readJson(PUBLISHED_FILE) as Partial<PublishedIds> | null;
+  if (data === null) return null;
+  const isIdList = (v: unknown): v is string[] =>
+    Array.isArray(v) && v.every(id => typeof id === 'string');
+  if (!isIdList(data.lessons) || !isIdList(data.questions)) {
+    error(PUBLISHED_FILE, 'must be { "lessons": string[], "questions": string[] }');
+    return null;
+  }
+  checkUnique(PUBLISHED_FILE, data.lessons, 'lesson id');
+  checkUnique(PUBLISHED_FILE, data.questions, 'question id');
+  return { lessons: data.lessons, questions: data.questions };
+}
+
+/**
+ * Fails for every published id that is gone from the content. Returns the ids
+ * that exist in the content but are not published yet, in content order.
+ */
+function checkPublishedIds(
+  published: PublishedIds,
+  current: PublishedIds,
+): { lessons: string[]; questions: string[] } {
+  const fresh = { lessons: [] as string[], questions: [] as string[] };
+  for (const kind of ['lessons', 'questions'] as const) {
+    const what = kind === 'lessons' ? 'lesson' : 'question';
+    const now = new Set(current[kind]);
+    for (const id of published[kind]) {
+      if (!now.has(id)) {
+        error(
+          PUBLISHED_FILE,
+          `published ${what} "${id}" is missing from the content. User progress refers to it: ` +
+            'restore it (ids of published lessons and questions are never removed or renamed)',
+        );
+      }
+    }
+    const locked = new Set(published[kind]);
+    fresh[kind] = current[kind].filter(id => !locked.has(id));
+  }
+  return fresh;
+}
+
+function writePublishedIds(published: PublishedIds, fresh: PublishedIds) {
+  const next: PublishedIds = {
+    lessons: [...published.lessons, ...fresh.lessons],
+    questions: [...published.questions, ...fresh.questions],
+  };
+  fs.writeFileSync(path.join(CONTENT_DIR, PUBLISHED_FILE), `${JSON.stringify(next, null, 2)}\n`);
+}
+
 // ─── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
-  const only = new Set(process.argv.slice(2));
+  const args = process.argv.slice(2);
+  const publishing = args.includes(PUBLISH_FLAG);
+  for (const flag of args.filter(a => a.startsWith('--') && a !== PUBLISH_FLAG)) {
+    error('args', `unknown flag "${flag}"`);
+  }
+  const only = new Set(args.filter(a => !a.startsWith('--')));
   const sections = loadSections();
   for (const sectionId of only) {
     if (!sections.some(s => s.id === sectionId)) error('args', `unknown section "${sectionId}"`);
@@ -284,12 +355,33 @@ async function main() {
   checkUnique('content', lessonIds, 'lesson id');
   checkUnique('content', questionIds, 'question id');
 
+  const published = loadPublishedIds(publishing);
+  let publishedNote = '';
+  if (published) {
+    const fresh = checkPublishedIds(published, { lessons: lessonIds, questions: questionIds });
+    const freshCount = fresh.lessons.length + fresh.questions.length;
+    if (freshCount > 0 && !publishing) {
+      warn(
+        PUBLISHED_FILE,
+        `${fresh.lessons.length} new lesson and ${fresh.questions.length} new question ids ` +
+          'are not locked yet; run `npm run content:publish-ids` before release',
+      );
+    } else if (freshCount > 0 && errors.length === 0) {
+      writePublishedIds(published, fresh);
+      publishedNote =
+        `\n${PUBLISHED_FILE}: locked ${fresh.lessons.length} new lesson and ` +
+        `${fresh.questions.length} new question ids`;
+    } else if (freshCount > 0) {
+      publishedNote = `\n${PUBLISHED_FILE}: not updated, fix the errors first`;
+    }
+  }
+
   for (const w of warnings) console.log(`⚠️  ${w}`);
   for (const e of errors) console.log(`❌ ${e}`);
   console.log(
     `\n${sections.length} sections, ${lessonCount} lessons (${withTheory} with theory), ` +
       `${questionCount} questions, ${executed} snippets executed — ` +
-      `${errors.length} errors, ${warnings.length} warnings`,
+      `${errors.length} errors, ${warnings.length} warnings${publishedNote}`,
   );
   process.exit(errors.length > 0 ? 1 : 0);
 }
