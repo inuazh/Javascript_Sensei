@@ -333,6 +333,20 @@ describe('parseRunResult', () => {
     expect(r!.value).toHaveLength(MAX_LINE_LENGTH);
     expect(r!.timedOut).toBe(false);
   });
+
+  it('does not throw on values that cannot be turned into strings', () => {
+    // A snippet on native can post this JSON itself via window.ReactNativeWebView.
+    const forged = JSON.stringify({
+      lines: [{ toString: 1, valueOf: 1 }, 'ok'],
+      error: { name: { toString: 1 }, message: { valueOf: 1, toString: 'x' } },
+      timedOut: false,
+    });
+    expect(parseRunResult(forged)).toEqual({
+      lines: ['', 'ok'],
+      error: { name: '', message: '' },
+      timedOut: false,
+    });
+  });
 });
 
 describe('describeError', () => {

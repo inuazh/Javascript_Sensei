@@ -37,8 +37,13 @@ export function titleForLevel(level: number): string {
 }
 
 export function getLevelInfo(totalXp: number): LevelInfo {
-  const xp = Math.max(0, totalXp);
-  let level = 1;
+  // Clamped to safe integers: beyond them `level + 1 === level` and no loop ends.
+  const xp = Number.isFinite(totalXp) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, totalXp)) : 0;
+  // xpForLevel(n + 1) = 25n² + 75n: solved for n instead of counting levels one
+  // by one, so a huge XP value (a corrupt save, a forged leaderboard entry)
+  // cannot hang the app. The loops only correct floating-point rounding.
+  let level = 1 + Math.max(0, Math.floor((Math.sqrt(5625 + 100 * xp) - 75) / 50));
+  while (level > 1 && xpForLevel(level) > xp) level--;
   while (xpForLevel(level + 1) <= xp) level++;
   const minXp = xpForLevel(level);
   const nextXp = xpForLevel(level + 1);
