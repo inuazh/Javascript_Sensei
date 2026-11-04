@@ -1,0 +1,1563 @@
+{
+  "lessons": [
+    {
+      "id": "try-catch-01",
+      "topicId": "try-catch",
+      "title": "throw и try/catch",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Ошибка во время выполнения останавливает код. Чтобы этого не случилось, оберни опасный код в `try { } catch (e) { }`: при ошибке выполнение сразу прыгает в `catch`, а остаток `try` пропускается."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  console.log(\"начало\");\n  null.length;\n  console.log(\"сюда не дойдём\");\n} catch (e) {\n  console.log(\"поймали:\", e.name);\n}\nconsole.log(\"работаем дальше\");\n// начало\n// поймали: TypeError\n// работаем дальше"
+          },
+          {
+            "type": "text",
+            "text": "Бросить ошибку можно и самому — через `throw`. Принято бросать объект `new Error(\"текст\")`: текст попадёт в свойство `message`."
+          },
+          {
+            "type": "code",
+            "code": "function divide(a, b) {\n  if (b === 0) throw new Error(\"делить на ноль нельзя\");\n  return a / b;\n}\ntry {\n  divide(1, 0);\n} catch (e) {\n  console.log(e.message); // делить на ноль нельзя\n}"
+          },
+          {
+            "type": "tip",
+            "text": "Если в `try` ошибки не было, блок `catch` не выполняется вовсе."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "try-catch-01-q1",
+          "type": "output",
+          "code": "try {\n  console.log(\"A\");\n  throw new Error(\"упс\");\n  console.log(\"B\");\n} catch (e) {\n  console.log(\"C\");\n}\nconsole.log(\"D\");",
+          "options": ["A C D", "A B C D", "A C", "A D"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строки после throw в блоке try не выполняются",
+            "Ошибку поймали, поэтому программа продолжает работу после catch",
+            "Ошибка в try передаёт управление в catch"
+          ],
+          "explanation": "После throw остаток try пропускается и выполняется catch. Ошибка обработана, поэтому код после try/catch тоже работает."
+        },
+        {
+          "id": "try-catch-01-q2",
+          "type": "output",
+          "code": "try {\n  console.log(1);\n} catch (e) {\n  console.log(2);\n}\nconsole.log(3);",
+          "options": ["1 3", "1 2 3", "1", "3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "catch выполняется только при ошибке в try",
+            "После try/catch код продолжает выполняться",
+            "Код в try выполняется как обычно"
+          ],
+          "explanation": "В try ошибки не было, поэтому catch пропускается целиком, а выполнение идёт дальше."
+        },
+        {
+          "id": "try-catch-01-q3",
+          "type": "fill",
+          "codeBefore": "function checkAge(age) {\n  if (age < 0) ",
+          "codeAfter": " new Error(\"возраст < 0\");\n  return age;\n}\ntry {\n  checkAge(-1);\n} catch (e) {\n  console.log(e.message); // возраст < 0\n}",
+          "options": ["throw", "return", "catch", "reject"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return просто вернёт объект ошибки как обычное значение: catch не сработает, и ничего не выведется",
+            "catch — это блок после try, а не команда. Такой код — SyntaxError",
+            "reject — параметр промиса, а не ключевое слово. Такой код — SyntaxError"
+          ],
+          "explanation": "Ошибку выбрасывают через throw: выполнение функции прерывается, и ошибку получает ближайший catch."
+        },
+        {
+          "id": "try-catch-01-q4",
+          "type": "trueFalse",
+          "code": "let config;\ntry {\n  config = JSON.parse(\"{ bad json }\");\n} catch (e) {\n  config = \"по умолчанию\";\n}\nconsole.log(config);",
+          "options": ["Выведет «по умолчанию»", "Программа упадёт с SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ошибка возникает при выполнении JSON.parse внутри try, и catch её ловит"
+          ],
+          "explanation": "JSON.parse бросает SyntaxError во время выполнения, поэтому try/catch его ловит и подставляет значение по умолчанию."
+        },
+        {
+          "id": "try-catch-01-q5",
+          "type": "order",
+          "title": "Собери код: при битом JSON в data будет null",
+          "lines": [
+            "let data;",
+            "try {",
+            "  data = JSON.parse(input);",
+            "} catch (e) {",
+            "  data = null;",
+            "}"
+          ],
+          "shuffled": [3, 5, 0, 4, 2, 1],
+          "explanation": "Переменную объявляем до try, чтобы она была видна после него. Опасный JSON.parse — внутри try, а запасное значение null — в catch."
+        }
+      ]
+    },
+    {
+      "id": "try-catch-02",
+      "topicId": "try-catch",
+      "title": "finally и return",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Блок `finally` выполняется **всегда**: была ошибка или нет, поймали её или нет. Туда кладут уборку — закрыть файл, спрятать индикатор загрузки."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  console.log(\"try\");\n  throw new Error(\"сбой\");\n} catch (e) {\n  console.log(\"catch\");\n} finally {\n  console.log(\"finally\");\n}\n// try\n// catch\n// finally"
+          },
+          {
+            "type": "text",
+            "text": "`catch` можно не писать: `try { } finally { }`. Тогда ошибка полетит дальше, но `finally` успеет выполниться."
+          },
+          {
+            "type": "warning",
+            "text": "`return` внутри `try` не отменяет `finally`: сначала выполнится `finally`, и только потом функция вернёт значение. А `return` в самом `finally` перезапишет любой другой `return`."
+          },
+          {
+            "type": "code",
+            "code": "function f() {\n  try {\n    return \"из try\";\n  } finally {\n    console.log(\"finally\");\n  }\n}\nconsole.log(f());\n// finally\n// из try"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "try-catch-02-q1",
+          "type": "order",
+          "title": "Собери код: файл закрывается в любом случае",
+          "lines": [
+            "try {",
+            "  console.log(\"открыли файл\");",
+            "  throw new Error(\"сбой\");",
+            "} catch (e) {",
+            "  console.log(\"ошибка:\", e.message);",
+            "} finally {",
+            "  console.log(\"закрыли файл\");",
+            "}"
+          ],
+          "shuffled": [5, 2, 7, 0, 4, 1, 6, 3],
+          "explanation": "Файл закрываем в finally — он выполнится и после ошибки, и без неё. Сообщение об ошибке выводим в catch."
+        },
+        {
+          "id": "try-catch-02-q2",
+          "type": "output",
+          "code": "try {\n  console.log(\"A\");\n} catch (e) {\n  console.log(\"B\");\n} finally {\n  console.log(\"C\");\n}",
+          "options": ["A C", "A B C", "A", "C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "catch выполняется только при ошибке",
+            "finally выполняется всегда, даже без ошибки",
+            "Код в try выполняется первым"
+          ],
+          "explanation": "Ошибки не было, поэтому catch пропускается. А finally выполняется в любом случае."
+        },
+        {
+          "id": "try-catch-02-q3",
+          "type": "output",
+          "code": "function test() {\n  try {\n    console.log(1);\n    return 2;\n  } finally {\n    console.log(3);\n  }\n}\nconsole.log(test());",
+          "options": ["1 3 2", "1 2 3", "1 2", "3 1 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значение возвращается из функции только после finally, а выводится уже снаружи",
+            "return не отменяет finally",
+            "finally выполняется после кода в try, а не до него"
+          ],
+          "explanation": "return в try не завершает функцию сразу: сначала выполняется finally, и только потом функция возвращает 2."
+        },
+        {
+          "id": "try-catch-02-q4",
+          "type": "output",
+          "code": "function f() {\n  try {\n    return \"try\";\n  } finally {\n    return \"finally\";\n  }\n}\nconsole.log(f());",
+          "options": ["finally", "try", "try finally", "SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return в finally перезаписывает результат try",
+            "Функция возвращает одно значение",
+            "return в finally разрешён, просто так делать не стоит"
+          ],
+          "explanation": "finally выполняется после return из try, и его собственный return перезаписывает возвращаемое значение."
+        },
+        {
+          "id": "try-catch-02-q5",
+          "type": "trueFalse",
+          "code": "try {\n  console.log(\"работаю\");\n  null.length;\n} finally {\n  console.log(\"убираю\");\n}\nconsole.log(\"дальше\");",
+          "options": [
+            "Выведет «работаю», «убираю» и упадёт с TypeError",
+            "Выведет «работаю», «убираю», «дальше»"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "finally не ловит ошибку: без catch она летит дальше, и до «дальше» дело не дойдёт"
+          ],
+          "explanation": "Без catch ошибка не обрабатывается: finally выполняется, а затем ошибка летит дальше и останавливает программу."
+        }
+      ]
+    },
+    {
+      "id": "try-catch-03",
+      "topicId": "try-catch",
+      "title": "Повторный выброс",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`catch` ловит **все** ошибки подряд, даже те, о которых ты не думал. Хорошая практика — обработать только ожидаемые, а остальные выбросить снова через `throw e`. Тип ошибки проверяют через `instanceof`."
+          },
+          {
+            "type": "code",
+            "code": "function readConfig(json) {\n  try {\n    return JSON.parse(json);\n  } catch (e) {\n    if (e instanceof SyntaxError) return {};\n    throw e; // чужая ошибка — дальше\n  }\n}\nconsole.log(readConfig(\"oops\")); // {}"
+          },
+          {
+            "type": "text",
+            "text": "Проброшенная ошибка летит наружу, к ближайшему внешнему `try`. Если его нет, программа падает с этой ошибкой."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  try {\n    throw new Error(\"глубоко\");\n  } catch (e) {\n    console.log(\"внутренний:\", e.message);\n    throw e;\n  }\n} catch (e) {\n  console.log(\"внешний:\", e.message);\n}\n// внутренний: глубоко\n// внешний: глубоко"
+          },
+          {
+            "type": "warning",
+            "text": "Пустой `catch (e) {}` молча глотает любую ошибку. Программа не падает, но баг потом очень трудно найти."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "try-catch-03-q1",
+          "type": "output",
+          "code": "try {\n  try {\n    throw new Error(\"A\");\n  } catch (e) {\n    console.log(\"inner\");\n  }\n} catch (e) {\n  console.log(\"outer\");\n}",
+          "options": ["inner", "inner outer", "outer", "outer inner"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внешний catch сработает, только если внутренний выбросит ошибку снова",
+            "Ошибку ловит ближайший catch — внутренний",
+            null
+          ],
+          "explanation": "Ошибку поймал внутренний catch и не выбросил снова. Для внешнего try всё прошло без ошибок."
+        },
+        {
+          "id": "try-catch-03-q2",
+          "type": "output",
+          "code": "try {\n  try {\n    throw new Error(\"сбой\");\n  } catch (e) {\n    console.log(\"inner\");\n    throw e;\n  } finally {\n    console.log(\"finally\");\n  }\n} catch (e) {\n  console.log(\"outer\");\n}",
+          "options": ["inner finally outer", "inner outer finally", "inner outer", "inner finally"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "finally внутреннего try выполняется до того, как ошибка доберётся до внешнего catch",
+            "finally выполняется всегда, даже если catch выбросил ошибку",
+            "Проброшенную ошибку ловит внешний catch"
+          ],
+          "explanation": "Внутренний catch пробрасывает ошибку, но перед уходом из внутреннего try выполняется его finally. Затем ошибку ловит внешний catch."
+        },
+        {
+          "id": "try-catch-03-q3",
+          "type": "fill",
+          "codeBefore": "function handle(fn) {\n  try {\n    fn();\n  } catch (e) {\n    if (e instanceof TypeError) {\n      console.log(\"исправили\");\n      return;\n    }\n    ",
+          "codeAfter": ";\n  }\n}\ntry {\n  handle(() => {\n    throw new RangeError(\"далеко\");\n  });\n} catch (e) {\n  console.log(\"наружу:\", e.name); // наружу: RangeError\n}",
+          "options": ["throw e", "return e", "throw new Error(e)", "throw"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return e вернёт ошибку как обычное значение: наружу она не полетит, и внешний catch ничего не выведет",
+            "Новый Error потеряет исходный тип: снаружи будет «наружу: Error»",
+            "После throw обязательно нужно значение — иначе SyntaxError"
+          ],
+          "explanation": "throw e выбрасывает ту же самую ошибку дальше, и внешний catch получает исходный RangeError."
+        },
+        {
+          "id": "try-catch-03-q4",
+          "type": "trueFalse",
+          "code": "function save(data) {\n  try {\n    data.items.push(1);\n  } catch (e) {}\n}\nsave({});\nconsole.log(\"готово\");",
+          "options": ["Выведет «готово»", "Упадёт с TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "TypeError действительно возникает, но пустой catch его глотает"
+          ],
+          "explanation": "У {} нет items, и push бросает TypeError. Но пустой catch молча проглатывает ошибку — программа идёт дальше, а баг остаётся незамеченным."
+        },
+        {
+          "id": "try-catch-03-q5",
+          "type": "order",
+          "title": "Собери код: обработай только SyntaxError, остальное — дальше",
+          "lines": [
+            "const input = \"{oops}\";",
+            "try {",
+            "  JSON.parse(input);",
+            "} catch (e) {",
+            "  if (!(e instanceof SyntaxError)) throw e;",
+            "  console.log(\"Неверный JSON\");",
+            "}"
+          ],
+          "shuffled": [3, 5, 0, 6, 2, 4, 1],
+          "explanation": "Сначала проверяем тип: чужую ошибку пробрасываем, и только для SyntaxError выводим сообщение."
+        }
+      ]
+    },
+    {
+      "id": "try-catch-04",
+      "topicId": "try-catch",
+      "title": "Асинхронные ошибки",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`try/catch` работает **синхронно**. Колбэк `setTimeout` выполнится позже, когда `try` уже закончился, поэтому внешний `catch` его ошибку не поймает."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  setTimeout(() => {\n    throw new Error(\"из таймера\");\n  }, 0);\n} catch (e) {\n  console.log(\"поймали\"); // не выполнится\n}\nconsole.log(\"после try\");\n// после try\n// Uncaught Error: из таймера"
+          },
+          {
+            "type": "tip",
+            "text": "Ставь `try/catch` **внутрь** колбэка — туда, где ошибка реально возникает."
+          },
+          {
+            "type": "text",
+            "text": "Промис с ошибкой ловят через `.catch()`. В `async`-функции работает обычный `try/catch`, но только если ждать промис через `await`."
+          },
+          {
+            "type": "code",
+            "code": "async function load() {\n  throw new Error(\"нет сети\");\n}\nasync function main() {\n  try {\n    await load();\n  } catch (e) {\n    console.log(\"поймали:\", e.message);\n  }\n}\nmain(); // поймали: нет сети"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "try-catch-04-q1",
+          "type": "output",
+          "code": "try {\n  setTimeout(() => {\n    throw new Error(\"бум\");\n  }, 0);\n  console.log(\"A\");\n} catch (e) {\n  console.log(\"B\");\n}\nconsole.log(\"C\");",
+          "options": ["A C Error", "A B C", "A C", "B C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внешний catch не ловит ошибки из колбэка setTimeout: к его запуску try уже закончился",
+            "Ошибка в таймере всё же произойдёт — просто позже, и её никто не поймает",
+            "Сам вызов setTimeout ошибки не бросает, поэтому A выводится"
+          ],
+          "explanation": "Колбэк таймера запускается позже, когда try/catch уже отработал. Его ошибку никто не ловит, и она остаётся необработанной."
+        },
+        {
+          "id": "try-catch-04-q2",
+          "type": "output",
+          "code": "setTimeout(() => {\n  try {\n    null.x;\n  } catch (e) {\n    console.log(\"поймали\", e.name);\n  }\n}, 0);\nconsole.log(\"старт\");",
+          "options": [
+            "старт поймали TypeError",
+            "поймали TypeError старт",
+            "старт TypeError",
+            "старт"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Колбэк setTimeout выполняется после всего синхронного кода",
+            "Ошибку поймал catch и вывел своё сообщение",
+            "try внутри колбэка ловит ошибку"
+          ],
+          "explanation": "try стоит внутри колбэка, поэтому ловит его ошибку. А сам колбэк выполняется после синхронного кода."
+        },
+        {
+          "id": "try-catch-04-q3",
+          "type": "output",
+          "code": "async function main() {\n  try {\n    Promise.reject(new Error(\"сбой\"));\n  } catch (e) {\n    console.log(\"поймали\");\n  }\n  console.log(\"конец\");\n}\nmain();",
+          "options": ["конец Error", "поймали конец", "конец", "поймали"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "try ловит отклонённый промис, только если его ждать через await",
+            "Отклонённый промис никто не обработал — это необработанная ошибка",
+            null
+          ],
+          "explanation": "Без await try не ждёт промис: отклонение происходит позже и становится необработанной ошибкой."
+        },
+        {
+          "id": "try-catch-04-q4",
+          "type": "fill",
+          "codeBefore": "async function main() {\n  try {\n    ",
+          "codeAfter": " Promise.reject(new Error(\"сбой\"));\n  } catch (e) {\n    console.log(\"поймали\");\n  }\n}\nmain(); // поймали",
+          "options": ["await", "return", "void", "yield"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return отдаёт промис наружу без ожидания: try уже не поймает его ошибку",
+            "void просто отбрасывает промис, ошибка остаётся необработанной",
+            "yield работает только в генераторах, здесь это SyntaxError"
+          ],
+          "explanation": "await ждёт промис, и если тот отклонён, бросает ошибку прямо в этой строке — её ловит catch."
+        },
+        {
+          "id": "try-catch-04-q5",
+          "type": "trueFalse",
+          "code": "Promise.reject(new Error(\"сбой\"))\n  .then(() => console.log(\"then\"))\n  .catch(e => console.log(\"catch:\", e.message));",
+          "options": ["Выведет только «catch: сбой»", "Выведет «then», затем «catch: сбой»"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "then вызывается только для успешного промиса, отклонение его пропускает"
+          ],
+          "explanation": "Отклонённый промис пропускает then и идёт по цепочке до ближайшего catch."
+        }
+      ]
+    },
+    {
+      "id": "try-catch-05",
+      "topicId": "try-catch",
+      "title": "Закрепление: try / catch",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Повторим главное. `catch` выполняется только при ошибке в `try`, а `finally` — всегда, даже после `return`."
+          },
+          {
+            "type": "code",
+            "code": "function f() {\n  try {\n    throw new Error(\"x\");\n  } catch (e) {\n    return \"из catch\";\n  } finally {\n    console.log(\"finally\");\n  }\n}\nconsole.log(f());\n// finally\n// из catch"
+          },
+          {
+            "type": "text",
+            "text": "`throw e` в `catch` пробрасывает ошибку дальше, к внешнему `try`. Внешний `try` не ловит ошибки из таймеров, а отклонённый промис ловят через `.catch()` или `await` внутри `try`. У промиса есть и `.finally()` — он срабатывает в любом случае."
+          },
+          {
+            "type": "warning",
+            "text": "Значение для `return` вычисляется **до** `finally`. Если в `finally` изменить переменную, возвращаемое значение уже не поменяется."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "try-catch-05-q1",
+          "type": "output",
+          "code": "function f() {\n  try {\n    throw new Error(\"x\");\n  } catch (e) {\n    return \"catch\";\n  } finally {\n    console.log(\"finally\");\n  }\n}\nconsole.log(f());",
+          "options": ["finally catch", "catch finally", "catch", "finally"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "finally выполняется до того, как функция вернёт значение",
+            "finally выполняется даже после return",
+            "finally без return не меняет результат функции"
+          ],
+          "explanation": "return в catch не завершает функцию сразу: сначала выполняется finally, а потом наружу уходит значение \"catch\"."
+        },
+        {
+          "id": "try-catch-05-q2",
+          "type": "output",
+          "code": "function parse(s) {\n  try {\n    return JSON.parse(s);\n  } catch (e) {\n    console.log(\"плохой JSON\");\n    throw e;\n  } finally {\n    console.log(\"finally\");\n  }\n}\ntry {\n  parse(\"{\");\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": [
+            "плохой JSON finally SyntaxError",
+            "плохой JSON SyntaxError finally",
+            "плохой JSON finally",
+            "SyntaxError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "finally выполняется до того, как ошибка покинет функцию",
+            "throw e пробрасывает ошибку, и внешний catch её ловит",
+            "Внутренний catch и finally выполняются раньше внешнего"
+          ],
+          "explanation": "Внутренний catch выводит сообщение и пробрасывает ошибку. Перед выходом из функции выполняется finally, а затем ошибку ловит внешний catch."
+        },
+        {
+          "id": "try-catch-05-q3",
+          "type": "output",
+          "code": "async function task() {\n  throw new Error(\"упало\");\n}\ntask()\n  .catch(e => console.log(e.message))\n  .finally(() => console.log(\"готово\"));\nconsole.log(\"старт\");",
+          "options": [
+            "старт упало готово",
+            "упало готово старт",
+            "упало старт готово",
+            "старт готово упало"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Обработчики промиса выполняются после синхронного кода",
+            "catch тоже асинхронный: он сработает после console.log(\"старт\")",
+            "finally стоит в цепочке после catch и выполняется после него"
+          ],
+          "explanation": "async-функция при ошибке возвращает отклонённый промис. Его обработчики выполняются асинхронно, после синхронного кода, и по порядку цепочки."
+        },
+        {
+          "id": "try-catch-05-q4",
+          "type": "trueFalse",
+          "code": "function getValue() {\n  let x = 1;\n  try {\n    return x;\n  } finally {\n    x = 2;\n  }\n}\nconsole.log(getValue());",
+          "options": ["Выведет 1", "Выведет 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Возвращаемое значение запомнили до finally; изменить его можно было бы только через return в finally"
+          ],
+          "explanation": "return x вычисляет значение 1 ещё до finally. Изменение x в finally на уже вычисленный результат не влияет."
+        },
+        {
+          "id": "try-catch-05-q5",
+          "type": "order",
+          "title": "Собери цепочку промиса с обработкой ошибок",
+          "lines": [
+            "fetchData()",
+            "  .then(data => console.log(data))",
+            "  .catch(e => console.log(\"ошибка:\", e.message))",
+            "  .finally(() => console.log(\"загрузка завершена\"));"
+          ],
+          "shuffled": [2, 3, 0, 1],
+          "explanation": "catch ставим после then, чтобы он ловил ошибки и загрузки, и обработки данных. finally — в конце цепочки: он сработает в любом случае."
+        }
+      ]
+    },
+    {
+      "id": "error-types-01",
+      "topicId": "error-types",
+      "title": "TypeError и ReferenceError",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Когда что-то идёт не так, JavaScript бросает объект ошибки, и его тип подсказывает причину. **TypeError** — операция не подходит значению: вызвать не-функцию, прочитать свойство у `null` или `undefined`, изменить `const`. **ReferenceError** — переменной с таким именем нет."
+          },
+          {
+            "type": "code",
+            "code": "undefined.name;    // TypeError\n(5)();             // TypeError\nconsole.log(usr);  // ReferenceError",
+            "caption": "каждая строка — отдельный пример"
+          },
+          {
+            "type": "text",
+            "text": "У ошибки есть свойство `name` — тип строкой, и `message` — описание."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  throw new Error(\"сбой\");\n} catch (e) {\n  console.log(e.name);    // Error\n  console.log(e.message); // сбой\n}"
+          },
+          {
+            "type": "warning",
+            "text": "`let` и `const` до своей строки тоже дают **ReferenceError**: переменная уже есть, но обращаться к ней ещё нельзя."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "error-types-01-q1",
+          "type": "output",
+          "code": "try {\n  const user = undefined;\n  console.log(user.name);\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": ["TypeError", "ReferenceError", "undefined", "SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "ReferenceError — когда переменной нет вовсе, а user объявлена",
+            "Чтение свойства у undefined не возвращает undefined, а бросает ошибку",
+            "Синтаксис здесь правильный, ошибка возникает при выполнении"
+          ],
+          "explanation": "Переменная user существует, но в ней undefined, а у undefined нельзя читать свойства — это TypeError."
+        },
+        {
+          "id": "error-types-01-q2",
+          "type": "output",
+          "code": "try {\n  console.log(total);\n  let total = 10;\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": ["ReferenceError", "undefined", "TypeError", "10"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так было бы с var. let до объявления недоступен",
+            "TypeError — про неподходящее значение, а здесь переменная ещё недоступна",
+            "Значение 10 присваивается только на следующей строке"
+          ],
+          "explanation": "let до своей строки находится в «мёртвой зоне»: обращение к нему бросает ReferenceError."
+        },
+        {
+          "id": "error-types-01-q3",
+          "type": "output",
+          "code": "const limit = 5;\ntry {\n  limit = 10;\n} catch (e) {\n  console.log(e.name);\n}\nconsole.log(limit);",
+          "options": ["TypeError 5", "ReferenceError 5", "TypeError 10", "10"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Переменная limit существует, просто её нельзя переприсвоить",
+            "Присваивание не выполнилось — limit осталась 5",
+            "const нельзя переприсвоить"
+          ],
+          "explanation": "Переприсвоить const нельзя: это TypeError во время выполнения. Значение осталось прежним."
+        },
+        {
+          "id": "error-types-01-q4",
+          "type": "trueFalse",
+          "code": "const list = [1, 2, 3];\nlist.push2(4);",
+          "options": ["Будет TypeError", "Будет ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "ReferenceError бывает, когда нет переменной. Отсутствующее свойство — это undefined, а его вызов — TypeError"
+          ],
+          "explanation": "list существует, а list.push2 — просто undefined. Вызвать undefined как функцию нельзя — это TypeError."
+        },
+        {
+          "id": "error-types-01-q5",
+          "type": "fill",
+          "codeBefore": "try {\n  undefinedFunction();\n} catch (e) {\n  console.log(e.",
+          "codeAfter": "); // ReferenceError\n}",
+          "options": ["name", "message", "type", "toString()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "message — текст ошибки, а не её тип",
+            "У ошибок нет свойства type — выведется undefined",
+            "toString() вернёт тип вместе с текстом: «ReferenceError: …»"
+          ],
+          "explanation": "Тип ошибки хранится в свойстве name."
+        }
+      ]
+    },
+    {
+      "id": "error-types-02",
+      "topicId": "error-types",
+      "title": "SyntaxError и RangeError",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**SyntaxError** — нарушены правила грамматики. Если ошибка в самом коде, скрипт не запустится вообще, и `try` не поможет. А вот `JSON.parse` с битой строкой бросает SyntaxError во время выполнения — её можно поймать."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  JSON.parse(\"{name: 'Аня'}\");\n} catch (e) {\n  console.log(e.name); // SyntaxError\n}"
+          },
+          {
+            "type": "text",
+            "text": "**RangeError** — число вне допустимого диапазона: отрицательная длина массива, слишком много знаков после запятой, отрицательный повтор строки."
+          },
+          {
+            "type": "code",
+            "code": "new Array(-1);          // RangeError\n(3.14).toFixed(200);    // RangeError\n\"ab\".repeat(-1);        // RangeError",
+            "caption": "каждая строка — отдельный пример"
+          },
+          {
+            "type": "tip",
+            "text": "JSON требует двойные кавычки и у ключей, и у строк: `'{\"name\": \"Аня\"}'`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "error-types-02-q1",
+          "type": "output",
+          "code": "try {\n  JSON.parse(\"{'a': 1}\");\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": ["SyntaxError", "{ a: 1 }", "TypeError", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Одинарные кавычки — не JSON, разобрать строку не получится",
+            "TypeError — про неподходящее значение, а здесь нарушен синтаксис JSON",
+            null
+          ],
+          "explanation": "В JSON строки и ключи пишутся только в двойных кавычках. Строка не по правилам JSON — SyntaxError."
+        },
+        {
+          "id": "error-types-02-q2",
+          "type": "output",
+          "code": "try {\n  const arr = new Array(-5);\n  console.log(arr.length);\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": ["RangeError", "0", "-5", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустой массив не создаётся — сразу бросается ошибка",
+            "Отрицательной длины у массива не бывает",
+            "Тип аргумента верный — число, а вот значение вне диапазона"
+          ],
+          "explanation": "Длина массива не может быть отрицательной: new Array(-5) бросает RangeError."
+        },
+        {
+          "id": "error-types-02-q3",
+          "type": "output",
+          "code": "try {\n  console.log(\"abc\".repeat(2));\n  console.log(\"abc\".repeat(-1));\n} catch (e) {\n  console.log(e.name);\n}",
+          "options": ["abcabc RangeError", "abcabc", "RangeError", "abcabc TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "repeat(-1) не возвращает пустую строку, а бросает ошибку",
+            "Первая строка успевает выполниться до ошибки",
+            "Число повторов — правильного типа, но вне диапазона"
+          ],
+          "explanation": "Первый repeat работает. Отрицательное число повторов вне диапазона — второй вызов бросает RangeError."
+        },
+        {
+          "id": "error-types-02-q4",
+          "type": "trueFalse",
+          "code": "try {\n  let x = ;\n} catch (e) {\n  console.log(\"поймали\");\n}",
+          "options": ["Выведет «поймали»", "Скрипт не запустится: SyntaxError"],
+          "correct": 1,
+          "optionExplanations": [
+            "try ловит ошибки при выполнении, а этот код даже не запустится",
+            null
+          ],
+          "explanation": "Синтаксическая ошибка в коде находится ещё при разборе скрипта, до запуска. try/catch к этому моменту не работает."
+        },
+        {
+          "id": "error-types-02-q5",
+          "type": "fill",
+          "codeBefore": "function makeArray(size) {\n  try {\n    return new Array(size);\n  } catch (e) {\n    if (e.name === \"",
+          "codeAfter": "\") return [];\n    throw e;\n  }\n}\nconsole.log(makeArray(-1)); // []",
+          "options": ["RangeError", "TypeError", "SyntaxError", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Тип аргумента верный, а значение вне диапазона — это RangeError",
+            "Синтаксис кода правильный",
+            "name конкретной ошибки — \"RangeError\", а не \"Error\": ошибка уйдёт в throw e"
+          ],
+          "explanation": "Отрицательная длина массива бросает RangeError, его и нужно перехватить."
+        }
+      ]
+    },
+    {
+      "id": "error-types-03",
+      "topicId": "error-types",
+      "title": "Проверка через instanceof",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Чтобы обработать ошибки по-разному, проверяй тип через `instanceof`. Все встроенные ошибки наследуются от `Error`, поэтому `e instanceof Error` верно для любой из них."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  null.x;\n} catch (e) {\n  console.log(e instanceof TypeError);  // true\n  console.log(e instanceof Error);      // true\n  console.log(e instanceof RangeError); // false\n}"
+          },
+          {
+            "type": "text",
+            "text": "Порядок проверок важен: сначала конкретные типы, общий `Error` — в конце, иначе он перехватит всё."
+          },
+          {
+            "type": "code",
+            "code": "function describe(e) {\n  if (e instanceof TypeError) return \"неверный тип\";\n  if (e instanceof RangeError) return \"вне диапазона\";\n  if (e instanceof Error) return \"какая-то ошибка\";\n  return \"это не Error\";\n}\nconsole.log(describe(new RangeError())); // вне диапазона\nconsole.log(describe(\"упс\"));            // это не Error"
+          },
+          {
+            "type": "warning",
+            "text": "`throw` может бросить что угодно, даже строку. У строки нет `message`, и `instanceof Error` для неё — `false`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "error-types-03-q1",
+          "type": "output",
+          "code": "const e = new TypeError(\"плохо\");\nconsole.log(e instanceof TypeError, e instanceof Error);",
+          "options": ["true true", "true false", "false true", "false false"],
+          "correct": 0,
+          "optionExplanations": [null, "Все встроенные ошибки наследуются от Error", null, null],
+          "explanation": "TypeError наследуется от Error, поэтому объект проходит обе проверки."
+        },
+        {
+          "id": "error-types-03-q2",
+          "type": "output",
+          "code": "try {\n  throw \"ошибка!\";\n} catch (e) {\n  console.log(e instanceof Error, e.message);\n}",
+          "options": ["false undefined", "true ошибка!", "false ошибка!", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка — не экземпляр Error",
+            "У строки нет свойства message",
+            "Бросить можно что угодно, catch просто получит эту строку"
+          ],
+          "explanation": "Бросили обычную строку. Она не объект Error, и свойства message у неё нет."
+        },
+        {
+          "id": "error-types-03-q3",
+          "type": "output",
+          "code": "function handle(e) {\n  if (e instanceof Error) return \"общая\";\n  if (e instanceof TypeError) return \"тип\";\n  return \"другое\";\n}\nconsole.log(handle(new TypeError()));",
+          "options": ["общая", "тип", "другое", "общая тип"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первая проверка e instanceof Error уже вернула результат",
+            "TypeError — это Error",
+            "return завершает функцию на первом совпадении"
+          ],
+          "explanation": "TypeError — тоже Error, поэтому первая проверка срабатывает и до второй дело не доходит. Конкретные типы надо проверять раньше общего."
+        },
+        {
+          "id": "error-types-03-q4",
+          "type": "fill",
+          "codeBefore": "try {\n  [].reduce((a, b) => a + b);\n} catch (e) {\n  if (e ",
+          "codeAfter": " TypeError) console.log(\"пустой массив без начального значения\");\n}\n// пустой массив без начального значения",
+          "options": ["instanceof", "===", "in", "typeof"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Объект ошибки и сам класс TypeError — разные вещи, === даст false",
+            "in проверяет наличие свойства в объекте, а не тип",
+            "typeof — унарный оператор, такая запись — SyntaxError"
+          ],
+          "explanation": "reduce пустого массива без начального значения бросает TypeError, а instanceof проверяет, к какому классу относится ошибка."
+        },
+        {
+          "id": "error-types-03-q5",
+          "type": "trueFalse",
+          "code": "const err = new SyntaxError(\"x\");\nconsole.log(err instanceof Error);",
+          "options": ["true", "false"],
+          "correct": 0,
+          "optionExplanations": [null, "Все встроенные ошибки — наследники Error"],
+          "explanation": "SyntaxError, как и все встроенные ошибки, наследуется от Error."
+        }
+      ]
+    },
+    {
+      "id": "error-types-04",
+      "topicId": "error-types",
+      "title": "Свои ошибки и cause",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Свой тип ошибки — это класс, унаследованный от `Error`. В конструкторе вызови `super(message)` и задай `name`. Своей ошибке можно добавить и поля, например `this.field`."
+          },
+          {
+            "type": "code",
+            "code": "class ValidationError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = \"ValidationError\";\n  }\n}\ntry {\n  throw new ValidationError(\"email пустой\");\n} catch (e) {\n  console.log(e.name, e.message); // ValidationError email пустой\n  console.log(e instanceof ValidationError, e instanceof Error); // true true\n}"
+          },
+          {
+            "type": "warning",
+            "text": "Без `this.name = ...` у ошибки останется имя `\"Error\"`: оно берётся из `Error.prototype`."
+          },
+          {
+            "type": "text",
+            "text": "Когда ловишь ошибку и бросаешь вместо неё новую, понятную, передай исходную во втором аргументе: `{ cause: e }`. Она будет доступна в свойстве `cause`."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  try {\n    JSON.parse(\"{\");\n  } catch (e) {\n    throw new Error(\"Не прочитали настройки\", { cause: e });\n  }\n} catch (e) {\n  console.log(e.message);    // Не прочитали настройки\n  console.log(e.cause.name); // SyntaxError\n}"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "error-types-04-q1",
+          "type": "output",
+          "code": "class NotFoundError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = \"NotFoundError\";\n  }\n}\nconst e = new NotFoundError(\"нет пользователя\");\nconsole.log(e.name, e.message);",
+          "options": [
+            "NotFoundError нет пользователя",
+            "Error нет пользователя",
+            "NotFoundError undefined",
+            "NotFoundError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В конструкторе name явно задан как \"NotFoundError\"",
+            "super(message) передаёт текст в Error, и он попадает в message",
+            "message тоже выводится: в console.log два аргумента"
+          ],
+          "explanation": "super(message) записывает message, а name мы задали сами."
+        },
+        {
+          "id": "error-types-04-q2",
+          "type": "output",
+          "code": "class DbError extends Error {}\nconst e = new DbError(\"timeout\");\nconsole.log(e.name, e instanceof DbError);",
+          "options": ["Error true", "DbError true", "Error false", "DbError false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "name не берётся из имени класса — его нужно задать вручную",
+            "e создан через new DbError, так что instanceof даёт true",
+            null
+          ],
+          "explanation": "Наследование работает, поэтому instanceof DbError даёт true. Но name никто не задал, и он берётся из Error.prototype — \"Error\"."
+        },
+        {
+          "id": "error-types-04-q3",
+          "type": "fill",
+          "codeBefore": "class AppError extends Error {\n  constructor(message) {\n    ",
+          "codeAfter": ";\n    this.name = \"AppError\";\n  }\n}\nconsole.log(new AppError(\"сбой\").message); // сбой",
+          "options": ["super(message)", "super()", "this.message = message", "Error(message)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "super() без аргумента оставит message пустой строкой",
+            "До вызова super к this обращаться нельзя — ReferenceError",
+            "Вызов Error(message) создаёт отдельный объект и не вызывает конструктор родителя: при обращении к this будет ReferenceError"
+          ],
+          "explanation": "В конструкторе наследника нужно вызвать super до обращения к this. super(message) передаёт текст в Error, и он попадает в message."
+        },
+        {
+          "id": "error-types-04-q4",
+          "type": "output",
+          "code": "const low = new TypeError(\"нет поля id\");\nconst high = new Error(\"Заказ не сохранён\", { cause: low });\nconsole.log(high.message, \"|\", high.cause.message);",
+          "options": [
+            "Заказ не сохранён | нет поля id",
+            "Заказ не сохранён | undefined",
+            "нет поля id | Заказ не сохранён",
+            "TypeError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "cause — это исходная ошибка целиком, у неё есть свой message",
+            "message — у новой ошибки, а исходная лежит в cause",
+            "Код ничего не бросает, он только создаёт ошибки"
+          ],
+          "explanation": "Исходная ошибка сохраняется в свойстве cause, а message у новой ошибки — свой."
+        },
+        {
+          "id": "error-types-04-q5",
+          "type": "order",
+          "title": "Собери код: брось HttpError и выведи его status",
+          "lines": [
+            "try {",
+            "  throw new HttpError(404);",
+            "} catch (e) {",
+            "  if (e instanceof HttpError) console.log(e.status);",
+            "}"
+          ],
+          "shuffled": [2, 4, 1, 3, 0],
+          "explanation": "Ошибку бросаем внутри try, а в catch проверяем её тип через instanceof и читаем своё поле status."
+        }
+      ]
+    },
+    {
+      "id": "error-types-05",
+      "topicId": "error-types",
+      "title": "Закрепление: типы ошибок",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Повторим. **TypeError** — неподходящее значение, **ReferenceError** — нет переменной, **SyntaxError** — нарушен синтаксис (в том числе в `JSON.parse`), **RangeError** — число вне диапазона."
+          },
+          {
+            "type": "code",
+            "code": "function run(fn) {\n  try {\n    fn();\n    return \"ok\";\n  } catch (e) {\n    return e.name;\n  }\n}\nconsole.log(run(() => new Array(-1))); // RangeError\nconsole.log(run(() => JSON.parse(\"{\"))); // SyntaxError"
+          },
+          {
+            "type": "text",
+            "text": "Тип проверяют через `instanceof`: от конкретного к общему `Error`. Свои ошибки — классы `extends Error` с `super(message)` и своим `name`, а исходную ошибку сохраняют в `cause`."
+          },
+          {
+            "type": "tip",
+            "text": "Свойство `name` у своей ошибки задавай всегда — так в логах сразу видно, что случилось."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "error-types-05-q1",
+          "type": "output",
+          "code": "const errors = [new RangeError(\"a\"), new TypeError(\"b\"), new Error(\"c\")];\nfor (const e of errors) {\n  if (e instanceof TypeError) console.log(\"T\");\n  else if (e instanceof Error) console.log(\"E\");\n}",
+          "options": ["E T E", "T", "E E E", "T E E"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "RangeError и Error тоже проходят проверку instanceof Error",
+            "Для TypeError первая проверка срабатывает раньше",
+            "Массив перебирается по порядку, первым идёт RangeError"
+          ],
+          "explanation": "RangeError не TypeError, но это Error — выводится E. TypeError проходит первую проверку — T. Обычный Error — E."
+        },
+        {
+          "id": "error-types-05-q2",
+          "type": "output",
+          "code": "class ValidationError extends Error {\n  constructor(field) {\n    super(\"Поле \" + field + \" заполнено неверно\");\n    this.name = \"ValidationError\";\n    this.field = field;\n  }\n}\nfunction save(user) {\n  if (!user.email) throw new ValidationError(\"email\");\n  return \"сохранено\";\n}\ntry {\n  console.log(save({ name: \"Аня\" }));\n} catch (e) {\n  console.log(e.name, e.field);\n}",
+          "options": [
+            "ValidationError email",
+            "сохранено",
+            "Error email",
+            "ValidationError undefined"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "user.email — undefined, и save бросает ошибку",
+            "name задан в конструкторе как \"ValidationError\"",
+            "field сохраняется в конструкторе: this.field = field"
+          ],
+          "explanation": "У пользователя нет email, поэтому save бросает ValidationError. Его name и field мы задали в конструкторе."
+        },
+        {
+          "id": "error-types-05-q3",
+          "type": "output",
+          "code": "function run(fn) {\n  try {\n    fn();\n    return \"ok\";\n  } catch (e) {\n    return e.name;\n  }\n}\nconsole.log(run(() => null.x), run(() => missingVar), run(() => 1));",
+          "options": [
+            "TypeError ReferenceError ok",
+            "TypeError TypeError ok",
+            "ReferenceError ReferenceError ok",
+            "TypeError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Необъявленная переменная — это ReferenceError",
+            "null существует, просто у него нельзя читать свойства — TypeError",
+            "run ловит ошибку внутри и возвращает её имя, так что все три вызова выполнятся"
+          ],
+          "explanation": "Свойство у null — TypeError, необъявленная переменная — ReferenceError, а третья функция работает без ошибок."
+        },
+        {
+          "id": "error-types-05-q4",
+          "type": "fill",
+          "codeBefore": "try {\n  try {\n    null.length;\n  } catch (err) {\n    throw new Error(\"Отчёт не построен\", { cause: err });\n  }\n} catch (e) {\n  console.log(e.",
+          "codeAfter": ".name); // TypeError\n}",
+          "options": ["cause", "message", "error", "reason"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "message — строка, у неё нет name: выведется undefined",
+            "Свойства error нет: e.error — undefined, и чтение .name бросит TypeError",
+            "Свойства reason у ошибки нет: чтение .name у undefined бросит TypeError"
+          ],
+          "explanation": "Исходная ошибка, переданная в { cause: err }, хранится в свойстве cause."
+        },
+        {
+          "id": "error-types-05-q5",
+          "type": "trueFalse",
+          "code": "try {\n  throw new RangeError(\"слишком много\");\n} catch (e) {\n  console.log(e instanceof TypeError ? \"тип\" : e.name);\n}",
+          "options": ["Выведет RangeError", "Выведет «тип»"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "RangeError не наследуется от TypeError — это «братья», а не родитель и потомок"
+          ],
+          "explanation": "RangeError и TypeError — разные наследники Error, проверка instanceof TypeError даёт false."
+        }
+      ]
+    },
+    {
+      "id": "common-bugs-01",
+      "topicId": "common-bugs",
+      "title": "Мутации и ссылки",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`sort` и `reverse` меняют **исходный** массив и возвращают его же. «Отсортировал копию» — на деле испортил оригинал."
+          },
+          {
+            "type": "code",
+            "code": "const prices = [30, 10, 20];\nconst sorted = prices.sort((a, b) => a - b);\nconsole.log(prices);            // [10, 20, 30]\nconsole.log(sorted === prices); // true"
+          },
+          {
+            "type": "tip",
+            "text": "Нужна копия — сортируй `[...prices].sort(...)` или вызывай `prices.toSorted(...)`."
+          },
+          {
+            "type": "text",
+            "text": "Массивы и объекты хранятся **по ссылке**. `const b = a` не копирует массив: обе переменные указывают на один и тот же. То же при передаче в функцию."
+          },
+          {
+            "type": "code",
+            "code": "const original = [1, 2];\nconst copy = original;\ncopy.push(3);\nconsole.log(original); // [1, 2, 3]"
+          },
+          {
+            "type": "warning",
+            "text": "`const` не спасает: он запрещает переприсвоить переменную, но не менять содержимое массива."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "common-bugs-01-q1",
+          "type": "output",
+          "code": "const scores = [3, 1, 2];\nconst top = scores.sort((a, b) => b - a);\nconsole.log(scores);",
+          "options": ["[3, 2, 1]", "[3, 1, 2]", "[1, 2, 3]", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "sort не создаёт копию, а меняет исходный массив",
+            "Компаратор b - a сортирует по убыванию",
+            "sort возвращает массив, а scores никуда не делся"
+          ],
+          "explanation": "sort сортирует массив на месте, поэтому scores тоже изменился. top и scores — один и тот же массив."
+        },
+        {
+          "id": "common-bugs-01-q2",
+          "type": "output",
+          "code": "const a = { count: 1 };\nconst b = a;\nb.count++;\nconsole.log(a.count);",
+          "options": ["2", "1", "undefined", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Присваивание объекта не создаёт копию",
+            "Свойство count у объекта есть",
+            "count — число, ++ работает нормально"
+          ],
+          "explanation": "b = a копирует ссылку, а не объект. a и b — один объект, поэтому изменение через b видно и через a."
+        },
+        {
+          "id": "common-bugs-01-q3",
+          "type": "fill",
+          "codeBefore": "const nums = [3, 1, 2];\nconst sorted = ",
+          "codeAfter": ".sort((a, b) => a - b);\nconsole.log(nums, sorted); // [3, 1, 2] [1, 2, 3]",
+          "options": ["[...nums]", "nums", "[nums]", "{ ...nums }"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "sort изменит сам nums: выведется [1, 2, 3] [1, 2, 3]",
+            "[nums] — массив с одним элементом-массивом, внутри ничего не отсортируется",
+            "Объект — не массив, у него нет метода sort: TypeError"
+          ],
+          "explanation": "Spread [...nums] создаёт новый массив, и sort меняет уже его, а nums остаётся прежним."
+        },
+        {
+          "id": "common-bugs-01-q4",
+          "type": "trueFalse",
+          "code": "function addItem(cart, item) {\n  cart.push(item);\n  return cart;\n}\nconst cart = [\"хлеб\"];\nconst newCart = addItem(cart, \"молоко\");\nconsole.log(cart.length);",
+          "options": ["Выведет 2", "Выведет 1"],
+          "correct": 0,
+          "optionExplanations": [null, "В функцию передаётся ссылка, а не копия массива"],
+          "explanation": "Функция получает ссылку на тот же массив, и push меняет исходный cart."
+        },
+        {
+          "id": "common-bugs-01-q5",
+          "type": "order",
+          "title": "Собери функцию, которая не меняет исходный массив",
+          "lines": [
+            "function addItem(cart, item) {",
+            "  const copy = [...cart];",
+            "  copy.push(item);",
+            "  return copy;",
+            "}"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Сначала копируем массив, потом добавляем элемент в копию и возвращаем её. Исходный cart не меняется."
+        }
+      ]
+    },
+    {
+      "id": "common-bugs-02",
+      "topicId": "common-bugs",
+      "title": "Сравнения",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`===` сравнивает объекты и массивы **по ссылке**, а не по содержимому. Два одинаковых на вид объекта — разные объекты."
+          },
+          {
+            "type": "code",
+            "code": "console.log({ a: 1 } === { a: 1 }); // false\nconsole.log([1, 2] === [1, 2]);     // false\nconst x = { a: 1 };\nconst y = x;\nconsole.log(x === y);               // true"
+          },
+          {
+            "type": "tip",
+            "text": "Сравнивай нужные поля: `a.id === b.id`. И помни: `includes` и `indexOf` тоже ищут объект по ссылке."
+          },
+          {
+            "type": "text",
+            "text": "`==` перед сравнением приводит типы, и это рождает сюрпризы. `===` сравнивает без приведения — используй его."
+          },
+          {
+            "type": "code",
+            "code": "console.log(0 == \"\");           // true\nconsole.log(\"1\" == 1);          // true\nconsole.log(null == undefined); // true\nconsole.log(0 === \"\");          // false\nconsole.log(null === undefined); // false"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "common-bugs-02-q1",
+          "type": "output",
+          "code": "console.log([] === [], [] == []);",
+          "options": ["false false", "true true", "false true", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Массивы сравниваются по ссылке, а не по содержимому",
+            "Когда оба операнда — объекты, == не приводит типы и тоже сравнивает ссылки",
+            null
+          ],
+          "explanation": "Каждый [] — новый массив. Для двух объектов == и === ведут себя одинаково: сравнивают ссылки."
+        },
+        {
+          "id": "common-bugs-02-q2",
+          "type": "output",
+          "code": "const users = [{ id: 1 }, { id: 2 }];\nconsole.log(users.includes({ id: 1 }));\nconsole.log(users.some(u => u.id === 1));",
+          "options": ["false true", "true true", "false false", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "includes сравнивает объекты по ссылке, а не по содержимому",
+            "some сравнивает числа id, и такое совпадение есть",
+            null
+          ],
+          "explanation": "includes ищет тот же самый объект по ссылке, а { id: 1 } — новый объект. some сравнивает поле id, это работает."
+        },
+        {
+          "id": "common-bugs-02-q3",
+          "type": "output",
+          "code": "const input = \"0\";\nif (input == false) {\n  console.log(\"пусто\");\n} else {\n  console.log(\"есть значение\");\n}",
+          "options": ["пусто", "есть значение", "true", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ловушка: == приводит \"0\" и false к числу 0, поэтому условие истинно",
+            "Выводится текст из ветки if, а не результат сравнения",
+            "Одна из веток if/else выполнится обязательно"
+          ],
+          "explanation": "== приводит обе стороны к числу: \"0\" → 0, false → 0. Получается 0 == 0, хотя непустая строка \"0\" — truthy."
+        },
+        {
+          "id": "common-bugs-02-q4",
+          "type": "fill",
+          "codeBefore": "function isSameUser(a, b) {\n  return ",
+          "codeAfter": ";\n}\nconsole.log(isSameUser({ id: 7, name: \"Аня\" }, { id: 7, name: \"Аня\" })); // true\nconsole.log(isSameUser({ id: 7 }, { id: 8 })); // false",
+          "options": ["a.id === b.id", "a === b", "a == b", "a.id === b"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это два разных объекта, === даст false",
+            "== для двух объектов тоже сравнивает ссылки — false",
+            "Число сравнивается с объектом — всегда false"
+          ],
+          "explanation": "Объекты разные, поэтому сравнивать их напрямую бесполезно. Сравниваем поле id — это числа."
+        },
+        {
+          "id": "common-bugs-02-q5",
+          "type": "trueFalse",
+          "code": "console.log(null == undefined, null === undefined);",
+          "options": ["Выведет true false", "Выведет false false"],
+          "correct": 0,
+          "optionExplanations": [null, "== считает null и undefined равными друг другу"],
+          "explanation": "Особое правило: null == undefined истинно. Но типы у них разные, поэтому === даёт false."
+        }
+      ]
+    },
+    {
+      "id": "common-bugs-03",
+      "topicId": "common-bugs",
+      "title": "Потерянный return и async в forEach",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Стрелка **без** фигурных скобок возвращает выражение сама. **С** фигурными скобками это тело функции, и без `return` она вернёт `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const doubled = [1, 2, 3].map(n => { n * 2 });\nconsole.log(doubled); // [undefined, undefined, undefined]\n\nconst fixed = [1, 2, 3].map(n => n * 2);\nconsole.log(fixed);   // [2, 4, 6]"
+          },
+          {
+            "type": "warning",
+            "text": "Хочешь вернуть объект из короткой стрелки — оберни его в круглые скобки: `() => ({ id: 1 })`. Без них `{` считается началом тела функции."
+          },
+          {
+            "type": "text",
+            "text": "`forEach` не ждёт промисы: он вызывает `async`-колбэк и сразу идёт дальше. `await` внутри задерживает только сам колбэк, а код после `forEach` выполняется раньше."
+          },
+          {
+            "type": "code",
+            "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\nasync function run() {\n  [1, 2].forEach(async n => {\n    await wait(100);\n    console.log(n);\n  });\n  console.log(\"готово\");\n}\nrun();\n// готово\n// 1\n// 2"
+          },
+          {
+            "type": "tip",
+            "text": "По очереди — `for...of` с `await`. Параллельно — `await Promise.all(arr.map(...))`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "common-bugs-03-q1",
+          "type": "output",
+          "code": "const users = [{ name: \"Аня\" }, { name: \"Боря\" }];\nconst names = users.map(u => { u.name });\nconsole.log(names);",
+          "options": ["[undefined, undefined]", "[\"Аня\", \"Боря\"]", "[]", "SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С фигурными скобками нужен явный return",
+            "map всегда возвращает массив той же длины",
+            "Код корректен, просто тело функции ничего не возвращает"
+          ],
+          "explanation": "В фигурных скобках нет return, поэтому колбэк возвращает undefined для каждого элемента."
+        },
+        {
+          "id": "common-bugs-03-q2",
+          "type": "output",
+          "code": "const make = id => { id: id };\nconsole.log(make(5));",
+          "options": ["undefined", "{ id: 5 }", "SyntaxError", "5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Чтобы вернуть объект, его нужно обернуть в круглые скобки: ({ id: id })",
+            "Внутри фигурных скобок получилась метка id: и выражение id — синтаксически это допустимо",
+            "Тело в фигурных скобках без return возвращает undefined"
+          ],
+          "explanation": "{ после стрелки — начало тела функции, а id: — метка. Тело ничего не возвращает, поэтому результат undefined."
+        },
+        {
+          "id": "common-bugs-03-q3",
+          "type": "output",
+          "code": "async function main() {\n  const items = [1, 2, 3];\n  let sum = 0;\n  items.forEach(async n => {\n    await null;\n    sum += n;\n  });\n  console.log(sum);\n}\nmain();",
+          "options": ["0", "6", "NaN", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Суммирование произойдёт после await — уже после console.log",
+            "sum — число 0, сложение ещё не началось",
+            "sum объявлена со значением 0"
+          ],
+          "explanation": "forEach не ждёт async-колбэки. Каждый колбэк останавливается на await, и console.log выполняется раньше, чем sum увеличится."
+        },
+        {
+          "id": "common-bugs-03-q4",
+          "type": "fill",
+          "codeBefore": "const wait = ms => new Promise(r => setTimeout(r, ms));\nasync function main() {\n  ",
+          "codeAfter": " {\n    await wait(10);\n    console.log(n);\n  }\n  console.log(\"готово\");\n}\nmain();\n// 1\n// 2\n// готово",
+          "options": [
+            "for (const n of [1, 2])",
+            "for (const n in [1, 2])",
+            "[1, 2].forEach(n =>",
+            "while (const n of [1, 2])"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "for...in перебирает индексы-строки: выведет 0 и 1",
+            "Скобка вызова forEach не закрыта, да и await в обычной стрелке запрещён — SyntaxError",
+            "while не умеет перебирать массив — SyntaxError"
+          ],
+          "explanation": "for...of внутри async-функции честно ждёт каждый await, поэтому «готово» выводится в конце."
+        },
+        {
+          "id": "common-bugs-03-q5",
+          "type": "order",
+          "title": "Собери функцию: загрузи всех и дождись",
+          "lines": [
+            "async function loadAll(ids) {",
+            "  const users = await Promise.all(",
+            "    ids.map(id => fetchUser(id))",
+            "  );",
+            "  return users;",
+            "}"
+          ],
+          "shuffled": [4, 1, 5, 2, 0, 3],
+          "explanation": "map создаёт массив промисов, Promise.all ждёт их все, и только потом функция возвращает результат."
+        }
+      ]
+    },
+    {
+      "id": "common-bugs-04",
+      "topicId": "common-bugs",
+      "title": "Числа и циклы",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Дробные числа хранятся в двоичном виде с погрешностью, поэтому `0.1 + 0.2` — не ровно `0.3`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(0.1 + 0.2);           // 0.30000000000000004\nconsole.log(0.1 + 0.2 === 0.3);   // false\nconsole.log((0.1 + 0.2).toFixed(2)); // 0.30"
+          },
+          {
+            "type": "text",
+            "text": "`parseInt` без второго аргумента сам угадывает систему счисления: строку с `0x` читает как шестнадцатеричную. А в `map(parseInt)` вторым аргументом попадает индекс элемента."
+          },
+          {
+            "type": "code",
+            "code": "console.log(parseInt(\"0x10\"));     // 16\nconsole.log(parseInt(\"0x10\", 10)); // 0\nconsole.log([\"1\", \"2\", \"3\"].map(parseInt)); // [1, NaN, NaN]\nconsole.log([\"1\", \"2\", \"3\"].map(s => parseInt(s, 10))); // [1, 2, 3]"
+          },
+          {
+            "type": "warning",
+            "text": "Off-by-one: индексы массива идут от `0` до `length - 1`. Условие `i <= arr.length` делает лишний шаг, и на нём `arr[i]` — `undefined`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "common-bugs-04-q1",
+          "type": "output",
+          "code": "let total = 0;\nfor (let i = 0; i < 3; i++) total += 0.1;\nconsole.log(total === 0.3);",
+          "options": ["false", "true", "0.3", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Дробные числа складываются с погрешностью",
+            "Выводится результат сравнения — логическое значение",
+            "total — обычное число, просто неточное"
+          ],
+          "explanation": "Погрешность 0.1 накапливается: total получается 0.30000000000000004, а не ровно 0.3."
+        },
+        {
+          "id": "common-bugs-04-q2",
+          "type": "output",
+          "code": "const arr = [10, 20, 30];\nlet sum = 0;\nfor (let i = 0; i <= arr.length; i++) {\n  sum += arr[i];\n}\nconsole.log(sum);",
+          "options": ["NaN", "60", "30", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Условие <= добавляет шаг с i = 3, где элемента нет",
+            null,
+            "sum — число, после сложения с undefined оно становится NaN"
+          ],
+          "explanation": "Цикл делает лишний шаг: arr[3] — undefined, а 60 + undefined = NaN."
+        },
+        {
+          "id": "common-bugs-04-q3",
+          "type": "output",
+          "code": "console.log([\"10\", \"10\", \"10\"].map(parseInt));",
+          "options": ["[10, NaN, 2]", "[10, 10, 10]", "[10, NaN, NaN]", "[NaN, NaN, NaN]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "map передаёт индекс вторым аргументом, и parseInt принимает его за основание",
+            "При основании 2 строка \"10\" — это двоичное число 2",
+            "Основание 0 означает «угадать», и \"10\" читается как 10"
+          ],
+          "explanation": "map передаёт в parseInt ещё и индекс как основание: parseInt(\"10\", 0) — 10, parseInt(\"10\", 1) — NaN, parseInt(\"10\", 2) — 2."
+        },
+        {
+          "id": "common-bugs-04-q4",
+          "type": "fill",
+          "codeBefore": "const ids = [\"7\", \"08\", \"0x1F\"].map(s => parseInt(s",
+          "codeAfter": "));\nconsole.log(ids); // [7, 8, 0]",
+          "options": [", 10", "", ", 16", ", 8"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без основания \"0x1F\" прочитается как шестнадцатеричное число 31",
+            "В шестнадцатеричной системе \"0x1F\" — это 31",
+            "В восьмеричной нет цифры 8: \"08\" даст 0"
+          ],
+          "explanation": "С основанием 10 parseInt читает только десятичные цифры: у \"0x1F\" это лишь первый 0."
+        },
+        {
+          "id": "common-bugs-04-q5",
+          "type": "trueFalse",
+          "code": "const arr = [1, 2, 3];\nconsole.log(arr[arr.length]);",
+          "options": ["Выведет undefined", "Выведет 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "arr[arr.length] — за концом массива, последний элемент — arr[arr.length - 1]"
+          ],
+          "explanation": "Последний индекс — length - 1, то есть 2. Элемента с индексом 3 нет."
+        }
+      ]
+    },
+    {
+      "id": "common-bugs-05",
+      "topicId": "common-bugs",
+      "title": "Закрепление: найди баг",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Повторим ловушки. `sort` меняет исходный массив, а присваивание объекта копирует только ссылку. Объекты сравниваются по ссылке, а `==` приводит типы. `includes` и `indexOf` сравнивают строго: строка `\"2\"` не найдётся среди чисел."
+          },
+          {
+            "type": "code",
+            "code": "const a = [2, 1];\nconst b = a;\nb.sort();\nconsole.log(a);             // [1, 2]\nconsole.log([1] === [1]);   // false\nconsole.log(\"1\" == 1);      // true"
+          },
+          {
+            "type": "text",
+            "text": "Стрелка с фигурными скобками без `return` возвращает `undefined`. `forEach` не ждёт `async`-колбэки. Дробные числа неточны, `parseInt` пиши с основанием, а в циклах следи за `<` и `<=`."
+          },
+          {
+            "type": "tip",
+            "text": "Если код ведёт себя странно, выведи промежуточные значения через `console.log` — баг обычно видно сразу."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "common-bugs-05-q1",
+          "type": "output",
+          "code": "const original = [5, 1, 4];\nconst copy = original;\ncopy.sort((a, b) => a - b);\nconsole.log(original[0]);",
+          "options": ["1", "5", "4", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "copy = original не копирует массив, а sort меняет его на месте",
+            null,
+            "Массив не пустой, элемент с индексом 0 есть"
+          ],
+          "explanation": "copy и original — один и тот же массив. sort отсортировал его на месте, и первым стал 1."
+        },
+        {
+          "id": "common-bugs-05-q2",
+          "type": "output",
+          "code": "const ids = [1, 2, 3];\nconst fromInput = \"2\";\nconsole.log(ids.includes(fromInput), ids.indexOf(fromInput));",
+          "options": ["false -1", "true 1", "false 1", "true -1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка \"2\" и число 2 — разные значения для includes и indexOf",
+            "indexOf не нашёл элемент — поэтому -1",
+            "includes и indexOf сравнивают одинаково, без приведения типов"
+          ],
+          "explanation": "includes и indexOf сравнивают без приведения типов: строка \"2\" не равна числу 2."
+        },
+        {
+          "id": "common-bugs-05-q3",
+          "type": "output",
+          "code": "const nums = [1, 2, 3, 4];\nconst even = nums.filter(n => {\n  n % 2 === 0;\n});\nconsole.log(even);",
+          "options": ["[]", "[2, 4]", "[1, 2, 3, 4]", "[undefined, undefined]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Нет return — колбэк возвращает undefined, и элемент отбрасывается",
+            "undefined — falsy, filter отбрасывает такие элементы",
+            "filter не меняет элементы, он только отбирает их"
+          ],
+          "explanation": "Колбэк в фигурных скобках без return возвращает undefined — falsy. filter не оставил ни одного элемента."
+        },
+        {
+          "id": "common-bugs-05-q4",
+          "type": "fill",
+          "codeBefore": "const price = 0.1 + 0.2;\nconsole.log(",
+          "codeAfter": "); // 0.30",
+          "options": [
+            "price.toFixed(2)",
+            "Math.round(price)",
+            "price.toFixed(1)",
+            "parseInt(price)"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Math.round округляет до целого: 0",
+            "Один знак после запятой даст 0.3",
+            "parseInt отбросит дробную часть: 0"
+          ],
+          "explanation": "toFixed(2) округляет до двух знаков после запятой и возвращает строку \"0.30\"."
+        },
+        {
+          "id": "common-bugs-05-q5",
+          "type": "trueFalse",
+          "title": "Когда выведется сообщение?",
+          "code": "const save = item => new Promise(r => setTimeout(r, 100));\nasync function saveAll(items) {\n  items.forEach(async item => {\n    await save(item);\n  });\n  console.log(\"всё сохранено\");\n}\nsaveAll([\"a\", \"b\"]);",
+          "options": [
+            "«всё сохранено» выведется до окончания сохранений",
+            "«всё сохранено» выведется после всех сохранений"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await внутри колбэка задерживает только сам колбэк, а не forEach"
+          ],
+          "explanation": "forEach не ждёт промисы, которые возвращает async-колбэк, поэтому сообщение выводится сразу. Для ожидания нужен for...of с await или Promise.all."
+        }
+      ]
+    }
+  ]
+}

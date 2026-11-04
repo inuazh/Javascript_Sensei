@@ -16,6 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
+    "build:e2e": "expo export --platform web --output-dir dist-e2e",
+    "test:e2e": "npm run build:e2e && playwright test",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test -- --ci && npm run validate:content",
     "build:rustore": "eas build --platform android --profile rustore"
   },
@@ -44,10 +46,12 @@
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-web": "^0.21.4",
+    "react-native-webview": "13.15.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",
+    "@playwright/test": "^1.63.0",
     "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
     "babel-preset-expo": "~54.0.12",
@@ -66,7 +70,13 @@
     "preset": "jest-expo",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/.expo/"
+      "/.expo/",
+      "/.claude/",
+      "<rootDir>/e2e/",
+      "<rootDir>/dist-e2e/"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.claude/"
     ]
   }
 }

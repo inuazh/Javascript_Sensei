@@ -28,6 +28,8 @@ export interface QuestionTypeDef<Q extends Question = Question, A = unknown> {
   correctAnswer: (question: Q) => CorrectAnswerView;
   /** A note about the specific answer the user gave, if the content has one. */
   answerNote?: (question: Q, answer: A) => string | null;
+  /** Complete code the user can run after answering, or null if there is none. */
+  runnableCode: (question: Q) => string | null;
 }
 
 export type QuestionOfType<T extends QuestionType> = Extract<Question, { type: T }>;

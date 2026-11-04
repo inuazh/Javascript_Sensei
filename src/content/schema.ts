@@ -104,6 +104,19 @@ export const OrderQuestionSchema = z.object({
   lines: z.array(text).min(2),
   /** Order in which the lines are shown: a permutation of line indexes. */
   shuffled: z.array(z.number().int().min(0)),
+  /** The lines are steps in words (a trace, a ranking), not code: nothing to run. */
+  steps: z.boolean().optional(),
+});
+
+export const FindBugQuestionSchema = z.object({
+  ...questionBase,
+  type: z.literal('findBug'),
+  /** A short snippet; the user taps the line with the bug. */
+  code: text,
+  /** 1-based number of the line with the bug. */
+  bugLine: z.number().int().min(1),
+  /** The corrected code, shown after a wrong answer. */
+  fixed: text.optional(),
 });
 
 export const QuestionSchema = z.discriminatedUnion('type', [
@@ -111,6 +124,7 @@ export const QuestionSchema = z.discriminatedUnion('type', [
   TrueFalseQuestionSchema,
   FillQuestionSchema,
   OrderQuestionSchema,
+  FindBugQuestionSchema,
 ]);
 
 // ─── Lessons ────────────────────────────────────────────────────────────────
@@ -138,6 +152,7 @@ export type OutputQuestion = z.infer<typeof OutputQuestionSchema>;
 export type TrueFalseQuestion = z.infer<typeof TrueFalseQuestionSchema>;
 export type FillQuestion = z.infer<typeof FillQuestionSchema>;
 export type OrderQuestion = z.infer<typeof OrderQuestionSchema>;
+export type FindBugQuestion = z.infer<typeof FindBugQuestionSchema>;
 export type Question = z.infer<typeof QuestionSchema>;
 export type QuestionType = Question['type'];
 export type ChoiceQuestion = OutputQuestion | TrueFalseQuestion | FillQuestion;

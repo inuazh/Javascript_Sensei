@@ -1,4 +1,14 @@
-import { tokenize } from '../highlight';
+import { tokenize, tokenizeLines } from '../highlight';
+
+describe('tokenizeLines', () => {
+  it('splits tokens into lines, including tokens spanning lines', () => {
+    const code = 'const a = `x\ny`;\n\nfoo(a);';
+    const lines = tokenizeLines(code);
+    expect(lines.map(l => l.map(t => t.text).join(''))).toEqual(code.split('\n'));
+    expect(lines[1][0]).toEqual({ kind: 'string', text: 'y`' });
+    expect(lines[2]).toEqual([]);
+  });
+});
 
 describe('tokenize', () => {
   it('splits code into highlighted tokens without losing text', () => {

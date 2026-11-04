@@ -38,3 +38,23 @@ export function tokenize(code: string): Token[] {
   if (last < code.length) tokens.push({ kind: 'text', text: code.slice(last) });
   return tokens;
 }
+
+/** Splits pieces of code into lines; a piece spanning several lines is split too. */
+export function splitLines<T extends { text: string }>(
+  pieces: T[],
+  keepEmpty: (piece: T) => boolean = () => false,
+): T[][] {
+  const lines: T[][] = [[]];
+  for (const piece of pieces) {
+    piece.text.split('\n').forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part || keepEmpty(piece)) lines[lines.length - 1].push({ ...piece, text: part });
+    });
+  }
+  return lines;
+}
+
+/** Highlighted tokens of `code`, one array per line. */
+export function tokenizeLines(code: string): Token[][] {
+  return splitLines(tokenize(code));
+}

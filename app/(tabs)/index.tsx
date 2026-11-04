@@ -2,15 +2,19 @@ import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import {
+  getDailyQuestion,
   getFirstUncompleted,
   getSectionLessons,
   getSections,
   getTopicLessons,
 } from '../../src/content/repository';
+import { dailyNumber, dailyStreak } from '../../src/domain/daily';
 import { todayActivity } from '../../src/domain/progress';
 import { plural } from '../../src/domain/reminders';
 import { dueItems } from '../../src/domain/review';
 import { viewStreak } from '../../src/domain/streak';
+import { DailyShareButton } from '../../src/features/daily/DailyShare';
+import { questionTitle } from '../../src/features/quiz/registry';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
 import {
@@ -55,6 +59,76 @@ function ActionRow({
   );
 }
 
+function DailyCard({ today }: { today: string }) {
+  const router = useRouter();
+  const results = useUserStore(s => s.progress.daily);
+  const question = useMemo(() => getDailyQuestion(today)?.question, [today]);
+  if (!question) return null;
+
+  const number = dailyNumber(today);
+  const result = results[today];
+  const streak = dailyStreak(results, today);
+  const open = () => router.push('/daily');
+
+  if (!result) {
+    return (
+      <Card style={styles.dailyCard}>
+        <View style={styles.rowBetween}>
+          <Label dot>задача дня</Label>
+          <Text style={styles.dailyNumber}>#{number}</Text>
+        </View>
+        <Text style={Type.h3}>{questionTitle(question)}</Text>
+        <Text style={Type.small}>
+          Одна попытка, одна задача для всех.
+          {streak > 0 ? ` Серия: ${streak}.` : ''}
+        </Text>
+        <Button
+          title="Решить"
+          icon="arrow-right"
+          variant="secondary"
+          onPress={open}
+          accessibilityHint={`Задача дня номер ${number}, одна попытка`}
+          style={styles.dailyButton}
+        />
+      </Card>
+    );
+  }
+
+  const status = result.correct ? 'решена' : 'не решена';
+  return (
+    <Card style={styles.dailyCard}>
+      <Pressable
+        onPress={open}
+        accessibilityRole="button"
+        accessibilityLabel={`Задача дня номер ${number} ${status}. Серия задач дня: ${streak}. Открыть результат`}
+        style={styles.dailyDone}
+      >
+        <View style={[styles.dailyBadge, result.correct && styles.dailyBadgeSolved]}>
+          <Icon
+            name={result.correct ? 'check' : 'x'}
+            size={18}
+            color={result.correct ? Colors.textOnAccent : Colors.textSecondary}
+          />
+        </View>
+        <View style={styles.flex}>
+          <Text style={Type.h3}>
+            Задача дня <Text style={styles.dailyInline}>#{number}</Text>
+          </Text>
+          <Text style={Type.small}>
+            {result.correct ? 'Решено' : 'Не в этот раз'} · серия {streak} · завтра новая
+          </Text>
+        </View>
+      </Pressable>
+      <DailyShareButton
+        results={results}
+        day={today}
+        variant="secondary"
+        style={styles.dailyButton}
+      />
+    </Card>
+  );
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const today = useToday();
@@ -92,8 +166,13 @@ export default function HomeScreen() {
             color={Colors.warning}
             label={String(streak.days)}
             muted={streak.status !== 'done'}
+            accessibilityLabel={`Стрик: ${days(streak.days)}`}
           />
-          <Chip icon="lightning" label={String(progress.totalXp)} />
+          <Chip
+            icon="lightning"
+            label={String(progress.totalXp)}
+            accessibilityLabel={`Опыт: ${progress.totalXp} XP`}
+          />
         </View>
       </View>
 
@@ -161,6 +240,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/placement')}
         />
       )}
+      <DailyCard today={today} />
       {dueCount > 0 && (
         <ActionRow
           icon="repeat"
@@ -262,6 +342,21 @@ const styles = StyleSheet.create({
   },
   continueButton: { marginTop: Spacing.md },
   action: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  dailyCard: { gap: Spacing.xs },
+  dailyNumber: { fontFamily: Fonts.display, fontSize: 26, lineHeight: 30, color: Colors.accent },
+  dailyInline: { fontFamily: Fonts.monoBold, color: Colors.accent },
+  dailyButton: { marginTop: Spacing.md },
+  dailyDone: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  dailyBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
+  dailyBadgeSolved: { backgroundColor: Colors.accent, borderColor: Colors.accent },
   flex: { flex: 1 },
   mapTitle: { marginTop: Spacing.md },
   section: { gap: Spacing.sm, marginBottom: Spacing.lg },

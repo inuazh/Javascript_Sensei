@@ -9,6 +9,8 @@
  *    unique ids, answer indexes in range, solvable `order` questions.
  * 3. The code of every `output` question is run in a sandbox (timers and
  *    promises included) and compared with the option marked as correct.
+ *    For `findBug` questions with `fixed`, both versions are run: the bug
+ *    must change the output.
  *
  * Exits with code 1 if any error is found. Warnings do not fail the run.
  */
@@ -23,6 +25,7 @@ import {
   type Question,
   type SectionDef,
 } from '../src/content/schema';
+import { checkFindBugFix, checkFindBugLines } from './lib/check-find-bug';
 import { candidateAnswers, normalizeOutput, runSnippet } from './lib/run-snippet';
 
 const CONTENT_DIR = path.join(__dirname, '..', 'content');
@@ -168,6 +171,23 @@ function checkQuestion(where: string, q: Question) {
     if (!isPermutation) error(where, `"shuffled" must be a permutation of 0..${n - 1}`);
     else if (sh.every((v, i) => v === i))
       error(where, '"shuffled" is already in the correct order');
+    if (!q.steps) {
+      try {
+        new Function(q.lines.join('\n'));
+      } catch (e) {
+        error(
+          where,
+          `lines in the correct order are not valid code (${(e as Error).message}); ` +
+            'if they are steps in words, set "steps": true',
+        );
+      }
+    }
+    return;
+  }
+  if (q.type === 'findBug') {
+    const issues = checkFindBugLines(q);
+    for (const e of issues.errors) error(where, e);
+    for (const w of issues.warnings) warn(where, w);
     return;
   }
   if (q.correct >= q.options.length) {
@@ -240,9 +260,14 @@ async function main() {
       questionCount += lesson.questions.length;
       if (only.size > 0 && !only.has(section.id)) continue;
       for (const q of lesson.questions) {
-        if (q.type !== 'output') continue;
-        await checkOutputQuestion(`${section.id}.json › ${q.id}`, q);
-        executed++;
+        const where = `${section.id}.json › ${q.id}`;
+        if (q.type === 'output') {
+          await checkOutputQuestion(where, q);
+          executed++;
+        } else if (q.type === 'findBug' && q.fixed !== undefined) {
+          for (const w of await checkFindBugFix(q)) warn(where, w);
+          executed += 2;
+        }
       }
     }
   }
@@ -253,7 +278,7 @@ async function main() {
   for (const e of errors) console.log(`❌ ${e}`);
   console.log(
     `\n${sections.length} sections, ${lessonCount} lessons (${withTheory} with theory), ` +
-      `${questionCount} questions, ${executed} output snippets executed — ` +
+      `${questionCount} questions, ${executed} snippets executed — ` +
       `${errors.length} errors, ${warnings.length} warnings`,
   );
   process.exit(errors.length > 0 ? 1 : 0);

@@ -1407,6 +1407,14 @@
             null
           ],
           "explanation": "Каждый вызов inc() увеличивает одну и ту же n из замыкания: 1, 2, 3."
+        },
+        {
+          "id": "functions-05-q6",
+          "type": "findBug",
+          "code": "function counter() {\n  return () => {\n    let n = 0;\n    return ++n;\n  };\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc()); // ждём 1 2 3",
+          "bugLine": 3,
+          "fixed": "function counter() {\n  let n = 0;\n  return () => ++n;\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc()); // 1 2 3",
+          "explanation": "`let n = 0` стоит внутри возвращаемой функции, поэтому n создаётся заново при каждом вызове inc() и код выводит 1 1 1. Чтобы счётчик помнил значение между вызовами, объяви n в counter(): тогда её сохранит замыкание."
         }
       ]
     }

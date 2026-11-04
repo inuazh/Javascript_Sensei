@@ -11,6 +11,8 @@ export const XP = {
   perfectLesson: 10,
   perCorrectReview: 5,
   dailyWorkoutBonus: 20,
+  /** Solving «Задача дня». */
+  dailyChallenge: 15,
 } as const;
 
 export type Stars = 0 | 1 | 2 | 3;

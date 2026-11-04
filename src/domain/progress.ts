@@ -4,6 +4,7 @@
  * so all the rules here are unit-tested without React.
  */
 import { newlyUnlocked, type Achievement, type AchievementStats } from './achievements';
+import { dailyStreak, type DailyResults } from './daily';
 import { toDayKey, weekDays, type DayKey } from './dates';
 import { getLevelInfo } from './levels';
 import {
@@ -46,6 +47,8 @@ export interface ProgressState {
   workoutsCompleted: number;
   mistakesFixed: number;
   lastWorkoutDay: DayKey | null;
+  /** «Задача дня» results by the day of the challenge. */
+  daily: DailyResults;
 }
 
 export const initialProgress: ProgressState = {
@@ -58,6 +61,7 @@ export const initialProgress: ProgressState = {
   workoutsCompleted: 0,
   mistakesFixed: 0,
   lastWorkoutDay: null,
+  daily: {},
 };
 
 /** Lesson ids per section, needed for section-wide achievements. */
@@ -99,6 +103,14 @@ export interface WorkoutOutcome extends ActivityOutcome {
   total: number;
   mistakesFixed: number;
   firstWorkoutToday: boolean;
+}
+
+export interface DailyOutcome extends ActivityOutcome {
+  correct: boolean;
+  /** Solved challenges in a row, including this one. */
+  dailyStreak: number;
+  /** The challenge of that day had already been answered; nothing changed. */
+  alreadyDone: boolean;
 }
 
 // ─── Selectors ──────────────────────────────────────────────────────────────
@@ -320,6 +332,60 @@ export function completeWorkout(
       total: input.answers.length,
       mistakesFixed: fixed,
       firstWorkoutToday,
+    },
+  };
+}
+
+export interface DailyResultInput {
+  /** The day the challenge belongs to (it may be finished after midnight). */
+  day: DayKey;
+  questionId: string;
+  lessonId: string;
+  correct: boolean;
+}
+
+/**
+ * Records the one attempt at the daily challenge. Any answer counts as activity
+ * for the streak; a correct one pays XP.dailyChallenge, a wrong one sends the
+ * question to spaced repetition like a lesson mistake.
+ */
+export function completeDaily(
+  state: ProgressState,
+  input: DailyResultInput,
+  ctx: ActivityContext,
+): { state: ProgressState; outcome: DailyOutcome } {
+  const today = toDayKey(ctx.now);
+  const daily = state.daily ?? {};
+  const previous = daily[input.day];
+  if (previous) {
+    const { outcome } = finishActivity(state, state, 0, ctx);
+    return {
+      state,
+      outcome: {
+        ...outcome,
+        streakExtended: false,
+        correct: previous.correct,
+        dailyStreak: dailyStreak(daily, input.day),
+        alreadyDone: true,
+      },
+    };
+  }
+
+  const xpEarned = input.correct ? XP.dailyChallenge : 0;
+  const results: DailyResults = {
+    ...daily,
+    [input.day]: { questionId: input.questionId, correct: input.correct },
+  };
+  const review = input.correct ? state.review : applyLessonAnswers(state.review, [input], today);
+  const updated = addActivity({ ...state, daily: results, review }, today, { xp: xpEarned });
+  const { state: next, outcome } = finishActivity(state, updated, xpEarned, ctx);
+  return {
+    state: next,
+    outcome: {
+      ...outcome,
+      correct: input.correct,
+      dailyStreak: dailyStreak(results, input.day),
+      alreadyDone: false,
     },
   };
 }

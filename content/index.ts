@@ -16,9 +16,13 @@ export const SECTION_FILES: Record<string, () => SectionFile> = {
   basics: () => require('./basics.json'),
   control: () => require('./control.json'),
   collections: () => require('./collections.json'),
+  modern: () => require('./modern.json'),
+  strings: () => require('./strings.json'),
   advanced: () => require('./advanced.json'),
   async: () => require('./async.json'),
+  errors: () => require('./errors.json'),
   interview: () => require('./interview.json'),
+  algorithms: () => require('./algorithms.json'),
 };
 
 export function loadSectionDefs(): SectionDef[] {
