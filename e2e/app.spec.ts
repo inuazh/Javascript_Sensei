@@ -137,3 +137,70 @@ test('persisted v0 state is migrated on load', async ({ page }) => {
     )
     .toBe(1);
 });
+
+test('profile: statistics by section open the weakest topic', async ({ page }) => {
+  await page.addInitScript(() => {
+    const KEY = 'js-sensei-user';
+    if (localStorage.getItem(KEY)) return; // seed only before the first load
+    const iso = new Date().toISOString();
+    const lesson = (bestCorrect: number) => ({
+      bestCorrect,
+      total: 5,
+      stars: bestCorrect === 5 ? 3 : 1,
+      attempts: 1,
+      firstCompletedAt: iso,
+      lastCompletedAt: iso,
+    });
+    const item = (questionId: string, box: number, lapses: number) => ({
+      questionId,
+      lessonId: questionId.replace(/-q\d+$/, ''),
+      box,
+      due: '2099-01-01',
+      lapses,
+    });
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        version: 1,
+        state: {
+          settings: { onboarded: true, placementDone: true },
+          progress: {
+            totalXp: 120,
+            lessons: {
+              'variables-01': lesson(5),
+              'variables-02': lesson(5),
+              'data-types-01': lesson(4),
+              'event-loop-01': lesson(5),
+              'promises-01': lesson(3),
+            },
+            review: {
+              'variables-01-q1': item('variables-01-q1', 4, 0),
+              'promises-01-q2': item('promises-01-q2', 0, 2),
+              'promises-01-q3': item('promises-01-q3', 1, 1),
+            },
+          },
+        },
+      }),
+    );
+  });
+
+  await page.goto('/profile');
+
+  await expect(page.getByText('по разделам')).toBeVisible();
+  await expect(page.getByLabel('Сильнее всего: Основы, 93%')).toBeVisible();
+  await expect(page.getByText('ещё не начато: 8 разделов')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /^Основы: пройдено 3 из 15 уроков, точность 93%/ }),
+  ).toBeVisible();
+  // Async: 8 of 10 answers right; promises (3/5) is the weakest topic.
+  const asyncRow = page.getByRole('button', {
+    name: /^Асинхронность: пройдено 2 из 15 уроков, точность 80%, в повторении 2, выучено 0, ошибок 3$/,
+  });
+  await asyncRow.click();
+  await expect(page).toHaveURL(/\/topic\/promises$/);
+
+  // Weak spots in the workout name their section.
+  await page.goto('/workout');
+  await expect(page.getByText('слабые места')).toBeVisible();
+  await expect(page.getByText('07 · асинхронность').first()).toBeVisible();
+});

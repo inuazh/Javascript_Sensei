@@ -5,6 +5,7 @@ import { ACHIEVEMENTS } from '../../src/domain/achievements';
 import { addDays, weekStart } from '../../src/domain/dates';
 import { getLevelInfo } from '../../src/domain/levels';
 import { viewStreak } from '../../src/domain/streak';
+import { SectionStatsCard } from '../../src/features/stats/SectionStatsCard';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
 import {
@@ -144,6 +145,8 @@ export default function ProfileScreen() {
           ))}
         </View>
       </Card>
+
+      <SectionStatsCard lessons={progress.lessons} review={progress.review} />
 
       <Label>{`достижения · ${unlockedCount}/${ACHIEVEMENTS.length}`}</Label>
       <View style={styles.grid}>

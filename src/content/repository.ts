@@ -7,6 +7,7 @@ import { SECTION_FILES, loadSectionDefs } from '../../content';
 import { pickDailyQuestionId } from '../domain/daily';
 import type { DayKey } from '../domain/dates';
 import type { ContentIndex } from '../domain/progress';
+import { buildContentLookup, type ContentLookup, type StatsContent } from '../domain/stats';
 import type { Lesson, Question, SectionDef, Topic } from './schema';
 
 export interface LessonRef {
@@ -19,6 +20,8 @@ let sectionsCache: SectionDef[] | null = null;
 const lessonsBySection = new Map<string, Lesson[]>();
 let questionIndex: Map<string, { question: Question; lesson: Lesson }> | null = null;
 let lessonIndex: Map<string, LessonRef> | null = null;
+let statsContent: StatsContent | null = null;
+let contentLookup: ContentLookup | null = null;
 
 const byOrder = <T extends { order: number }>(a: T, b: T) => a.order - b.order;
 
@@ -109,6 +112,34 @@ export function getContentIndex(): ContentIndex {
       lessonIds: getSectionLessons(s.id).map(l => l.id),
     })),
   };
+}
+
+/** Sections → topics → lesson and question ids, for the statistics in src/domain/stats. */
+export function getStatsContent(): StatsContent {
+  if (!statsContent) {
+    statsContent = {
+      sections: getSections().map(s => ({
+        id: s.id,
+        title: s.title,
+        topics: s.topics.map(t => {
+          const lessons = getTopicLessons(t.id);
+          return {
+            id: t.id,
+            title: t.title,
+            lessonIds: lessons.map(l => l.id),
+            questionIds: lessons.flatMap(l => l.questions.map(q => q.id)),
+          };
+        }),
+      })),
+    };
+  }
+  return statsContent;
+}
+
+/** Section and topic of a question or lesson. */
+export function getContentLookup(): ContentLookup {
+  if (!contentLookup) contentLookup = buildContentLookup(getStatsContent());
+  return contentLookup;
 }
 
 /** «Задача дня» for `day`: the same question on every device with this content. */
