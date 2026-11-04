@@ -225,7 +225,7 @@ function Empty() {
       <Icon name="search" size={28} color={Colors.textDisabled} />
       <Text style={Type.h3}>ничего не нашлось</Text>
       <Text style={[Type.small, styles.emptyHint]}>
-        попробуй другое слово или его начало: «замык», «промис», «map».
+        попробуй другое слово или его начало: «замык», «промис», «map»
       </Text>
     </View>
   );

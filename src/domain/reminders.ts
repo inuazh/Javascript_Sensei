@@ -49,7 +49,7 @@ function reminderText(
   if (dayOffset <= 1 && streakDays > 0 && isDeadline) {
     return {
       title: `🔥 стрик ${streakDays} ${plural(streakDays, 'день', 'дня', 'дней')} под угрозой`,
-      body: 'один урок, и серия продолжается. это пара минут.',
+      body: 'один урок, и серия продолжается. это пара минут',
     };
   }
   if (dayOffset === 0 && dueCount > 0) {
@@ -61,12 +61,12 @@ function reminderText(
   if (dayOffset >= 3) {
     return {
       title: '⚡ JavaScript скучает',
-      body: 'вернись на 5 минут, и продолжим с того же места.',
+      body: 'вернись на 5 минут, и продолжим с того же места',
     };
   }
   return {
     title: '⚡ время JavaScript',
-    body: 'пять минут практики сегодня, и знания не выветрятся.',
+    body: 'пять минут практики сегодня, и знания не выветрятся',
   };
 }
 

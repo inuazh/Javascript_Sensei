@@ -112,7 +112,7 @@ export default function OnboardingScreen() {
         </Text>
         <Text style={[Type.body, styles.muted]}>
           JavaScript по 5 минут в день: короткая теория, практика на реальном коде и повторения,
-          чтобы ничего не забылось.
+          чтобы ничего не забылось
         </Text>
       </Screen>
     );
@@ -136,7 +136,7 @@ export default function OnboardingScreen() {
             onPress={() => setChoice(c.id)}
           />
         ))}
-        <Text style={Type.small}>пропущенные разделы можно пройти в любой момент.</Text>
+        <Text style={Type.small}>пропущенные разделы можно пройти в любой момент</Text>
       </Screen>
     );
   }
@@ -149,7 +149,7 @@ export default function OnboardingScreen() {
       >
         {dots}
         <Text style={Type.h1}>цель на день</Text>
-        <Text style={[Type.small]}>её можно поменять в настройках.</Text>
+        <Text style={[Type.small]}>её можно поменять в настройках</Text>
         {DAILY_GOALS.map(g => (
           <OptionCard
             key={g.xp}
@@ -175,7 +175,7 @@ export default function OnboardingScreen() {
       <Text style={Type.h1}>когда напомнить?</Text>
       <Text style={Type.small}>
         одно уведомление в день, и только если ты ещё не занимался. привычка складывается из
-        регулярности.
+        регулярности
       </Text>
       <View style={styles.time}>
         <TimePicker hour={time.hour} minute={time.minute} onChange={setTime} />

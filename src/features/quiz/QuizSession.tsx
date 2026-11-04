@@ -88,7 +88,7 @@ export function QuizSession({
     if (state.answers.length === 0 || !confirmExitAfterAnswer) return onExit();
     confirmAction({
       title: 'прервать?',
-      message: 'прогресс этой сессии не сохранится.',
+      message: 'прогресс этой сессии не сохранится',
       confirmText: 'выйти',
       cancelText: 'остаться',
       onConfirm: onExit,

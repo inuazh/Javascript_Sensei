@@ -49,7 +49,7 @@ export default function WorkoutTab() {
       <Text style={Type.h1}>тренировка</Text>
       <Text style={Type.small}>
         вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
-        ошибки идут в первую очередь.
+        ошибки идут в первую очередь
       </Text>
 
       <Card style={styles.hero}>
@@ -65,7 +65,7 @@ export default function WorkoutTab() {
             <Text style={Type.small}>
               {due.length > 0
                 ? `+${XP.perCorrectReview} XP за верный ответ${doneToday ? '' : `, +${XP.dailyWorkoutBonus} XP за первую тренировку дня`}`
-                : 'можно потренироваться на свежих вопросах: без XP, но с пользой.'}
+                : 'можно потренироваться на свежих вопросах: без XP, но с пользой'}
             </Text>
             <Button
               title={due.length > 0 ? 'начать тренировку' : 'свободная практика'}
@@ -78,7 +78,7 @@ export default function WorkoutTab() {
         ) : (
           <>
             <Text style={Type.h3}>здесь будут повторения</Text>
-            <Text style={Type.small}>пройди первый урок, и его вопросы появятся в тренировке.</Text>
+            <Text style={Type.small}>пройди первый урок, и его вопросы появятся в тренировке</Text>
             <Button
               title="к урокам"
               variant="secondary"

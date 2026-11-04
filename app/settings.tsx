@@ -54,7 +54,7 @@ export default function SettingsScreen() {
     if (patch.enabled && !(await requestNotificationPermission())) {
       showNotice(
         'уведомления выключены',
-        'разреши уведомления для JS Sensei в настройках телефона.',
+        'разреши уведомления для JS Sensei в настройках телефона',
       );
       return;
     }
@@ -65,13 +65,13 @@ export default function SettingsScreen() {
   const confirmLeave = () =>
     confirmAction({
       title: 'выйти из рейтинга?',
-      message: 'твоя запись и ник будут удалены из рейтинга.',
+      message: 'твоя запись и ник будут удалены из рейтинга',
       confirmText: 'выйти',
       onConfirm: async () => {
         if (!(await leaveLeaderboard())) {
           showNotice(
             'запись не удалена',
-            'не удалось связаться с сервером. напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
+            'не удалось связаться с сервером. напиши на jssensei.app@gmail.com, и мы удалим её вручную',
           );
         }
       },
@@ -80,7 +80,7 @@ export default function SettingsScreen() {
   const confirmReset = () =>
     confirmAction({
       title: 'сбросить прогресс?',
-      message: 'уроки, XP, стрик и достижения будут удалены. это нельзя отменить.',
+      message: 'уроки, XP, стрик и достижения будут удалены. это нельзя отменить',
       confirmText: 'сбросить',
       onConfirm: () => {
         resetProgress();
@@ -118,7 +118,7 @@ export default function SettingsScreen() {
               minute={settings.reminder.minute}
               onChange={t => setReminder(t)}
             />
-            <Text style={Type.small}>если ты уже позанимался сегодня, напоминание не придёт.</Text>
+            <Text style={Type.small}>если ты уже позанимался сегодня, напоминание не придёт</Text>
           </>
         )}
       </Card>
@@ -148,7 +148,7 @@ export default function SettingsScreen() {
           </>
         ) : (
           <Text style={Type.small}>
-            ты не участвуешь в рейтинге. присоединиться можно на вкладке «рейтинг».
+            ты не участвуешь в рейтинге. присоединиться можно на вкладке «рейтинг»
           </Text>
         )}
       </Card>

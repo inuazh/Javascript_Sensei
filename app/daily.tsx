@@ -40,7 +40,7 @@ export default function DailyScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>задачи на сегодня нет</Text>
-        <Text style={Type.small}>загляни завтра.</Text>
+        <Text style={Type.small}>загляни завтра</Text>
         <Button title="назад" onPress={goBack} />
       </Screen>
     );
