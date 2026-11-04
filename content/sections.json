@@ -164,6 +164,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "errors",
+      "title": "Ошибки и отладка",
+      "icon": "🐞",
+      "color": "#FFFFFF",
+      "order": 12,
+      "description": "Как ловить и разбирать ошибки и находить типичные баги в своём коде.",
+      "topics": [
+        {
+          "id": "try-catch",
+          "title": "try / catch",
+          "subtitle": "обработка исключений",
+          "order": 0
+        },
+        {
+          "id": "error-types",
+          "title": "Типы ошибок",
+          "subtitle": "TypeError, ReferenceError, свои ошибки",
+          "order": 1
+        },
+        {
+          "id": "common-bugs",
+          "title": "Типичные баги",
+          "subtitle": "найди ошибку в коде",
+          "order": 2
+        }
+      ]
     }
   ]
 }
