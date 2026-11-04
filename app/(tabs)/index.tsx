@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { useContentStore } from '../../src/stores/useContentStore';
-import { Colors, Spacing, Radius, SectionColors } from '../../src/constants/theme';
+import { Colors, Spacing, Radius, getSectionColor } from '../../src/constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -305,10 +305,7 @@ export default function HomeScreen() {
   // Load content once on mount
   useEffect(() => {
     const initContent = async () => {
-      await contentStore.loadSections();
-      await contentStore.loadLessonsForSection('basics');
-      await contentStore.loadLessonsForSection('control');
-      await contentStore.loadLessonsForSection('collections');
+      await contentStore.loadAllLessons();
       setContentReady(true);
     };
     initContent();
@@ -318,7 +315,7 @@ export default function HomeScreen() {
   const sections = React.useMemo(() => {
     if (!contentReady) return [];
     return contentStore.sections.map((sectionDef) => {
-      const sectionColor = SectionColors[sectionDef.id] || '#FFFFFF';
+      const sectionColor = getSectionColor(sectionDef);
       const nodes: SkillNode[] = (sectionDef.topics || []).map((topic) => {
         const progress = userStore.topicsProgress[topic.id];
         const completedCount = progress?.completedLessons.length || 0;

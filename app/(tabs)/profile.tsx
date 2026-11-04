@@ -11,28 +11,17 @@ import { useRouter } from 'expo-router';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { getLevelForXp, ACHIEVEMENTS } from '../../src/constants/gamification';
 import { getActivityHeatmap } from '../../src/db/database';
-import { Colors, Spacing, Radius } from '../../src/constants/theme';
+import { Colors, Spacing, Radius, getSectionColor } from '../../src/constants/theme';
+import { loadSectionDefs } from '../../content';
 
 type TabType = 'activity' | 'achievements';
 
 // Section info for topic progress display
-const SECTIONS = [
-  {
-    name: 'Основы',
-    color: Colors.green,
-    topicIds: ['variables', 'data-types', 'operators'],
-  },
-  {
-    name: 'Управление',
-    color: Colors.blue,
-    topicIds: ['conditions', 'loops', 'functions'],
-  },
-  {
-    name: 'Коллекции',
-    color: Colors.yellow,
-    topicIds: ['arrays', 'objects', 'set-map'],
-  },
-];
+const SECTIONS = loadSectionDefs().map(section => ({
+  name: section.title,
+  color: getSectionColor(section),
+  topicIds: section.topics.map(t => t.id),
+}));
 
 // Build 15-week heatmap grid from a date→count map
 function buildHeatmapGrid(activityMap: Record<string, number>): number[][] {

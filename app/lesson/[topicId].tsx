@@ -23,19 +23,6 @@ import type { Lesson, Question } from '../../src/stores/useContentStore';
 
 const XP_PER_QUESTION = 15;
 
-// Map topicId → sectionId for content loading
-const TOPIC_SECTION_MAP: Record<string, string> = {
-  variables: 'basics',
-  'data-types': 'basics',
-  operators: 'basics',
-  conditions: 'control',
-  loops: 'control',
-  functions: 'control',
-  arrays: 'collections',
-  objects: 'collections',
-  'set-map': 'collections',
-};
-
 // ─── Achievement Toast ───────────────────────────────────────────────────────
 
 function AchievementToast({ achievementId, onHide }: { achievementId: string; onHide: () => void }) {
@@ -409,10 +396,7 @@ export default function LessonScreen() {
   useEffect(() => {
     const load = async () => {
       if (!topicId) return;
-      const sectionId = TOPIC_SECTION_MAP[topicId];
-      if (sectionId) {
-        await contentStore.loadLessonsForSection(sectionId);
-      }
+      await contentStore.loadLessonsForTopic(topicId);
       setLoading(false);
     };
     load();

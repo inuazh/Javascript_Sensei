@@ -30,7 +30,7 @@
           "title": "Заполни пропуск",
           "codeBefore": "let score = 75;\n",
           "codeAfter": " (score >= 60) {\n  console.log(\"passed\");\n}",
-          "options": ["when", "if", "check", "when"],
+          "options": ["when", "if", "check", "unless"],
           "correct": 1,
           "explanation": "if — ключевое слово для условного выполнения кода"
         },
@@ -753,7 +753,7 @@
           "title": "Заполни пропуск",
           "codeBefore": "function twice(fn) {\n  return x => fn(",
           "codeAfter": "(x));\n}",
-          "options": ["fn", "x", "twice", "fn"],
+          "options": ["fn", "x", "twice", "fn()"],
           "correct": 0,
           "explanation": "twice возвращает функцию, применяющую fn дважды: fn(fn(x))"
         },
@@ -813,15 +813,15 @@
           "title": "Заполни пропуск — IIFE",
           "codeBefore": "const result = (",
           "codeAfter": " => 42)();\nconsole.log(result);",
-          "options": ["function", "()", "() ", "x"],
-          "correct": 2,
+          "options": ["function", "()", "=>", "return"],
+          "correct": 1,
           "explanation": "IIFE (Immediately Invoked Function Expression): (() => 42)()"
         },
         {
           "id": "functions-05-q4",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const arrowFn = () => arguments;",
+          "code": "const arrowFn = () => arguments;\narrowFn();",
           "options": ["Вернёт объект arguments", "Вызовет ReferenceError"],
           "correct": 1,
           "explanation": "Стрелочные функции не имеют своего arguments — он берётся из внешней области или ошибка"

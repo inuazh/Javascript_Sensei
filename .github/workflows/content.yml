@@ -1,0 +1,25 @@
+name: Content
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**'
+      - 'scripts/validate-content.mjs'
+      - '.github/workflows/content.yml'
+  pull_request:
+    paths:
+      - 'content/**'
+      - 'scripts/validate-content.mjs'
+      - '.github/workflows/content.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate lessons
+        run: node scripts/validate-content.mjs
