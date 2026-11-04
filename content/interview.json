@@ -66,9 +66,13 @@
           "id": "type-coercion-01-q3",
           "type": "trueFalse",
           "code": "console.log(typeof (\"3\" * \"4\"));",
-          "options": ["Выведет \"number\"", "Выведет \"string\""],
+          "options": ["Выведет number", "Выведет string"],
           "correct": 0,
-          "explanation": "`*` всегда приводит операнды к числу, поэтому результат — число 12, а не строка."
+          "explanation": "`*` всегда приводит операнды к числу, поэтому результат — число 12, а не строка.",
+          "optionExplanations": [
+            null,
+            "`*` не склеивает строки, как `+`: он всегда приводит операнды к числу"
+          ]
         },
         {
           "id": "type-coercion-01-q4",
@@ -91,7 +95,13 @@
           "codeAfter": "a + b); // 15",
           "options": ["+", "-", "!", "~"],
           "correct": 0,
-          "explanation": "Унарный плюс превращает строку \"10\" в число 10, и дальше 10 + 5 — обычное сложение."
+          "explanation": "Унарный плюс превращает строку \"10\" в число 10, и дальше 10 + 5 — обычное сложение.",
+          "optionExplanations": [
+            null,
+            "Унарный минус тоже превратит \"10\" в число, но со знаком минус: -10 + 5 = -5",
+            "!\"10\" — это false, а false + 5 = 5",
+            "Побитовое НЕ: ~\"10\" = -11, и -11 + 5 = -6"
+          ]
         }
       ]
     },
@@ -289,7 +299,13 @@
           "codeAfter": " v;\n}\nconsole.log(isReallyNaN(NaN), isReallyNaN(\"abc\")); // true false",
           "options": ["!==", "===", "==", ">="],
           "correct": 0,
-          "explanation": "Только NaN не равен самому себе, поэтому `v !== v` истинно ровно для NaN. Это старый способ проверки, работающий без Number.isNaN."
+          "explanation": "Только NaN не равен самому себе, поэтому `v !== v` истинно ровно для NaN. Это старый способ проверки, работающий без Number.isNaN.",
+          "optionExplanations": [
+            null,
+            "v === v ложно только для NaN, поэтому вывод будет наоборот: false true",
+            "== для NaN ведёт себя так же, как ===: вывод false true",
+            "NaN >= NaN — false, а \"abc\" >= \"abc\" — true: вывод false true"
+          ]
         }
       ]
     },
@@ -670,9 +686,13 @@
           "type": "trueFalse",
           "title": "Что выведет код?",
           "code": "console.log(typeof bar);\nvar bar = function () {};",
-          "options": ["\"undefined\"", "\"function\""],
+          "options": ["undefined", "function"],
           "correct": 0,
-          "explanation": "bar — переменная var, она всплывает со значением undefined. Функция будет присвоена ей только на второй строке."
+          "explanation": "bar — переменная var, она всплывает со значением undefined. Функция будет присвоена ей только на второй строке.",
+          "optionExplanations": [
+            null,
+            "Всплывает только объявление var bar со значением undefined, функция присваивается позже"
+          ]
         },
         {
           "id": "hoisting-02-q5",
