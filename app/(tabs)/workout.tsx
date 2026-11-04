@@ -25,6 +25,9 @@ import {
   pad2,
 } from '../../src/ui';
 
+/** Days between reviews after each correct answer: «2, 4, 8, 16, 32». */
+const INTERVALS = BOX_INTERVALS.slice(1);
+
 export default function WorkoutTab() {
   const router = useRouter();
   const today = useToday();
@@ -48,8 +51,9 @@ export default function WorkoutTab() {
     <Screen>
       <Text style={Type.h1}>тренировка</Text>
       <Text style={Type.small}>
-        вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
-        ошибки идут в первую очередь
+        вопросы из пройденных уроков возвращаются через {INTERVALS.join(', ')}{' '}
+        {plural(INTERVALS[INTERVALS.length - 1], 'день', 'дня', 'дней')}. ошибки идут в первую
+        очередь
       </Text>
 
       <Card style={styles.hero}>
