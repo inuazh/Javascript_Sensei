@@ -1074,9 +1074,14 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const s = new Set([\"a\", \"b\", \"c\"]);\nlet result = \"\";\nfor (const v of s) {\n  result += v;\n}\nconsole.log(result);",
-          "options": ["abc", "a b c", "[a, b, c]", "Error"],
+          "options": ["abc", "c", "[a, b, c]", "Error"],
           "correct": 0,
-          "optionExplanations": [null, "Значения склеиваются в строку без пробелов", null, null],
+          "optionExplanations": [
+            null,
+            "+= дописывает к строке, а не заменяет её — иначе осталось бы только последнее значение",
+            null,
+            null
+          ],
           "explanation": "Set итерируемый; for...of перебирает все элементы в порядке добавления"
         },
         {

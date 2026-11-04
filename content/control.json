@@ -812,10 +812,10 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "for (const ch of \"JS\") {\n  console.log(ch);\n}",
-          "options": ["JS", "J S", "0 1", "Error"],
+          "options": ["JS", "J\nS", "0 1", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "for...of перебирает строку по символам",
+            "console.log вызывается для каждого символа отдельно, поэтому будет две строки вывода",
             null,
             "Индексы дал бы for...in",
             null
@@ -872,13 +872,13 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "let result = \"\";\nfor (let i = 1; i <= 4; i++) {\n  result += i;\n}\nconsole.log(result);",
-          "options": ["10", "1234", "4321", "1 2 3 4"],
+          "options": ["10", "1234", "4321", "4"],
           "correct": 1,
           "optionExplanations": [
             "Так было бы, если начать с числа 0, а result — пустая строка",
             null,
             null,
-            "Числа склеиваются в одну строку без пробелов"
+            "+= дописывает к строке, а не заменяет её — иначе осталось бы только последнее число"
           ],
           "explanation": "result — строка, += конкатенирует: '1' + '2' + '3' + '4' = '1234'"
         },
