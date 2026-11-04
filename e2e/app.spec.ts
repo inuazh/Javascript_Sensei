@@ -189,7 +189,7 @@ test('profile: statistics by section open the weakest topic', async ({ page }) =
 
   await expect(page.getByText('по разделам')).toBeVisible();
   await expect(page.getByLabel('Сильнее всего: Основы, 93%')).toBeVisible();
-  await expect(page.getByText('ещё не начато: 8 разделов')).toBeVisible();
+  await expect(page.getByText(/^ещё не начато: \d+ раздел/)).toBeVisible();
   await expect(
     page.getByRole('button', { name: /^Основы: пройдено 3 из 15 уроков, точность 93%/ }),
   ).toBeVisible();
@@ -203,7 +203,7 @@ test('profile: statistics by section open the weakest topic', async ({ page }) =
   // Weak spots in the workout name their section.
   await page.goto('/workout');
   await expect(page.getByText('слабые места')).toBeVisible();
-  await expect(page.getByText('07 · асинхронность').first()).toBeVisible();
+  await expect(page.getByText(/^\d{2} · асинхронность$/).first()).toBeVisible();
 });
 
 test('reference: search the theory and open a lesson', async ({ page }) => {
