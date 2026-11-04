@@ -40,6 +40,34 @@
         { "id": "objects", "title": "Объекты", "subtitle": "ключи, деструктуризация", "order": 1 },
         { "id": "set-map", "title": "Set & Map", "subtitle": "уникальные коллекции", "order": 2 }
       ]
+    },
+    {
+      "id": "advanced",
+      "title": "Продвинутые темы",
+      "icon": "🧙",
+      "color": "#A78BFA",
+      "order": 3,
+      "description": "Замыкания, this и прототипы — как JavaScript устроен изнутри.",
+      "topics": [
+        {
+          "id": "closures",
+          "title": "Замыкания",
+          "subtitle": "область видимости, замыкания",
+          "order": 0
+        },
+        {
+          "id": "this-context",
+          "title": "this и контекст",
+          "subtitle": "call, apply, bind",
+          "order": 1
+        },
+        {
+          "id": "prototypes-classes",
+          "title": "Прототипы и классы",
+          "subtitle": "prototype, class, extends",
+          "order": 2
+        }
+      ]
     }
   ]
 }
