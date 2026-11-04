@@ -20,7 +20,9 @@
     "build:e2e": "expo export --platform web --output-dir dist-e2e",
     "test:e2e": "npm run build:e2e && playwright test",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test -- --ci && npm run validate:content",
-    "build:rustore": "eas build --platform android --profile rustore"
+    "build:rustore": "eas build --platform android --profile rustore",
+    "update": "eas update --channel production --environment production",
+    "update:preview": "eas update --channel preview --environment preview"
   },
   "dependencies": {
     "@expo-google-fonts/doto": "^0.4.1",
@@ -40,6 +42,7 @@
     "expo-router": "~6.0.23",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
+    "expo-updates": "~29.0.20",
     "react": "19.1.0",
     "react-dom": "^19.1.0",
     "react-native": "0.81.5",

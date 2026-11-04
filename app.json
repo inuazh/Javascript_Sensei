@@ -10,9 +10,8 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0A0A0A"
+      "backgroundColor": "#000000"
     },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.jssensei.app"
@@ -20,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0A0A"
+        "backgroundColor": "#000000"
       },
       "package": "com.jssensei.app",
       "versionCode": 1,
@@ -51,16 +50,19 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#FACC15"
+          "color": "#D71921"
         }
       ],
       "expo-font"
     ],
     "updates": {
-      "enabled": false
+      "enabled": true,
+      "url": "https://u.expo.dev/ded34d91-f4eb-4acf-b80d-9459cd1cd6a6",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "runtimeVersion": {
-      "policy": "sdkVersion"
+      "policy": "appVersion"
     },
     "experiments": {
       "typedRoutes": true
