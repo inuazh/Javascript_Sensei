@@ -14,6 +14,7 @@ import {
   WATCHDOG_MS,
   buildRunnerHtml,
   failedToStart,
+  isRunnerNavigationAllowed,
   parseRunResult,
   type RunCode,
   type RunResult,
@@ -78,12 +79,24 @@ function RunnerPage({ run, onDone }: { run: Run; onDone: (run: Run, r: RunResult
   return (
     <WebView
       style={styles.page}
-      source={{ html: run.html }}
+      source={{ html: run.html, baseUrl: 'about:blank' }}
+      // Every URL must reach onShouldStartLoadWithRequest below: react-native-webview
+      // hands URLs outside originWhitelist to Linking.openURL (the system browser),
+      // so a narrower list would let a snippet open any site.
       originWhitelist={['*']}
+      onShouldStartLoadWithRequest={request => isRunnerNavigationAllowed(request.url)}
+      setSupportMultipleWindows={false}
+      javaScriptCanOpenWindowsAutomatically={false}
       javaScriptEnabled
       domStorageEnabled={false}
       cacheEnabled={false}
       incognito
+      allowFileAccess={false}
+      allowFileAccessFromFileURLs={false}
+      allowUniversalAccessFromFileURLs={false}
+      allowsLinkPreview={false}
+      mixedContentMode="never"
+      geolocationEnabled={false}
       onMessage={event => {
         const result = parseRunResult(event.nativeEvent.data);
         if (result) finish(result);
