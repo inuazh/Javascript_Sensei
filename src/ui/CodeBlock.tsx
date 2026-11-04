@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text, View, type ViewStyle } from 'react-native';
-import { tokenize, type Token, type TokenKind } from './highlight';
+import { ScrollView, StyleSheet, Text, View, type TextStyle, type ViewStyle } from 'react-native';
+import { splitLines, tokenize, type Token, type TokenKind } from './highlight';
 import { Colors, Fonts, Radius, Spacing, alpha } from './theme';
 
 const TOKEN_COLORS: Record<TokenKind, string> = {
@@ -15,17 +15,13 @@ const TOKEN_COLORS: Record<TokenKind, string> = {
 
 type Piece = Token | { kind: 'gap'; text: string };
 
-/** Splits tokens into lines; a token spanning lines is split too. */
-function toLines(pieces: Piece[]): Piece[][] {
-  const lines: Piece[][] = [[]];
-  for (const piece of pieces) {
-    const parts = piece.text.split('\n');
-    parts.forEach((part, i) => {
-      if (i > 0) lines.push([]);
-      if (part || piece.kind === 'gap') lines[lines.length - 1].push({ ...piece, text: part });
-    });
-  }
-  return lines;
+/** Text style of a highlighted token. Shared with other code views. */
+export function tokenStyle(kind: TokenKind): TextStyle {
+  return {
+    color: TOKEN_COLORS[kind],
+    fontFamily: kind === 'keyword' ? Fonts.monoBold : Fonts.mono,
+    fontStyle: kind === 'comment' ? 'italic' : 'normal',
+  };
 }
 
 interface CodeBlockProps {
@@ -45,7 +41,7 @@ export function CodeBlock({ code, gap, caption, filename = 'main.js', style }: C
       pieces.push({ kind: 'gap', text: gap.value ? ` ${gap.value} ` : ' ___ ' });
       pieces.push(...tokenize(gap.after));
     }
-    return toLines(pieces);
+    return splitLines(pieces, p => p.kind === 'gap');
   }, [code, gap]);
   const digits = String(lines.length).length;
 
@@ -64,14 +60,7 @@ export function CodeBlock({ code, gap, caption, filename = 'main.js', style }: C
                       {p.text}
                     </Text>
                   ) : (
-                    <Text
-                      key={i}
-                      style={{
-                        color: TOKEN_COLORS[p.kind],
-                        fontFamily: p.kind === 'keyword' ? Fonts.monoBold : Fonts.mono,
-                        fontStyle: p.kind === 'comment' ? 'italic' : 'normal',
-                      }}
-                    >
+                    <Text key={i} style={tokenStyle(p.kind)}>
                       {p.text}
                     </Text>
                   ),

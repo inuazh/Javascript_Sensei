@@ -466,6 +466,14 @@
           ],
           "shuffled": [2, 0, 3, 1],
           "explanation": "Сначала массив, затем Set убирает дубли, sort с функцией (a, b) => a - b сортирует числа, и вывод: [1, 3, 4, 5, 9]."
+        },
+        {
+          "id": "arrays-05-q6",
+          "type": "findBug",
+          "code": "const prices = [100, 25, 9, 40];\nconst cheapest = prices\n  .filter(p => p > 10)\n  .sort()\n  .slice(0, 2);\nconsole.log(cheapest); // ждём [25, 40]",
+          "bugLine": 4,
+          "fixed": "const prices = [100, 25, 9, 40];\nconst cheapest = prices\n  .filter(p => p > 10)\n  .sort((a, b) => a - b)\n  .slice(0, 2);\nconsole.log(cheapest); // [25, 40]",
+          "explanation": "`sort()` без аргументов сравнивает числа как строки: \"100\" < \"25\" < \"40\", поэтому 100 оказывается первым и код выводит [100, 25]. Для чисел передавай функцию сравнения: `sort((a, b) => a - b)`."
         }
       ]
     },
@@ -938,6 +946,14 @@
           ],
           "shuffled": [3, 1, 0, 2],
           "explanation": "custom использует defaults.size, поэтому defaults объявляется первым. При слиянии custom идёт позже и перезаписывает оба свойства: red 20."
+        },
+        {
+          "id": "objects-05-q6",
+          "type": "findBug",
+          "code": "const defaults = { theme: \"dark\", size: 14 };\nconst settings = defaults;\nsettings.size = 18;\nconsole.log(defaults.size); // ждём 14",
+          "bugLine": 2,
+          "fixed": "const defaults = { theme: \"dark\", size: 14 };\nconst settings = { ...defaults };\nsettings.size = 18;\nconsole.log(defaults.size); // 14",
+          "explanation": "`const settings = defaults` копирует ссылку, а не объект: settings и defaults указывают на один объект. Поэтому `settings.size = 18` меняет и defaults, и код выводит 18. Нужна копия: `{ ...defaults }`."
         }
       ]
     },

@@ -5,7 +5,7 @@ export { Card } from './Card';
 export { ProgressBar } from './ProgressBar';
 export { Stars } from './Stars';
 export { Chip } from './Chip';
-export { CodeBlock } from './CodeBlock';
+export { CodeBlock, tokenStyle } from './CodeBlock';
 export { RichText } from './RichText';
 export { OptionCard } from './OptionCard';
 export { TimePicker } from './TimePicker';
