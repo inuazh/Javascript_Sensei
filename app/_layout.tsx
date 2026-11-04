@@ -17,6 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { CodeRunnerHost } from '../src/services/codeRunner';
 import { syncReminders } from '../src/services/notifications';
 import { useUserStore, waitForHydration } from '../src/stores/useUserStore';
 import { Colors } from '../src/ui';
@@ -80,6 +81,7 @@ export default function RootLayout() {
         <Stack.Screen name="settings" />
         <Stack.Screen name="privacy-policy" />
       </Stack>
+      <CodeRunnerHost />
     </SafeAreaProvider>
   );
 }
