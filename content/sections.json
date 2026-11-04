@@ -87,7 +87,7 @@
       "icon": "✨",
       "color": "#FFFFFF",
       "order": 3,
-      "description": "деструктуризация, spread и rest, ?. и ?? — приёмы, которые делают код короче и понятнее.",
+      "description": "деструктуризация, spread и rest, ?. и ??: приёмы, которые делают код короче и понятнее.",
       "topics": [
         {
           "id": "destructuring",
@@ -227,7 +227,7 @@
       "icon": "🧙",
       "color": "#A78BFA",
       "order": 8,
-      "description": "замыкания, this и прототипы — как JavaScript устроен изнутри.",
+      "description": "замыкания, this и прототипы: как JavaScript устроен изнутри.",
       "topics": [
         {
           "id": "closures",
@@ -283,7 +283,7 @@
       "icon": "◇",
       "color": "#FFFFFF",
       "order": 10,
-      "description": "Debounce, throttle, мемоизация и наблюдатель — приёмы, которые решают частые задачи в реальном коде.",
+      "description": "Debounce, throttle, мемоизация и наблюдатель: приёмы, которые решают частые задачи в реальном коде.",
       "topics": [
         {
           "id": "timing-patterns",
