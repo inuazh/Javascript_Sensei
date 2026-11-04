@@ -30,6 +30,8 @@ export interface QuestionTypeDef<Q extends Question = Question, A = unknown> {
   answerNote?: (question: Q, answer: A) => string | null;
   /** Complete code the user can run after answering, or null if there is none. */
   runnableCode: (question: Q) => string | null;
+  /** The given answer in words, for an error report. */
+  answerText: (question: Q, answer: A) => string;
 }
 
 export type QuestionOfType<T extends QuestionType> = Extract<Question, { type: T }>;

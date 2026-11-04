@@ -18,6 +18,7 @@
  * check that also has to coerce rather than reject.
  */
 import { parseDayKey, type DayKey } from './dates';
+import type { LessonSession, LessonSessionAnswer } from './lessonSession';
 import {
   initialProgress,
   type DayActivity,
@@ -38,6 +39,8 @@ import { MAX_FREEZES, type StreakState } from './streak';
 export interface PersistedState {
   settings: Settings;
   progress: ProgressState;
+  /** The unfinished lesson to continue, see src/domain/lessonSession.ts. */
+  lessonSession: LessonSession | null;
 }
 
 /** Stand-in for a lost timestamp: keeps the record, sorts it first. */
@@ -178,11 +181,49 @@ export function sanitizeProgress(raw: unknown): ProgressState {
   };
 }
 
+// ─── Unfinished lesson ──────────────────────────────────────────────────────
+
+function readSessionAnswer(v: unknown): LessonSessionAnswer | undefined {
+  if (!isObject(v) || typeof v.questionId !== 'string' || typeof v.correct !== 'boolean') {
+    return undefined;
+  }
+  return { questionId: v.questionId, correct: v.correct };
+}
+
+/**
+ * The saved lesson session, or null. Unlike the progress it is not repaired:
+ * a session with any broken part is dropped and the lesson starts over, which
+ * costs a few answers at most. Whether it still fits the lesson content is
+ * checked when the lesson opens (resumeLessonSession).
+ */
+export function sanitizeLessonSession(raw: unknown): LessonSession | null {
+  if (!isObject(raw)) return null;
+  const { lessonId, questionIds, answers, index, savedAt } = raw;
+  if (typeof lessonId !== 'string' || !lessonId) return null;
+  if (!Array.isArray(questionIds) || questionIds.length === 0) return null;
+  if (!questionIds.every((id): id is string => typeof id === 'string')) return null;
+  if (!Array.isArray(answers) || answers.length === 0 || answers.length > questionIds.length) {
+    return null;
+  }
+  const read = answers.map(readSessionAnswer);
+  if (read.some((a, i) => a?.questionId !== questionIds[i])) return null;
+  if (index !== answers.length) return null;
+  if (typeof savedAt !== 'string' || Number.isNaN(new Date(savedAt).getTime())) return null;
+  return {
+    lessonId,
+    questionIds: [...questionIds],
+    answers: read as LessonSessionAnswer[],
+    index,
+    savedAt,
+  };
+}
+
 /** A complete, well-typed state from whatever storage returned (after migrations). */
 export function sanitizePersistedState(raw: unknown): PersistedState {
   const state = asObject(raw);
   return {
     settings: sanitizeSettings(state.settings),
     progress: sanitizeProgress(state.progress),
+    lessonSession: sanitizeLessonSession(state.lessonSession),
   };
 }

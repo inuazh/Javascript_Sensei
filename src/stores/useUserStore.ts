@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { getContentIndex } from '../content/repository';
+import { createLessonSession, type LessonSession } from '../domain/lessonSession';
 import { migratePersistedState, STORE_VERSION } from '../domain/migrations';
 import { sanitizePersistedState, type PersistedState } from '../domain/persistence';
 import {
@@ -25,6 +26,7 @@ import {
   type WorkoutOutcome,
   type WorkoutResultInput,
 } from '../domain/progress';
+import type { AnswerRecord } from '../domain/review';
 import { defaultSettings, type Settings } from '../domain/settings';
 
 export { defaultSettings };
@@ -39,9 +41,19 @@ export const DAILY_GOALS = [
 interface UserState {
   settings: Settings;
   progress: ProgressState;
+  /** The unfinished lesson, saved after every answer so it survives a reload. */
+  lessonSession: LessonSession | null;
 
   updateSettings: (patch: Partial<Settings>) => void;
+  /** Records a finished lesson and drops its saved session. */
   completeLesson: (input: LessonResultInput) => LessonOutcome;
+  /** Saves the answers given so far in a lesson, replacing any other saved session. */
+  saveLessonSession: (
+    lesson: { id: string; questions: readonly { id: string }[] },
+    answers: readonly AnswerRecord[],
+  ) => void;
+  /** Drops the saved session of this lesson, if there is one. */
+  clearLessonSession: (lessonId: string) => void;
   completeWorkout: (input: WorkoutResultInput) => WorkoutOutcome;
   completeDaily: (input: DailyResultInput) => DailyOutcome;
   /** Marks lessons as known after the placement test (no XP). */
@@ -56,6 +68,7 @@ export const useUserStore = create<UserState>()(
     (set, get) => ({
       settings: defaultSettings,
       progress: initialProgress,
+      lessonSession: null,
 
       updateSettings: patch => set(state => ({ settings: { ...state.settings, ...patch } })),
 
@@ -66,8 +79,22 @@ export const useUserStore = create<UserState>()(
           content: getContentIndex(),
           dailyGoalXp: settings.dailyGoalXp,
         });
-        set({ progress: state });
+        // One write: a reload can neither lose the result nor replay the lesson.
+        set(s => ({
+          progress: state,
+          lessonSession: s.lessonSession?.lessonId === input.lessonId ? null : s.lessonSession,
+        }));
         return outcome;
+      },
+
+      saveLessonSession: (lesson, answers) =>
+        set({
+          lessonSession: answers.length ? createLessonSession(lesson, answers, new Date()) : null,
+        }),
+
+      clearLessonSession: lessonId => {
+        // No write at all when there is nothing to drop (every lesson opening asks).
+        if (get().lessonSession?.lessonId === lessonId) set({ lessonSession: null });
       },
 
       completeWorkout: input => {
@@ -101,6 +128,7 @@ export const useUserStore = create<UserState>()(
       resetProgress: () =>
         set(state => ({
           progress: initialProgress,
+          lessonSession: null,
           settings: { ...state.settings, placementDone: false },
         })),
     }),
@@ -111,6 +139,7 @@ export const useUserStore = create<UserState>()(
       partialize: (state): PersistedState => ({
         settings: state.settings,
         progress: state.progress,
+        lessonSession: state.lessonSession,
       }),
       // Runs only when the saved version differs; `merge` validates the result.
       migrate: (persisted, version) => migratePersistedState(persisted, version) as PersistedState,

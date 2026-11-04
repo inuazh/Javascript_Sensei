@@ -15,7 +15,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jssensei.app"
+      "bundleIdentifier": "com.jssensei.app",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["mailto"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -54,7 +57,8 @@
           "color": "#FACC15"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "./plugins/withMailtoQuery"
     ],
     "updates": {
       "enabled": false

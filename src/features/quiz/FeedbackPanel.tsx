@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { reportQuestion, type QuestionReport } from '../../services/support';
 import { CodeBlock, Colors, Fonts, Icon, Radius, RichText, Spacing } from '../../ui';
 import { RunCode } from '../runner/RunCode';
 import type { CorrectAnswerView } from './types';
@@ -10,6 +11,8 @@ interface FeedbackPanelProps {
   note: string | null;
   /** Code to run with «Запустить», if the question has any. */
   runnableCode: string | null;
+  /** Details for the «ошибка в задании?» letter. */
+  report: QuestionReport;
 }
 
 const PRAISE = ['верно', 'точно', 'в точку', 'правильно', 'отлично'];
@@ -20,6 +23,7 @@ export function FeedbackPanel({
   correctAnswer,
   note,
   runnableCode,
+  report,
 }: FeedbackPanelProps) {
   const color = correct ? Colors.success : Colors.danger;
   const praise = PRAISE[explanation.length % PRAISE.length];
@@ -38,6 +42,16 @@ export function FeedbackPanel({
       {!correct && note ? <RichText text={note} style={styles.note} /> : null}
       <RichText text={explanation} style={styles.explanation} />
       {runnableCode ? <RunCode code={runnableCode} /> : null}
+      <Pressable
+        onPress={() => void reportQuestion(report)}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="сообщить об ошибке в задании"
+        style={({ pressed }) => [styles.report, pressed && styles.reportPressed]}
+      >
+        <Icon name="flag" size={12} color={Colors.textMuted} />
+        <Text style={styles.reportText}>ошибка в задании?</Text>
+      </Pressable>
     </View>
   );
 }
@@ -58,4 +72,13 @@ const styles = StyleSheet.create({
   answerValue: { fontFamily: Fonts.monoBold, color: Colors.success },
   note: { fontSize: 14, lineHeight: 21, color: Colors.warning },
   explanation: { fontSize: 14, lineHeight: 21, color: Colors.textSecondary },
+  report: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  reportPressed: { opacity: 0.6 },
+  reportText: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
 });
