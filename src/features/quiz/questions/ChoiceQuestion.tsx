@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ChoiceQuestion as ChoiceQuestionT } from '../../../content/schema';
 import { CodeBlock, Colors, Fonts, Radius, Spacing, alpha } from '../../../ui';
+import { optionOrder } from '../shuffle';
 import type { QuestionViewProps } from '../types';
 
 const LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -34,6 +36,8 @@ export function ChoiceQuestion({
   revealed,
 }: QuestionViewProps<ChoiceQuestionT, number>) {
   const isTrueFalse = question.type === 'trueFalse';
+  // New random order each time the question is shown (the view is keyed by question id).
+  const order = useMemo(() => optionOrder(question.options), [question.options]);
   const code =
     question.type === 'fill' ? (
       <CodeBlock
@@ -51,7 +55,8 @@ export function ChoiceQuestion({
     <View style={styles.wrap}>
       {code}
       <View style={isTrueFalse ? styles.row : styles.list}>
-        {question.options.map((option, i) => {
+        {order.map((i, position) => {
+          const option = question.options[i];
           const state = optionState(i, answer, question.correct, revealed);
           const color = STATE_COLOR[state];
           return (
@@ -73,7 +78,7 @@ export function ChoiceQuestion({
               {!isTrueFalse && (
                 <View style={[styles.label, color && { backgroundColor: alpha(color, 0.2) }]}>
                   <Text style={[styles.labelText, color && { color }]}>
-                    {state === 'correct' ? '✓' : state === 'wrong' ? '✗' : LABELS[i]}
+                    {state === 'correct' ? '✓' : state === 'wrong' ? '✗' : LABELS[position]}
                   </Text>
                 </View>
               )}

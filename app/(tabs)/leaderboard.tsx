@@ -16,7 +16,6 @@ import { plural } from '../../src/domain/reminders';
 import { useToday } from '../../src/hooks/useToday';
 import { publishScore } from '../../src/services/activity';
 import {
-  createPlayerId,
   fetchPlayers,
   rankAllTime,
   rankWeekly,
@@ -53,12 +52,11 @@ function JoinCard() {
     const problem = validateNickname(nickname);
     if (problem) return setError(problem);
     setSaving(true);
-    const playerId = useUserStore.getState().settings.playerId ?? (await createPlayerId());
-    updateSettings({ nickname: nickname.trim(), playerId });
+    updateSettings({ nickname: nickname.trim() });
     try {
       await publishScore();
     } catch {
-      // Will be retried after the next activity.
+      // Offline or the server is unavailable: retried after the next activity.
     }
     setSaving(false);
   };

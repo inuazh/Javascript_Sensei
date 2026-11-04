@@ -84,7 +84,9 @@ export default function TopicScreen() {
                   {p && p.attempts > 1 ? ` · попыток: ${p.attempts}` : ''}
                 </Text>
               </View>
-              {p ? (
+              {p?.skipped ? (
+                <Text style={styles.known}>знакомо</Text>
+              ) : p ? (
                 <Stars count={p.stars} size={12} />
               ) : isNext ? (
                 <Text style={[styles.go, { color }]}>Начать</Text>
@@ -122,4 +124,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   title: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
   go: { fontWeight: '800', fontSize: 14 },
+  known: { color: Colors.textMuted, fontWeight: '700', fontSize: 13 },
 });

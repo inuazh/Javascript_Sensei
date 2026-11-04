@@ -2,6 +2,7 @@ import {
   completeLesson,
   completeWorkout,
   initialProgress,
+  skipLessons,
   weeklyXp,
   type ActivityContext,
   type ProgressState,
@@ -174,5 +175,35 @@ describe('completeWorkout', () => {
       ctx('2026-11-04T19:00:00'),
     );
     expect(again.outcome.xpEarned).toBe(0);
+  });
+});
+
+describe('skipLessons', () => {
+  it('marks lessons as known without XP, and pays full XP when taken later', () => {
+    const now = new Date('2026-11-04T12:00:00');
+    const skipped = skipLessons(initialProgress, ['b1', 'b2'], now);
+    expect(skipped.totalXp).toBe(0);
+    expect(skipped.lessons.b1).toMatchObject({ skipped: true, stars: 0 });
+
+    const { state, outcome } = completeLesson(
+      skipped,
+      { lessonId: 'b1', answers: answers('b1', perfect) },
+      ctx('2026-11-04T13:00:00'),
+    );
+    expect(outcome.firstCompletion).toBe(true);
+    expect(outcome.xpEarned).toBe(lessonResultXp(5, 5));
+    expect(state.lessons.b1.skipped).toBeUndefined();
+    // b2 is only skipped, so the section is not "completed" for achievements.
+    expect(Object.keys(state.achievements)).not.toContain('section_complete');
+  });
+
+  it('keeps lessons that were already taken', () => {
+    const taken = completeLesson(
+      initialProgress,
+      { lessonId: 'b1', answers: answers('b1', twoMistakes) },
+      ctx('2026-11-04T12:00:00'),
+    ).state;
+    const after = skipLessons(taken, ['b1'], new Date());
+    expect(after.lessons.b1).toBe(taken.lessons.b1);
   });
 });
