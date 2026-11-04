@@ -39,6 +39,7 @@ export function formatValue(v: unknown, nested = false, seen = new Set<object>()
       return `${e.name}: ${e.message}`;
     }
     if (tag === 'Promise') return 'Promise';
+    if (v instanceof RegExp || tag === 'RegExp') return String(v);
     if (tag === 'Date') return (v as Date).toISOString();
     const keys = Object.keys(v);
     if (keys.length === 0) return '{}';
