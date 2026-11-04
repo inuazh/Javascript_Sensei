@@ -47,7 +47,9 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!disabled }}
+      // The title stays the name while the spinner replaces it.
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: !!disabled, busy: !!loading }}
       accessibilityHint={accessibilityHint}
       onPress={onPress}
       disabled={disabled || loading}
