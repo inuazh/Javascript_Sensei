@@ -1,0 +1,1502 @@
+{
+  "lessons": [
+    {
+      "id": "complexity-01",
+      "topicId": "complexity",
+      "title": "Что считает O-нотация",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**O-нотация** описывает, как растёт число операций, когда растёт размер входа `n`. Она считает не секунды, а форму роста."
+          },
+          {
+            "type": "code",
+            "code": "function first(arr) {\n  return arr[0]; // O(1): один шаг при любом n\n}\n\nfunction sum(arr) {\n  let total = 0;\n  for (const x of arr) total += x; // O(n): шаг на каждый элемент\n  return total;\n}\n\nconsole.log(first([5, 6, 7]), sum([5, 6, 7])); // 5 18"
+          },
+          {
+            "type": "text",
+            "text": "Константы отбрасывают: два цикла **подряд** по `n` — это `2n` шагов, но всё равно `O(n)`. Важно, во сколько раз вырастет работа, если вход вырастет вдвое."
+          },
+          {
+            "type": "tip",
+            "text": "Доступ по индексу `arr[i]` и чтение `arr.length` не перебирают массив — это `O(1)`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "complexity-01-q1",
+          "type": "output",
+          "code": "function countOps(n) {\n  let ops = 0;\n  for (let i = 0; i < n; i++) ops++;\n  for (let i = 0; i < n; i++) ops++;\n  return ops;\n}\nconsole.log(countOps(5));",
+          "options": ["10", "5", "25", "2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Циклов два, и каждый делает 5 шагов",
+            "25 получилось бы, если бы циклы были вложены друг в друга",
+            "ops считает шаги, а не циклы"
+          ],
+          "explanation": "Два цикла подряд дают n + n = 10 шагов. Это 2n, то есть всё ещё O(n): константу 2 отбрасывают."
+        },
+        {
+          "id": "complexity-01-q2",
+          "type": "output",
+          "code": "function countOps(n) {\n  let ops = 0;\n  for (let i = 0; i < n; i++) ops++;\n  return ops;\n}\nconsole.log(countOps(10), countOps(20));",
+          "options": ["10 20", "10 10", "10 40", "1 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Цикл делает по шагу на каждое значение i от 0 до n − 1",
+            "Вчетверо больше было бы при O(n²)",
+            "Цикл выполняется n раз, а не один"
+          ],
+          "explanation": "Вход вырос вдвое — шагов тоже стало вдвое больше. Так и выглядит линейный рост O(n)."
+        },
+        {
+          "id": "complexity-01-q3",
+          "type": "trueFalse",
+          "title": "Какая сложность у функции?",
+          "code": "function last(arr) {\n  return arr[arr.length - 1];\n}",
+          "options": ["Сложность O(1)", "Сложность O(n)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Чтобы взять последний элемент, не нужно проходить по остальным"
+          ],
+          "explanation": "Функция читает length и берёт элемент по индексу. Ни то ни другое не перебирает массив, поэтому время не зависит от его длины."
+        },
+        {
+          "id": "complexity-01-q4",
+          "type": "fill",
+          "title": "Какая сложность у функции?",
+          "codeBefore": "function sum(arr) {\n  let total = 0;\n  for (const x of arr) total += x;\n  return total;\n}\n// Сложность: O(",
+          "codeAfter": ")",
+          "options": ["n", "1", "n²", "log n"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Число шагов зависит от длины массива, значит это не O(1)",
+            "Цикл здесь один, вложенного нет",
+            "Цикл не отбрасывает половину данных, а проходит по всем"
+          ],
+          "explanation": "Цикл делает по одному шагу на каждый элемент: вдвое длиннее массив — вдвое больше шагов."
+        },
+        {
+          "id": "complexity-01-q5",
+          "type": "order",
+          "title": "Собери функцию суммы за O(n)",
+          "lines": [
+            "function sum(arr) {",
+            "  let total = 0;",
+            "  for (const x of arr) total += x;",
+            "  return total;",
+            "}"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Сначала заводим счётчик, затем один раз проходим по массиву и только после цикла возвращаем сумму."
+        }
+      ]
+    },
+    {
+      "id": "complexity-02",
+      "topicId": "complexity",
+      "title": "Цикл и вложенный цикл",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Цикл внутри цикла по тому же массиву — это **`O(n²)`**: на каждый из `n` шагов внешнего цикла внутренний делает ещё `n` шагов."
+          },
+          {
+            "type": "code",
+            "code": "function countPairs(n) {\n  let ops = 0;\n  for (let i = 0; i < n; i++) {\n    for (let j = 0; j < n; j++) ops++;\n  }\n  return ops;\n}\n\nconsole.log(countPairs(10)); // 100\nconsole.log(countPairs(20)); // 400"
+          },
+          {
+            "type": "text",
+            "text": "При `O(n²)` вход вдвое больше — работы вчетверо больше. А два цикла **подряд** — это `n + n`, всё ещё `O(n)`."
+          },
+          {
+            "type": "tip",
+            "text": "Если внутренний цикл начинается с `j = i + 1`, шагов примерно вдвое меньше — `n · (n − 1) / 2`. Но это всё равно `O(n²)`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "complexity-02-q1",
+          "type": "output",
+          "code": "let ops = 0;\nconst n = 4;\nfor (let i = 0; i < n; i++) {\n  for (let j = 0; j < n; j++) ops++;\n}\nconsole.log(ops);",
+          "options": ["16", "8", "4", "12"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "8 было бы у двух циклов подряд, а здесь один внутри другого",
+            "Внутренний цикл запускается заново на каждом шаге внешнего",
+            "Внутренний цикл начинается с 0, а не с i + 1"
+          ],
+          "explanation": "Внутренний цикл делает 4 шага на каждый из 4 шагов внешнего: 4 · 4 = 16."
+        },
+        {
+          "id": "complexity-02-q2",
+          "type": "output",
+          "code": "let ops = 0;\nconst n = 5;\nfor (let i = 0; i < n; i++) {\n  for (let j = i + 1; j < n; j++) ops++;\n}\nconsole.log(ops);",
+          "options": ["10", "25", "20", "5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "j начинается с i + 1, поэтому с каждым шагом внешнего цикла внутренний короче",
+            "Пар (i, j) с j > i ровно n · (n − 1) / 2",
+            "Внутренний цикл вложен во внешний, шагов больше n"
+          ],
+          "explanation": "Внутренний цикл делает 4, 3, 2, 1 и 0 шагов: всего 10 = 5 · 4 / 2. Шагов меньше, но рост всё равно O(n²)."
+        },
+        {
+          "id": "complexity-02-q3",
+          "type": "trueFalse",
+          "title": "Какая сложность у функции?",
+          "code": "function minMax(arr) {\n  let min = Infinity;\n  for (const x of arr) min = Math.min(min, x);\n  let max = -Infinity;\n  for (const x of arr) max = Math.max(max, x);\n  return [min, max];\n}",
+          "options": ["O(n): циклы идут друг за другом", "O(n²): в функции два цикла"],
+          "correct": 0,
+          "optionExplanations": [null, "O(n²) получается, только когда один цикл внутри другого"],
+          "explanation": "Циклы не вложены: сначала один проход, потом второй. Это 2n шагов, то есть O(n)."
+        },
+        {
+          "id": "complexity-02-q4",
+          "type": "fill",
+          "codeBefore": "function hasDuplicate(arr) {\n  for (let i = 0; i < arr.length; i++) {\n    for (let j = ",
+          "codeAfter": "; j < arr.length; j++) {\n      if (arr[i] === arr[j]) return true;\n    }\n  }\n  return false;\n}\nconsole.log(hasDuplicate([1, 2, 3])); // false\nconsole.log(hasDuplicate([1, 2, 1])); // true",
+          "options": ["i + 1", "0", "i", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При j = i элемент сравнится сам с собой: true даже для [1, 2, 3]",
+            "Первая же проверка сравнит arr[i] с самим собой",
+            "При i = 1 j тоже равно 1: элемент сравнится сам с собой"
+          ],
+          "explanation": "Сравнивать нужно только с элементами правее i. Иначе при j === i элемент сравнится сам с собой и функция всегда вернёт true."
+        },
+        {
+          "id": "complexity-02-q5",
+          "type": "order",
+          "title": "Собери вложенный цикл",
+          "lines": [
+            "let ops = 0;",
+            "for (let i = 0; i < 3; i++) {",
+            "  for (let j = 0; j < 3; j++) ops++;",
+            "}",
+            "console.log(ops); // 9"
+          ],
+          "shuffled": [3, 1, 4, 0, 2],
+          "explanation": "Внутренний цикл стоит внутри внешнего, поэтому шагов 3 · 3 = 9. Вывод — после обоих циклов, иначе он сработает несколько раз."
+        }
+      ]
+    },
+    {
+      "id": "complexity-03",
+      "topicId": "complexity",
+      "title": "Поиск: массив, Set и Map",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`arr.includes(x)` и `indexOf` перебирают массив с начала — **`O(n)`**. `set.has(x)` и `map.get(key)` находят значение по хешу в среднем за **`O(1)`**, сколько бы элементов там ни было."
+          },
+          {
+            "type": "code",
+            "code": "const ids = [3, 8, 15, 42];\nconst idSet = new Set(ids);\nconsole.log(ids.includes(42)); // true, но перебрал 4 элемента\nconsole.log(idSet.has(42)); // true, без перебора"
+          },
+          {
+            "type": "text",
+            "text": "Построить `Set` или `Map` из массива — это `O(n)`, но один раз. Если поисков много, это быстро окупается."
+          },
+          {
+            "type": "code",
+            "code": "const users = [{ id: 1, name: \"Аня\" }, { id: 2, name: \"Борис\" }];\nconst byId = new Map(users.map(u => [u.id, u]));\nconsole.log(byId.get(2).name); // Борис"
+          },
+          {
+            "type": "tip",
+            "text": "`Set` и `Map` не приводят типы: число `2` и строка `\"2\"` — разные ключи."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "complexity-03-q1",
+          "type": "output",
+          "code": "function countSteps(arr, target) {\n  let steps = 0;\n  for (const x of arr) {\n    steps++;\n    if (x === target) break;\n  }\n  return steps;\n}\nconsole.log(countSteps([4, 7, 1, 9], 9), countSteps([4, 7, 1, 9], 4));",
+          "options": ["4 1", "1 4", "4 4", "3 0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Поиск идёт с начала массива, а не с конца",
+            "break останавливает цикл, как только элемент найден",
+            "steps++ стоит до проверки, поэтому шаг с найденным элементом тоже считается"
+          ],
+          "explanation": "Линейный поиск идёт с начала: 9 стоит последним — 4 шага, 4 стоит первым — 1 шаг. Худший случай — O(n)."
+        },
+        {
+          "id": "complexity-03-q2",
+          "type": "output",
+          "code": "const set = new Set([1, 2, 3]);\nconsole.log(set.has(2), set.has(\"2\"));",
+          "options": ["true false", "true true", "false false", "2 undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set не приводит строку к числу, как это делает ==",
+            "Число 2 в множестве есть",
+            "has возвращает true или false, а не сам элемент"
+          ],
+          "explanation": "Set не приводит типы: в нём лежит число 2, а строки \"2\" нет."
+        },
+        {
+          "id": "complexity-03-q3",
+          "type": "trueFalse",
+          "title": "Перебирает ли set.has(x) все элементы множества из миллиона чисел?",
+          "options": ["Да, has перебирает все элементы", "Нет, has в среднем работает за O(1)"],
+          "correct": 1,
+          "optionExplanations": ["Перебирают массив includes и indexOf, а Set ищет по хешу", null],
+          "explanation": "Set хранит значения в хеш-таблице: has сразу находит нужное место и не смотрит на остальные элементы."
+        },
+        {
+          "id": "complexity-03-q4",
+          "type": "fill",
+          "codeBefore": "const users = [{ id: 1, name: \"Аня\" }, { id: 2, name: \"Борис\" }];\nconst byId = new Map(users.map(u => ",
+          "codeAfter": "));\nconsole.log(byId.get(2).name); // Борис",
+          "options": ["[u.id, u]", "[u, u.id]", "u.id", "[u.id, u.name]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключом стал объект, а не id: get(2) вернёт undefined, и обращение к .name упадёт с TypeError",
+            "Map ждёт пары [ключ, значение], а не числа: TypeError",
+            "get(2) вернёт строку \"Борис\", а у строки нет поля name — выведется undefined"
+          ],
+          "explanation": "Конструктор Map принимает пары [ключ, значение]. Ключом берём id, значением — весь объект, чтобы потом читать любое поле."
+        },
+        {
+          "id": "complexity-03-q5",
+          "type": "order",
+          "title": "Построй индекс по id и найди пользователя",
+          "lines": [
+            "const users = [{ id: 1, name: \"Аня\" }, { id: 2, name: \"Борис\" }];",
+            "const byId = new Map(users.map(u => [u.id, u]));",
+            "const user = byId.get(2);",
+            "console.log(user.name); // Борис"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Сначала данные, потом из них один раз строим Map за O(n). После этого каждый поиск по id — O(1)."
+        }
+      ]
+    },
+    {
+      "id": "complexity-04",
+      "topicId": "complexity",
+      "title": "includes внутри цикла",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`includes`, `indexOf` и `find` — это циклы внутри. Вызови их в цикле по другому массиву, и получишь **вложенный цикл**: `O(n · m)`, а для массивов одной длины — `O(n²)`."
+          },
+          {
+            "type": "code",
+            "code": "// O(n · m): includes перебирает b для каждого элемента a\nfunction commonSlow(a, b) {\n  return a.filter(x => b.includes(x));\n}\n\n// O(n + m): Set строится один раз, has — O(1)\nfunction commonFast(a, b) {\n  const setB = new Set(b);\n  return a.filter(x => setB.has(x));\n}\n\nconsole.log(commonFast([1, 2, 3], [2, 3, 4])); // [2, 3]"
+          },
+          {
+            "type": "warning",
+            "text": "`new Set(b)` внутри колбэка `filter` создаётся заново на каждом шаге — это снова `O(n · m)`. Строй `Set` один раз, до цикла."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "complexity-04-q1",
+          "type": "output",
+          "code": "let comparisons = 0;\nfunction contains(arr, x) {\n  for (const item of arr) {\n    comparisons++;\n    if (item === x) return true;\n  }\n  return false;\n}\nconst a = [1, 2, 3];\nconst b = [7, 8, 9];\nfor (const x of a) contains(b, x);\nconsole.log(comparisons);",
+          "options": ["9", "3", "6", "0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "contains — это цикл: на каждый элемент a он перебирает весь b",
+            "6 было бы у двух циклов подряд, а здесь один внутри другого",
+            "comparisons++ стоит перед проверкой и срабатывает на каждом элементе"
+          ],
+          "explanation": "Совпадений нет, поэтому contains каждый раз проходит весь b: 3 элемента a · 3 элемента b = 9 сравнений. Так работает includes в цикле."
+        },
+        {
+          "id": "complexity-04-q2",
+          "type": "output",
+          "code": "const a = [1, 2, 2, 3];\nconst setB = new Set([2, 3, 4]);\nconsole.log(a.filter(x => setB.has(x)));",
+          "options": ["[2, 2, 3]", "[2, 3]", "[2, 3, 4]", "[1]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "filter не убирает повторы из a, он проверяет каждый элемент отдельно",
+            "Результат строится из элементов a, а 4 в a нет",
+            "Это элементы a, которых нет в setB, — обратное условие"
+          ],
+          "explanation": "filter проходит по a и оставляет каждый элемент, который есть в setB. Дубли в a сохраняются: Set здесь только для быстрой проверки."
+        },
+        {
+          "id": "complexity-04-q3",
+          "type": "trueFalse",
+          "title": "Какая сложность у функции?",
+          "code": "function common(a, b) {\n  return a.filter(x => new Set(b).has(x));\n}",
+          "options": [
+            "O(n + m): функция использует Set",
+            "O(n · m): Set строится заново на каждом шаге"
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Сам по себе Set не ускоряет код, если строить его на каждом шаге",
+            null
+          ],
+          "explanation": "Колбэк filter вызывается для каждого элемента a, и каждый раз new Set(b) заново проходит весь b. Set нужно создать один раз до filter."
+        },
+        {
+          "id": "complexity-04-q4",
+          "type": "fill",
+          "codeBefore": "function hasCommon(a, b) {\n  const setB = ",
+          "codeAfter": ";\n  return a.some(x => setB.has(x));\n}\nconsole.log(hasCommon([1, 2], [2, 5])); // true\nconsole.log(hasCommon([1, 3], [2, 5])); // false",
+          "options": ["new Set(b)", "Set(b)", "b", "new Map(b)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set — конструктор, без new будет TypeError",
+            "У массива нет метода has: TypeError",
+            "Map ждёт пары [ключ, значение], а не числа: TypeError"
+          ],
+          "explanation": "Множество из b строится один раз за O(m), а каждая проверка has — O(1). Вся функция работает за O(n + m)."
+        },
+        {
+          "id": "complexity-04-q5",
+          "type": "order",
+          "title": "Собери поиск общих элементов за O(n + m)",
+          "lines": [
+            "const common = (a, b) => {",
+            "  const setB = new Set(b);",
+            "  return a.filter(x => setB.has(x));",
+            "};",
+            "console.log(common([1, 2, 3], [3, 4])); // [3]"
+          ],
+          "shuffled": [4, 2, 0, 3, 1],
+          "explanation": "Set строится до filter, один раз. Вызывать функцию можно только после объявления: стрелка в const не всплывает."
+        }
+      ]
+    },
+    {
+      "id": "complexity-05",
+      "topicId": "complexity",
+      "title": "Логарифм и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**`O(log n)`** — когда каждый шаг отбрасывает половину данных. Бинарный поиск в **отсортированном** массиве смотрит на середину и выкидывает ту половину, где искомого быть не может."
+          },
+          {
+            "type": "code",
+            "code": "function halvings(n) {\n  let steps = 0;\n  while (n > 1) {\n    n = Math.floor(n / 2);\n    steps++;\n  }\n  return steps;\n}\n\nconsole.log(halvings(8)); // 3\nconsole.log(halvings(1024)); // 10"
+          },
+          {
+            "type": "text",
+            "text": "Для миллиона элементов это около 20 шагов вместо миллиона. От лучшей сложности к худшей: `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n²)`."
+          },
+          {
+            "type": "warning",
+            "text": "Бинарный поиск работает только с отсортированным массивом. В неотсортированном он может выкинуть половину, где искомое как раз лежит."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "complexity-05-q1",
+          "type": "output",
+          "code": "function halvings(n) {\n  let steps = 0;\n  while (n > 1) {\n    n = Math.floor(n / 2);\n    steps++;\n  }\n  return steps;\n}\nconsole.log(halvings(16), halvings(17));",
+          "options": ["4 4", "4 5", "8 9", "16 17"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Math.floor(17 / 2) = 8, дальше путь тот же, что у 16",
+            "Каждый шаг делит n пополам, а не вычитает единицу",
+            "steps считает деления, а не элементы"
+          ],
+          "explanation": "16 → 8 → 4 → 2 → 1 и 17 → 8 → 4 → 2 → 1: по 4 деления. Логарифм растёт очень медленно — лишний элемент почти ничего не меняет."
+        },
+        {
+          "id": "complexity-05-q2",
+          "type": "output",
+          "code": "function binarySteps(arr, target) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  let steps = 0;\n  while (lo <= hi) {\n    steps++;\n    const mid = Math.floor((lo + hi) / 2);\n    if (arr[mid] === target) return steps;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return steps;\n}\nconsole.log(binarySteps([1, 3, 5, 7, 9, 11, 13], 13));",
+          "options": ["3", "7", "1", "6"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "7 шагов сделал бы линейный поиск, а бинарный отбрасывает половину за раз",
+            "Первой проверяется середина, а не последний элемент",
+            "Бинарный поиск не идёт по элементам подряд"
+          ],
+          "explanation": "Середина 7 < 13 — уходим вправо, середина 11 < 13 — снова вправо, затем находим 13. Три шага на 7 элементов: каждый шаг отбрасывает половину."
+        },
+        {
+          "id": "complexity-05-q3",
+          "type": "trueFalse",
+          "code": "function binarySearch(arr, target) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (arr[mid] === target) return mid;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\nconsole.log(binarySearch([9, 2, 7, 4, 1], 9));",
+          "options": ["Выведет 0: девятка стоит первой", "Выведет -1: массив не отсортирован"],
+          "correct": 1,
+          "optionExplanations": [
+            "Поиск начинает с середины и сразу отбрасывает левую половину, где лежит 9",
+            null
+          ],
+          "explanation": "Середина 7 меньше 9, и поиск уходит вправо, хотя 9 лежит слева. Бинарный поиск верен только для отсортированного массива."
+        },
+        {
+          "id": "complexity-05-q4",
+          "type": "fill",
+          "codeBefore": "function countSteps(n) {\n  let steps = 0;\n  for (let i = 1; i < n; ",
+          "codeAfter": ") steps++;\n  return steps;\n}\nconsole.log(countSteps(1000)); // 10",
+          "options": ["i *= 2", "i++", "i += 2", "i *= 10"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "i++ даст 999 шагов — это O(n)",
+            "i += 2 даст 500 шагов — это всё ещё O(n)",
+            "i *= 10 даст 1, 10, 100 — только 3 шага"
+          ],
+          "explanation": "При i *= 2 счётчик растёт как 1, 2, 4, …, 512 — это 10 значений меньше 1000. Удвоение счётчика даёт O(log n)."
+        },
+        {
+          "id": "complexity-05-q5",
+          "type": "order",
+          "title": "Расставь сложности от лучшей к худшей",
+          "lines": ["O(1)", "O(log n)", "O(n)", "O(n log n)", "O(n²)"],
+          "shuffled": [3, 0, 4, 2, 1],
+          "explanation": "Константа не растёт вовсе, логарифм растёт очень медленно, линейная — пропорционально n, n log n — чуть быстрее, а квадрат — быстрее всех."
+        }
+      ]
+    },
+    {
+      "id": "array-algorithms-01",
+      "topicId": "array-algorithms",
+      "title": "Линейный и бинарный поиск",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Линейный поиск** идёт по массиву с начала и сравнивает каждый элемент — `O(n)`. Работает с любым массивом. Так устроены `indexOf` и `includes`."
+          },
+          {
+            "type": "code",
+            "code": "function linearSearch(arr, target) {\n  for (let i = 0; i < arr.length; i++) {\n    if (arr[i] === target) return i;\n  }\n  return -1;\n}\n\nconsole.log(linearSearch([4, 2, 7], 7)); // 2\nconsole.log(linearSearch([4, 2, 7], 5)); // -1"
+          },
+          {
+            "type": "text",
+            "text": "**Бинарный поиск** работает только с отсортированным массивом: смотрит на середину и сдвигает границу `lo` или `hi`, отбрасывая половину, — `O(log n)`."
+          },
+          {
+            "type": "code",
+            "code": "function binarySearch(arr, target) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (arr[mid] === target) return mid;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\n\nconsole.log(binarySearch([1, 3, 5, 7, 9], 7)); // 3"
+          },
+          {
+            "type": "warning",
+            "text": "Условие цикла — `lo <= hi`. С `<` последний оставшийся кандидат не проверится. А `return -1` пишут после цикла, а не внутри него."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "array-algorithms-01-q1",
+          "type": "output",
+          "code": "function linearSearch(arr, target) {\n  for (let i = 0; i < arr.length; i++) {\n    if (arr[i] === target) return i;\n  }\n  return -1;\n}\nconsole.log(linearSearch([5, 3, 5], 5), linearSearch([5, 3, 5], 8));",
+          "options": ["0 -1", "2 -1", "0 undefined", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return срабатывает на первом совпадении и до второй пятёрки не доходит",
+            "После цикла стоит return -1",
+            "Функция возвращает индекс, а не true или false"
+          ],
+          "explanation": "return прерывает цикл на первом совпадении, поэтому возвращается индекс первой пятёрки. Если совпадений нет, срабатывает return -1 после цикла."
+        },
+        {
+          "id": "array-algorithms-01-q2",
+          "type": "output",
+          "code": "function binarySearch(arr, target) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  while (lo <= hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (arr[mid] === target) return mid;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\nconsole.log(binarySearch([2, 4, 6, 8, 10, 12], 10), binarySearch([2, 4, 6, 8, 10, 12], 5));",
+          "options": ["4 -1", "5 -1", "4 2", "3 -1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы считаются с нуля: 10 — пятый элемент, индекс 4",
+            "Пятёрки в массиве нет, поэтому -1, а не место, куда её можно вставить",
+            "По индексу 3 лежит 8"
+          ],
+          "explanation": "Для 10: середина 6 < 10, вправо, затем середина — 10 по индексу 4. Для 5 границы сходятся, так ничего и не найдя, и функция возвращает -1."
+        },
+        {
+          "id": "array-algorithms-01-q3",
+          "type": "fill",
+          "codeBefore": "function binarySearch(arr, target) {\n  let lo = 0;\n  let hi = arr.length - 1;\n  while (lo ",
+          "codeAfter": " hi) {\n    const mid = Math.floor((lo + hi) / 2);\n    if (arr[mid] === target) return mid;\n    if (arr[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n  }\n  return -1;\n}\nconsole.log(binarySearch([1, 3, 5], 5)); // 2",
+          "options": ["<=", "<", "!==", ">="],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При lo === hi цикл остановится, не проверив последний кандидат: -1",
+            "При lo === hi цикл остановится, не проверив последний кандидат: -1",
+            "В начале lo = 0, hi = 2, и цикл не выполнится ни разу: -1"
+          ],
+          "explanation": "Когда lo === hi, остаётся ровно один кандидат, и его тоже нужно проверить. Поэтому цикл идёт, пока lo <= hi."
+        },
+        {
+          "id": "array-algorithms-01-q4",
+          "type": "trueFalse",
+          "code": "function linearSearch(arr, target) {\n  for (let i = 0; i < arr.length; i++) {\n    if (arr[i] === target) return i;\n    else return -1;\n  }\n}\nconsole.log(linearSearch([4, 2, 7], 7));",
+          "options": ["Выведет 2", "Выведет -1"],
+          "correct": 1,
+          "optionExplanations": [
+            "Цикл не дойдёт до семёрки: return в else выходит из функции на первом шаге",
+            null
+          ],
+          "explanation": "На первом же элементе 4 !== 7, срабатывает else и return -1 завершает функцию. return -1 должен стоять после цикла."
+        },
+        {
+          "id": "array-algorithms-01-q5",
+          "type": "order",
+          "title": "Расставь шаги binarySearch([1, 3, 5, 7, 9, 11], 7)",
+          "lines": [
+            "lo = 0, hi = 5, mid = 2: 5 < 7, идём вправо",
+            "lo = 3, hi = 5, mid = 4: 9 > 7, идём влево",
+            "lo = 3, hi = 3, mid = 3: нашли 7"
+          ],
+          "shuffled": [1, 2, 0],
+          "explanation": "Каждый шаг сдвигает одну границу за середину: сначала lo = mid + 1, потом hi = mid - 1. Когда границы сошлись, остаётся один элемент — искомая 7."
+        }
+      ]
+    },
+    {
+      "id": "array-algorithms-02",
+      "topicId": "array-algorithms",
+      "title": "sort с компаратором",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`sort()` без аргументов сравнивает элементы **как строки**: `\"10\"` меньше `\"9\"`, потому что `\"1\"` меньше `\"9\"`. Для чисел это ломает порядок."
+          },
+          {
+            "type": "code",
+            "code": "console.log([10, 9, 1].sort()); // [1, 10, 9]\nconsole.log([10, 9, 1].sort((a, b) => a - b)); // [1, 9, 10]"
+          },
+          {
+            "type": "text",
+            "text": "Компаратор `(a, b)` возвращает отрицательное число, если `a` должен идти раньше, положительное — если позже, и `0`, если порядок не важен. `a - b` сортирует по возрастанию, `b - a` — по убыванию."
+          },
+          {
+            "type": "code",
+            "code": "const users = [{ name: \"Оля\", age: 30 }, { name: \"Ян\", age: 25 }];\nusers.sort((a, b) => a.age - b.age);\nconsole.log(users[0].name); // Ян"
+          },
+          {
+            "type": "warning",
+            "text": "`sort` меняет исходный массив и возвращает его же. Нужна копия — сортируй `[...arr]`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "array-algorithms-02-q1",
+          "type": "output",
+          "code": "console.log([5, 25, 100, 1].sort());",
+          "options": ["[1, 100, 25, 5]", "[1, 5, 25, 100]", "[100, 25, 5, 1]", "[5, 25, 100, 1]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так отсортировал бы компаратор (a, b) => a - b",
+            "sort() сортирует по возрастанию, хоть и строковому",
+            "sort() меняет порядок, просто не числовой"
+          ],
+          "explanation": "Без компаратора числа сравниваются как строки: \"1\" < \"100\" < \"25\" < \"5\" — посимвольно, как слова в словаре."
+        },
+        {
+          "id": "array-algorithms-02-q2",
+          "type": "output",
+          "code": "const arr = [3, 1, 2];\nconst sorted = arr.sort((a, b) => b - a);\nconsole.log(arr, sorted === arr);",
+          "options": ["[3, 2, 1] true", "[3, 1, 2] false", "[1, 2, 3] true", "[3, 2, 1] false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "sort не создаёт копию, а меняет исходный массив",
+            "b - a сортирует по убыванию",
+            "sort возвращает тот же массив, а не новый"
+          ],
+          "explanation": "b - a сортирует по убыванию. sort меняет сам массив и возвращает ссылку на него же, поэтому sorted и arr — один объект."
+        },
+        {
+          "id": "array-algorithms-02-q3",
+          "type": "trueFalse",
+          "code": "console.log([10, 9, 1].sort());",
+          "options": ["Выведет [1, 9, 10]", "Выведет [1, 10, 9]"],
+          "correct": 1,
+          "optionExplanations": ["Числовой порядок дал бы sort((a, b) => a - b)", null],
+          "explanation": "Без компаратора сравниваются строки \"10\", \"9\" и \"1\". Строка \"10\" начинается с \"1\", поэтому идёт раньше \"9\"."
+        },
+        {
+          "id": "array-algorithms-02-q4",
+          "type": "fill",
+          "codeBefore": "const nums = [2, 10, 9, 1];\nconst sorted = [...nums].",
+          "codeAfter": ";\nconsole.log(sorted); // [10, 9, 2, 1]",
+          "options": [
+            "sort((a, b) => b - a)",
+            "sort((a, b) => a - b)",
+            "sort().reverse()",
+            "reverse()"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "a - b сортирует по возрастанию: [1, 2, 9, 10]",
+            "sort() сортирует как строки, [1, 10, 2, 9], а reverse даст [9, 2, 10, 1]",
+            "reverse только переворачивает массив, не сортируя: [1, 9, 10, 2]"
+          ],
+          "explanation": "Чтобы числа шли по убыванию, компаратор возвращает b - a: положительное число, когда b больше a, ставит b раньше."
+        },
+        {
+          "id": "array-algorithms-02-q5",
+          "type": "order",
+          "title": "Найди самого молодого",
+          "lines": [
+            "const users = [{ name: \"Оля\", age: 30 }, { name: \"Ян\", age: 25 }];",
+            "const byAge = [...users].sort((a, b) => a.age - b.age);",
+            "const youngest = byAge[0];",
+            "console.log(youngest.name); // Ян"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Сортируем копию по возрасту, после сортировки самый молодой оказывается первым. Каждая строка использует результат предыдущей."
+        }
+      ]
+    },
+    {
+      "id": "array-algorithms-03",
+      "topicId": "array-algorithms",
+      "title": "Удаление дублей",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Самый короткий способ — `Set`: он хранит только уникальные значения, а спред превращает его обратно в массив. Порядок первых вхождений сохраняется, сложность `O(n)`."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [3, 1, 3, 2, 1];\nconsole.log([...new Set(nums)]); // [3, 1, 2]\n\nconst unique = nums.filter((x, i) => nums.indexOf(x) === i);\nconsole.log(unique); // [3, 1, 2]"
+          },
+          {
+            "type": "text",
+            "text": "Вариант с `filter` и `indexOf` оставляет элемент, только если его первое вхождение — текущий индекс. Работает, но это `O(n²)`: `indexOf` — цикл внутри цикла."
+          },
+          {
+            "type": "warning",
+            "text": "`Set` не приводит типы и сравнивает объекты по ссылке: `1` и `\"1\"` — разные значения, два объекта `{ id: 1 }` — тоже."
+          },
+          {
+            "type": "tip",
+            "text": "Дубли объектов по полю убирает `Map` с этим полем в ключе: `new Map(users.map(u => [u.id, u]))`. Повторный ключ перезаписывает значение."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "array-algorithms-03-q1",
+          "type": "output",
+          "code": "console.log([...new Set([\"b\", \"a\", \"b\", \"c\", \"a\"])]);",
+          "options": [
+            "[\"b\", \"a\", \"c\"]",
+            "[\"a\", \"b\", \"c\"]",
+            "[\"c\"]",
+            "[\"b\", \"a\", \"b\", \"c\", \"a\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set не сортирует значения, а хранит их в порядке добавления",
+            "Set убирает повторы, но оставляет по одному экземпляру каждого значения",
+            "В Set не бывает повторов"
+          ],
+          "explanation": "Set запоминает порядок первых вхождений: b, затем a, затем c. Повторы просто не добавляются."
+        },
+        {
+          "id": "array-algorithms-03-q2",
+          "type": "output",
+          "code": "console.log(new Set([1, \"1\", 1]).size);",
+          "options": ["2", "1", "3", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set не приводит строку \"1\" к числу",
+            "Число 1 встречается дважды, второе не добавится",
+            "Set может хранить значения любых типов вперемешку"
+          ],
+          "explanation": "Число 1 и строка \"1\" — разные значения, Set их не приводит. Вторая единица-число — повтор и не добавляется."
+        },
+        {
+          "id": "array-algorithms-03-q3",
+          "type": "trueFalse",
+          "code": "const users = [{ id: 1 }, { id: 1 }];\nconsole.log(new Set(users).size);",
+          "options": ["Выведет 1: объекты одинаковые", "Выведет 2: это разные объекты"],
+          "correct": 1,
+          "optionExplanations": [
+            "Одинаковое содержимое не делает объекты одним и тем же значением",
+            null
+          ],
+          "explanation": "Set сравнивает объекты по ссылке. Два литерала { id: 1 } создают два разных объекта, хоть и с одинаковым содержимым."
+        },
+        {
+          "id": "array-algorithms-03-q4",
+          "type": "fill",
+          "codeBefore": "const nums = [3, 1, 3, 2, 1];\nconst unique = nums.filter((x, i) => nums.",
+          "codeAfter": "(x) === i);\nconsole.log(unique); // [3, 1, 2]",
+          "options": ["indexOf", "lastIndexOf", "includes", "findIndex"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Останутся последние вхождения, и порядок станет [3, 2, 1]",
+            "includes возвращает true или false, а не индекс: true === i всегда ложно, получится []",
+            "findIndex ждёт функцию, а не значение: TypeError"
+          ],
+          "explanation": "indexOf возвращает индекс первого вхождения. Он совпадает с i только у первого экземпляра каждого числа, остальные отфильтруются."
+        },
+        {
+          "id": "array-algorithms-03-q5",
+          "type": "order",
+          "title": "Убери дубли объектов по id",
+          "lines": [
+            "const users = [{ id: 1, name: \"А\" }, { id: 1, name: \"Б\" }];",
+            "const byId = new Map(users.map(u => [u.id, u]));",
+            "const unique = [...byId.values()];",
+            "console.log(unique.length); // 1"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Map с id в ключе хранит по одному объекту на каждый id. Затем values() достаёт объекты, а спред собирает их в массив."
+        }
+      ]
+    },
+    {
+      "id": "array-algorithms-04",
+      "topicId": "array-algorithms",
+      "title": "Два указателя",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Два указателя** — два индекса, которые идут по массиву навстречу друг другу. Вместо вложенного цикла получается один проход — `O(n)`."
+          },
+          {
+            "type": "code",
+            "code": "function reverse(arr) {\n  let left = 0;\n  let right = arr.length - 1;\n  while (left < right) {\n    [arr[left], arr[right]] = [arr[right], arr[left]];\n    left++;\n    right--;\n  }\n  return arr;\n}\n\nconsole.log(reverse([1, 2, 3, 4])); // [4, 3, 2, 1]"
+          },
+          {
+            "type": "text",
+            "text": "В **отсортированном** массиве так ищут пару с нужной суммой: сумма меньше цели — двигаем левый указатель вправо, больше — правый влево."
+          },
+          {
+            "type": "code",
+            "code": "function pairSum(sorted, target) {\n  let left = 0;\n  let right = sorted.length - 1;\n  while (left < right) {\n    const sum = sorted[left] + sorted[right];\n    if (sum === target) return [sorted[left], sorted[right]];\n    if (sum < target) left++;\n    else right--;\n  }\n  return null;\n}\n\nconsole.log(pairSum([1, 3, 4, 6, 9], 7)); // [1, 6]"
+          },
+          {
+            "type": "warning",
+            "text": "Приём работает только с отсортированным массивом: сдвигая указатель, мы рассчитываем, что слева числа меньше, а справа больше."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "array-algorithms-04-q1",
+          "type": "output",
+          "code": "function pairSum(sorted, target) {\n  let left = 0;\n  let right = sorted.length - 1;\n  while (left < right) {\n    const sum = sorted[left] + sorted[right];\n    if (sum === target) return [sorted[left], sorted[right]];\n    if (sum < target) left++;\n    else right--;\n  }\n  return null;\n}\nconsole.log(pairSum([1, 2, 4, 7, 11], 15), pairSum([1, 2, 4, 7, 11], 100));",
+          "options": ["[4, 11] null", "[4, 11] undefined", "[11, 4] null", "[2, 11] null"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "После цикла явно стоит return null",
+            "Пара собирается как [sorted[left], sorted[right]] — меньшее число первым",
+            "2 + 11 = 13, а нужно 15"
+          ],
+          "explanation": "Суммы 12 и 13 меньше 15, левый указатель идёт вправо, пока не получится 4 + 11. Для 100 указатели встречаются, и после цикла возвращается null."
+        },
+        {
+          "id": "array-algorithms-04-q2",
+          "type": "output",
+          "code": "let left = 0;\nlet right = 4;\nlet swaps = 0;\nwhile (left < right) {\n  swaps++;\n  left++;\n  right--;\n}\nconsole.log(swaps);",
+          "options": ["2", "5", "3", "4"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Каждый шаг сдвигает оба указателя, поэтому шагов вдвое меньше",
+            "При left === right условие left < right уже ложно",
+            "Каждый шаг сдвигает оба указателя, поэтому шагов вдвое меньше"
+          ],
+          "explanation": "Указатели проходят пары (0, 4) и (1, 3), а на (2, 2) встречаются. В массиве из 5 элементов средний элемент остаётся на месте."
+        },
+        {
+          "id": "array-algorithms-04-q3",
+          "type": "trueFalse",
+          "code": "function pairSum(sorted, target) {\n  let left = 0;\n  let right = sorted.length - 1;\n  while (left < right) {\n    const sum = sorted[left] + sorted[right];\n    if (sum === target) return [sorted[left], sorted[right]];\n    if (sum < target) left++;\n    else right--;\n  }\n  return null;\n}\nconsole.log(pairSum([9, 1, 6, 3], 7));",
+          "options": ["Выведет [1, 6]", "Выведет null: массив не отсортирован"],
+          "correct": 1,
+          "optionExplanations": [
+            "Левый указатель так и не сдвинется с девятки: сумма всё время больше 7",
+            null
+          ],
+          "explanation": "Все суммы с девяткой больше 7, поэтому правый указатель сдвигается влево, пока не встретит левый. Пару 1 + 6 алгоритм так и не проверит."
+        },
+        {
+          "id": "array-algorithms-04-q4",
+          "type": "fill",
+          "codeBefore": "function pairSum(sorted, target) {\n  let left = 0;\n  let right = sorted.length - 1;\n  while (left < right) {\n    const sum = sorted[left] + sorted[right];\n    if (sum === target) return [sorted[left], sorted[right]];\n    if (sum < target) ",
+          "codeAfter": ";\n    else right--;\n  }\n  return null;\n}\nconsole.log(pairSum([1, 3, 4, 6, 9], 13)); // [4, 9]",
+          "options": ["left++", "right--", "left--", "break"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Сдвиг правого указателя влево только уменьшит сумму: null",
+            "Левый указатель уйдёт за начало массива: null",
+            "Цикл прервётся на первой же маленькой сумме: null"
+          ],
+          "explanation": "Если сумма мала, её нужно увеличить. Справа числа больше, поэтому левый указатель сдвигаем вправо."
+        },
+        {
+          "id": "array-algorithms-04-q5",
+          "type": "order",
+          "title": "Расставь шаги pairSum([1, 3, 4, 6, 9], 8)",
+          "lines": [
+            "left = 0, right = 4: 1 + 9 = 10 > 8, right--",
+            "left = 0, right = 3: 1 + 6 = 7 < 8, left++",
+            "left = 1, right = 3: 3 + 6 = 9 > 8, right--",
+            "left = 1, right = 2: 3 + 4 = 7 < 8, left++",
+            "left = 2, right = 2: указатели встретились, null"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Большая сумма сдвигает правый указатель, маленькая — левый. Пары с суммой 8 нет, поэтому указатели встречаются и функция возвращает null."
+        }
+      ]
+    },
+    {
+      "id": "array-algorithms-05",
+      "topicId": "array-algorithms",
+      "title": "Частоты и сумма пары",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Частоты** считают за один проход: ключ — значение, счётчик — сколько раз оно встретилось. `|| 0` нужен, потому что в первый раз счётчика нет, а `undefined + 1` — это `NaN`."
+          },
+          {
+            "type": "code",
+            "code": "const counts = new Map();\nfor (const x of [\"a\", \"b\", \"a\"]) {\n  counts.set(x, (counts.get(x) || 0) + 1);\n}\nconsole.log(counts.get(\"a\"), counts.get(\"b\")); // 2 1"
+          },
+          {
+            "type": "text",
+            "text": "**Сумма пары** в неотсортированном массиве: для каждого числа проверяем, встречалось ли уже `target - x`. `Set` просмотренных чисел даёт `O(n)` вместо вложенного цикла."
+          },
+          {
+            "type": "code",
+            "code": "function hasPairSum(arr, target) {\n  const seen = new Set();\n  for (const x of arr) {\n    if (seen.has(target - x)) return true;\n    seen.add(x);\n  }\n  return false;\n}\n\nconsole.log(hasPairSum([8, 3, 5, 1], 6)); // true: 5 + 1"
+          },
+          {
+            "type": "warning",
+            "text": "Сначала проверяй, потом добавляй. Иначе число сложится само с собой: в `[3, 4]` найдётся пара с суммой 6."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "array-algorithms-05-q1",
+          "type": "output",
+          "code": "const counts = {};\nfor (const n of [1, 2, 1, 3, 1]) {\n  counts[n] = (counts[n] || 0) + 1;\n}\nconsole.log(counts[1], counts[3]);",
+          "options": ["3 1", "1 1", "3 3", "undefined 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Счётчик увеличивается при каждой встрече, а не ставится в 1",
+            "Тройка в массиве одна",
+            "Числовой ключ 1 превращается в строку \"1\", и counts[1] находит его"
+          ],
+          "explanation": "Единица встречается трижды, тройка — один раз. Объект работает как Map: ключ — число, значение — счётчик."
+        },
+        {
+          "id": "array-algorithms-05-q2",
+          "type": "output",
+          "code": "const counts = {};\nfor (const ch of \"aab\") {\n  counts[ch] = counts[ch] + 1;\n}\nconsole.log(counts.a);",
+          "options": ["NaN", "2", "undefined", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без || 0 первое сложение даёт undefined + 1",
+            "Значение присваивается, но это NaN",
+            "undefined + 1 — это не 1, а NaN"
+          ],
+          "explanation": "В первый раз counts.a — undefined, а undefined + 1 даёт NaN. Дальше NaN + 1 — снова NaN. Нужен запасной ноль: (counts[ch] || 0) + 1."
+        },
+        {
+          "id": "array-algorithms-05-q3",
+          "type": "trueFalse",
+          "code": "function hasPairSum(arr, target) {\n  const seen = new Set();\n  for (const x of arr) {\n    seen.add(x);\n    if (seen.has(target - x)) return true;\n  }\n  return false;\n}\nconsole.log(hasPairSum([3, 4], 6));",
+          "options": [
+            "Выведет false: пары с суммой 6 нет",
+            "Выведет true: 3 сложилось само с собой"
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Добавление стоит до проверки, и seen.has(3) находит только что добавленную тройку",
+            null
+          ],
+          "explanation": "Тройка попадает в seen до проверки, и seen.has(6 - 3) сразу находит её же. Поэтому сначала проверяют, а потом добавляют."
+        },
+        {
+          "id": "array-algorithms-05-q4",
+          "type": "fill",
+          "codeBefore": "function hasPairSum(arr, target) {\n  const seen = new Set();\n  for (const x of arr) {\n    if (seen.has(",
+          "codeAfter": ")) return true;\n    seen.add(x);\n  }\n  return false;\n}\nconsole.log(hasPairSum([8, 3, 5, 1], 6)); // true\nconsole.log(hasPairSum([8, 3], 6)); // false",
+          "options": ["target - x", "x", "target + x", "target"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так ищутся повторы, а не пара с суммой: false",
+            "Нужно дополнение до target, а не сумма: false",
+            "Ищем не саму цель, а второе слагаемое: false"
+          ],
+          "explanation": "Для числа x пара — это target - x. Если оно уже встречалось, пара найдена за один проход."
+        },
+        {
+          "id": "array-algorithms-05-q5",
+          "type": "order",
+          "title": "Посчитай частоты слов",
+          "lines": [
+            "const counts = new Map();",
+            "for (const w of [\"кот\", \"пёс\", \"кот\"]) {",
+            "  counts.set(w, (counts.get(w) || 0) + 1);",
+            "}",
+            "console.log(counts.get(\"кот\")); // 2"
+          ],
+          "shuffled": [4, 2, 0, 3, 1],
+          "explanation": "Сначала пустой Map, потом цикл, который обновляет счётчик, и только после цикла — вывод."
+        }
+      ]
+    },
+    {
+      "id": "string-algorithms-01",
+      "topicId": "string-algorithms",
+      "title": "Разворот строки",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "У строк нет метода `reverse`. Строку разбивают на массив символов, разворачивают массив и склеивают обратно."
+          },
+          {
+            "type": "code",
+            "code": "const word = \"привет\";\nconsole.log(word.split(\"\").reverse().join(\"\")); // тевирп\nconsole.log([...word].reverse().join(\"\")); // тевирп"
+          },
+          {
+            "type": "text",
+            "text": "То же циклом: идём с последнего индекса к нулю и дописываем символы к результату."
+          },
+          {
+            "type": "code",
+            "code": "function reverse(str) {\n  let result = \"\";\n  for (let i = str.length - 1; i >= 0; i--) result += str[i];\n  return result;\n}\nconsole.log(reverse(\"abc\")); // cba"
+          },
+          {
+            "type": "warning",
+            "text": "`str.reverse()` — `TypeError`: это метод массивов. Без `join` останется массив, а `join()` без аргумента склеит символы через запятую."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-algorithms-01-q1",
+          "type": "output",
+          "code": "console.log(\"abc\".split(\"\").reverse());",
+          "options": ["[\"c\", \"b\", \"a\"]", "cba", "[\"a\", \"b\", \"c\"]", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без join(\"\") результат остаётся массивом",
+            "reverse меняет порядок элементов массива",
+            "reverse вызывается у массива из split, а не у строки"
+          ],
+          "explanation": "split(\"\") даёт массив символов, reverse разворачивает его. Чтобы снова получить строку, нужен join(\"\")."
+        },
+        {
+          "id": "string-algorithms-01-q2",
+          "type": "output",
+          "code": "const s = \"JS\";\nconsole.log(s.reverse());",
+          "options": ["TypeError", "SJ", "JS", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "reverse есть только у массивов",
+            "Код падает на вызове несуществующего метода",
+            "undefined — это сам s.reverse, а вызов его падает"
+          ],
+          "explanation": "У строк нет метода reverse: s.reverse — undefined, а вызов undefined как функции даёт TypeError."
+        },
+        {
+          "id": "string-algorithms-01-q3",
+          "type": "fill",
+          "codeBefore": "function reverse(str) {\n  let result = \"\";\n  for (let i = ",
+          "codeAfter": "; i >= 0; i--) result += str[i];\n  return result;\n}\nconsole.log(reverse(\"abc\")); // cba",
+          "options": ["str.length - 1", "str.length", "0", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "str[3] — undefined, и результат начнётся со слова undefined",
+            "Цикл возьмёт только str[0] и вернёт \"a\"",
+            "Цикл начнёт со второго символа и вернёт \"ba\""
+          ],
+          "explanation": "Последний символ лежит по индексу length - 1. С него цикл идёт к нулю включительно."
+        },
+        {
+          "id": "string-algorithms-01-q4",
+          "type": "trueFalse",
+          "code": "console.log([...\"ура\"].reverse().join());",
+          "options": ["Выведет ару", "Выведет а,р,у"],
+          "correct": 1,
+          "optionExplanations": ["Без аргумента join ставит между элементами запятую", null],
+          "explanation": "join() без аргумента использует запятую как разделитель. Чтобы склеить символы вплотную, нужен join(\"\")."
+        },
+        {
+          "id": "string-algorithms-01-q5",
+          "type": "order",
+          "title": "Разверни строку",
+          "lines": [
+            "const word = \"кот\";",
+            "const chars = word.split(\"\");",
+            "const reversed = chars.reverse();",
+            "const result = reversed.join(\"\");",
+            "console.log(result); // ток"
+          ],
+          "shuffled": [3, 0, 4, 2, 1],
+          "explanation": "Строка → массив символов → развёрнутый массив → снова строка. Каждый шаг использует результат предыдущего."
+        }
+      ]
+    },
+    {
+      "id": "string-algorithms-02",
+      "topicId": "string-algorithms",
+      "title": "Палиндром",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Палиндром** читается одинаково в обе стороны: «шалаш», «level». Самая короткая проверка — сравнить строку с её разворотом."
+          },
+          {
+            "type": "code",
+            "code": "const isPalindrome = str => str === [...str].reverse().join(\"\");\nconsole.log(isPalindrome(\"шалаш\"), isPalindrome(\"шалун\")); // true false"
+          },
+          {
+            "type": "text",
+            "text": "Фразы сначала **нормализуют**: приводят к одному регистру и убирают всё, кроме букв и цифр."
+          },
+          {
+            "type": "code",
+            "code": "const phrase = \"А роза упала на лапу Азора\";\nconst clean = phrase.toLowerCase().replace(/[^a-zа-яё0-9]/g, \"\");\nconsole.log(clean); // арозаупаланалапуазора"
+          },
+          {
+            "type": "tip",
+            "text": "Без разворота — два указателя: сравниваем символы с краёв и идём к середине. На первом несовпадении сразу возвращаем `false`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-algorithms-02-q1",
+          "type": "output",
+          "code": "const isPalindrome = str => str === [...str].reverse().join(\"\");\nconsole.log(isPalindrome(\"Abba\"), isPalindrome(\"abba\"));",
+          "options": ["false true", "true true", "true false", "false false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Сравнение строк учитывает регистр: \"Abba\" !== \"abbA\"",
+            "Наоборот: \"abba\" — палиндром, а \"Abba\" из-за заглавной A — нет",
+            "\"abba\" одинаково читается в обе стороны"
+          ],
+          "explanation": "Разворот \"Abba\" — \"abbA\", а \"A\" и \"a\" — разные символы. Без toLowerCase регистр ломает проверку."
+        },
+        {
+          "id": "string-algorithms-02-q2",
+          "type": "output",
+          "code": "const s = \"Топот!\";\nconst clean = s.toLowerCase().replace(/[^a-zа-яё0-9]/g, \"\");\nconsole.log(clean, clean === [...clean].reverse().join(\"\"));",
+          "options": ["топот true", "Топот! false", "топот false", "топот! false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "toLowerCase и replace возвращают новую строку, и clean уже нормализована",
+            "«топот» одинаково читается в обе стороны",
+            "Знак «!» не входит в [a-zа-яё0-9], и replace его удаляет"
+          ],
+          "explanation": "toLowerCase убирает заглавную Т, регулярка — восклицательный знак. Остаётся «топот», а это палиндром."
+        },
+        {
+          "id": "string-algorithms-02-q3",
+          "type": "trueFalse",
+          "code": "function isPalindrome(str) {\n  let left = 0;\n  let right = str.length - 1;\n  while (left < right) {\n    if (str[left] !== str[right]) return false;\n    left++;\n    right--;\n  }\n  return true;\n}\nconsole.log(isPalindrome(\"abca\"));",
+          "options": [
+            "Вернёт false на втором сравнении",
+            "Вернёт true: первая и последняя буквы совпадают"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Цикл проверяет все пары с краёв к середине, а не только первую"
+          ],
+          "explanation": "Первое сравнение a и a проходит, второе — b и c — нет, и функция сразу возвращает false. Проверяются все пары с краёв, а не только крайняя."
+        },
+        {
+          "id": "string-algorithms-02-q4",
+          "type": "fill",
+          "codeBefore": "const phrase = \"А роза упала на лапу Азора.\";\nconst clean = phrase.toLowerCase().replace(",
+          "codeAfter": ", \"\");\nconsole.log(clean === [...clean].reverse().join(\"\")); // true",
+          "options": ["/[^a-zа-яё0-9]/g", "/[^a-zа-яё0-9]/", "/\\s/g", "\" \""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без флага g заменится только первый пробел: false",
+            "Пробелы уйдут, но точка в конце останется: false",
+            "Строка в replace заменяет только первое вхождение: false"
+          ],
+          "explanation": "Класс [^…] — всё, кроме букв и цифр, а флаг g заменяет все совпадения. Так уходят и пробелы, и точка."
+        },
+        {
+          "id": "string-algorithms-02-q5",
+          "type": "order",
+          "title": "Проверь фразу на палиндром",
+          "lines": [
+            "const phrase = \"Топот!\";",
+            "const lower = phrase.toLowerCase();",
+            "const clean = lower.replace(/[^a-zа-яё0-9]/g, \"\");",
+            "const reversed = [...clean].reverse().join(\"\");",
+            "console.log(clean === reversed); // true"
+          ],
+          "shuffled": [3, 0, 4, 2, 1],
+          "explanation": "Сначала нормализуем: регистр, затем лишние символы. Только потом разворачиваем и сравниваем."
+        }
+      ]
+    },
+    {
+      "id": "string-algorithms-03",
+      "topicId": "string-algorithms",
+      "title": "Анаграммы",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Анаграммы** — слова из одних и тех же букв: «кот» и «ток». Способ 1: отсортировать буквы обоих слов и сравнить строки — `O(n log n)`."
+          },
+          {
+            "type": "code",
+            "code": "const sortLetters = s => [...s].sort().join(\"\");\nconsole.log(sortLetters(\"кот\"), sortLetters(\"ток\")); // кот кот"
+          },
+          {
+            "type": "text",
+            "text": "Способ 2 — подсчёт за `O(n)`: буквы первого слова прибавляем, второго — вычитаем. Если буквы не хватило, это не анаграмма. Длины проверяем заранее."
+          },
+          {
+            "type": "code",
+            "code": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\nconsole.log(isAnagram(\"листок\", \"столик\")); // true"
+          },
+          {
+            "type": "warning",
+            "text": "Массивы через `===` не сравнить: `[...\"ab\"].sort() === [...\"ba\"].sort()` — `false`, это разные объекты. Поэтому после `sort` делают `join(\"\")`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-algorithms-03-q1",
+          "type": "output",
+          "code": "console.log([...\"ток\"].sort().join(\"\"), [...\"кот\"].sort() === [...\"ток\"].sort());",
+          "options": ["кот false", "кот true", "ток false", "кто true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "=== сравнивает массивы по ссылке, а это два разных массива",
+            "sort расставляет буквы по алфавиту: к, о, т",
+            "sort расставляет буквы по алфавиту: к, о, т"
+          ],
+          "explanation": "Буквы «ток» по алфавиту — «кот». А === сравнивает массивы по ссылке, и два разных массива не равны, даже с одинаковыми элементами."
+        },
+        {
+          "id": "string-algorithms-03-q2",
+          "type": "output",
+          "code": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\nconsole.log(isAnagram(\"aab\", \"abb\"), isAnagram(\"ab\", \"ba\"));",
+          "options": ["false true", "true true", "false false", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Одинаковой длины и набора букв мало, важно и количество каждой буквы",
+            "\"ab\" и \"ba\" — анаграммы",
+            "Наоборот: в \"aab\" и \"abb\" разное число букв a и b"
+          ],
+          "explanation": "В \"aab\" одна b. Вторая b из \"abb\" находит нулевой счётчик, и функция возвращает false. \"ab\" и \"ba\" состоят из одних и тех же букв."
+        },
+        {
+          "id": "string-algorithms-03-q3",
+          "type": "fill",
+          "codeBefore": "function isAnagram(a, b) {\n  if (a.length !== b.length) return false;\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (",
+          "codeAfter": ") return false;\n    counts[ch]--;\n  }\n  return true;\n}\nconsole.log(isAnagram(\"ab\", \"ba\")); // true\nconsole.log(isAnagram(\"aab\", \"abb\")); // false",
+          "options": [
+            "!counts[ch]",
+            "counts[ch] === undefined",
+            "counts[ch] > 0",
+            "counts[ch] === 1"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Не ловит счётчик, который уже дошёл до нуля: для \"aab\" и \"abb\" вернёт true",
+            "Условие перевёрнуто: функция вернёт false на первой же найденной букве",
+            "Функция вернёт false на первой же букве, которая встретилась один раз"
+          ],
+          "explanation": "!counts[ch] ловит и букву, которой не было (undefined), и букву, которая уже кончилась (0)."
+        },
+        {
+          "id": "string-algorithms-03-q4",
+          "type": "trueFalse",
+          "code": "function isAnagram(a, b) {\n  const counts = {};\n  for (const ch of a) counts[ch] = (counts[ch] || 0) + 1;\n  for (const ch of b) {\n    if (!counts[ch]) return false;\n    counts[ch]--;\n  }\n  return true;\n}\nconsole.log(isAnagram(\"кошка\", \"кош\"));",
+          "options": [
+            "Выведет false: слова разной длины",
+            "Выведет true: лишние буквы не проверяются"
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Проверки длины в этой версии нет, а цикл по b находит все свои буквы",
+            null
+          ],
+          "explanation": "Цикл идёт по буквам b, и для «кош» каждой букве хватило счётчика. Оставшиеся «к» и «а» никто не проверил — поэтому длины сравнивают заранее."
+        },
+        {
+          "id": "string-algorithms-03-q5",
+          "type": "order",
+          "title": "Получи ключ анаграммы",
+          "lines": [
+            "const word = \"пила\";",
+            "const letters = [...word];",
+            "const sorted = letters.sort();",
+            "const key = sorted.join(\"\");",
+            "console.log(key); // аилп"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Строка → массив букв → отсортированный массив → строка-ключ. У всех анаграмм такой ключ одинаковый: у «липа» он тоже «аилп»."
+        }
+      ]
+    },
+    {
+      "id": "string-algorithms-04",
+      "topicId": "string-algorithms",
+      "title": "Подсчёт символов",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Многие задачи на строки решаются в **два прохода** за `O(n)`: сначала считаем каждый символ в `Map`, потом ищем ответ по счётчикам."
+          },
+          {
+            "type": "code",
+            "code": "function mostFrequent(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) || 0) + 1);\n  let best = \"\";\n  let max = 0;\n  for (const [ch, n] of counts) {\n    if (n > max) {\n      max = n;\n      best = ch;\n    }\n  }\n  return best;\n}\n\nconsole.log(mostFrequent(\"banana\")); // a"
+          },
+          {
+            "type": "text",
+            "text": "**Первая неповторяющаяся буква**: после подсчёта снова идём по строке и возвращаем первый символ со счётчиком `1`."
+          },
+          {
+            "type": "code",
+            "code": "function firstUnique(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) || 0) + 1);\n  for (const ch of str) {\n    if (counts.get(ch) === 1) return ch;\n  }\n  return null;\n}\n\nconsole.log(firstUnique(\"swiss\")); // w"
+          },
+          {
+            "type": "tip",
+            "text": "`Map` хранит ключи в порядке добавления. При равенстве счётчиков `n > max` оставит символ, который встретился первым."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-algorithms-04-q1",
+          "type": "output",
+          "code": "function mostFrequent(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) || 0) + 1);\n  let best = \"\";\n  let max = 0;\n  for (const [ch, n] of counts) {\n    if (n > max) {\n      max = n;\n      best = ch;\n    }\n  }\n  return best;\n}\nconsole.log(mostFrequent(\"hello\"), mostFrequent(\"banana\"));",
+          "options": ["l a", "h a", "l n", "o a"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "h встречается один раз, а l — дважды",
+            "n в \"banana\" две, а a — три",
+            "Побеждает самый частый символ, а не последний"
+          ],
+          "explanation": "В \"hello\" две l, в \"banana\" три a. Цикл по счётчикам запоминает символ с наибольшим значением."
+        },
+        {
+          "id": "string-algorithms-04-q2",
+          "type": "output",
+          "code": "function firstUnique(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) || 0) + 1);\n  for (const ch of str) {\n    if (counts.get(ch) === 1) return ch;\n  }\n  return null;\n}\nconsole.log(firstUnique(\"aabbcdc\"), firstUnique(\"aabb\"));",
+          "options": ["d null", "c null", "d undefined", "a null"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "c встречается дважды: в середине и в конце",
+            "После цикла явно стоит return null",
+            "a встречается дважды"
+          ],
+          "explanation": "a, b и c встречаются по два раза, d — один. В \"aabb\" одиночек нет, и после цикла срабатывает return null."
+        },
+        {
+          "id": "string-algorithms-04-q3",
+          "type": "fill",
+          "codeBefore": "function mostFrequent(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) ",
+          "codeAfter": " 0) + 1);\n  let best = \"\";\n  let max = 0;\n  for (const [ch, n] of counts) {\n    if (n > max) {\n      max = n;\n      best = ch;\n    }\n  }\n  return best;\n}\nconsole.log(mostFrequent(\"banana\")); // a",
+          "options": ["||", "&&", "+", "-"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "undefined && 0 — это undefined: счётчики станут NaN, и функция вернёт пустую строку",
+            "undefined + 0 — это NaN: счётчики сломаются",
+            "undefined - 0 — это NaN: счётчики сломаются"
+          ],
+          "explanation": "В первый раз get вернёт undefined, и || подставит 0. Без запасного нуля undefined + 1 даст NaN."
+        },
+        {
+          "id": "string-algorithms-04-q4",
+          "type": "trueFalse",
+          "code": "function mostFrequent(str) {\n  const counts = new Map();\n  for (const ch of str) counts.set(ch, (counts.get(ch) || 0) + 1);\n  let best = \"\";\n  let max = 0;\n  for (const [ch, n] of counts) {\n    if (n > max) {\n      max = n;\n      best = ch;\n    }\n  }\n  return best;\n}\nconsole.log(mostFrequent(\"xyyx\"));",
+          "options": ["Выведет x", "Выведет y"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При равенстве строгое n > max не меняет уже найденный символ"
+          ],
+          "explanation": "У x и y по два вхождения. x попал в Map первым, а условие n > max строгое, поэтому равный счётчик y его не вытесняет."
+        },
+        {
+          "id": "string-algorithms-04-q5",
+          "type": "order",
+          "title": "Найди неповторяющиеся буквы",
+          "lines": [
+            "const counts = new Map();",
+            "for (const ch of \"кокос\") counts.set(ch, (counts.get(ch) || 0) + 1);",
+            "const unique = [...\"кокос\"].filter(ch => counts.get(ch) === 1);",
+            "console.log(unique); // [\"с\"]"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Первый проход считает символы, второй по строке оставляет те, что встретились один раз. К и о повторяются, остаётся только с."
+        }
+      ]
+    },
+    {
+      "id": "string-algorithms-05",
+      "topicId": "string-algorithms",
+      "title": "FizzBuzz и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**FizzBuzz** — классика собеседований: для числа вернуть `Fizz`, если оно делится на 3, `Buzz` — если на 5, `FizzBuzz` — если на оба, иначе само число."
+          },
+          {
+            "type": "code",
+            "code": "function fizzBuzz(n) {\n  if (n % 15 === 0) return \"FizzBuzz\";\n  if (n % 3 === 0) return \"Fizz\";\n  if (n % 5 === 0) return \"Buzz\";\n  return n;\n}\n\nconsole.log(fizzBuzz(9), fizzBuzz(10), fizzBuzz(30), fizzBuzz(7)); // Fizz Buzz FizzBuzz 7"
+          },
+          {
+            "type": "warning",
+            "text": "Проверку на оба делителя (`n % 15 === 0` или `n % 3 === 0 && n % 5 === 0`) ставь **первой**. Иначе 15 поймает условие `n % 3 === 0`, и получится `Fizz`."
+          },
+          {
+            "type": "text",
+            "text": "Короткий вариант склеивает строку: `(n % 3 ? \"\" : \"Fizz\") + (n % 5 ? \"\" : \"Buzz\") || n`. Пустая строка ложна, поэтому `|| n` подставит число."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-algorithms-05-q1",
+          "type": "output",
+          "code": "function fizzBuzz(n) {\n  if (n % 3 === 0) return \"Fizz\";\n  if (n % 5 === 0) return \"Buzz\";\n  if (n % 15 === 0) return \"FizzBuzz\";\n  return n;\n}\nconsole.log(fizzBuzz(15), fizzBuzz(20));",
+          "options": ["Fizz Buzz", "FizzBuzz Buzz", "FizzBuzz 20", "Fizz 20"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Проверка на 15 стоит последней, и 15 раньше ловит условие n % 3",
+            "20 делится на 5",
+            "20 делится на 5"
+          ],
+          "explanation": "15 делится на 3, и первый же return вернёт Fizz — до проверки на 15 дело не дойдёт. 20 делится на 5, это Buzz."
+        },
+        {
+          "id": "string-algorithms-05-q2",
+          "type": "output",
+          "code": "const result = [];\nfor (let i = 1; i <= 5; i++) {\n  result.push((i % 3 ? \"\" : \"Fizz\") + (i % 5 ? \"\" : \"Buzz\") || i);\n}\nconsole.log(result.join(\" \"));",
+          "options": ["1 2 Fizz 4 Buzz", "1 2 3 4 5", "Fizz Buzz", "1 2 Fizz 4 FizzBuzz"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для 3 и 5 строка не пустая, поэтому || оставляет её",
+            "Для остальных чисел || подставляет само число",
+            "5 не делится на 3, поэтому первая скобка даёт пустую строку"
+          ],
+          "explanation": "Для 1, 2 и 4 обе скобки дают пустую строку, она ложна, и || подставляет число. Для 3 получается \"Fizz\", для 5 — \"Buzz\"."
+        },
+        {
+          "id": "string-algorithms-05-q3",
+          "type": "trueFalse",
+          "code": "for (let i = 1; i <= 15; i++) {\n  if (i % 3 === 0 && i % 5 === 0) console.log(\"FizzBuzz\");\n  else if (i % 3 === 0) console.log(\"Fizz\");\n  else if (i % 5 === 0) console.log(\"Buzz\");\n  else console.log(i);\n}",
+          "options": [
+            "FizzBuzz выведется один раз — для 15",
+            "FizzBuzz не выведется: 15 поймает проверка на 3"
+          ],
+          "correct": 0,
+          "optionExplanations": [null, "Комбинированная проверка стоит раньше проверки на 3"],
+          "explanation": "Проверка на оба делителя стоит первой, поэтому 15 попадает в неё. Остальные числа до 15 на 3 и 5 сразу не делятся."
+        },
+        {
+          "id": "string-algorithms-05-q4",
+          "type": "fill",
+          "codeBefore": "function fizzBuzz(n) {\n  if (n % ",
+          "codeAfter": " === 0) return \"FizzBuzz\";\n  if (n % 3 === 0) return \"Fizz\";\n  if (n % 5 === 0) return \"Buzz\";\n  return n;\n}\nconsole.log(fizzBuzz(15), fizzBuzz(10), fizzBuzz(9)); // FizzBuzz Buzz Fizz",
+          "options": ["15", "8", "5", "30"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Делители перемножают, а не складывают: 15 % 8 !== 0",
+            "Тогда и 10 станет FizzBuzz, хотя на 3 не делится",
+            "15 не делится на 30 и получит Fizz"
+          ],
+          "explanation": "Число делится и на 3, и на 5, только если делится на 15. Других чисел, которые делятся на оба, нет."
+        },
+        {
+          "id": "string-algorithms-05-q5",
+          "type": "order",
+          "title": "Собери мини-FizzBuzz",
+          "lines": [
+            "const result = [];",
+            "for (let i = 1; i <= 3; i++) {",
+            "  result.push(i % 3 === 0 ? \"Fizz\" : i);",
+            "}",
+            "console.log(result); // [1, 2, \"Fizz\"]"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "Массив создаётся до цикла, push — внутри цикла, вывод — после него, когда массив уже заполнен."
+        }
+      ]
+    }
+  ]
+}

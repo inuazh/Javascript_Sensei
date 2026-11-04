@@ -164,6 +164,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "algorithms",
+      "title": "Алгоритмы",
+      "icon": "🧮",
+      "color": "#FFFFFF",
+      "order": 13,
+      "description": "Задачи с собеседований: сложность, поиск, сортировка и обработка строк.",
+      "topics": [
+        {
+          "id": "complexity",
+          "title": "Сложность",
+          "subtitle": "O(1), O(n), O(n²) на примерах",
+          "order": 0
+        },
+        {
+          "id": "array-algorithms",
+          "title": "Задачи на массивы",
+          "subtitle": "поиск, сортировка, два указателя",
+          "order": 1
+        },
+        {
+          "id": "string-algorithms",
+          "title": "Задачи на строки",
+          "subtitle": "палиндромы, анаграммы, подсчёт",
+          "order": 2
+        }
+      ]
     }
   ]
 }
