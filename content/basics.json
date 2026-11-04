@@ -5,6 +5,34 @@
       "topicId": "variables",
       "title": "Основы переменных",
       "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Переменная** — это имя, под которым программа хранит значение. Объявляем её ключевым словом, даём имя и кладём значение через `=`."
+          },
+          {
+            "type": "code",
+            "code": "let score = 10;\nconsole.log(score); // 10\n\nscore = 15; // значение можно заменить\nconsole.log(score); // 15"
+          },
+          {
+            "type": "text",
+            "text": "В современном JavaScript переменные объявляют через `let` — если значение будет меняться, и через `const` — если не будет. Попытка перезаписать `const` приведёт к ошибке."
+          },
+          {
+            "type": "code",
+            "code": "const name = \"Alice\";\nname = \"Bob\"; // TypeError: Assignment to constant variable."
+          },
+          {
+            "type": "warning",
+            "text": "`var` — старый способ объявления. Он разрешает объявить одну и ту же переменную дважды, и это часто приводит к багам. В новом коде используй `let` и `const`."
+          },
+          {
+            "type": "tip",
+            "text": "Начинай с `const`. Меняй на `let`, только когда значение действительно нужно перезаписать."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "variables-01-q1",
@@ -47,11 +75,7 @@
           "id": "variables-01-q5",
           "type": "order",
           "title": "Расставь строки по порядку",
-          "lines": [
-            "let score = 0;",
-            "score = score + 10;",
-            "console.log(score);"
-          ],
+          "lines": ["let score = 0;", "score = score + 10;", "console.log(score);"],
           "shuffled": [1, 2, 0],
           "explanation": "Сначала объявляем переменную, затем изменяем значение, потом выводим"
         }
@@ -62,6 +86,30 @@
       "topicId": "variables",
       "title": "let и const",
       "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`const` запрещает **перезапись**, но не чтение: значение константы можно сколько угодно использовать в выражениях."
+          },
+          {
+            "type": "code",
+            "code": "const PI = 3.14;\nconst r = 2;\nconsole.log(PI * r * r); // 12.56"
+          },
+          {
+            "type": "text",
+            "text": "Если объявить переменную через `let` и не присвоить значение, в ней окажется `undefined` — «значения пока нет». Константу без значения объявить нельзя."
+          },
+          {
+            "type": "code",
+            "code": "let x;\nconsole.log(x); // undefined\n\nconst y; // SyntaxError: Missing initializer"
+          },
+          {
+            "type": "tip",
+            "text": "Константы-настройки, которые известны заранее, принято называть БОЛЬШИМИ_БУКВАМИ: `const MAX_USERS = 100;`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "variables-02-q1",
@@ -770,12 +818,7 @@
           "id": "operators-04-q5",
           "type": "order",
           "title": "Расставь строки по порядку",
-          "lines": [
-            "let count = 0;",
-            "count += 1;",
-            "count *= 2;",
-            "console.log(count); // 2"
-          ],
+          "lines": ["let count = 0;", "count += 1;", "count *= 2;", "console.log(count); // 2"],
           "shuffled": [3, 0, 2, 1],
           "explanation": "Сначала инициализация, затем прибавляем 1 и удваиваем: (0 + 1) * 2 = 2. В обратном порядке получилось бы 0 * 2 + 1 = 1"
         }

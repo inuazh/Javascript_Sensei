@@ -10,9 +10,6 @@ yarn-debug.*
 yarn-error.*
 .pnpm-debug.log*
 
-# Dependencies
-package-lock.json
-yarn.lock
 
 # IDE
 .vscode

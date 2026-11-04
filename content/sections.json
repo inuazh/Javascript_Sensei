@@ -8,7 +8,12 @@
       "order": 0,
       "topics": [
         { "id": "variables", "title": "Переменные", "subtitle": "let, const, var", "order": 0 },
-        { "id": "data-types", "title": "Типы данных", "subtitle": "string, number, boolean", "order": 1 },
+        {
+          "id": "data-types",
+          "title": "Типы данных",
+          "subtitle": "string, number, boolean",
+          "order": 1
+        },
         { "id": "operators", "title": "Операторы", "subtitle": "арифметика, сравнение", "order": 2 }
       ]
     },

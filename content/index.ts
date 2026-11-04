@@ -1,4 +1,4 @@
-import type { SectionDef, SectionFile } from '../src/types/content';
+import type { SectionDef, SectionFile } from '../src/content/schema';
 
 /**
  * Registry of lesson files, one entry per section in sections.json.

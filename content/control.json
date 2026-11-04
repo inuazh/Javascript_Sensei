@@ -604,12 +604,7 @@
           "id": "functions-01-q5",
           "type": "order",
           "title": "Расставь строки по порядку",
-          "lines": [
-            "function square(n) {",
-            "  return n * n;",
-            "}",
-            "console.log(square(5));"
-          ],
+          "lines": ["function square(n) {", "  return n * n;", "}", "console.log(square(5));"],
           "shuffled": [3, 0, 2, 1],
           "explanation": "Объявление функции: имя, тело с return, закрытие, вызов"
         }

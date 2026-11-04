@@ -6,15 +6,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#0A0A0A"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.jssensei.app"
@@ -26,9 +24,7 @@
       },
       "package": "com.jssensei.app",
       "versionCode": 1,
-      "permissions": [
-        "android.permission.POST_NOTIFICATIONS"
-      ]
+      "permissions": ["android.permission.POST_NOTIFICATIONS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -43,7 +39,13 @@
           }
         }
       ],
-      "expo-sqlite"
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#FACC15"
+        }
+      ]
     ],
     "updates": {
       "enabled": false
