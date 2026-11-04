@@ -1,4 +1,6 @@
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+// Deep imports keep the other icon fonts out of the bundle.
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { ComponentProps } from 'react';
 import { Colors } from './theme';
 

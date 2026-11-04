@@ -55,14 +55,13 @@ export function getSectionColor(_section: { id: string }): string {
   return Colors.textPrimary;
 }
 
+/** Every face here must be loaded in app/_layout.tsx, and only these are bundled. */
 export const Fonts = {
   /** Dot-matrix display face. Latin and digits only: never use it for Russian text. */
   display: 'Doto_900Black',
   mono: 'IBMPlexMono_400Regular',
-  monoMedium: 'IBMPlexMono_500Medium',
   monoBold: 'IBMPlexMono_700Bold',
   sans: 'Inter_400Regular',
-  sansMedium: 'Inter_500Medium',
   sansSemiBold: 'Inter_600SemiBold',
   sansBold: 'Inter_700Bold',
 } as const;
