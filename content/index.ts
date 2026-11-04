@@ -23,6 +23,7 @@ export const SECTION_FILES: Record<string, () => SectionFile> = {
   errors: () => require('./errors.json'),
   interview: () => require('./interview.json'),
   algorithms: () => require('./algorithms.json'),
+  iterators: () => require('./iterators.json'),
 };
 
 export function loadSectionDefs(): SectionDef[] {

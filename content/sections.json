@@ -276,6 +276,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "iterators",
+      "title": "Итераторы и генераторы",
+      "icon": "↻",
+      "color": "#FFFFFF",
+      "order": 21,
+      "description": "Как устроен for...of, как писать свои итерируемые объекты и генераторы и перебирать асинхронные данные.",
+      "topics": [
+        {
+          "id": "iteration-protocol",
+          "title": "Протокол итерации",
+          "subtitle": "for...of, Symbol.iterator",
+          "order": 0
+        },
+        {
+          "id": "generators",
+          "title": "Генераторы",
+          "subtitle": "function*, yield",
+          "order": 1
+        },
+        {
+          "id": "async-iteration",
+          "title": "Асинхронная итерация",
+          "subtitle": "for await, async-генераторы",
+          "order": 2
+        }
+      ]
     }
   ]
 }
