@@ -1,0 +1,1530 @@
+{
+  "lessons": [
+    {
+      "id": "type-coercion-01",
+      "topicId": "type-coercion",
+      "title": "Плюс, минус и строки",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Если хотя бы один операнд `+` — строка, второй тоже превращается в строку и они **склеиваются**. Остальные арифметические операторы (`-`, `*`, `/`, `%`) всегда приводят операнды **к числу**."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"5\" + 2);   // 52\nconsole.log(\"5\" - 2);   // 3\nconsole.log(\"5\" * \"2\"); // 10"
+          },
+          {
+            "type": "text",
+            "text": "Выражение считается слева направо, и тип меняется по ходу: пока складываются числа, это арифметика, а после встречи со строкой — склейка."
+          },
+          {
+            "type": "code",
+            "code": "console.log(1 + 2 + \"3\"); // 33\nconsole.log(\"1\" + 2 + 3); // 123"
+          },
+          {
+            "type": "text",
+            "text": "Унарный плюс `+x` — короткая запись `Number(x)`. Пробелы по краям строки игнорируются, пустая строка — это `0`, а мусор внутри даёт `NaN`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(+\"\", +\" 7 \", +\"7px\"); // 0 7 NaN"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "type-coercion-01-q1",
+          "type": "output",
+          "code": "console.log(1 + 2 + \"3\");",
+          "options": ["33", "123", "6", "15"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так было бы, если бы строка стояла первой: \"1\" + 2 + 3",
+            "Строка \"3\" не превращается в число при сложении — `+` со строкой склеивает",
+            "Числа не склеиваются: 1 + 2 считается арифметически"
+          ],
+          "explanation": "Сначала 1 + 2 = 3 — оба числа, это арифметика. Затем 3 + \"3\": есть строка, поэтому склейка — \"33\"."
+        },
+        {
+          "id": "type-coercion-01-q2",
+          "type": "output",
+          "code": "console.log(\"10\" - \"4\" + \"2\");",
+          "options": ["62", "8", "64", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "`+` со строкой не складывает числа, а склеивает",
+            "Минус не склеивает строки — он всегда работает с числами",
+            "\"10\" и \"4\" успешно превращаются в числа, NaN тут не возникает"
+          ],
+          "explanation": "`-` приводит обе строки к числам: 10 - 4 = 6. Потом 6 + \"2\" — сложение со строкой, получается склейка \"62\"."
+        },
+        {
+          "id": "type-coercion-01-q3",
+          "type": "trueFalse",
+          "code": "console.log(typeof (\"3\" * \"4\"));",
+          "options": ["Выведет \"number\"", "Выведет \"string\""],
+          "correct": 0,
+          "explanation": "`*` всегда приводит операнды к числу, поэтому результат — число 12, а не строка."
+        },
+        {
+          "id": "type-coercion-01-q4",
+          "type": "output",
+          "code": "console.log(+\"\", +\" 12 \", +\"12px\");",
+          "options": ["0 12 NaN", "NaN 12 NaN", "0 NaN NaN", "0 12 12"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустая строка (и строка из одних пробелов) превращается в 0, а не в NaN",
+            "Пробелы по краям при преобразовании в число игнорируются",
+            "Унарный плюс не умеет, как parseInt, читать число до первого «мусора»"
+          ],
+          "explanation": "Пустая строка превращается в 0, пробелы по краям отбрасываются, а \"12px\" не является числом целиком — это NaN."
+        },
+        {
+          "id": "type-coercion-01-q5",
+          "type": "fill",
+          "codeBefore": "const a = \"10\";\nconst b = 5;\nconsole.log(",
+          "codeAfter": "a + b); // 15",
+          "options": ["+", "-", "!", "~"],
+          "correct": 0,
+          "explanation": "Унарный плюс превращает строку \"10\" в число 10, и дальше 10 + 5 — обычное сложение."
+        }
+      ]
+    },
+    {
+      "id": "type-coercion-02",
+      "topicId": "type-coercion",
+      "title": "== против ===",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`===` сравнивает **без приведения**: разные типы — сразу `false`. `==` сначала приводит операнды к общему типу."
+          },
+          {
+            "type": "code",
+            "code": "console.log(1 === \"1\"); // false\nconsole.log(1 == \"1\");  // true"
+          },
+          {
+            "type": "text",
+            "text": "Правила `==`: строка сравнивается с числом как число; `true` и `false` сначала превращаются в `1` и `0`; `null` и `undefined` равны **только друг другу**."
+          },
+          {
+            "type": "code",
+            "code": "console.log(true == 1);         // true\nconsole.log(\"\" == 0);           // true\nconsole.log(null == undefined); // true\nconsole.log(null == 0);         // false"
+          },
+          {
+            "type": "warning",
+            "text": "Операторы `>`, `<`, `>=`, `<=` устроены иначе: они приводят `null` к `0`. Поэтому `null == 0` — `false`, а `null >= 0` — `true`."
+          },
+          {
+            "type": "tip",
+            "text": "В своём коде используй `===`. Единственное популярное исключение — `x == null`: проверка «`null` или `undefined`» одним сравнением."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "type-coercion-02-q1",
+          "type": "output",
+          "code": "console.log(\"0\" == false, \"1\" == true, \"2\" == true);",
+          "options": ["true true false", "false true true", "true true true", "false false false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка \"0\" не становится false: false превращается в 0, и \"0\" == 0 — true",
+            "`==` не проверяет «truthy»: true становится 1, а \"2\" — числом 2, они не равны",
+            "Строки сравниваются с boolean как числа, и первые два сравнения дают true"
+          ],
+          "explanation": "Boolean при `==` становится числом: false → 0, true → 1. Дальше \"0\" == 0 и \"1\" == 1 — true, а \"2\" == 1 — false."
+        },
+        {
+          "id": "type-coercion-02-q2",
+          "type": "output",
+          "code": "console.log(null == 0, null == undefined, undefined == false);",
+          "options": ["false true false", "true true true", "false true true", "true true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "null и undefined не приводятся к числу при `==`",
+            "undefined не равен false: при `==` он равен только null и самому себе",
+            "null при `==` не превращается в 0"
+          ],
+          "explanation": "При `==` null и undefined равны только друг другу и ничему больше — ни 0, ни false."
+        },
+        {
+          "id": "type-coercion-02-q3",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "console.log(null >= 0);",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "Операторы сравнения `>=`, `<` и т. п. приводят null к числу 0, а 0 >= 0 — true. Это отличается от `==`, где null равен только undefined."
+        },
+        {
+          "id": "type-coercion-02-q4",
+          "type": "output",
+          "code": "console.log(\"\" == 0, \"   \" == 0, \"0\" == \"\");",
+          "options": ["true true false", "true false false", "true true true", "false false false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка из одних пробелов при приведении к числу тоже даёт 0",
+            "Две строки `==` не приводит к числам — сравнивает посимвольно",
+            "Пустая строка при сравнении с числом превращается в 0"
+          ],
+          "explanation": "Строка при сравнении с числом становится числом: и пустая, и строка из пробелов дают 0. А \"0\" == \"\" — две строки, их сравнивают как строки, и они разные."
+        },
+        {
+          "id": "type-coercion-02-q5",
+          "type": "fill",
+          "codeBefore": "function isMissing(v) {\n  return v ",
+          "codeAfter": " null;\n}\nconsole.log(isMissing(undefined), isMissing(0)); // true false",
+          "options": ["==", "===", "!=", "="],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "undefined === null — false, поэтому первый вызов вернёт false",
+            "Это обратная проверка: вывод будет false true",
+            "Это присваивание: функция вернёт null, а не boolean"
+          ],
+          "explanation": "`v == null` истинно ровно для null и undefined — 0 при этом не подходит. `===` дал бы false для undefined."
+        }
+      ]
+    },
+    {
+      "id": "type-coercion-03",
+      "topicId": "type-coercion",
+      "title": "NaN, null и undefined",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`NaN` — единственное значение, которое **не равно самому себе**: `NaN === NaN` — `false`. При этом `typeof NaN` — `\"number\"`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(NaN === NaN);           // false\nconsole.log(Number.isNaN(NaN));     // true\nconsole.log(isNaN(\"abc\"));          // true\nconsole.log(Number.isNaN(\"abc\"));   // false"
+          },
+          {
+            "type": "text",
+            "text": "Глобальный `isNaN` сначала приводит аргумент к числу, поэтому любая «нечисловая» строка для него — NaN. `Number.isNaN` ничего не приводит и возвращает `true` только для самого `NaN`."
+          },
+          {
+            "type": "text",
+            "text": "`Object.is(a, b)` — как `===`, но с двумя отличиями: `NaN` равен `NaN`, а `0` и `-0` различаются."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Object.is(NaN, NaN)); // true\nconsole.log(Object.is(0, -0));    // false\nconsole.log(0 === -0);            // true"
+          },
+          {
+            "type": "warning",
+            "text": "В арифметике `null` становится `0`, а `undefined` — `NaN`: `null + 1` — `1`, `undefined + 1` — `NaN`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "type-coercion-03-q1",
+          "type": "output",
+          "code": "console.log(typeof NaN, NaN == NaN);",
+          "options": ["number false", "NaN false", "undefined false", "number true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "typeof не возвращает \"NaN\" — такого типа нет",
+            null,
+            "NaN не равен даже самому себе"
+          ],
+          "explanation": "NaN — это специальное значение типа number. Оно не равно ничему, даже самому себе, ни через `==`, ни через `===`."
+        },
+        {
+          "id": "type-coercion-03-q2",
+          "type": "output",
+          "code": "console.log(null + 1, undefined + 1, null + undefined);",
+          "options": ["1 NaN NaN", "1 NaN 0", "NaN NaN NaN", "1 1 0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "undefined превращается в NaN, а 0 + NaN — тоже NaN",
+            "null в арифметике — это 0, поэтому null + 1 = 1",
+            "undefined не становится 0 — он превращается в NaN"
+          ],
+          "explanation": "В арифметике null превращается в 0, а undefined — в NaN. Любая операция с NaN даёт NaN, поэтому и 0 + NaN — NaN."
+        },
+        {
+          "id": "type-coercion-03-q3",
+          "type": "output",
+          "code": "console.log(isNaN(\"hello\"), Number.isNaN(\"hello\"));",
+          "options": ["true false", "false false", "true true", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Глобальный isNaN приводит аргумент к числу, а Number(\"hello\") — это NaN",
+            "Number.isNaN не приводит типы и для строки всегда возвращает false",
+            null
+          ],
+          "explanation": "isNaN сначала превращает \"hello\" в число — получается NaN, отсюда true. Number.isNaN не приводит типы: строка — не NaN, поэтому false."
+        },
+        {
+          "id": "type-coercion-03-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "console.log(Object.is(0, -0));",
+          "options": ["true", "false"],
+          "correct": 1,
+          "explanation": "Object.is различает 0 и -0, хотя `0 === -0` — true. Это одно из двух отличий Object.is от `===`, второе — NaN равен NaN."
+        },
+        {
+          "id": "type-coercion-03-q5",
+          "type": "fill",
+          "codeBefore": "function isReallyNaN(v) {\n  return v ",
+          "codeAfter": " v;\n}\nconsole.log(isReallyNaN(NaN), isReallyNaN(\"abc\")); // true false",
+          "options": ["!==", "===", "==", ">="],
+          "correct": 0,
+          "explanation": "Только NaN не равен самому себе, поэтому `v !== v` истинно ровно для NaN. Это старый способ проверки, работающий без Number.isNaN."
+        }
+      ]
+    },
+    {
+      "id": "type-coercion-04",
+      "topicId": "type-coercion",
+      "title": "Truthy и falsy",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "В `if`, `!`, `||` и `&&` значение превращается в boolean. **Falsy** всего восемь: `false`, `0`, `-0`, `0n`, `\"\"`, `null`, `undefined`, `NaN`. Всё остальное — truthy."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Boolean(\"0\"));   // true — непустая строка\nconsole.log(Boolean(\" \"));   // true\nconsole.log(Boolean([]));    // true — любой объект\nconsole.log(Boolean({}));    // true"
+          },
+          {
+            "type": "text",
+            "text": "`||` возвращает первый truthy-операнд, `&&` — первый falsy. Если такого нет, возвращается последний операнд. Результат — само значение, а не `true`/`false`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(0 || \"default\"); // default\nconsole.log(\"\" || null);     // null\nconsole.log(1 && \"ok\");      // ok\nconsole.log(0 && \"ok\");      // 0"
+          },
+          {
+            "type": "tip",
+            "text": "`??` подставляет значение только вместо `null` и `undefined`. Поэтому `0 ?? 10` — это `0`, а `0 || 10` — `10`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "type-coercion-04-q1",
+          "type": "output",
+          "code": "const values = [0, \"0\", \"\", \" \", [], null];\nconsole.log(values.filter(Boolean).length);",
+          "options": ["3", "2", "4", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустой массив — объект, а все объекты truthy",
+            "Пустая строка \"\" — falsy, а \"0\" и \" \" — truthy",
+            "\"0\" и \" \" — непустые строки, они truthy"
+          ],
+          "explanation": "Truthy здесь \"0\", \" \" и [] — непустые строки и любой объект. 0, \"\" и null — falsy."
+        },
+        {
+          "id": "type-coercion-04-q2",
+          "type": "output",
+          "code": "console.log(0 || null || \"\" || undefined);",
+          "options": ["undefined", "null", "false", "0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "`||` идёт дальше, пока не найдёт truthy; если не найдёт — вернёт последний операнд",
+            "`||` возвращает сам операнд, а не boolean",
+            "`||` возвращает первый truthy-операнд, а 0 — falsy"
+          ],
+          "explanation": "Все операнды falsy, поэтому `||` не находит truthy-значения и возвращает последний операнд — undefined."
+        },
+        {
+          "id": "type-coercion-04-q3",
+          "type": "output",
+          "code": "const count = 0;\nconsole.log(count || 10, count ?? 10);",
+          "options": ["10 0", "0 0", "10 10", "0 10"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0 — falsy, поэтому `||` берёт правый операнд",
+            "`??` не считает 0 «пустым» значением — только null и undefined",
+            null
+          ],
+          "explanation": "`||` заменяет любое falsy-значение, включая 0. `??` заменяет только null и undefined, поэтому 0 остаётся."
+        },
+        {
+          "id": "type-coercion-04-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "const name = \"\";\nconst result = name && name.toUpperCase();\nconsole.log(result === \"\");",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "Пустая строка falsy, поэтому `&&` сразу возвращает её саму, не вызывая toUpperCase. result — это \"\", а не false."
+        },
+        {
+          "id": "type-coercion-04-q5",
+          "type": "fill",
+          "codeBefore": "function getVolume(settings) {\n  return settings.volume ",
+          "codeAfter": " 50;\n}\nconsole.log(getVolume({ volume: 0 }), getVolume({})); // 0 50",
+          "options": ["??", "||", "&&", "|"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "`||` считает 0 «пустым» и вернёт 50 для обоих вызовов",
+            "`&&` вернёт 50 только если volume truthy: вывод будет 0 undefined",
+            "Побитовое ИЛИ: 0 | 50 = 50, а undefined | 50 = 50"
+          ],
+          "explanation": "`??` подставляет 50 только когда volume — null или undefined. Громкость 0 — законное значение, и `??` её сохраняет."
+        }
+      ]
+    },
+    {
+      "id": "type-coercion-05",
+      "topicId": "type-coercion",
+      "title": "Закрепление: каверзные примеры",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Объект в `+` или `==` сначала превращается в примитив — обычно через `toString`. У массива это элементы через запятую, у обычного объекта — `\"[object Object]\"`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(String([]));     // \"\" (пустая строка)\nconsole.log(String([1, 2])); // 1,2\nconsole.log(String({}));     // [object Object]\nconsole.log([1, 2] + [3]);   // 1,23"
+          },
+          {
+            "type": "text",
+            "text": "`[] == ![]` разбираем по шагам: `![]` — `false` (массив truthy). Дальше `[] == false` → `\"\" == 0` → `0 == 0` → `true`."
+          },
+          {
+            "type": "code",
+            "code": "console.log([] == ![]);  // true\nconsole.log([0] == false); // true\nconsole.log([1] == 1);     // true"
+          },
+          {
+            "type": "warning",
+            "text": "Два объекта при `==` и `===` сравниваются **по ссылке**, без приведения: `[] == []` — `false`, это разные массивы."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "type-coercion-05-q1",
+          "type": "output",
+          "code": "console.log(typeof ([] + []), [1, 2] + [3]);",
+          "options": ["string 1,23", "object 1,2,3", "string 1,2,3", "object 1,23"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "`+` не объединяет массивы — он приводит их к строкам и склеивает",
+            "Массивы стали строками \"1,2\" и \"3\", а склейка не добавляет запятую между ними",
+            "Результат `+` с массивами — строка, а не объект"
+          ],
+          "explanation": "`+` превращает массивы в строки: [] → \"\", [1, 2] → \"1,2\", [3] → \"3\". Результат — склейка строк, а не объединение массивов."
+        },
+        {
+          "id": "type-coercion-05-q2",
+          "type": "output",
+          "code": "console.log([] == ![], [] == []);",
+          "options": ["true false", "false false", "true true", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "![] даёт false, и [] == false после приведений превращается в 0 == 0",
+            "Два разных массива никогда не равны: объекты сравниваются по ссылке",
+            null
+          ],
+          "explanation": "![] — false, затем [] == false сводится к 0 == 0 — true. А [] == [] сравнивает ссылки двух разных массивов — false."
+        },
+        {
+          "id": "type-coercion-05-q3",
+          "type": "output",
+          "code": "console.log(\"b\" + \"a\" + +\"a\" + \"a\");",
+          "options": ["baNaNa", "baaa", "ba+aa", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Между двумя плюсами стоит унарный `+`, он превращает \"a\" в число NaN",
+            "Второй `+` — не символ строки, а оператор",
+            "Строка слева превращает весь результат в склейку, а не в число"
+          ],
+          "explanation": "Выражение `+\"a\"` — унарный плюс, он даёт NaN. Дальше всё склеивается: \"ba\" + NaN + \"a\" = \"baNaNa\"."
+        },
+        {
+          "id": "type-coercion-05-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "const a = [1, 2];\nconsole.log(a == \"1,2\");",
+          "options": ["true", "false"],
+          "correct": 0,
+          "explanation": "Массив сравнивается со строкой, поэтому он превращается в примитив через toString — \"1,2\". Строки равны."
+        },
+        {
+          "id": "type-coercion-05-q5",
+          "type": "output",
+          "code": "console.log({} + [], [2] * [3], [1, 2] * 2);",
+          "options": [
+            "[object Object] 6 NaN",
+            "0 6 NaN",
+            "[object Object] 6 2,4",
+            "[object Object] NaN NaN"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внутри console.log {} — это объект, а не пустой блок, поэтому получается склейка строк",
+            "`*` не применяется к каждому элементу массива — массив приводится к числу целиком",
+            "Массив из одного элемента [2] превращается в \"2\", а затем в 2"
+          ],
+          "explanation": "{} + [] — склейка строк \"[object Object]\" и \"\". `*` приводит к числу: [2] → \"2\" → 2, [3] → 3, а \"1,2\" — не число, поэтому NaN."
+        }
+      ]
+    },
+    {
+      "id": "hoisting-01",
+      "topicId": "hoisting",
+      "title": "Всплытие var",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Перед запуском движок находит все объявления. Переменная `var` создаётся сразу со значением `undefined`, а присваивание остаётся на своей строке."
+          },
+          {
+            "type": "code",
+            "code": "console.log(x); // undefined\nvar x = 5;\nconsole.log(x); // 5"
+          },
+          {
+            "type": "code",
+            "code": "var x;          // объявление «всплыло» наверх\nconsole.log(x); // undefined\nx = 5;          // присваивание осталось на месте",
+            "caption": "так движок видит код выше"
+          },
+          {
+            "type": "text",
+            "text": "Область видимости `var` — вся функция (или весь скрипт), блоки `if` и `for` для неё не преграда. Объявление внутри функции всплывает в начало **этой функции** и затеняет внешнюю переменную."
+          },
+          {
+            "type": "code",
+            "code": "function f() {\n  if (true) {\n    var a = 1;\n  }\n  console.log(a); // 1\n}\nf();"
+          },
+          {
+            "type": "warning",
+            "text": "Всплывает только то, что объявлено. Обращение к имени, которого нет нигде, — `ReferenceError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "hoisting-01-q1",
+          "type": "output",
+          "code": "console.log(a);\nvar a = 10;\nconsole.log(a);",
+          "options": ["undefined 10", "10 10", "ReferenceError", "undefined undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Наверх поднимается только объявление, присваивание выполняется на своей строке",
+            "var a объявлена в этом скрипте, поэтому ошибки нет — объявление уже существует",
+            "После строки var a = 10 значение уже 10"
+          ],
+          "explanation": "Объявление var a всплывает вместе со значением undefined, а присваивание 10 выполняется на своей строке."
+        },
+        {
+          "id": "hoisting-01-q2",
+          "type": "output",
+          "code": "var x = 1;\nfunction f() {\n  console.log(x);\n  var x = 2;\n}\nf();",
+          "options": ["undefined", "1", "2", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внутри функции есть своя var x — она всплывает и затеняет внешнюю с самого начала функции",
+            "Присваивание 2 выполняется только после console.log",
+            "Локальная var x уже объявлена благодаря всплытию, ошибки нет"
+          ],
+          "explanation": "var x внутри f всплывает в начало функции и затеняет внешнюю x. На момент console.log локальная x уже есть, но ещё равна undefined."
+        },
+        {
+          "id": "hoisting-01-q3",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "function test() {\n  for (var i = 0; i < 3; i++) {}\n  console.log(i);\n}\ntest();",
+          "options": ["3", "ReferenceError"],
+          "correct": 0,
+          "explanation": "var не видит границ блока for: i принадлежит всей функции и после цикла равна 3."
+        },
+        {
+          "id": "hoisting-01-q4",
+          "type": "output",
+          "code": "function f() {\n  if (false) {\n    var flag = true;\n  }\n  console.log(flag);\n}\nf();",
+          "options": ["undefined", "true", "ReferenceError", "false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Блок if (false) не выполняется, присваивания не было",
+            "var flag всплывает в начало функции, даже если стоит в невыполняемом блоке",
+            "Значение по умолчанию у var — undefined, а не false"
+          ],
+          "explanation": "Объявление var всплывает, даже если блок с ним никогда не выполняется. Присваивания true не было, поэтому flag — undefined."
+        },
+        {
+          "id": "hoisting-01-q5",
+          "type": "order",
+          "title": "Расставь строки, чтобы код вывёл: undefined 4",
+          "lines": ["console.log(count);", "var count = 3;", "console.log(count + 1);"],
+          "shuffled": [2, 1, 0],
+          "explanation": "Первый console.log срабатывает до присваивания и видит всплывшую count со значением undefined. Второй — уже после: 3 + 1 = 4."
+        }
+      ]
+    },
+    {
+      "id": "hoisting-02",
+      "topicId": "hoisting",
+      "title": "Function Declaration и Expression",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Function Declaration** (`function name() {}`) всплывает целиком, вместе с телом. Её можно вызвать выше по коду, чем она написана."
+          },
+          {
+            "type": "code",
+            "code": "sayHi(); // Привет\nfunction sayHi() {\n  console.log(\"Привет\");\n}"
+          },
+          {
+            "type": "text",
+            "text": "**Function Expression** — функция, записанная в переменную. Всплывает только переменная: с `var` до присваивания там `undefined`, и вызов даёт `TypeError`. С `let`/`const` — `ReferenceError` (об этом следующий урок)."
+          },
+          {
+            "type": "code",
+            "code": "greet(); // TypeError: greet is not a function\nvar greet = function () {\n  console.log(\"Hi\");\n};"
+          },
+          {
+            "type": "text",
+            "text": "Если одно имя объявлено и через `var`, и как функция, до выполнения кода в нём лежит функция. Но строка с присваиванием `var` её перезапишет."
+          },
+          {
+            "type": "code",
+            "code": "console.log(typeof f); // function\nvar f = 1;\nfunction f() {}\nconsole.log(typeof f); // number"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "hoisting-02-q1",
+          "type": "output",
+          "code": "console.log(sum(2, 3));\nfunction sum(a, b) {\n  return a + b;\n}",
+          "options": ["5", "undefined", "ReferenceError", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Функция всплыла полностью и вернула a + b",
+            "Function Declaration доступна во всей области видимости с самого начала",
+            "sum уже является функцией в момент вызова"
+          ],
+          "explanation": "Function Declaration всплывает целиком, вместе с телом, поэтому её можно вызвать до объявления."
+        },
+        {
+          "id": "hoisting-02-q2",
+          "type": "output",
+          "code": "hello();\nvar hello = function () {\n  console.log(\"hi\");\n};",
+          "options": ["TypeError", "ReferenceError", "hi", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Переменная hello объявлена через var и всплыла, поэтому её имя известно — ошибка другая",
+            "Всплывает только переменная, а функция присваивается ей позже",
+            "Код не доходит до вывода: вызов undefined() сразу падает"
+          ],
+          "explanation": "Всплыла только переменная hello со значением undefined. Вызов undefined как функции — TypeError: hello is not a function."
+        },
+        {
+          "id": "hoisting-02-q3",
+          "type": "output",
+          "code": "var foo = 1;\nfunction foo() {}\nconsole.log(typeof foo);",
+          "options": ["number", "function", "undefined", "object"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Функция действительно всплывает, но присваивание var foo = 1 выполняется позже и перезаписывает её",
+            null,
+            null
+          ],
+          "explanation": "До выполнения в foo лежит функция, но первая же строка var foo = 1 перезаписывает её числом."
+        },
+        {
+          "id": "hoisting-02-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "console.log(typeof bar);\nvar bar = function () {};",
+          "options": ["\"undefined\"", "\"function\""],
+          "correct": 0,
+          "explanation": "bar — переменная var, она всплывает со значением undefined. Функция будет присвоена ей только на второй строке."
+        },
+        {
+          "id": "hoisting-02-q5",
+          "type": "fill",
+          "codeBefore": "console.log(double(4)); // 8\n",
+          "codeAfter": "\n  return n * 2;\n}",
+          "options": [
+            "function double(n) {",
+            "var double = function (n) {",
+            "const double = function (n) {",
+            "let double = (n) => {"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "var всплывает со значением undefined — будет TypeError",
+            "const в TDZ до своей строки — будет ReferenceError",
+            "let в TDZ до своей строки — будет ReferenceError"
+          ],
+          "explanation": "Вызвать функцию до её строки можно только если это Function Declaration — она всплывает вместе с телом."
+        }
+      ]
+    },
+    {
+      "id": "hoisting-03",
+      "topicId": "hoisting",
+      "title": "TDZ: let, const и class",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`let`, `const` и `class` тоже всплывают, но **не инициализируются**. От начала блока до строки объявления длится **временная мёртвая зона** (TDZ): любое обращение к переменной даёт `ReferenceError`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(a); // ReferenceError\nlet a = 1;"
+          },
+          {
+            "type": "text",
+            "text": "Что всплытие есть, видно по затенению: внутренняя `let` «закрывает» внешнюю с самого начала блока, а не со своей строки. Это касается и чтения, и присваивания."
+          },
+          {
+            "type": "code",
+            "code": "let x = \"внешняя\";\n{\n  console.log(x); // ReferenceError\n  let x = \"внутренняя\";\n}"
+          },
+          {
+            "type": "warning",
+            "text": "`typeof` в TDZ тоже падает с `ReferenceError`, хотя для вообще не объявленной переменной он спокойно вернёт `\"undefined\"`."
+          },
+          {
+            "type": "tip",
+            "text": "Зона «временная»: важен момент выполнения, а не место в коде. Функция может ссылаться на `const`, объявленную ниже, если вызвана после объявления. `class` ведёт себя как `let`: `new User()` до строки `class User` — `ReferenceError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "hoisting-03-q1",
+          "type": "output",
+          "code": "console.log(typeof notDeclared);\nconsole.log(typeof later);\nlet later = 1;",
+          "options": [
+            "undefined ReferenceError",
+            "undefined undefined",
+            "ReferenceError",
+            "undefined number"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "later объявлена через let, а в TDZ typeof не защищает от ошибки",
+            "Первая строка успевает выполниться: typeof необъявленной переменной ошибки не даёт",
+            "На момент второго console.log присваивание ещё не произошло"
+          ],
+          "explanation": "Для необъявленного имени typeof возвращает \"undefined\". Но later объявлена через let и находится в TDZ, поэтому даже typeof бросает ReferenceError."
+        },
+        {
+          "id": "hoisting-03-q2",
+          "type": "output",
+          "code": "let name = \"outer\";\nfunction show() {\n  console.log(name);\n  let name = \"inner\";\n}\nshow();",
+          "options": ["ReferenceError", "outer", "undefined", "inner"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внутренняя name затеняет внешнюю с начала функции, а не со своей строки",
+            "let не инициализируется значением undefined, как var — в TDZ чтение падает",
+            "Строка с присваиванием \"inner\" ещё не выполнилась"
+          ],
+          "explanation": "Внутренняя let name всплывает в начало функции и затеняет внешнюю. До своей строки она в TDZ, поэтому чтение даёт ReferenceError."
+        },
+        {
+          "id": "hoisting-03-q3",
+          "type": "output",
+          "code": "function getValue() {\n  return value;\n}\nconst value = 42;\nconsole.log(getValue());",
+          "options": ["42", "ReferenceError", "undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Функция объявлена выше const, но вызвана ниже — к этому моменту TDZ закончилась",
+            "const не бывает undefined до инициализации — но здесь она уже инициализирована",
+            null
+          ],
+          "explanation": "TDZ — временная зона: значение важно в момент вызова. getValue вызвана после строки const value = 42, поэтому value уже готова."
+        },
+        {
+          "id": "hoisting-03-q4",
+          "type": "trueFalse",
+          "title": "Что произойдёт?",
+          "code": "const p = new Point();\nclass Point {}",
+          "options": ["Код выполнится без ошибок", "Будет ReferenceError"],
+          "correct": 1,
+          "explanation": "class всплывает как let: до строки объявления он в TDZ. В отличие от Function Declaration, класс нельзя использовать раньше объявления."
+        },
+        {
+          "id": "hoisting-03-q5",
+          "type": "output",
+          "code": "let x = 1;\n{\n  x = 2;\n  let x = 3;\n}\nconsole.log(x);",
+          "options": ["ReferenceError", "1", "2", "3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ошибка возникает раньше, чем console.log",
+            "x = 2 относится не к внешней x, а к внутренней, которая ещё в TDZ",
+            "Внутренняя x существует только внутри блока"
+          ],
+          "explanation": "В блоке объявлена своя let x, и с начала блока имя x относится к ней. Присваивание x = 2 попадает в TDZ — ReferenceError."
+        }
+      ]
+    },
+    {
+      "id": "hoisting-04",
+      "topicId": "hoisting",
+      "title": "Блочная область видимости",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Блок — это код в `{ }`: тело `if`, `for` или просто фигурные скобки. `let` и `const` живут только внутри своего блока. `var` блоков не замечает — её граница только функция."
+          },
+          {
+            "type": "code",
+            "code": "if (true) {\n  var a = 1;\n  let b = 2;\n}\nconsole.log(a); // 1\nconsole.log(b); // ReferenceError"
+          },
+          {
+            "type": "text",
+            "text": "`let` с тем же именем во вложенном блоке — это **другая** переменная. Она затеняет внешнюю, а после блока снова видна внешняя."
+          },
+          {
+            "type": "code",
+            "code": "let n = 1;\n{\n  let n = 2;\n  console.log(n); // 2\n}\nconsole.log(n); // 1"
+          },
+          {
+            "type": "warning",
+            "text": "Два `let` с одним именем в одной области — `SyntaxError`. Синтаксические ошибки находятся до запуска, поэтому не выполнится ни одна строка скрипта."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "hoisting-04-q1",
+          "type": "output",
+          "code": "let n = 1;\nif (true) {\n  let n = 2;\n  n++;\n}\nconsole.log(n);",
+          "options": ["1", "2", "3", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            null,
+            "n++ изменил внутреннюю n, а выводится внешняя",
+            "Внешняя n объявлена и видна после блока"
+          ],
+          "explanation": "Внутри if своя n, и n++ меняет именно её. Внешняя n остаётся равной 1."
+        },
+        {
+          "id": "hoisting-04-q2",
+          "type": "output",
+          "code": "for (var i = 0; i < 2; i++) {}\nfor (let j = 0; j < 2; j++) {}\nconsole.log(i);\nconsole.log(j);",
+          "options": ["2 ReferenceError", "2 2", "ReferenceError", "undefined undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "let j существует только внутри цикла",
+            "var i видна после цикла, первый console.log успевает выполниться",
+            "После цикла i = 2, а j снаружи нет вообще"
+          ],
+          "explanation": "var i видна за пределами цикла и равна 2. let j живёт только внутри for, снаружи её нет — ReferenceError."
+        },
+        {
+          "id": "hoisting-04-q3",
+          "type": "output",
+          "code": "var v = \"A\";\n{\n  var v = \"B\";\n}\nlet l = \"A\";\n{\n  let l = \"B\";\n}\nconsole.log(v, l);",
+          "options": ["B A", "A A", "B B", "A B"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "var не создаёт новую переменную в блоке — это та же v",
+            "let в блоке создаёт отдельную переменную, внешнюю она не трогает",
+            null
+          ],
+          "explanation": "Повторное var v в блоке — та же самая переменная, её значение перезаписано. let l в блоке — новая переменная, внешняя l не изменилась."
+        },
+        {
+          "id": "hoisting-04-q4",
+          "type": "trueFalse",
+          "title": "Что произойдёт?",
+          "code": "console.log(\"старт\");\nlet x = 1;\nlet x = 2;",
+          "options": ["Выведет «старт» и упадёт", "Ничего не выведет: SyntaxError"],
+          "correct": 1,
+          "explanation": "Повторное объявление let — синтаксическая ошибка. Её находят при разборе скрипта, до выполнения, поэтому console.log не запускается."
+        },
+        {
+          "id": "hoisting-04-q5",
+          "type": "fill",
+          "codeBefore": "const items = [\"a\", \"b\"];\nfor (",
+          "codeAfter": " i = 0; i < items.length; i++) {}\nconsole.log(typeof i); // number",
+          "options": ["var", "let", "const"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "let i живёт только внутри цикла: typeof i снаружи — \"undefined\"",
+            "i++ попытается изменить константу — TypeError"
+          ],
+          "explanation": "Только var видна за пределами цикла. С let i снаружи нет, и typeof вернёт \"undefined\"."
+        }
+      ]
+    },
+    {
+      "id": "hoisting-05",
+      "topicId": "hoisting",
+      "title": "Закрепление: всплытие",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Шпаргалка. `var` — всплывает со значением `undefined`, область — функция. **Function Declaration** — всплывает целиком, даже если стоит после `return`. `let`/`const`/`class` — всплывают в TDZ, область — блок. **Function Expression** и стрелки ведут себя как переменная, в которой лежат."
+          },
+          {
+            "type": "code",
+            "code": "function demo() {\n  // тут уже: a === undefined,\n  // run — готовая функция,\n  // b — в TDZ\n  var a = 1;\n  let b = 2;\n  function run() {}\n}"
+          },
+          {
+            "type": "tip",
+            "text": "Две Function Declaration с одним именем: до запуска кода остаётся последняя, она перезаписывает предыдущую."
+          },
+          {
+            "type": "warning",
+            "text": "`const` читается сразу на своей строке. Если в выражении есть константа, объявленная ниже, будет `ReferenceError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "hoisting-05-q1",
+          "type": "output",
+          "code": "var a = 1;\nfunction outer() {\n  console.log(a);\n  if (true) {\n    var a = 2;\n  }\n  console.log(a);\n}\nouter();",
+          "options": ["undefined 2", "1 2", "1 1", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Локальная var a затеняет внешнюю с начала функции, а не с блока if",
+            "var не ограничена блоком, и внутри outer обе строки видят локальную a",
+            "Локальная a всплыла со значением undefined, ошибки нет"
+          ],
+          "explanation": "var a внутри if всплывает в начало outer и затеняет внешнюю a. Сначала она undefined, после присваивания в блоке — 2."
+        },
+        {
+          "id": "hoisting-05-q2",
+          "type": "output",
+          "code": "function speak() {\n  return \"first\";\n}\nconsole.log(speak());\nfunction speak() {\n  return \"second\";\n}",
+          "options": ["second", "first", "SyntaxError", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Объявления обрабатываются до выполнения, поэтому вторая функция уже заменила первую",
+            "Повторная Function Declaration в скрипте или функции — не ошибка, просто перезапись",
+            null
+          ],
+          "explanation": "Обе Function Declaration всплывают до выполнения кода, вторая перезаписывает первую. К моменту вызова speak — это уже вторая функция."
+        },
+        {
+          "id": "hoisting-05-q3",
+          "type": "output",
+          "code": "function test() {\n  console.log(typeof inner, typeof expr);\n  function inner() {}\n  var expr = function () {};\n}\ntest();",
+          "options": [
+            "function undefined",
+            "function function",
+            "undefined undefined",
+            "ReferenceError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Function Expression присваивается переменной только на своей строке",
+            "Function Declaration всплывает вместе с телом",
+            "typeof для всплывшей var не бросает ошибку"
+          ],
+          "explanation": "inner — Function Declaration, она всплыла целиком. expr — переменная var, до присваивания в ней undefined."
+        },
+        {
+          "id": "hoisting-05-q4",
+          "type": "order",
+          "title": "Расставь строки, чтобы код выполнился без ошибок",
+          "lines": [
+            "const price = 100;",
+            "const discount = price * 0.2;",
+            "const total = price - discount;",
+            "console.log(total);"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Каждая const сразу читает константы из своего выражения. Если поставить строку выше той, от которой она зависит, обращение попадёт в TDZ."
+        },
+        {
+          "id": "hoisting-05-q5",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "function f() {\n  return g();\n  function g() {\n    return \"ok\";\n  }\n}\nconsole.log(f());",
+          "options": ["ok", "ReferenceError"],
+          "correct": 0,
+          "explanation": "Function Declaration всплывает в начало функции, даже если записана после return. К моменту return g() уже существует."
+        }
+      ]
+    },
+    {
+      "id": "tricky-output-01",
+      "topicId": "tricky-output",
+      "title": "Замыкания в циклах",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Колбэк `setTimeout` запускается только после того, как весь синхронный код закончился. С `var` переменная цикла одна на все итерации, и к моменту вызова в ней уже финальное значение."
+          },
+          {
+            "type": "code",
+            "code": "for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}\n// 3 3 3"
+          },
+          {
+            "type": "text",
+            "text": "`let` **в заголовке** `for` создаёт новую переменную на каждой итерации, и каждый колбэк замыкает свою копию. Если `let` объявлена до цикла, переменная снова одна."
+          },
+          {
+            "type": "code",
+            "code": "for (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}\n// 0 1 2"
+          },
+          {
+            "type": "tip",
+            "text": "С `var` значение можно «заморозить»: передать его в IIFE `(function (j) { ... })(i)` или третьим аргументом `setTimeout(fn, 0, i)` — он придёт в `fn` параметром."
+          },
+          {
+            "type": "text",
+            "text": "Таймеры срабатывают по возрастанию задержки, а при равной задержке — в порядке создания."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "tricky-output-01-q1",
+          "type": "output",
+          "code": "for (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
+          "options": ["3 3 3", "0 1 2", "2 2 2", "undefined undefined undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Колбэки читают i в момент вызова, а не создания — и это одна общая переменная",
+            "Цикл останавливается, когда i становится 3, а не 2",
+            "i видна колбэкам через замыкание и равна 3"
+          ],
+          "explanation": "Переменная var i одна на весь цикл. Таймеры срабатывают после окончания цикла, когда i уже стала 3 — на этом значении условие i < 3 и остановило цикл."
+        },
+        {
+          "id": "tricky-output-01-q2",
+          "type": "output",
+          "code": "for (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 100 - i * 10);\n}",
+          "options": ["2 1 0", "0 1 2", "3 3 3", "2 2 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Задержка у первой итерации самая большая — 100 мс, она сработает последней",
+            "С let в заголовке for у каждой итерации своя переменная",
+            null
+          ],
+          "explanation": "let даёт каждой итерации свою i, а задержки 100, 90 и 80 мс: первым сработает таймер последней итерации."
+        },
+        {
+          "id": "tricky-output-01-q3",
+          "type": "fill",
+          "codeBefore": "for (var i = 0; i < 3; i++) {\n  setTimeout(",
+          "codeAfter": ", 0, i);\n}\n// 0 1 2",
+          "options": ["j => console.log(j)", "() => console.log(i)", "() => console.log(j)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Колбэк читает общую var i уже после цикла — выведет 3 3 3",
+            "Переменной j нигде нет — ReferenceError"
+          ],
+          "explanation": "Третий аргумент setTimeout передаётся в колбэк параметром. Значение i копируется в j в момент создания таймера, поэтому выводится 0 1 2."
+        },
+        {
+          "id": "tricky-output-01-q4",
+          "type": "output",
+          "code": "let i = 0;\nfor (; i < 3; i++) {\n  setTimeout(() => console.log(i));\n}",
+          "options": ["3 3 3", "0 1 2", "2 2 2", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Отдельная переменная на итерацию появляется только при let в заголовке for",
+            null,
+            "i объявлена во внешней области и видна колбэкам"
+          ],
+          "explanation": "Новая копия на каждой итерации создаётся только для let, объявленной в заголовке for. Здесь i объявлена до цикла — она одна, как с var."
+        },
+        {
+          "id": "tricky-output-01-q5",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "for (var i = 0; i < 3; i++) {\n  (function (j) {\n    setTimeout(() => console.log(j));\n  })(i);\n}",
+          "options": ["0 1 2", "3 3 3"],
+          "correct": 0,
+          "explanation": "IIFE вызывается сразу на каждой итерации и получает текущее значение i в свой параметр j. Каждый колбэк замыкает свою j."
+        }
+      ]
+    },
+    {
+      "id": "tricky-output-02",
+      "topicId": "tricky-output",
+      "title": "Event loop: микро и макро",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Порядок: сначала весь синхронный код. Затем **все** микрозадачи (`.then`, продолжения после `await`, `queueMicrotask`). Потом **одна** макрозадача (`setTimeout`), после неё снова все микрозадачи — и так по кругу."
+          },
+          {
+            "type": "code",
+            "code": "console.log(1);\nsetTimeout(() => console.log(2));\nPromise.resolve().then(() => console.log(3));\nconsole.log(4);\n// 1 4 3 2"
+          },
+          {
+            "type": "warning",
+            "text": "Функция внутри `new Promise(...)` выполняется **синхронно**, сразу при создании. Асинхронны только колбэки `.then`. Вызов `resolve` не прерывает функцию."
+          },
+          {
+            "type": "text",
+            "text": "`async`-функция выполняется синхронно до первого `await`. Всё, что после него, продолжится микрозадачей."
+          },
+          {
+            "type": "code",
+            "code": "async function f() {\n  console.log(2);\n  await null;\n  console.log(4);\n}\nconsole.log(1);\nf();\nconsole.log(3);\n// 1 2 3 4"
+          },
+          {
+            "type": "tip",
+            "text": "Микрозадача, добавленная из другой микрозадачи, тоже выполнится раньше любого `setTimeout`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "tricky-output-02-q1",
+          "type": "output",
+          "code": "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nPromise.resolve().then(() => console.log(\"C\"));\nconsole.log(\"D\");",
+          "options": ["A D C B", "A D B C", "A B C D", "A C D B"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадачи (then) выполняются раньше макрозадач (setTimeout), даже с задержкой 0",
+            "setTimeout и then асинхронны — они ждут, пока выполнится весь синхронный код",
+            "then не выполняется сразу — он ждёт окончания синхронного кода"
+          ],
+          "explanation": "Сначала синхронные A и D. Затем микрозадача C — промисы обрабатываются раньше таймеров. Последним — setTimeout с B."
+        },
+        {
+          "id": "tricky-output-02-q2",
+          "type": "output",
+          "code": "new Promise(resolve => {\n  console.log(1);\n  resolve(2);\n  console.log(3);\n}).then(v => console.log(v));\nconsole.log(4);",
+          "options": ["1 3 4 2", "1 4 3 2", "4 1 3 2", "1 2 3 4"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "resolve не прерывает функцию — console.log(3) выполнится сразу",
+            "Функция внутри new Promise выполняется синхронно, при создании промиса",
+            "resolve не вызывает then сразу — колбэк попадает в очередь микрозадач"
+          ],
+          "explanation": "Функция в new Promise выполняется синхронно целиком: 1 и 3. Затем синхронная 4. Колбэк then — микрозадача, он срабатывает последним."
+        },
+        {
+          "id": "tricky-output-02-q3",
+          "type": "output",
+          "code": "async function run() {\n  console.log(\"B\");\n  await Promise.resolve();\n  console.log(\"D\");\n}\nconsole.log(\"A\");\nrun();\nconsole.log(\"C\");",
+          "options": ["A B C D", "A C B D", "A B D C", "B A C D"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Код async-функции до первого await выполняется синхронно, при вызове",
+            "await приостанавливает функцию: D выполнится только после синхронного кода",
+            "run() вызывается после console.log(\"A\")"
+          ],
+          "explanation": "run() синхронно выполняется до первого await и печатает B. Остаток функции ждёт в очереди микрозадач, пока не выполнится C."
+        },
+        {
+          "id": "tricky-output-02-q4",
+          "type": "order",
+          "title": "Расставь этапы event loop по порядку",
+          "lines": [
+            "Выполняется весь синхронный код",
+            "Выполняются все микрозадачи из очереди",
+            "Выполняется одна макрозадача (например, setTimeout)",
+            "Снова выполняются все накопившиеся микрозадачи"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "После синхронного кода очередь микрозадач опустошается полностью. Потом берётся одна макрозадача, и после неё снова выполняются все микрозадачи."
+        },
+        {
+          "id": "tricky-output-02-q5",
+          "type": "output",
+          "code": "setTimeout(() => console.log(\"t1\"));\nPromise.resolve().then(() => {\n  console.log(\"p1\");\n  setTimeout(() => console.log(\"t2\"));\n  Promise.resolve().then(() => console.log(\"p2\"));\n});",
+          "options": ["p1 p2 t1 t2", "t1 p1 p2 t2", "p1 t1 p2 t2", "p1 t1 t2 p2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадачи выполняются раньше таймеров, даже если таймер создан первым",
+            "p2 — тоже микрозадача, она выполнится до любого setTimeout",
+            null
+          ],
+          "explanation": "Микрозадачи выполняются до любых таймеров, включая добавленные по ходу: p1, затем p2. Таймеры идут в порядке создания: t1, потом t2."
+        }
+      ]
+    },
+    {
+      "id": "tricky-output-03",
+      "topicId": "tricky-output",
+      "title": "Ссылки и мутации",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Объекты и массивы передаются **по ссылке**: присваивание копирует ссылку, а не сам объект. Две переменные — один и тот же объект."
+          },
+          {
+            "type": "code",
+            "code": "const a = { n: 1 };\nconst b = a;\nb.n = 2;\nconsole.log(a.n);       // 2\nconsole.log({} === {}); // false — разные объекты"
+          },
+          {
+            "type": "text",
+            "text": "Функция получает копию ссылки. Изменение полей видно снаружи, а присваивание параметру нового объекта меняет только локальную переменную."
+          },
+          {
+            "type": "code",
+            "code": "function change(obj) {\n  obj.n = 10;     // меняет исходный объект\n  obj = { n: 20 }; // теперь obj — другой объект\n}\nconst x = { n: 1 };\nchange(x);\nconsole.log(x.n); // 10"
+          },
+          {
+            "type": "warning",
+            "text": "`{ ...obj }` и `[...arr]` копируют только **верхний уровень**: вложенные объекты и массивы остаются общими. А `const` запрещает переприсваивание, но не изменение содержимого."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "tricky-output-03-q1",
+          "type": "output",
+          "code": "const arr1 = [1, 2];\nconst arr2 = arr1;\narr2.push(3);\nconsole.log(arr1.length, arr1 === arr2);",
+          "options": ["3 true", "2 false", "3 false", "2 true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Присваивание не копирует массив — это один и тот же массив",
+            "Сравнение объектов проверяет ссылку, а ссылка одна",
+            "Изменение через arr2 видно и через arr1"
+          ],
+          "explanation": "arr2 = arr1 копирует ссылку: обе переменные указывают на один массив. push через arr2 меняет его же."
+        },
+        {
+          "id": "tricky-output-03-q2",
+          "type": "output",
+          "code": "function update(user) {\n  user.age = 30;\n  user = { age: 40 };\n  user.age = 50;\n}\nconst person = { age: 20 };\nupdate(person);\nconsole.log(person.age);",
+          "options": ["30", "20", "40", "50"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "user.age = 30 меняет тот же объект, что лежит в person",
+            "Присваивание параметру не меняет переменную снаружи",
+            "После переприсваивания user указывает на другой объект"
+          ],
+          "explanation": "Первая строка меняет исходный объект. После user = { age: 40 } параметр указывает на новый объект, и дальнейшие изменения person не касаются."
+        },
+        {
+          "id": "tricky-output-03-q3",
+          "type": "output",
+          "code": "const original = { name: \"Аня\", tags: [\"js\"] };\nconst copy = { ...original };\ncopy.name = \"Боб\";\ncopy.tags.push(\"css\");\nconsole.log(original.name, original.tags);",
+          "options": [
+            "Аня [\"js\", \"css\"]",
+            "Боб [\"js\", \"css\"]",
+            "Аня [\"js\"]",
+            "Боб [\"js\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строковое поле name скопировано, его изменение оригинал не задевает",
+            "Spread — поверхностная копия: вложенный массив общий",
+            null
+          ],
+          "explanation": "Spread копирует верхний уровень: name у копии своё. А tags — ссылка на тот же массив, поэтому push виден и в оригинале."
+        },
+        {
+          "id": "tricky-output-03-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "const config = { debug: false };\nconfig.debug = true;\nconsole.log(config.debug);",
+          "options": ["true", "TypeError"],
+          "correct": 0,
+          "explanation": "const запрещает переприсвоить саму переменную config, но менять поля объекта можно."
+        },
+        {
+          "id": "tricky-output-03-q5",
+          "type": "fill",
+          "codeBefore": "const state = { items: [1, 2] };\nconst next = { ...state, items: ",
+          "codeAfter": " };\nnext.items.push(3);\nconsole.log(state.items.length); // 2",
+          "options": [
+            "[...state.items]",
+            "state.items",
+            "{ ...state }.items",
+            "Object.assign(state.items)"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это ссылка на тот же массив: push сделает длину 3",
+            "Spread копирует верхний уровень, а items в копии — тот же массив",
+            "Object.assign возвращает свой первый аргумент — тот же массив"
+          ],
+          "explanation": "Только [...state.items] создаёт новый массив. Остальные варианты возвращают ссылку на тот же массив, и push изменит state."
+        }
+      ]
+    },
+    {
+      "id": "tricky-output-04",
+      "topicId": "tricky-output",
+      "title": "this и потеря контекста",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`this` в обычной функции определяется **в момент вызова**: это объект слева от точки. Метод, сохранённый в переменную или переданный как колбэк, вызывается без объекта и теряет `this`."
+          },
+          {
+            "type": "code",
+            "code": "class User {\n  name = \"Аня\";\n  hi() {\n    return this.name;\n  }\n}\nconst u = new User();\nconsole.log(u.hi()); // Аня\nconst hi = u.hi;\nhi(); // TypeError: this — undefined"
+          },
+          {
+            "type": "warning",
+            "text": "Код классов всегда в строгом режиме, поэтому потерянный `this` там — `undefined`, и `this.x` падает с `TypeError`."
+          },
+          {
+            "type": "text",
+            "text": "У стрелочной функции нет своего `this` — она берёт его из места, где создана. Поэтому стрелка внутри метода видит объект метода."
+          },
+          {
+            "type": "text",
+            "text": "`bind` возвращает функцию с жёстко привязанным `this`. Повторный `bind` её уже не перепривяжет — работает первый."
+          },
+          {
+            "type": "code",
+            "code": "const bound = u.hi.bind(u);\nconsole.log(bound()); // Аня"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "tricky-output-04-q1",
+          "type": "output",
+          "code": "class Counter {\n  count = 0;\n  inc() {\n    this.count++;\n    return this.count;\n  }\n}\nconst c = new Counter();\nconst inc = c.inc;\nconsole.log(c.inc());\nconsole.log(inc());",
+          "options": ["1 TypeError", "1 2", "1 NaN", "1 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "inc скопировал функцию, но не привязку к объекту c",
+            "В классе нет подстановки глобального объекта: this — undefined, а не window",
+            null
+          ],
+          "explanation": "c.inc() вызван через объект — this это c. inc() вызван без объекта, а в классе строгий режим: this — undefined, и this.count бросает TypeError."
+        },
+        {
+          "id": "tricky-output-04-q2",
+          "type": "output",
+          "code": "const team = {\n  title: \"Dev\",\n  members: [\"Аня\", \"Боб\"],\n  list() {\n    return this.members.map(m => m + \"@\" + this.title);\n  },\n};\nconsole.log(team.list());",
+          "options": [
+            "[\"Аня@Dev\", \"Боб@Dev\"]",
+            "[\"Аня@undefined\", \"Боб@undefined\"]",
+            "TypeError",
+            "[\"Аня@\", \"Боб@\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так было бы с обычной function в map: у стрелки this берётся из метода list",
+            "this внутри list — объект team, ошибки нет",
+            null
+          ],
+          "explanation": "Стрелка не имеет своего this и берёт его из list. list вызван как team.list(), поэтому this.title — \"Dev\"."
+        },
+        {
+          "id": "tricky-output-04-q3",
+          "type": "output",
+          "code": "function show() {\n  return this.id;\n}\nconst a = { id: 1 };\nconst b = { id: 2 };\nconst bound = show.bind(a).bind(b);\nconsole.log(bound(), show.call(b));",
+          "options": ["1 2", "2 2", "1 1", "undefined 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Повторный bind не перепривязывает this — работает первый",
+            "call вызывает исходную show, а не bound, поэтому this — b",
+            "bind привязал this к a, у которого id = 1"
+          ],
+          "explanation": "Первый bind навсегда привязывает this к a, второй уже ничего не меняет. А call у исходной show задаёт this = b."
+        },
+        {
+          "id": "tricky-output-04-q4",
+          "type": "trueFalse",
+          "title": "Что выведет код?",
+          "code": "class Timer {\n  constructor() {\n    this.seconds = 5;\n  }\n  tick() {\n    console.log(this.seconds);\n  }\n}\nconst t = new Timer();\nsetTimeout(() => t.tick(), 0);",
+          "options": ["5", "undefined"],
+          "correct": 0,
+          "explanation": "Стрелка вызывает t.tick() через объект, поэтому this — t. Контекст теряется, только если передать сам метод: setTimeout(t.tick)."
+        },
+        {
+          "id": "tricky-output-04-q5",
+          "type": "fill",
+          "codeBefore": "class Button {\n  label = \"OK\";\n  click() {\n    return this.label;\n  }\n}\nconst btn = new Button();\nconst handler = ",
+          "codeAfter": ";\nconsole.log(handler()); // OK",
+          "options": ["btn.click.bind(btn)", "btn.click", "Button.click", "btn.click()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Метод без объекта теряет this: в классе это TypeError",
+            "click — метод экземпляров, у самого класса Button такого свойства нет",
+            "Это сразу вызывает метод: в handler окажется строка \"OK\", а не функция"
+          ],
+          "explanation": "bind создаёт функцию, у которой this навсегда btn, — её можно вызывать отдельно от объекта."
+        }
+      ]
+    },
+    {
+      "id": "tricky-output-05",
+      "topicId": "tricky-output",
+      "title": "Закрепление: typeof и смесь",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`typeof` всегда возвращает строку, и у него есть известные сюрпризы:"
+          },
+          {
+            "type": "code",
+            "code": "console.log(typeof null);      // object — историческая ошибка\nconsole.log(typeof []);        // object\nconsole.log(typeof class {});  // function\nconsole.log(typeof NaN);       // number\nconsole.log(typeof undeclared); // undefined, без ошибки"
+          },
+          {
+            "type": "tip",
+            "text": "Массив проверяй через `Array.isArray(x)`, а `null` — через `x === null`. Надёжная проверка на объект: `typeof x === \"object\" && x !== null`."
+          },
+          {
+            "type": "text",
+            "text": "В смешанных задачах разбирай по шагам: что выполнится синхронно, что попадёт в микро- и макрозадачи, какой `this` у каждого вызова и где общая ссылка."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "tricky-output-05-q1",
+          "type": "output",
+          "code": "console.log(typeof null, typeof [], typeof typeof 1);",
+          "options": [
+            "object object string",
+            "null array number",
+            "object array string",
+            "null object string"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "typeof не возвращает \"null\" и \"array\" — таких результатов нет",
+            "Для массива typeof возвращает \"object\"",
+            "typeof null — \"object\", это известная историческая ошибка"
+          ],
+          "explanation": "typeof null — \"object\" из-за старой ошибки языка, массив — тоже объект. typeof всегда возвращает строку, поэтому typeof typeof 1 — \"string\"."
+        },
+        {
+          "id": "tricky-output-05-q2",
+          "type": "output",
+          "code": "console.log(typeof class {}, typeof NaN, typeof undeclaredVar);",
+          "options": [
+            "function number undefined",
+            "class NaN ReferenceError",
+            "object number undefined",
+            "function NaN undefined"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "typeof не возвращает \"class\" и \"NaN\", а для необъявленного имени не бросает ошибку",
+            "Класс — это особая функция",
+            "NaN — значение типа number"
+          ],
+          "explanation": "Класс — это функция-конструктор, NaN имеет тип number, а typeof для необъявленного имени возвращает \"undefined\" без ошибки."
+        },
+        {
+          "id": "tricky-output-05-q3",
+          "type": "output",
+          "code": "const log = [];\nfor (var i = 0; i < 2; i++) {\n  setTimeout(() => log.push(i));\n}\nPromise.resolve().then(() => log.push(\"p\"));\nsetTimeout(() => console.log(log));",
+          "options": ["[\"p\", 2, 2]", "[0, 1, \"p\"]", "[\"p\", 0, 1]", "[2, 2, \"p\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "then — микрозадача, она выполнится раньше любого setTimeout",
+            "С var переменная i одна, к моменту таймеров она равна 2",
+            "Промисы обрабатываются раньше таймеров"
+          ],
+          "explanation": "Микрозадача then выполняется раньше таймеров, поэтому \"p\" первый. Затем таймеры по порядку: оба видят общую var i, равную 2, и последний выводит массив."
+        },
+        {
+          "id": "tricky-output-05-q4",
+          "type": "output",
+          "code": "const obj = {\n  value: 1,\n  regular() {\n    return typeof this;\n  },\n  nested() {\n    const arrow = () => this.value;\n    return arrow();\n  },\n};\nconsole.log(obj.regular(), obj.nested());",
+          "options": ["object 1", "function 1", "object undefined", "undefined 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "this — это объект, у которого вызван метод, а не сама функция",
+            "Стрелка берёт this из метода nested, а там this — obj",
+            "Метод вызван через obj, this не потерян"
+          ],
+          "explanation": "При вызове obj.regular() this — объект obj, его typeof — \"object\". Стрелка внутри nested берёт this из nested, то есть тоже obj."
+        },
+        {
+          "id": "tricky-output-05-q5",
+          "type": "fill",
+          "codeBefore": "function isObject(v) {\n  return typeof v === \"object\" && v ",
+          "codeAfter": " null;\n}\nconsole.log(isObject({}), isObject(null), isObject([1])); // true false true",
+          "options": ["!==", "===", "==", "&&"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это оставит только null: вывод будет false true false",
+            "v == null истинно только для null и undefined: вывод false true false",
+            "Выражение вернёт null вместо boolean"
+          ],
+          "explanation": "typeof null тоже \"object\", поэтому null нужно отсечь отдельно: v !== null."
+        }
+      ]
+    }
+  ]
+}
