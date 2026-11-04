@@ -12,7 +12,7 @@
           ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Za-zА-Яа-яЁё_.-][0-9A-Za-zА-Яа-яЁё_. -]{0,18}[0-9A-Za-zА-Яа-яЁё_.-]$/) && !(newData.val().matches(/[A-Za-z]/) && newData.val().matches(/[А-Яа-яЁё]/)) && newData.getPriority() === null"
         },
         "xp": {
-          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() && data.parent().child('updatedAt').isNumber() ? (newData.val() - data.val() <= (now - data.parent().child('updatedAt').val()) / 100 || (newData.val() - data.val() <= 1000 && now - data.parent().child('updatedAt').val() >= 60000)) : newData.val() <= 20000) && newData.getPriority() === null"
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() && data.parent().child('updatedAt').isNumber() ? (newData.val() - data.val() <= (now - data.parent().child('updatedAt').val()) / 100 || (newData.val() - data.val() <= 1000 && now - data.parent().child('updatedAt').val() >= 60000)) : newData.val() <= 100000) && newData.getPriority() === null"
         },
         "streak": {
           ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && (newData.val() === 0 || newData.parent().child('xp').val() > 0) && newData.val() <= 1 + (now - 1775001600000) / 86400000 && (!(data.exists() && data.parent().child('updatedAt').isNumber()) || newData.val() <= data.val() + 1 + (now - data.parent().child('updatedAt').val()) / 86400000) && newData.getPriority() === null"

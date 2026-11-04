@@ -103,8 +103,8 @@ await expect(
   false,
 );
 await expect(
-  'new xp > 20000',
-  req('PUT', 'leaderboard/u4', { uid: 'u4', body: lb({ xp: 20001 }) }),
+  'new xp > 100000',
+  req('PUT', 'leaderboard/u4', { uid: 'u4', body: lb({ xp: 100001 }) }),
   false,
 );
 await expect(
