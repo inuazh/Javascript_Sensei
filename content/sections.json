@@ -2,26 +2,26 @@
   "sections": [
     {
       "id": "basics",
-      "title": "Основы",
+      "title": "основы",
       "icon": "🌱",
       "color": "#34D399",
       "order": 0,
       "topics": [
         {
           "id": "variables",
-          "title": "Переменные",
+          "title": "переменные",
           "subtitle": "let, const, var",
           "order": 0
         },
         {
           "id": "data-types",
-          "title": "Типы данных",
+          "title": "типы данных",
           "subtitle": "string, number, boolean",
           "order": 1
         },
         {
           "id": "operators",
-          "title": "Операторы",
+          "title": "операторы",
           "subtitle": "арифметика, сравнение",
           "order": 2
         }
@@ -29,26 +29,26 @@
     },
     {
       "id": "control",
-      "title": "Управление",
+      "title": "управление",
       "icon": "🔀",
       "color": "#60A5FA",
       "order": 1,
       "topics": [
         {
           "id": "conditions",
-          "title": "Условия",
+          "title": "условия",
           "subtitle": "if, else, switch",
           "order": 0
         },
         {
           "id": "loops",
-          "title": "Циклы",
+          "title": "циклы",
           "subtitle": "for, while, do...while",
           "order": 1
         },
         {
           "id": "functions",
-          "title": "Функции",
+          "title": "функции",
           "subtitle": "объявление, стрелочные",
           "order": 2
         }
@@ -56,20 +56,20 @@
     },
     {
       "id": "collections",
-      "title": "Коллекции",
+      "title": "коллекции",
       "icon": "📦",
       "color": "#FACC15",
       "order": 2,
       "topics": [
         {
           "id": "arrays",
-          "title": "Массивы",
+          "title": "массивы",
           "subtitle": "map, filter, reduce",
           "order": 0
         },
         {
           "id": "objects",
-          "title": "Объекты",
+          "title": "объекты",
           "subtitle": "ключи, деструктуризация",
           "order": 1
         },
@@ -83,15 +83,15 @@
     },
     {
       "id": "modern",
-      "title": "Современный синтаксис",
+      "title": "современный синтаксис",
       "icon": "✨",
       "color": "#FFFFFF",
       "order": 3,
-      "description": "Деструктуризация, spread и rest, ?. и ?? — приёмы, которые делают код короче и понятнее.",
+      "description": "деструктуризация, spread и rest, ?. и ?? — приёмы, которые делают код короче и понятнее.",
       "topics": [
         {
           "id": "destructuring",
-          "title": "Деструктуризация",
+          "title": "деструктуризация",
           "subtitle": "объекты, массивы, значения по умолчанию",
           "order": 0
         },
@@ -111,27 +111,27 @@
     },
     {
       "id": "strings",
-      "title": "Строки и регулярки",
+      "title": "строки и регулярки",
       "icon": "🔤",
       "color": "#FFFFFF",
       "order": 4,
-      "description": "Методы строк и регулярные выражения: как искать, вырезать и заменять текст.",
+      "description": "методы строк и регулярные выражения: как искать, вырезать и заменять текст.",
       "topics": [
         {
           "id": "string-methods",
-          "title": "Методы строк",
+          "title": "методы строк",
           "subtitle": "slice, includes, replace",
           "order": 0
         },
         {
           "id": "regex-basics",
-          "title": "Регулярные выражения",
+          "title": "регулярные выражения",
           "subtitle": "test, match, флаги",
           "order": 1
         },
         {
           "id": "regex-practice",
-          "title": "Регулярки на практике",
+          "title": "регулярки на практике",
           "subtitle": "группы, replace, split",
           "order": 2
         }
@@ -139,27 +139,27 @@
     },
     {
       "id": "functional",
-      "title": "Функциональный стиль",
+      "title": "функциональный стиль",
       "icon": "λ",
       "color": "#FFFFFF",
       "order": 5,
-      "description": "Чистые функции, иммутабельность, map/filter/reduce и сборка функций из маленьких частей.",
+      "description": "чистые функции, иммутабельность, map/filter/reduce и сборка функций из маленьких частей.",
       "topics": [
         {
           "id": "pure-functions",
-          "title": "Чистые функции",
+          "title": "чистые функции",
           "subtitle": "побочные эффекты, иммутабельность",
           "order": 0
         },
         {
           "id": "higher-order",
-          "title": "Функции высшего порядка",
+          "title": "функции высшего порядка",
           "subtitle": "map, filter, reduce в цепочках",
           "order": 1
         },
         {
           "id": "composition",
-          "title": "Композиция и каррирование",
+          "title": "композиция и каррирование",
           "subtitle": "compose, pipe, curry",
           "order": 2
         }
@@ -167,27 +167,27 @@
     },
     {
       "id": "iterators",
-      "title": "Итераторы и генераторы",
+      "title": "итераторы и генераторы",
       "icon": "↻",
       "color": "#FFFFFF",
       "order": 6,
-      "description": "Как устроен for...of, как писать свои итерируемые объекты и генераторы и перебирать асинхронные данные.",
+      "description": "как устроен for...of, как писать свои итерируемые объекты и генераторы и перебирать асинхронные данные.",
       "topics": [
         {
           "id": "iteration-protocol",
-          "title": "Протокол итерации",
+          "title": "протокол итерации",
           "subtitle": "for...of, Symbol.iterator",
           "order": 0
         },
         {
           "id": "generators",
-          "title": "Генераторы",
+          "title": "генераторы",
           "subtitle": "function*, yield",
           "order": 1
         },
         {
           "id": "async-iteration",
-          "title": "Асинхронная итерация",
+          "title": "асинхронная итерация",
           "subtitle": "for await, async-генераторы",
           "order": 2
         }
@@ -199,7 +199,7 @@
       "icon": "{}",
       "color": "#FFFFFF",
       "order": 7,
-      "description": "Как сохранять данные в JSON, считать без потери точности и перекладывать массивы и объекты.",
+      "description": "как сохранять данные в JSON, считать без потери точности и перекладывать массивы и объекты.",
       "topics": [
         {
           "id": "json",
@@ -209,13 +209,13 @@
         },
         {
           "id": "numbers-math",
-          "title": "Числа и Math",
+          "title": "числа и Math",
           "subtitle": "округление, toFixed, точность",
           "order": 1
         },
         {
           "id": "data-transform",
-          "title": "Преобразование данных",
+          "title": "преобразование данных",
           "subtitle": "группировка, нормализация, сортировка",
           "order": 2
         }
@@ -223,15 +223,15 @@
     },
     {
       "id": "advanced",
-      "title": "Продвинутые темы",
+      "title": "продвинутые темы",
       "icon": "🧙",
       "color": "#A78BFA",
       "order": 8,
-      "description": "Замыкания, this и прототипы — как JavaScript устроен изнутри.",
+      "description": "замыкания, this и прототипы — как JavaScript устроен изнутри.",
       "topics": [
         {
           "id": "closures",
-          "title": "Замыкания",
+          "title": "замыкания",
           "subtitle": "область видимости, замыкания",
           "order": 0
         },
@@ -243,7 +243,7 @@
         },
         {
           "id": "prototypes-classes",
-          "title": "Прототипы и классы",
+          "title": "прототипы и классы",
           "subtitle": "prototype, class, extends",
           "order": 2
         }
@@ -251,15 +251,15 @@
     },
     {
       "id": "async",
-      "title": "Асинхронность",
+      "title": "асинхронность",
       "icon": "⏳",
       "color": "#F472B6",
       "order": 9,
-      "description": "Колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
+      "description": "колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
       "topics": [
         {
           "id": "event-loop",
-          "title": "Колбэки и Event Loop",
+          "title": "колбэки и Event Loop",
           "subtitle": "setTimeout, очередь задач",
           "order": 0
         },
@@ -279,7 +279,7 @@
     },
     {
       "id": "patterns",
-      "title": "Паттерны",
+      "title": "паттерны",
       "icon": "◇",
       "color": "#FFFFFF",
       "order": 10,
@@ -293,13 +293,13 @@
         },
         {
           "id": "memoization",
-          "title": "Мемоизация и кэш",
+          "title": "мемоизация и кэш",
           "subtitle": "запоминание результатов",
           "order": 1
         },
         {
           "id": "observer",
-          "title": "Наблюдатель и модуль",
+          "title": "наблюдатель и модуль",
           "subtitle": "события, подписки, инкапсуляция",
           "order": 2
         }
@@ -307,11 +307,11 @@
     },
     {
       "id": "errors",
-      "title": "Ошибки и отладка",
+      "title": "ошибки и отладка",
       "icon": "🐞",
       "color": "#FFFFFF",
       "order": 11,
-      "description": "Как ловить и разбирать ошибки и находить типичные баги в своём коде.",
+      "description": "как ловить и разбирать ошибки и находить типичные баги в своём коде.",
       "topics": [
         {
           "id": "try-catch",
@@ -321,13 +321,13 @@
         },
         {
           "id": "error-types",
-          "title": "Типы ошибок",
+          "title": "типы ошибок",
           "subtitle": "TypeError, ReferenceError, свои ошибки",
           "order": 1
         },
         {
           "id": "common-bugs",
-          "title": "Типичные баги",
+          "title": "типичные баги",
           "subtitle": "найди ошибку в коде",
           "order": 2
         }
@@ -335,15 +335,15 @@
     },
     {
       "id": "interview",
-      "title": "К собеседованию",
+      "title": "к собеседованию",
       "icon": "🎤",
       "color": "#FB923C",
       "order": 12,
-      "description": "Каверзные вопросы с собеседований: приведение типов, всплытие и вывод в консоль.",
+      "description": "каверзные вопросы с собеседований: приведение типов, всплытие и вывод в консоль.",
       "topics": [
         {
           "id": "type-coercion",
-          "title": "Приведение типов",
+          "title": "приведение типов",
           "subtitle": "==, ===, truthy/falsy",
           "order": 0
         },
@@ -355,7 +355,7 @@
         },
         {
           "id": "tricky-output",
-          "title": "Что выведет консоль?",
+          "title": "что выведет консоль?",
           "subtitle": "каверзные задачи",
           "order": 2
         }
@@ -363,27 +363,27 @@
     },
     {
       "id": "algorithms",
-      "title": "Алгоритмы",
+      "title": "алгоритмы",
       "icon": "🧮",
       "color": "#FFFFFF",
       "order": 13,
-      "description": "Задачи с собеседований: сложность, поиск, сортировка и обработка строк.",
+      "description": "задачи с собеседований: сложность, поиск, сортировка и обработка строк.",
       "topics": [
         {
           "id": "complexity",
-          "title": "Сложность",
+          "title": "сложность",
           "subtitle": "O(1), O(n), O(n²) на примерах",
           "order": 0
         },
         {
           "id": "array-algorithms",
-          "title": "Задачи на массивы",
+          "title": "задачи на массивы",
           "subtitle": "поиск, сортировка, два указателя",
           "order": 1
         },
         {
           "id": "string-algorithms",
-          "title": "Задачи на строки",
+          "title": "задачи на строки",
           "subtitle": "палиндромы, анаграммы, подсчёт",
           "order": 2
         }

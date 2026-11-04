@@ -3,13 +3,13 @@
     {
       "id": "variables-01",
       "topicId": "variables",
-      "title": "Основы переменных",
+      "title": "основы переменных",
       "order": 0,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "**Переменная** — это имя, под которым программа хранит значение. Объявляем её ключевым словом, даём имя и кладём значение через `=`."
+            "text": "**переменная** — это имя, под которым программа хранит значение. объявляем её ключевым словом, даём имя и кладём значение через `=`."
           },
           {
             "type": "code",
@@ -17,7 +17,7 @@
           },
           {
             "type": "text",
-            "text": "В современном JavaScript переменные объявляют через `let` — если значение будет меняться, и через `const` — если не будет. Попытка перезаписать `const` приведёт к ошибке."
+            "text": "в современном JavaScript переменные объявляют через `let` — если значение будет меняться, и через `const` — если не будет. попытка перезаписать `const` приведёт к ошибке."
           },
           {
             "type": "code",
@@ -25,11 +25,11 @@
           },
           {
             "type": "warning",
-            "text": "`var` — старый способ объявления. Он разрешает объявить одну и ту же переменную дважды, и это часто приводит к багам. В новом коде используй `let` и `const`."
+            "text": "`var` — старый способ объявления. он разрешает объявить одну и ту же переменную дважды, и это часто приводит к багам. в новом коде используй `let` и `const`."
           },
           {
             "type": "tip",
-            "text": "Начинай с `const`. Меняй на `let`, только когда значение действительно нужно перезаписать."
+            "text": "начинай с `const`. меняй на `let`, только когда значение действительно нужно перезаписать."
           }
         ]
       },
@@ -37,7 +37,7 @@
         {
           "id": "variables-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 10;\nconsole.log(x);",
           "options": ["undefined", "x", "10", "null"],
           "correct": 2,
@@ -48,14 +48,14 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const a = 5;\na = 10;",
-          "options": ["Код выполнится без ошибок", "Код вызовет ошибку"],
+          "options": ["код выполнится без ошибок", "код вызовет ошибку"],
           "correct": 1,
           "explanation": "const запрещает повторное присваивание — изменить её значение нельзя"
         },
         {
           "id": "variables-01-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "",
           "codeAfter": " name = \"Alice\";\nname = \"Bob\";\nconsole.log(name); // Bob",
           "options": ["const", "let", "variable", "int"],
@@ -63,15 +63,15 @@
           "optionExplanations": [
             "const запрещает перезапись: строка name = \"Bob\" вызовет TypeError",
             null,
-            "Такого ключевого слова в JavaScript нет",
-            "Типы при объявлении в JavaScript не указывают"
+            "такого ключевого слова в JavaScript нет",
+            "типы при объявлении в JavaScript не указывают"
           ],
-          "explanation": "Значение name дальше меняется, поэтому нужна let: она разрешает перезапись, а const — нет."
+          "explanation": "значение name дальше меняется, поэтому нужна let: она разрешает перезапись, а const — нет."
         },
         {
           "id": "variables-01-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "var city = \"Moscow\";\nvar city = \"London\";\nconsole.log(city);",
           "options": ["Moscow", "London", "Error", "undefined"],
           "correct": 1,
@@ -80,10 +80,10 @@
         {
           "id": "variables-01-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": ["let score = 0;", "score = score + 10;", "console.log(score);"],
           "shuffled": [1, 2, 0],
-          "explanation": "Сначала объявляем переменную, затем изменяем значение, потом выводим"
+          "explanation": "сначала объявляем переменную, затем изменяем значение, потом выводим"
         }
       ]
     },
@@ -104,7 +104,7 @@
           },
           {
             "type": "text",
-            "text": "Если объявить переменную через `let` и не присвоить значение, в ней окажется `undefined` — «значения пока нет». Константу без значения объявить нельзя."
+            "text": "если объявить переменную через `let` и не присвоить значение, в ней окажется `undefined` — «значения пока нет». константу без значения объявить нельзя."
           },
           {
             "type": "code",
@@ -112,7 +112,7 @@
           },
           {
             "type": "tip",
-            "text": "Константы-настройки, которые известны заранее, принято называть БОЛЬШИМИ_БУКВАМИ: `const MAX_USERS = 100;`."
+            "text": "константы-настройки, которые известны заранее, принято называть БОЛЬШИМИ_БУКВАМИ: `const MAX_USERS = 100;`."
           }
         ]
       },
@@ -120,57 +120,57 @@
         {
           "id": "variables-02-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let a = 1;\nlet b = 2;\nlet c = a + b;\nconsole.log(c);",
           "options": ["12", "3", "ab", "undefined"],
           "correct": 1,
-          "explanation": "Числа складываются арифметически: 1 + 2 = 3"
+          "explanation": "числа складываются арифметически: 1 + 2 = 3"
         },
         {
           "id": "variables-02-q2",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const PI = 3.14;\nconsole.log(PI);",
-          "options": ["Выведет 3.14", "Вызовет ошибку"],
+          "options": ["выведет 3.14", "вызовет ошибку"],
           "correct": 0,
           "explanation": "const позволяет читать значение, только запрещает перезапись"
         },
         {
           "id": "variables-02-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "",
           "codeAfter": " MAX = 100;\nconsole.log(MAX);",
           "options": ["constant", "final", "const", "set"],
           "correct": 2,
           "optionExplanations": [
-            "Ключевое слово пишется короче — const",
+            "ключевое слово пишется короче — const",
             "final есть в Java, но не в JavaScript",
             null,
             "set — не ключевое слово для объявления переменных"
           ],
-          "explanation": "const объявляет константу — переменную, которую нельзя перезаписать. Остальные слова не объявляют переменные, и код упадёт с SyntaxError."
+          "explanation": "const объявляет константу — переменную, которую нельзя перезаписать. остальные слова не объявляют переменные, и код упадёт с SyntaxError."
         },
         {
           "id": "variables-02-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x;\nconsole.log(x);",
           "options": ["null", "0", "undefined", "Error"],
           "correct": 2,
-          "explanation": "Переменная, объявленная без значения, имеет значение undefined"
+          "explanation": "переменная, объявленная без значения, имеет значение undefined"
         },
         {
           "id": "variables-02-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "const name = \"Bob\";",
             "let greeting = \"Hello, \" + name;",
             "console.log(greeting);"
           ],
           "shuffled": [2, 0, 1],
-          "explanation": "Сначала объявляем константу, затем строим строку, потом выводим результат"
+          "explanation": "сначала объявляем константу, затем строим строку, потом выводим результат"
         }
       ]
     },
@@ -191,7 +191,7 @@
           },
           {
             "type": "text",
-            "text": "`let` и `const` тоже известны заранее, но обращаться к ним до объявления нельзя — это «временная мёртвая зона». Будет `ReferenceError`."
+            "text": "`let` и `const` тоже известны заранее, но обращаться к ним до объявления нельзя — это «временная мёртвая зона». будет `ReferenceError`."
           },
           {
             "type": "code",
@@ -211,32 +211,32 @@
         {
           "id": "variables-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(x);\nvar x = 5;",
           "options": ["5", "Error", "undefined", "null"],
           "correct": 2,
           "optionExplanations": [
-            "Объявление поднимается, а присваивание = 5 — нет: оно выполнится позже",
-            "У var обращение до объявления не падает: переменная уже есть, просто в ней пока undefined",
+            "объявление поднимается, а присваивание = 5 — нет: оно выполнится позже",
+            "у var обращение до объявления не падает: переменная уже есть, просто в ней пока undefined",
             null,
             null
           ],
-          "explanation": "Объявление var поднимается в начало, а присваивание остаётся на своём месте. На момент console.log переменная уже есть, но в ней undefined."
+          "explanation": "объявление var поднимается в начало, а присваивание остаётся на своём месте. на момент console.log переменная уже есть, но в ней undefined."
         },
         {
           "id": "variables-03-q2",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "console.log(y);\nlet y = 5;",
-          "options": ["Выведет undefined", "Вызовет ReferenceError"],
+          "options": ["выведет undefined", "вызовет ReferenceError"],
           "correct": 1,
-          "optionExplanations": ["Так вела бы себя var, а let до объявления недоступна", null],
+          "optionExplanations": ["так вела бы себя var, а let до объявления недоступна", null],
           "explanation": "let тоже поднимается, но до строки объявления находится во «временной мёртвой зоне»: любое обращение к ней вызывает ReferenceError."
         },
         {
           "id": "variables-03-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "{\n  var a = 1;\n}\nconsole.log(a);",
           "options": ["1", "undefined", "Error", "null"],
           "correct": 0,
@@ -245,40 +245,40 @@
         {
           "id": "variables-03-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "{\n  let b = 2;\n}\nconsole.log(b);",
           "options": ["2", "undefined", "null", "ReferenceError"],
           "correct": 3,
           "optionExplanations": [
-            "Так было бы с var, но let ограничена блоком",
-            "Снаружи блока переменной b просто нет — это ошибка, а не undefined",
+            "так было бы с var, но let ограничена блоком",
+            "снаружи блока переменной b просто нет — это ошибка, а не undefined",
             null,
             null
           ],
-          "explanation": "let видна только внутри блока {}. Снаружи переменной b не существует, поэтому — ReferenceError."
+          "explanation": "let видна только внутри блока {}. снаружи переменной b не существует, поэтому — ReferenceError."
         },
         {
           "id": "variables-03-q5",
           "type": "fill",
-          "title": "Заполни пропуск, чтобы код вывел undefined",
+          "title": "заполни пропуск, чтобы код вывел undefined",
           "codeBefore": "console.log(n); // undefined\n",
           "codeAfter": " n = 10;",
           "options": ["let", "const", "var", "function"],
           "correct": 2,
-          "explanation": "До объявления var уже существует и равна undefined. С let и const будет ReferenceError (временная мёртвая зона), а function n = 10 — синтаксическая ошибка."
+          "explanation": "до объявления var уже существует и равна undefined. с let и const будет ReferenceError (временная мёртвая зона), а function n = 10 — синтаксическая ошибка."
         }
       ]
     },
     {
       "id": "variables-04",
       "topicId": "variables",
-      "title": "Именование переменных",
+      "title": "именование переменных",
       "order": 3,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Имя переменной может состоять из букв, цифр, `_` и `$`, но **не может начинаться с цифры**. Пробелы, дефисы и точки в имени запрещены."
+            "text": "имя переменной может состоять из букв, цифр, `_` и `$`, но **не может начинаться с цифры**. пробелы, дефисы и точки в имени запрещены."
           },
           {
             "type": "code",
@@ -286,7 +286,7 @@
           },
           {
             "type": "text",
-            "text": "В JavaScript принят **camelCase**: первое слово со строчной буквы, каждое следующее — с заглавной: `userAge`, `firstName`."
+            "text": "в JavaScript принят **camelCase**: первое слово со строчной буквы, каждое следующее — с заглавной: `userAge`, `firstName`."
           },
           {
             "type": "code",
@@ -294,7 +294,7 @@
           },
           {
             "type": "tip",
-            "text": "Константы-настройки пишут `БОЛЬШИМИ_БУКВАМИ` через подчёркивание: `const MAX_SIZE = 100;`."
+            "text": "константы-настройки пишут `БОЛЬШИМИ_БУКВАМИ` через подчёркивание: `const MAX_SIZE = 100;`."
           }
         ]
       },
@@ -304,54 +304,54 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let 1name = \"error\";",
-          "options": ["Валидное имя переменной", "Вызовет SyntaxError"],
+          "options": ["валидное имя переменной", "вызовет SyntaxError"],
           "correct": 1,
-          "explanation": "Имя переменной не может начинаться с цифры — парсер не поймёт такой код. А вот name1 — допустимое имя."
+          "explanation": "имя переменной не может начинаться с цифры — парсер не поймёт такой код. а вот name1 — допустимое имя."
         },
         {
           "id": "variables-04-q2",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let _private = 42;\nlet $price = 9.99;",
-          "options": ["Оба имени валидны", "Оба вызовут ошибку"],
+          "options": ["оба имени валидны", "оба вызовут ошибку"],
           "correct": 0,
-          "explanation": "Имя может начинаться с буквы, _ или $ — оба имени допустимы."
+          "explanation": "имя может начинаться с буквы, _ или $ — оба имени допустимы."
         },
         {
           "id": "variables-04-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let firstName = \"Anna\";\nlet lastName = \"Smith\";\nconsole.log(firstName + \" \" + lastName);",
           "options": ["firstName lastName", "Anna Smith", "AnnaSmith", "Error"],
           "correct": 1,
-          "explanation": "Выводятся значения переменных, а не их имена. Между ними явно добавлен пробел \" \".",
+          "explanation": "выводятся значения переменных, а не их имена. между ними явно добавлен пробел \" \".",
           "optionExplanations": [
-            "Выводятся значения переменных, а не их имена",
+            "выводятся значения переменных, а не их имена",
             null,
-            "Между переменными явно вставлена строка с пробелом \" \"",
+            "между переменными явно вставлена строка с пробелом \" \"",
             null
           ]
         },
         {
           "id": "variables-04-q4",
           "type": "fill",
-          "title": "Заполни пропуск — допустимое имя в стиле camelCase",
+          "title": "заполни пропуск — допустимое имя в стиле camelCase",
           "codeBefore": "let ",
           "codeAfter": " = 25;",
           "options": ["user age", "user-age", "userAge", "user.age"],
           "correct": 2,
           "optionExplanations": [
-            "Пробел в имени недопустим",
-            "Дефис будет прочитан как минус — SyntaxError",
+            "пробел в имени недопустим",
+            "дефис будет прочитан как минус — SyntaxError",
             null,
-            "Точка означает доступ к свойству, в объявлении так нельзя"
+            "точка означает доступ к свойству, в объявлении так нельзя"
           ],
-          "explanation": "Имя не может содержать пробел, дефис или точку. userAge — допустимое имя в принятом в JavaScript стиле camelCase."
+          "explanation": "имя не может содержать пробел, дефис или точку. userAge — допустимое имя в принятом в JavaScript стиле camelCase."
         },
         {
           "id": "variables-04-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "const MAX_SIZE = 100;",
             "let currentSize = MAX_SIZE / 4;",
@@ -359,20 +359,20 @@
             "console.log(currentSize);"
           ],
           "shuffled": [2, 0, 3, 1],
-          "explanation": "currentSize вычисляется из MAX_SIZE, поэтому константа идёт первой. Дальше удваиваем: 25 * 2 = 50, и выводим."
+          "explanation": "currentSize вычисляется из MAX_SIZE, поэтому константа идёт первой. дальше удваиваем: 25 * 2 = 50, и выводим."
         }
       ]
     },
     {
       "id": "variables-05",
       "topicId": "variables",
-      "title": "Переменные: закрепление",
+      "title": "переменные: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Примитив (число, строка) при присваивании **копируется**: после `b = a` у переменных свои значения, и дальше они живут отдельно."
+            "text": "примитив (число, строка) при присваивании **копируется**: после `b = a` у переменных свои значения, и дальше они живут отдельно."
           },
           {
             "type": "code",
@@ -380,7 +380,7 @@
           },
           {
             "type": "text",
-            "text": "`const` запрещает переприсвоить переменную, но менять содержимое массива или объекта можно. А `-=`, `+=` и подобные — короткая запись изменения переменной."
+            "text": "`const` запрещает переприсвоить переменную, но менять содержимое массива или объекта можно. а `-=`, `+=` и подобные — короткая запись изменения переменной."
           },
           {
             "type": "code",
@@ -388,7 +388,7 @@
           },
           {
             "type": "warning",
-            "text": "Повторно объявить `let` или `const` в той же области нельзя: `let x = 1; let x = 2;` даст `SyntaxError`, и код не запустится вовсе."
+            "text": "повторно объявить `let` или `const` в той же области нельзя: `let x = 1; let x = 2;` даст `SyntaxError`, и код не запустится вовсе."
           }
         ]
       },
@@ -396,7 +396,7 @@
         {
           "id": "variables-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let a = 5;\nlet b = a;\na = 10;\nconsole.log(b);",
           "options": ["10", "5", "undefined", "Error"],
           "correct": 1,
@@ -406,12 +406,12 @@
             null,
             null
           ],
-          "explanation": "Числа копируются по значению: в b записано 5, и изменение a на неё не влияет."
+          "explanation": "числа копируются по значению: в b записано 5, и изменение a на неё не влияет."
         },
         {
           "id": "variables-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const arr = [1, 2, 3];\narr.push(4);\nconsole.log(arr.length);",
           "options": ["3", "4", "Error", "undefined"],
           "correct": 1,
@@ -428,22 +428,22 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let x = 'hello';\nlet x = 'world';",
-          "options": ["Код выполнится", "Вызовет SyntaxError"],
+          "options": ["код выполнится", "вызовет SyntaxError"],
           "correct": 1,
-          "explanation": "let запрещает повторное объявление в той же области видимости. Ошибка находится ещё до запуска, поэтому не выполнится ни одна строка."
+          "explanation": "let запрещает повторное объявление в той же области видимости. ошибка находится ещё до запуска, поэтому не выполнится ни одна строка."
         },
         {
           "id": "variables-05-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let total = 100;\ntotal ",
           "codeAfter": " 20;\nconsole.log(total); // 80",
           "options": ["= -", "-=", "+ =", "-"],
           "correct": 1,
           "optionExplanations": [
-            "Это total = -20: переменной присваивается минус 20",
+            "это total = -20: переменной присваивается минус 20",
             null,
-            "Пробел внутри оператора недопустим",
+            "пробел внутри оператора недопустим",
             "total - 20 вычисляет 80, но никуда не сохраняет: total остаётся 100"
           ],
           "explanation": "-= вычитает значение из переменной и сохраняет результат: total = total - 20 = 80."
@@ -451,7 +451,7 @@
         {
           "id": "variables-05-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "let price = 50;",
             "const discount = price * 0.2;",
@@ -459,20 +459,20 @@
             "console.log(finalPrice);"
           ],
           "shuffled": [3, 1, 0, 2],
-          "explanation": "Скидка считается от цены, а итог — от цены и скидки. Поэтому price, затем discount (10), затем finalPrice (40) и вывод."
+          "explanation": "скидка считается от цены, а итог — от цены и скидки. поэтому price, затем discount (10), затем finalPrice (40) и вывод."
         }
       ]
     },
     {
       "id": "data-types-01",
       "topicId": "data-types",
-      "title": "Примитивные типы",
+      "title": "примитивные типы",
       "order": 0,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Оператор `typeof` возвращает тип значения **строкой** в нижнем регистре. Пишется слитно и со строчной буквы, скобки не нужны."
+            "text": "оператор `typeof` возвращает тип значения **строкой** в нижнем регистре. пишется слитно и со строчной буквы, скобки не нужны."
           },
           {
             "type": "code",
@@ -480,11 +480,11 @@
           },
           {
             "type": "text",
-            "text": "Отдельных типов для целых и дробных чисел нет: любое число — `number`."
+            "text": "отдельных типов для целых и дробных чисел нет: любое число — `number`."
           },
           {
             "type": "warning",
-            "text": "`typeof null` возвращает `\"object\"`. Это старая ошибка языка: `null` — примитив, но исправить поведение уже нельзя."
+            "text": "`typeof null` возвращает `\"object\"`. это старая ошибка языка: `null` — примитив, но исправить поведение уже нельзя."
           }
         ]
       },
@@ -492,22 +492,22 @@
         {
           "id": "data-types-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(typeof 42);",
           "options": ["int", "number", "integer", "num"],
           "correct": 1,
           "optionExplanations": [
-            "Отдельного типа для целых чисел в JavaScript нет",
+            "отдельного типа для целых чисел в JavaScript нет",
             null,
-            "Отдельного типа для целых чисел в JavaScript нет",
+            "отдельного типа для целых чисел в JavaScript нет",
             "typeof возвращает полное имя типа"
           ],
-          "explanation": "Целых и дробных типов по отдельности нет: и 42, и 3.14 — это number."
+          "explanation": "целых и дробных типов по отдельности нет: и 42, и 3.14 — это number."
         },
         {
           "id": "data-types-01-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(typeof \"hello\");",
           "options": ["String", "text", "string", "char"],
           "correct": 2,
@@ -515,7 +515,7 @@
             "typeof возвращает имя типа в нижнем регистре",
             null,
             null,
-            "Отдельного типа для символа нет — это тоже строка"
+            "отдельного типа для символа нет — это тоже строка"
           ],
           "explanation": "typeof строки возвращает 'string' — всегда в нижнем регистре."
         },
@@ -526,28 +526,28 @@
           "code": "typeof null === \"object\"",
           "options": ["true", "false"],
           "correct": 0,
-          "explanation": "Это историческая ошибка JS: typeof null возвращает 'object', хотя null — примитив"
+          "explanation": "это историческая ошибка JS: typeof null возвращает 'object', хотя null — примитив"
         },
         {
           "id": "data-types-01-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "console.log(",
           "codeAfter": " true);",
           "options": ["type", "typeOf", "typeof", "getType"],
           "correct": 2,
           "explanation": "typeof — оператор, а не функция: пишется слитно, со строчной o, скобки не нужны.",
           "optionExplanations": [
-            "Оператор называется typeof",
+            "оператор называется typeof",
             "JavaScript различает регистр: оператор пишется typeof, со строчной o",
             null,
-            "Такой функции в JavaScript нет"
+            "такой функции в JavaScript нет"
           ]
         },
         {
           "id": "data-types-01-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(typeof undefined);",
           "options": ["null", "void", "undefined", "object"],
           "correct": 2,
@@ -564,13 +564,13 @@
     {
       "id": "data-types-02",
       "topicId": "data-types",
-      "title": "Строки (String)",
+      "title": "строки (String)",
       "order": 1,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Строки пишут в двойных, одинарных или обратных кавычках. Длину даёт свойство `length`, а методы вроде `toUpperCase()` и `includes()` возвращают новые значения."
+            "text": "строки пишут в двойных, одинарных или обратных кавычках. длину даёт свойство `length`, а методы вроде `toUpperCase()` и `includes()` возвращают новые значения."
           },
           {
             "type": "code",
@@ -578,7 +578,7 @@
           },
           {
             "type": "text",
-            "text": "В обратных кавычках работает подстановка `${...}` — это **шаблонная строка**."
+            "text": "в обратных кавычках работает подстановка `${...}` — это **шаблонная строка**."
           },
           {
             "type": "code",
@@ -586,7 +586,7 @@
           },
           {
             "type": "warning",
-            "text": "Если хотя бы один операнд `+` — строка, второй тоже станет строкой: `\"5\" + 5` даёт `\"55\"`, а не `10`."
+            "text": "если хотя бы один операнд `+` — строка, второй тоже станет строкой: `\"5\" + 5` даёт `\"55\"`, а не `10`."
           }
         ]
       },
@@ -594,12 +594,12 @@
         {
           "id": "data-types-02-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let s = \"Hello\";\nconsole.log(s.length);",
           "options": ["4", "5", "6", "undefined"],
           "correct": 1,
           "optionExplanations": [
-            "Посчитай ещё раз: H-e-l-l-o",
+            "посчитай ещё раз: H-e-l-l-o",
             null,
             "length считает только символы, без кавычек",
             null
@@ -609,22 +609,22 @@
         {
           "id": "data-types-02-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let name = \"World\";\nconsole.log(`Hello, ${name}!`);",
           "options": ["Hello, ${name}!", "Hello, World!", "Hello, name!", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Подстановка работает именно в обратных кавычках",
+            "подстановка работает именно в обратных кавычках",
             null,
-            "Подставляется значение переменной, а не её имя",
+            "подставляется значение переменной, а не её имя",
             null
           ],
-          "explanation": "В обратных кавычках ${name} заменяется значением переменной name."
+          "explanation": "в обратных кавычках ${name} заменяется значением переменной name."
         },
         {
           "id": "data-types-02-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let str = \"hello world\";\nconsole.log(str.",
           "codeAfter": "());",
           "options": ["upper", "toUpper", "toUpperCase", "uppercase"],
@@ -634,7 +634,7 @@
         {
           "id": "data-types-02-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(\"abc\".includes(\"b\"));",
           "options": ["1", "b", "false", "true"],
           "correct": 3,
@@ -653,7 +653,7 @@
           "code": "\"5\" + 5 === \"55\"",
           "options": ["true", "false"],
           "correct": 0,
-          "explanation": "Когда один операнд строка, + склеивает строки: '5' + 5 = '55'."
+          "explanation": "когда один операнд строка, + склеивает строки: '5' + 5 = '55'."
         }
       ]
     },
@@ -666,7 +666,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "Числа хранятся в двоичном виде, поэтому дроби бывают неточными. Деление на ноль не вызывает ошибку — получается `Infinity`."
+            "text": "числа хранятся в двоичном виде, поэтому дроби бывают неточными. деление на ноль не вызывает ошибку — получается `Infinity`."
           },
           {
             "type": "code",
@@ -674,7 +674,7 @@
           },
           {
             "type": "text",
-            "text": "`Number()` и `Boolean()` приводят значение к своему типу. Ложными (falsy) становятся `0`, `\"\"`, `null`, `undefined`, `NaN` и `false`, всё остальное — `true`."
+            "text": "`Number()` и `Boolean()` приводят значение к своему типу. ложными (falsy) становятся `0`, `\"\"`, `null`, `undefined`, `NaN` и `false`, всё остальное — `true`."
           },
           {
             "type": "code",
@@ -686,32 +686,32 @@
         {
           "id": "data-types-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(0.1 + 0.2 === 0.3);",
           "options": ["true", "false", "Error", "NaN"],
           "correct": 1,
           "optionExplanations": [
-            "На бумаге да, но в двоичном виде 0.1 + 0.2 = 0.30000000000000004",
+            "на бумаге да, но в двоичном виде 0.1 + 0.2 = 0.30000000000000004",
             null,
             null,
             null
           ],
-          "explanation": "Дроби хранятся в двоичном виде неточно: 0.1 + 0.2 = 0.30000000000000004, а это не 0.3."
+          "explanation": "дроби хранятся в двоичном виде неточно: 0.1 + 0.2 = 0.30000000000000004, а это не 0.3."
         },
         {
           "id": "data-types-03-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(10 / 0);",
           "options": ["Error", "0", "NaN", "Infinity"],
           "correct": 3,
           "optionExplanations": [
-            "В JavaScript деление на ноль не бросает ошибку",
+            "в JavaScript деление на ноль не бросает ошибку",
             null,
             "NaN получится только при 0 / 0",
             null
           ],
-          "explanation": "Деление на ноль в JS не вызывает ошибку, а возвращает Infinity. NaN будет только у 0 / 0."
+          "explanation": "деление на ноль в JS не вызывает ошибку, а возвращает Infinity. NaN будет только у 0 / 0."
         },
         {
           "id": "data-types-03-q3",
@@ -725,7 +725,7 @@
         {
           "id": "data-types-03-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(Number(\"42\") + 8);",
           "options": ["428", "50", "NaN", "Error"],
           "correct": 1,
@@ -733,19 +733,19 @@
           "optionExplanations": [
             "Number уже превратил строку в число, поэтому + складывает, а не склеивает",
             null,
-            "Строка \"42\" целиком состоит из цифр, Number превращает её в 42",
+            "строка \"42\" целиком состоит из цифр, Number превращает её в 42",
             "Number не бросает ошибок: в худшем случае он вернёт NaN"
           ]
         },
         {
           "id": "data-types-03-q5",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "console.log(",
           "codeAfter": "(\"hello\")); // true",
           "options": ["Boolean", "String", "Number", "Object"],
           "correct": 0,
-          "explanation": "Boolean() приводит значение к true/false. Непустая строка — truthy, поэтому true."
+          "explanation": "Boolean() приводит значение к true/false. непустая строка — truthy, поэтому true."
         }
       ]
     },
@@ -766,7 +766,7 @@
           },
           {
             "type": "text",
-            "text": "При `==` `null` и `undefined` равны друг другу — и больше ничему. При `===` — нет: у них разные типы. В арифметике `null` становится `0`, а `undefined` — `NaN`."
+            "text": "при `==` `null` и `undefined` равны друг другу — и больше ничему. при `===` — нет: у них разные типы. в арифметике `null` становится `0`, а `undefined` — `NaN`."
           },
           {
             "type": "code",
@@ -774,7 +774,7 @@
           },
           {
             "type": "tip",
-            "text": "Оператор `??` подставляет запасное значение, только если слева `null` или `undefined`: `name ?? \"Гость\"`."
+            "text": "оператор `??` подставляет запасное значение, только если слева `null` или `undefined`: `name ?? \"Гость\"`."
           }
         ]
       },
@@ -786,7 +786,7 @@
           "code": "null == undefined",
           "options": ["true", "false"],
           "correct": 0,
-          "explanation": "При нестрогом == значения null и undefined равны друг другу (и больше ничему)."
+          "explanation": "при нестрогом == значения null и undefined равны друг другу (и больше ничему)."
         },
         {
           "id": "data-types-04-q2",
@@ -795,48 +795,48 @@
           "code": "null === undefined",
           "options": ["true", "false"],
           "correct": 1,
-          "explanation": "Строгое === не приводит типы: у null и undefined типы разные, поэтому false."
+          "explanation": "строгое === не приводит типы: у null и undefined типы разные, поэтому false."
         },
         {
           "id": "data-types-04-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = null;\nconsole.log(x + 1);",
           "options": ["null1", "Error", "1", "NaN"],
           "correct": 2,
           "optionExplanations": [
-            "Склейка была бы со строкой, а здесь два не-строковых операнда",
+            "склейка была бы со строкой, а здесь два не-строковых операнда",
             null,
             null,
             "NaN получился бы с undefined, а null в арифметике — это 0"
           ],
-          "explanation": "В арифметике null превращается в 0: null + 1 = 0 + 1 = 1."
+          "explanation": "в арифметике null превращается в 0: null + 1 = 0 + 1 = 1."
         },
         {
           "id": "data-types-04-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let user;\nconsole.log(user ?? \"Гость\");",
           "options": ["undefined", "null", "Гость", "Error"],
           "correct": 2,
-          "explanation": "?? возвращает правый операнд, если левый — null или undefined. user не задан, значит undefined, и выводится «Гость»."
+          "explanation": "?? возвращает правый операнд, если левый — null или undefined. user не задан, значит undefined, и выводится «гость»."
         },
         {
           "id": "data-types-04-q5",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let value = ",
           "codeAfter": ";\nconsole.log(value === null); // true",
           "options": ["undefined", "null", "0", "false"],
           "correct": 1,
-          "explanation": "Строгое === даст true, только если value — именно null. undefined, 0 и false — другие значения."
+          "explanation": "строгое === даст true, только если value — именно null. undefined, 0 и false — другие значения."
         }
       ]
     },
     {
       "id": "data-types-05",
       "topicId": "data-types",
-      "title": "Типы данных: закрепление",
+      "title": "типы данных: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
@@ -862,12 +862,12 @@
         {
           "id": "data-types-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(typeof typeof 42);",
           "options": ["number", "string", "typeof", "undefined"],
           "correct": 1,
           "optionExplanations": [
-            "Это typeof 42, а здесь typeof применяется ещё раз — к строке \"number\"",
+            "это typeof 42, а здесь typeof применяется ещё раз — к строке \"number\"",
             null,
             null,
             null
@@ -877,7 +877,7 @@
         {
           "id": "data-types-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(Number(true) + Number(false));",
           "options": ["NaN", "2", "1", "undefined"],
           "correct": 2,
@@ -895,7 +895,7 @@
         {
           "id": "data-types-05-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let n = parseInt(",
           "codeAfter": ");\nconsole.log(n); // 42",
           "options": ["\"42.9\"", "\"$42\"", "\"hello\"", "true"],
@@ -903,7 +903,7 @@
           "optionExplanations": [
             null,
             "parseInt должен встретить цифру первой: \"$42\" даёт NaN",
-            "В строке нет цифр — NaN",
+            "в строке нет цифр — NaN",
             "true сначала станет строкой \"true\" — NaN"
           ],
           "explanation": "parseInt читает цифры с начала строки и останавливается на первом неподходящем символе: \"42.9\" → 42."
@@ -911,27 +911,27 @@
         {
           "id": "data-types-05-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "let raw = \"  42  \";",
             "let num = Number(raw.trim());",
             "console.log(num + 8);"
           ],
           "shuffled": [2, 0, 1],
-          "explanation": "Сначала строка, потом trim() убирает пробелы и Number() превращает её в 42, затем 42 + 8 = 50."
+          "explanation": "сначала строка, потом trim() убирает пробелы и Number() превращает её в 42, затем 42 + 8 = 50."
         }
       ]
     },
     {
       "id": "operators-01",
       "topicId": "operators",
-      "title": "Арифметические операторы",
+      "title": "арифметические операторы",
       "order": 0,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Кроме `+ - * /` есть `%` — **остаток от деления** и `**` — **возведение в степень**."
+            "text": "кроме `+ - * /` есть `%` — **остаток от деления** и `**` — **возведение в степень**."
           },
           {
             "type": "code",
@@ -939,7 +939,7 @@
           },
           {
             "type": "text",
-            "text": "`++` увеличивает переменную на 1. Постфиксный `x++` возвращает **старое** значение, префиксный `++x` — **новое**."
+            "text": "`++` увеличивает переменную на 1. постфиксный `x++` возвращает **старое** значение, префиксный `++x` — **новое**."
           },
           {
             "type": "code",
@@ -955,7 +955,7 @@
         {
           "id": "operators-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(17 % 5);",
           "options": ["3", "2", "4", "0"],
           "correct": 1,
@@ -970,7 +970,7 @@
         {
           "id": "operators-01-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 5;\nconsole.log(x++);",
           "options": ["6", "5", "4", "undefined"],
           "correct": 1,
@@ -980,21 +980,21 @@
             null,
             null
           ],
-          "explanation": "Постфиксный x++ возвращает старое значение 5 и только потом увеличивает x до 6."
+          "explanation": "постфиксный x++ возвращает старое значение 5 и только потом увеличивает x до 6."
         },
         {
           "id": "operators-01-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let y = 5;\nconsole.log(++y);",
           "options": ["4", "5", "6", "undefined"],
           "correct": 2,
-          "explanation": "Префиксный ++y сначала увеличивает y до 6, потом возвращает новое значение."
+          "explanation": "префиксный ++y сначала увеличивает y до 6, потом возвращает новое значение."
         },
         {
           "id": "operators-01-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let result = 2 ",
           "codeAfter": " 10;\nconsole.log(result); // 1024",
           "options": ["*", "**", "^", "x"],
@@ -1014,20 +1014,20 @@
           "code": "10 % 2 === 0",
           "options": ["true", "false"],
           "correct": 0,
-          "explanation": "10 делится на 2 без остатка: 10 % 2 = 0. Так проверяют чётность."
+          "explanation": "10 делится на 2 без остатка: 10 % 2 = 0. так проверяют чётность."
         }
       ]
     },
     {
       "id": "operators-02",
       "topicId": "operators",
-      "title": "Операторы сравнения",
+      "title": "операторы сравнения",
       "order": 1,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "`==` перед сравнением **приводит типы**, а `===` сравнивает без приведения: разные типы — сразу `false`. Пары `!=` и `!==` устроены так же."
+            "text": "`==` перед сравнением **приводит типы**, а `===` сравнивает без приведения: разные типы — сразу `false`. пары `!=` и `!==` устроены так же."
           },
           {
             "type": "code",
@@ -1035,7 +1035,7 @@
           },
           {
             "type": "text",
-            "text": "Сравнения выполняются слева направо, а результат `true`/`false` в следующем сравнении становится `1`/`0`."
+            "text": "сравнения выполняются слева направо, а результат `true`/`false` в следующем сравнении становится `1`/`0`."
           },
           {
             "type": "code",
@@ -1043,11 +1043,11 @@
           },
           {
             "type": "warning",
-            "text": "В `>`, `<`, `>=`, `<=` значение `null` становится `0`, а в `==` равно только `null` и `undefined`. Поэтому `null >= 0` — `true`, а `null == 0` — `false`."
+            "text": "в `>`, `<`, `>=`, `<=` значение `null` становится `0`, а в `==` равно только `null` и `undefined`. поэтому `null >= 0` — `true`, а `null == 0` — `false`."
           },
           {
             "type": "tip",
-            "text": "Используй `===` и `!==` — так меньше сюрпризов."
+            "text": "используй `===` и `!==` — так меньше сюрпризов."
           }
         ]
       },
@@ -1073,22 +1073,22 @@
         {
           "id": "operators-02-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(3 > 2 > 1);",
           "options": ["true", "false", "Error", "NaN"],
           "correct": 1,
           "optionExplanations": [
-            "Математически 3 > 2 > 1 верно, но JS сравнивает по шагам: true > 1 — это 1 > 1",
+            "математически 3 > 2 > 1 верно, но JS сравнивает по шагам: true > 1 — это 1 > 1",
             null,
             null,
             null
           ],
-          "explanation": "Сравнение идёт слева направо: 3 > 2 = true, затем true > 1 → 1 > 1 = false."
+          "explanation": "сравнение идёт слева направо: 3 > 2 = true, затем true > 1 → 1 > 1 = false."
         },
         {
           "id": "operators-02-q4",
           "type": "fill",
-          "title": "Заполни пропуск — строгое неравенство",
+          "title": "заполни пропуск — строгое неравенство",
           "codeBefore": "console.log(5 ",
           "codeAfter": " \"5\"); // true",
           "options": ["!=", "!==", "<>", "=/="],
@@ -1097,14 +1097,14 @@
             "!= приводит типы: 5 != \"5\" — false",
             null,
             "<> в JavaScript нет",
-            "Такого оператора нет"
+            "такого оператора нет"
           ],
           "explanation": "!== — строгое неравенство: число 5 и строка \"5\" разных типов, значит не равны."
         },
         {
           "id": "operators-02-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(null > 0);\nconsole.log(null == 0);\nconsole.log(null >= 0);",
           "options": [
             "false\nfalse\nfalse",
@@ -1117,22 +1117,22 @@
             null,
             null,
             "null > 0 — это 0 > 0, false",
-            "При == null не приводится к числу и равен только null и undefined"
+            "при == null не приводится к числу и равен только null и undefined"
           ],
-          "explanation": "В >, < и >= null приводится к 0: null > 0 — false, null >= 0 — true. А при == null равен только null и undefined, поэтому null == 0 — false."
+          "explanation": "в >, < и >= null приводится к 0: null > 0 — false, null >= 0 — true. а при == null равен только null и undefined, поэтому null == 0 — false."
         }
       ]
     },
     {
       "id": "operators-03",
       "topicId": "operators",
-      "title": "Логические операторы",
+      "title": "логические операторы",
       "order": 2,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "`&&` и `||` возвращают **один из операндов**, а не обязательно `true`/`false`. `||` возвращает первое truthy-значение, `&&` — первое falsy. Если такого нет — последний операнд."
+            "text": "`&&` и `||` возвращают **один из операндов**, а не обязательно `true`/`false`. `||` возвращает первое truthy-значение, `&&` — первое falsy. если такого нет — последний операнд."
           },
           {
             "type": "code",
@@ -1140,7 +1140,7 @@
           },
           {
             "type": "text",
-            "text": "`!` приводит значение к boolean и инвертирует его. Двойное `!!` просто приводит к boolean."
+            "text": "`!` приводит значение к boolean и инвертирует его. двойное `!!` просто приводит к boolean."
           },
           {
             "type": "code",
@@ -1148,7 +1148,7 @@
           },
           {
             "type": "tip",
-            "text": "Falsy-значения: `false`, `0`, `\"\"`, `null`, `undefined`, `NaN`. Всё остальное — truthy."
+            "text": "Falsy-значения: `false`, `0`, `\"\"`, `null`, `undefined`, `NaN`. всё остальное — truthy."
           }
         ]
       },
@@ -1156,16 +1156,16 @@
         {
           "id": "operators-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(true && false);",
           "options": ["true", "false", "null", "undefined"],
           "correct": 1,
-          "explanation": "&& возвращает первый falsy-операнд, а если его нет — последний. Здесь первый falsy — false."
+          "explanation": "&& возвращает первый falsy-операнд, а если его нет — последний. здесь первый falsy — false."
         },
         {
           "id": "operators-03-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(\"cat\" || \"dog\");",
           "options": ["true", "cat", "dog", "catdog"],
           "correct": 1,
@@ -1180,7 +1180,7 @@
         {
           "id": "operators-03-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(0 || \"default\");",
           "options": ["0", "false", "default", "null"],
           "correct": 2,
@@ -1195,7 +1195,7 @@
         {
           "id": "operators-03-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(!\"hello\");",
           "options": ["true", "false", "hello", "null"],
           "correct": 1,
@@ -1214,20 +1214,20 @@
           "code": "!!0 === false",
           "options": ["true", "false"],
           "correct": 0,
-          "explanation": "!0 = true (0 — falsy), а !true = false. Значит, !!0 === false — истина."
+          "explanation": "!0 = true (0 — falsy), а !true = false. значит, !!0 === false — истина."
         }
       ]
     },
     {
       "id": "operators-04",
       "topicId": "operators",
-      "title": "Операторы присваивания",
+      "title": "операторы присваивания",
       "order": 3,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Составные операторы сокращают запись: `x += 5` — то же, что `x = x + 5`. Так же работают `-=`, `*=`, `/=`, `%=` и `**=`."
+            "text": "составные операторы сокращают запись: `x += 5` — то же, что `x = x + 5`. так же работают `-=`, `*=`, `/=`, `%=` и `**=`."
           },
           {
             "type": "code",
@@ -1243,7 +1243,7 @@
           },
           {
             "type": "warning",
-            "text": "Порядок операций важен: из нуля `+= 1`, потом `*= 2` даёт `2`, а в обратном порядке — `1`."
+            "text": "порядок операций важен: из нуля `+= 1`, потом `*= 2` даёт `2`, а в обратном порядке — `1`."
           }
         ]
       },
@@ -1251,7 +1251,7 @@
         {
           "id": "operators-04-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 10;\nx += 5;\nconsole.log(x);",
           "options": ["5", "10", "15", "105"],
           "correct": 2,
@@ -1259,14 +1259,14 @@
             null,
             null,
             null,
-            "Оба операнда — числа, поэтому складываются, а не склеиваются"
+            "оба операнда — числа, поэтому складываются, а не склеиваются"
           ],
           "explanation": "+= увеличивает переменную на указанное значение: 10 + 5 = 15"
         },
         {
           "id": "operators-04-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let s = \"Hello\";\ns += \" World\";\nconsole.log(s);",
           "options": ["Hello", "World", "Hello World", "Error"],
           "correct": 2,
@@ -1275,7 +1275,7 @@
         {
           "id": "operators-04-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let n = 100;\nn ",
           "codeAfter": " 4;\nconsole.log(n); // 25",
           "options": ["*=", "/=", "-=", "%="],
@@ -1285,7 +1285,7 @@
         {
           "id": "operators-04-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let a = 5;\na **= 2;\nconsole.log(a);",
           "options": ["10", "25", "52", "Error"],
           "correct": 1,
@@ -1295,23 +1295,23 @@
         {
           "id": "operators-04-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": ["let count = 0;", "count += 1;", "count *= 2;", "console.log(count); // 2"],
           "shuffled": [3, 0, 2, 1],
-          "explanation": "Сначала инициализация, затем прибавляем 1 и удваиваем: (0 + 1) * 2 = 2. В обратном порядке получилось бы 0 * 2 + 1 = 1"
+          "explanation": "сначала инициализация, затем прибавляем 1 и удваиваем: (0 + 1) * 2 = 2. в обратном порядке получилось бы 0 * 2 + 1 = 1"
         }
       ]
     },
     {
       "id": "operators-05",
       "topicId": "operators",
-      "title": "Операторы: закрепление",
+      "title": "операторы: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "**Тернарный оператор** `условие ? a : b` возвращает `a`, если условие истинно, иначе `b`. Умножение выполняется раньше сложения — как в математике."
+            "text": "**тернарный оператор** `условие ? a : b` возвращает `a`, если условие истинно, иначе `b`. умножение выполняется раньше сложения — как в математике."
           },
           {
             "type": "code",
@@ -1319,7 +1319,7 @@
           },
           {
             "type": "text",
-            "text": "`??` возвращает правый операнд, только если левый — `null` или `undefined`. В отличие от `||`, он не заменяет `0` и `\"\"`."
+            "text": "`??` возвращает правый операнд, только если левый — `null` или `undefined`. в отличие от `||`, он не заменяет `0` и `\"\"`."
           },
           {
             "type": "code",
@@ -1327,7 +1327,7 @@
           },
           {
             "type": "warning",
-            "text": "`NaN` не равен даже самому себе: `NaN === NaN` — `false`. Проверяй через `Number.isNaN(x)`."
+            "text": "`NaN` не равен даже самому себе: `NaN === NaN` — `false`. проверяй через `Number.isNaN(x)`."
           }
         ]
       },
@@ -1335,26 +1335,26 @@
         {
           "id": "operators-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(5 > 3 ? \"yes\" : \"no\");",
           "options": ["yes", "no", "true", "false"],
           "correct": 0,
-          "explanation": "Тернарный оператор: условие ? еслиДа : еслиНет. 5 > 3 истинно, поэтому 'yes'."
+          "explanation": "тернарный оператор: условие ? еслида : еслинет. 5 > 3 истинно, поэтому 'yes'."
         },
         {
           "id": "operators-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let a = 2, b = 3;\nconsole.log(a + b * 2);",
           "options": ["10", "8", "7", "12"],
           "correct": 1,
           "optionExplanations": [
-            "Так было бы при (2 + 3) * 2, но умножение выполняется раньше сложения",
+            "так было бы при (2 + 3) * 2, но умножение выполняется раньше сложения",
             null,
             null,
             null
           ],
-          "explanation": "Умножение выполняется раньше сложения: 3 * 2 = 6, затем 2 + 6 = 8."
+          "explanation": "умножение выполняется раньше сложения: 3 * 2 = 6, затем 2 + 6 = 8."
         },
         {
           "id": "operators-05-q3",
@@ -1363,12 +1363,12 @@
           "code": "NaN === NaN",
           "options": ["true", "false"],
           "correct": 1,
-          "explanation": "NaN не равен ничему, даже самому себе. Для проверки используй Number.isNaN(x)."
+          "explanation": "NaN не равен ничему, даже самому себе. для проверки используй Number.isNaN(x)."
         },
         {
           "id": "operators-05-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let x = 0;\nconsole.log(x ",
           "codeAfter": " 5); // 0",
           "options": ["||", "+", "?:", "??"],
@@ -1376,20 +1376,20 @@
           "optionExplanations": [
             "0 — falsy, поэтому || вернёт 5",
             "0 + 5 = 5",
-            "Такого оператора в JavaScript нет",
+            "такого оператора в JavaScript нет",
             null
           ],
-          "explanation": "?? заменяет только null и undefined. 0 — обычное значение, поэтому x ?? 5 вернёт 0. А || счёл бы 0 ложным и вернул 5."
+          "explanation": "?? заменяет только null и undefined. 0 — обычное значение, поэтому x ?? 5 вернёт 0. а || счёл бы 0 ложным и вернул 5."
         },
         {
           "id": "operators-05-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "console.log(typeof (1 + \"1\"));",
           "options": ["number", "string", "Error", "boolean"],
           "correct": 1,
           "optionExplanations": [
-            "Если один операнд + строка, получается склейка, а не сложение",
+            "если один операнд + строка, получается склейка, а не сложение",
             null,
             null,
             null
