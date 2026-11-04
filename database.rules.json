@@ -7,18 +7,18 @@
       ".indexOn": ["xp"],
       "$uid": {
         ".write": "auth !== null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['nickname', 'xp', 'streak', 'updatedAt'])",
+        ".validate": "newData.hasChildren(['nickname', 'xp', 'streak', 'updatedAt']) && newData.getPriority() === null",
         "nickname": {
-          ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Za-zА-Яа-яЁё_.-][0-9A-Za-zА-Яа-яЁё_. -]{0,18}[0-9A-Za-zА-Яа-яЁё_.-]$/) && !(newData.val().matches(/[A-Za-z]/) && newData.val().matches(/[А-Яа-яЁё]/))"
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Za-zА-Яа-яЁё_.-][0-9A-Za-zА-Яа-яЁё_. -]{0,18}[0-9A-Za-zА-Яа-яЁё_.-]$/) && !(newData.val().matches(/[A-Za-z]/) && newData.val().matches(/[А-Яа-яЁё]/)) && newData.getPriority() === null"
         },
         "xp": {
-          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() && data.parent().child('updatedAt').isNumber() ? (newData.val() - data.val() <= (now - data.parent().child('updatedAt').val()) / 100 || (newData.val() - data.val() <= 1000 && now - data.parent().child('updatedAt').val() >= 60000)) : newData.val() <= 100000) && newData.getPriority() === null"
         },
         "streak": {
-          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && (newData.val() === 0 || newData.parent().child('xp').val() > 0) && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() <= data.val() + 1 + (now - data.parent().child('updatedAt').val()) / 86400000 : newData.val() <= 1 + (now - 1775001600000) / 86400000)"
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && (newData.val() === 0 || newData.parent().child('xp').val() > 0) && newData.val() <= 1 + (now - 1775001600000) / 86400000 && (!(data.exists() && data.parent().child('updatedAt').isNumber()) || newData.val() <= data.val() + 1 + (now - data.parent().child('updatedAt').val()) / 86400000) && newData.getPriority() === null"
         },
         "updatedAt": {
-          ".validate": "newData.isNumber() && newData.val() === now"
+          ".validate": "newData.isNumber() && newData.val() === now && newData.getPriority() === null"
         },
         "$other": {
           ".validate": false
@@ -31,24 +31,24 @@
         ".indexOn": ["weekXp"],
         "$uid": {
           ".write": "auth !== null && auth.uid === $uid",
-          ".validate": "newData.hasChildren(['nickname', 'xp', 'weekXp', 'week', 'streak', 'updatedAt']) && $week === newData.child('week').val() + ''",
+          ".validate": "newData.hasChildren(['nickname', 'xp', 'weekXp', 'week', 'streak', 'updatedAt']) && $week === newData.child('week').val() + '' && newData.getPriority() === null",
           "nickname": {
-            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('nickname').val()"
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('nickname').val() && newData.getPriority() === null"
           },
           "xp": {
-            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('xp').val()"
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('xp').val() && newData.getPriority() === null"
           },
           "streak": {
-            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('streak').val()"
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('streak').val() && newData.getPriority() === null"
           },
           "weekXp": {
-            ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() > 0 && newData.val() <= newData.parent().child('xp').val() && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
+            ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() > 0 && newData.val() <= newData.parent().child('xp').val() && (data.exists() && data.parent().child('updatedAt').isNumber() ? (newData.val() - data.val() <= (now - data.parent().child('updatedAt').val()) / 100 || (newData.val() - data.val() <= 1000 && now - data.parent().child('updatedAt').val() >= 60000)) : newData.val() <= 20000) && newData.getPriority() === null"
           },
           "week": {
-            ".validate": "newData.isNumber() && newData.val() % 7 === 4 && newData.val() * 86400000 > now - 8 * 86400000 && newData.val() * 86400000 < now + 86400000"
+            ".validate": "newData.isNumber() && newData.val() % 7 === 4 && newData.val() * 86400000 > now - 8 * 86400000 && newData.val() * 86400000 < now + 86400000 && newData.getPriority() === null"
           },
           "updatedAt": {
-            ".validate": "newData.isNumber() && newData.val() === now"
+            ".validate": "newData.isNumber() && newData.val() === now && newData.getPriority() === null"
           },
           "$other": {
             ".validate": false

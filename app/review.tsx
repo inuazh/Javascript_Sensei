@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Text } from 'react-native';
 import { getQuestion, questionExists } from '../src/content/repository';
@@ -12,10 +11,11 @@ import { ResultView } from '../src/features/results/ResultView';
 import { afterActivity } from '../src/services/activity';
 import { useUserStore } from '../src/stores/useUserStore';
 import { Button, Colors, Screen, Type } from '../src/ui';
+import { useGoBack } from '../src/hooks/useGoBack';
 
 /** Daily workout: spaced-repetition review of earlier questions. */
 export default function ReviewScreen() {
-  const router = useRouter();
+  const goBack = useGoBack();
   const completeWorkout = useUserStore(s => s.completeWorkout);
   const totalXp = useUserStore(s => s.progress.totalXp);
   const [outcome, setOutcome] = useState<WorkoutOutcome | null>(null);
@@ -45,7 +45,7 @@ export default function ReviewScreen() {
         }
         outcome={outcome}
         totalXp={totalXp}
-        primary={{ title: 'Готово', onPress: () => router.back() }}
+        primary={{ title: 'Готово', onPress: goBack }}
       />
     );
   }
@@ -55,7 +55,7 @@ export default function ReviewScreen() {
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>Пока нечего повторять</Text>
         <Text style={Type.small}>Пройди пару уроков — вопросы из них появятся в тренировке.</Text>
-        <Button title="Назад" onPress={() => router.back()} />
+        <Button title="Назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -70,7 +70,7 @@ export default function ReviewScreen() {
       items={plan.items}
       label="Тренировка"
       color={Colors.accent}
-      onExit={() => router.back()}
+      onExit={goBack}
       onFinish={finish}
     />
   );

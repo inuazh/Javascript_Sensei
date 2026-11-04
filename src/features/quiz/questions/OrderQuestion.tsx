@@ -152,6 +152,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     backgroundColor: Colors.codeBackground,
     borderColor: Colors.border,
+    // On the web a mouse drag would select the text, which cancels the pan gesture.
+    userSelect: 'none',
   },
   lineDragging: { borderColor: Colors.accent, backgroundColor: Colors.surfaceRaised },
   lineTarget: { borderColor: Colors.accent, borderStyle: 'dashed' },

@@ -238,3 +238,15 @@ test('reference: search the theory and open a lesson', async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`/lesson/${lesson.id}$`));
   await expect(page.getByRole('button', { name: /К практике/ })).toBeVisible();
 });
+
+test('the page CSP only lets the app talk to its own origin and Firebase', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
+  const result = await page.evaluate(() =>
+    fetch('https://example.com/csp-probe').then(
+      () => 'reached',
+      () => 'blocked',
+    ),
+  );
+  expect(result).toBe('blocked');
+});
