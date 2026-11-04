@@ -51,6 +51,7 @@ export interface ContentLesson {
   id: string;
   topicId: string;
   title: string;
+  theory?: { blocks: { type: string; text?: string; code?: string }[] };
   questions: ContentQuestion[];
 }
 

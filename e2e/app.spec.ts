@@ -2,6 +2,7 @@ import {
   answerQuiz,
   completeOnboarding,
   expect,
+  getLesson,
   getTopicTitle,
   leaveLessonResult,
   openNextLesson,
@@ -136,4 +137,104 @@ test('persisted v0 state is migrated on load', async ({ page }) => {
       page.evaluate(() => JSON.parse(localStorage.getItem('js-sensei-user') ?? '{}').version),
     )
     .toBe(1);
+});
+
+test('profile: statistics by section open the weakest topic', async ({ page }) => {
+  await page.addInitScript(() => {
+    const KEY = 'js-sensei-user';
+    if (localStorage.getItem(KEY)) return; // seed only before the first load
+    const iso = new Date().toISOString();
+    const lesson = (bestCorrect: number) => ({
+      bestCorrect,
+      total: 5,
+      stars: bestCorrect === 5 ? 3 : 1,
+      attempts: 1,
+      firstCompletedAt: iso,
+      lastCompletedAt: iso,
+    });
+    const item = (questionId: string, box: number, lapses: number) => ({
+      questionId,
+      lessonId: questionId.replace(/-q\d+$/, ''),
+      box,
+      due: '2099-01-01',
+      lapses,
+    });
+    localStorage.setItem(
+      KEY,
+      JSON.stringify({
+        version: 1,
+        state: {
+          settings: { onboarded: true, placementDone: true },
+          progress: {
+            totalXp: 120,
+            lessons: {
+              'variables-01': lesson(5),
+              'variables-02': lesson(5),
+              'data-types-01': lesson(4),
+              'event-loop-01': lesson(5),
+              'promises-01': lesson(3),
+            },
+            review: {
+              'variables-01-q1': item('variables-01-q1', 4, 0),
+              'promises-01-q2': item('promises-01-q2', 0, 2),
+              'promises-01-q3': item('promises-01-q3', 1, 1),
+            },
+          },
+        },
+      }),
+    );
+  });
+
+  await page.goto('/profile');
+
+  await expect(page.getByText('по разделам')).toBeVisible();
+  await expect(page.getByLabel('Сильнее всего: Основы, 93%')).toBeVisible();
+  await expect(page.getByText('ещё не начато: 8 разделов')).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /^Основы: пройдено 3 из 15 уроков, точность 93%/ }),
+  ).toBeVisible();
+  // Async: 8 of 10 answers right; promises (3/5) is the weakest topic.
+  const asyncRow = page.getByRole('button', {
+    name: /^Асинхронность: пройдено 2 из 15 уроков, точность 80%, в повторении 2, выучено 0, ошибок 3$/,
+  });
+  await asyncRow.click();
+  await expect(page).toHaveURL(/\/topic\/promises$/);
+
+  // Weak spots in the workout name their section.
+  await page.goto('/workout');
+  await expect(page.getByText('слабые места')).toBeVisible();
+  await expect(page.getByText('07 · асинхронность').first()).toBeVisible();
+});
+
+test('reference: search the theory and open a lesson', async ({ page }) => {
+  await completeOnboarding(page);
+
+  await page.getByRole('button', { name: /Справочник/ }).click();
+  await expect(page).toHaveURL(/\/reference$/);
+  const search = page.getByRole('textbox', { name: 'Поиск по теории' });
+  await search.fill('qwertyzzz');
+  await expect(page.getByText('Ничего не нашлось')).toBeVisible();
+
+  await search.fill('замыкани');
+  await expect(page.getByText(/^найдено: \d+ урок/)).toBeVisible();
+  // Lessons titled «Замыкания…» are ranked first.
+  const first = page
+    .getByRole('button', { name: /^Теория: / })
+    .filter({ visible: true })
+    .first();
+  await expect(first).toHaveAccessibleName(/^Теория: Замыкания/);
+  await first.click();
+
+  await expect(page).toHaveURL(/\/reference\/[\w-]+$/);
+  const lesson = getLesson(new URL(page.url()).pathname.split('/').pop()!);
+  expect(lesson.title).toMatch(/^Замыкания/);
+  const visible = (text: string) => page.getByText(text).filter({ visible: true }).first();
+  await expect(visible(lesson.title)).toBeVisible();
+  const text = lesson.theory!.blocks.find(b => b.type === 'text')!.text!;
+  await expect(visible(text.replace(/\*\*|`/g, '').slice(0, 40))).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Запустить код' }).first()).toBeVisible();
+
+  await page.getByRole('button', { name: 'Пройти урок' }).click();
+  await expect(page).toHaveURL(new RegExp(`/lesson/${lesson.id}$`));
+  await expect(page.getByRole('button', { name: /К практике/ })).toBeVisible();
 });

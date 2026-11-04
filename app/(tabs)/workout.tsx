@@ -1,13 +1,16 @@
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
-import { getQuestion } from '../../src/content/repository';
+import { getContentLookup, getQuestion } from '../../src/content/repository';
 import { plural } from '../../src/domain/reminders';
 import { BOX_INTERVALS, dueItems, weakItems } from '../../src/domain/review';
 import { XP } from '../../src/domain/rewards';
+import { placeOf } from '../../src/domain/stats';
 import { questionPreview } from '../../src/features/quiz/registry';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { Button, Card, Colors, Fonts, Icon, Label, Screen, Spacing, Type } from '../../src/ui';
+
+const pad = (n: number) => String(n).padStart(2, '0');
 
 function Stat({ value, label }: { value: number; label: string }) {
   return (
@@ -84,9 +87,20 @@ export default function WorkoutTab() {
           {weak.map(item => {
             const found = getQuestion(item.questionId);
             if (!found) return null;
+            const place = placeOf(getContentLookup(), item);
             return (
-              <View key={item.questionId} style={styles.weak}>
+              <View
+                key={item.questionId}
+                accessible
+                accessibilityLabel={`${place ? `Раздел «${place.sectionTitle}», ` : ''}урок «${found.lesson.title}»: ${questionPreview(found.question)}. Ошибок: ${item.lapses}`}
+                style={styles.weak}
+              >
                 <View style={styles.flex}>
+                  {place && (
+                    <Text style={styles.section} numberOfLines={1}>
+                      {pad(place.sectionNumber)} · {place.sectionTitle.toLowerCase()}
+                    </Text>
+                  )}
                   <Text style={styles.weakTitle}>{found.lesson.title}</Text>
                   <Text style={styles.preview} numberOfLines={1}>
                     {questionPreview(found.question)}
@@ -136,6 +150,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   flex: { flex: 1 },
+  section: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginBottom: 2 },
   weakTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: Colors.textPrimary },
   preview: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted, marginTop: 2 },
   lapses: { flexDirection: 'row', alignItems: 'center', gap: 2 },

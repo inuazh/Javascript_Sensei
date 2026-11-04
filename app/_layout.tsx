@@ -77,6 +77,8 @@ export default function RootLayout() {
           options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
         />
         <Stack.Screen name="topic/[topicId]" />
+        <Stack.Screen name="reference/index" />
+        <Stack.Screen name="reference/[lessonId]" />
         <Stack.Screen name="placement" options={{ gestureEnabled: false }} />
         <Stack.Screen name="settings" />
         <Stack.Screen name="privacy-policy" />
