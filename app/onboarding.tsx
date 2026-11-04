@@ -1,6 +1,8 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { BackHandler, StyleSheet, Text, View } from 'react-native';
+import { getLevelPlacement } from '../src/content/repository';
+import { PLACEMENT_MINUTES } from '../src/domain/placement';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ExperienceLevel } from '../src/stores/useUserStore';
 import {
@@ -16,14 +18,27 @@ import {
   Type,
 } from '../src/ui';
 
-const LEVELS: { id: ExperienceLevel; title: string; subtitle: string; icon: IconName }[] = [
+type Choice = ExperienceLevel | 'test';
+
+const startsWith = (level: ExperienceLevel) => {
+  const title = getLevelPlacement(level).startSection?.title;
+  return title ? `Начнёшь с раздела «${title}»` : '';
+};
+
+const CHOICES: { id: Choice; title: string; subtitle: string; icon: IconName }[] = [
   { id: 'beginner', title: 'Новичок', subtitle: 'Начинаю с нуля', icon: 'sprout' },
-  { id: 'intermediate', title: 'Знаю основы', subtitle: 'Писал немного кода', icon: 'rocket' },
   {
-    id: 'advanced',
-    title: 'Есть опыт',
-    subtitle: 'Хочу закрыть пробелы и подготовиться к собеседованию',
-    icon: 'cpu',
+    id: 'intermediate',
+    title: 'Знаю основы',
+    subtitle: startsWith('intermediate'),
+    icon: 'rocket',
+  },
+  { id: 'advanced', title: 'Есть опыт', subtitle: startsWith('advanced'), icon: 'cpu' },
+  {
+    id: 'test',
+    title: 'Не уверен',
+    subtitle: `Пройти тест — займёт около ${PLACEMENT_MINUTES}\u00a0минут`,
+    icon: 'compass',
   },
 ];
 
@@ -31,8 +46,9 @@ const STEPS = 4;
 
 export default function OnboardingScreen() {
   const updateSettings = useUserStore(s => s.updateSettings);
+  const applyPlacement = useUserStore(s => s.applyPlacement);
   const [step, setStep] = useState(0);
-  const [experience, setExperience] = useState<ExperienceLevel>('beginner');
+  const [choice, setChoice] = useState<Choice>('beginner');
   const [goal, setGoal] = useState<number>(DAILY_GOALS[0].xp);
   const [time, setTime] = useState({ hour: 19, minute: 0 });
 
@@ -49,9 +65,18 @@ export default function OnboardingScreen() {
   const finish = async (withReminder: boolean) => {
     const enabled = withReminder && (await requestNotificationPermission());
     const reminder = { enabled, ...time };
+    // Someone unsure of their level takes the test; the level only matters until then.
+    const experience: ExperienceLevel = choice === 'test' ? 'intermediate' : choice;
     updateSettings({ onboarded: true, experience, dailyGoalXp: goal, reminder });
+    if (choice === 'test') {
+      syncReminders(reminder, useUserStore.getState().progress);
+      router.replace({ pathname: '/placement', params: { start: '1' } });
+      return;
+    }
+    const { lessonIds } = getLevelPlacement(choice);
+    if (lessonIds.length > 0) applyPlacement(lessonIds);
     syncReminders(reminder, useUserStore.getState().progress);
-    router.replace(experience === 'beginner' ? '/(tabs)' : '/placement');
+    router.replace('/(tabs)');
   };
 
   const dots = (
@@ -101,16 +126,17 @@ export default function OnboardingScreen() {
       >
         {dots}
         <Text style={Type.h1}>Какой у тебя опыт?</Text>
-        {LEVELS.map(l => (
+        {CHOICES.map(c => (
           <OptionCard
-            key={l.id}
-            icon={l.icon}
-            title={l.title}
-            subtitle={l.subtitle}
-            selected={experience === l.id}
-            onPress={() => setExperience(l.id)}
+            key={c.id}
+            icon={c.icon}
+            title={c.title}
+            subtitle={c.subtitle}
+            selected={choice === c.id}
+            onPress={() => setChoice(c.id)}
           />
         ))}
+        <Text style={Type.small}>Пропущенные разделы можно пройти в любой момент.</Text>
       </Screen>
     );
   }

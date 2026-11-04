@@ -5,6 +5,8 @@
  */
 import { SECTION_FILES, loadSectionDefs } from '../../content';
 import { pickDailyQuestionId } from '../domain/daily';
+import { LEVEL_SKIPS } from '../domain/placement';
+import type { ExperienceLevel } from '../domain/settings';
 import type { DayKey } from '../domain/dates';
 import type { ContentIndex } from '../domain/progress';
 import { buildContentLookup, type ContentLookup, type StatsContent } from '../domain/stats';
@@ -158,4 +160,16 @@ export function getDailyQuestion(day: DayKey): { question: Question; lesson: Les
   );
   const id = pickDailyQuestionId(candidates, day);
   return id ? getQuestion(id) : undefined;
+}
+
+/** Lessons a self-assessed level marks as known, and the section the learner then starts with. */
+export function getLevelPlacement(level: ExperienceLevel): {
+  lessonIds: string[];
+  startSection: SectionDef | undefined;
+} {
+  const skipped = new Set(LEVEL_SKIPS[level]);
+  return {
+    lessonIds: [...skipped].flatMap(id => getSectionLessons(id).map(l => l.id)),
+    startSection: getSections().find(s => !skipped.has(s.id)),
+  };
 }

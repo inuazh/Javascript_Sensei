@@ -12,6 +12,7 @@ import {
 } from '../../src/content/repository';
 import { dailyNumber, dailyStreak } from '../../src/domain/daily';
 import { todayActivity } from '../../src/domain/progress';
+import { PLACEMENT_MINUTES } from '../../src/domain/placement';
 import { plural } from '../../src/domain/reminders';
 import { countDue } from '../../src/domain/review';
 import { viewStreak } from '../../src/domain/streak';
@@ -246,7 +247,7 @@ export default function HomeScreen() {
         <ActionRow
           icon="compass"
           title="Уже знаешь основы?"
-          subtitle="Вводный тест засчитает знакомые темы"
+          subtitle={`Тест на ${PLACEMENT_MINUTES}\u00a0минут засчитает то, что ты уже знаешь`}
           onPress={() => router.push('/placement')}
         />
       )}

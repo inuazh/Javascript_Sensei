@@ -102,7 +102,7 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // ---------------------------------------------------------------- flows
 
-export type Experience = 'Новичок' | 'Знаю основы' | 'Есть опыт';
+export type Experience = 'Новичок' | 'Знаю основы' | 'Есть опыт' | 'Не уверен';
 
 /** Goes through onboarding from the welcome screen, declining reminders. */
 export async function completeOnboarding(page: Page, experience: Experience = 'Новичок') {

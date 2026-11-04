@@ -72,18 +72,24 @@ test('review: mistakes come back in the workout', async ({ page }) => {
   await expect(page.getByText('тренировок')).toBeVisible();
 });
 
-test('placement: experienced user can skip the test', async ({ page }) => {
+test('onboarding: an experienced user skips the basic sections without a test', async ({
+  page,
+}) => {
   await completeOnboarding(page, 'Есть опыт');
 
-  await expect(page).toHaveURL(/\/placement$/);
-  await expect(page.getByText('Вводный тест')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Пройти тест/ })).toBeVisible();
-
-  await page.getByRole('button', { name: 'Начать с первого урока' }).click();
   await expect(page).toHaveURL(/\/$/);
   await expect(startLessonButton(page)).toBeVisible();
-  // Declined placement is remembered, so home does not offer it again.
+  // The course continues after the skipped sections, and no test is offered.
+  await expect(page.getByText('Функциональный стиль').first()).toBeVisible();
   await expect(page.getByText('Уже знаешь основы?')).toHaveCount(0);
+});
+
+test('onboarding: an unsure user goes straight into the placement test', async ({ page }) => {
+  await completeOnboarding(page, 'Не уверен');
+
+  await expect(page).toHaveURL(/\/placement/);
+  await expect(page.getByText('вводный тест')).toBeVisible();
+  await expect(page.getByText(/^1\/14$/)).toBeVisible();
 });
 
 test('persisted v0 state is migrated on load', async ({ page }) => {

@@ -1,9 +1,14 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { getSections, getTopicLessons } from '../src/content/repository';
+import { getSectionLessons, getSections } from '../src/content/repository';
 import type { Question } from '../src/content/schema';
-import { passedTopics, planPlacement, shouldStopPlacement } from '../src/domain/placement';
+import {
+  PLACEMENT_MINUTES,
+  passedUnits,
+  planPlacement,
+  shouldStopPlacement,
+} from '../src/domain/placement';
 import { plural } from '../src/domain/reminders';
 import { QuizSession } from '../src/features/quiz/QuizSession';
 import type { QuizAnswer } from '../src/features/quiz/quizReducer';
@@ -12,30 +17,24 @@ import { Button, Colors, Fonts, Icon, Radius, Screen, Spacing, Type } from '../s
 
 type Phase = 'intro' | 'quiz' | 'result';
 
-/** Placement test: marks topics the learner already knows as done. */
+/** Placement test: marks sections the learner already knows as done. */
 export default function PlacementScreen() {
   const router = useRouter();
+  // Onboarding already explained the test, so it starts right away from there.
+  const { start } = useLocalSearchParams<{ start?: string }>();
   const applyPlacement = useUserStore(s => s.applyPlacement);
   const updateSettings = useUserStore(s => s.updateSettings);
-  const [phase, setPhase] = useState<Phase>('intro');
+  const [phase, setPhase] = useState<Phase>(start === '1' ? 'quiz' : 'intro');
   const [passed, setPassed] = useState<string[]>([]);
 
   const items = useMemo(
     () =>
       planPlacement<Question>(
-        getSections().flatMap(section =>
-          section.topics.map(topic => ({
-            topicId: topic.id,
-            lessons: getTopicLessons(topic.id),
-          })),
-        ),
+        getSections().map(section => ({ id: section.id, lessons: getSectionLessons(section.id) })),
       ),
     [],
   );
-  const topicTitles = useMemo(
-    () => new Map(getSections().flatMap(s => s.topics.map(t => [t.id, t.title] as const))),
-    [],
-  );
+  const sectionTitles = useMemo(() => new Map(getSections().map(s => [s.id, s.title])), []);
 
   const leave = () => router.replace('/(tabs)');
   const decline = () => {
@@ -60,11 +59,14 @@ export default function PlacementScreen() {
         </View>
         <Text style={Type.h1}>Вводный тест</Text>
         <Text style={[Type.body, styles.muted]}>
-          По одному вопросу на тему. Темы, где ответишь верно, засчитаются, и ты начнёшь с того,
-          чего ещё не знаешь. Займёт пару минут — тест закончится сам, если вопросы станут слишком
-          сложными.
+          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. Займёт около ${PLACEMENT_MINUTES}\u00a0минут.`}
         </Text>
-        <Text style={Type.small}>Засчитанные темы можно пройти позже — за них тоже дадут XP.</Text>
+        <Text style={[Type.body, styles.muted]}>
+          Ответишь верно — раздел засчитается, и ты начнёшь с того, чего ещё не знаешь.
+        </Text>
+        <Text style={Type.small}>
+          Засчитанные разделы можно пройти позже — за них тоже дадут XP.
+        </Text>
       </Screen>
     );
   }
@@ -82,18 +84,18 @@ export default function PlacementScreen() {
         <Text style={styles.score}>{`${passed.length}/${items.length}`}</Text>
         <Text style={Type.h1}>
           {passed.length > 0
-            ? `${plural(passed.length, 'Засчитана', 'Засчитаны', 'Засчитано')} ${passed.length} ${plural(passed.length, 'тема', 'темы', 'тем')}`
+            ? `${plural(passed.length, 'Засчитан', 'Засчитаны', 'Засчитано')} ${passed.length} ${plural(passed.length, 'раздел', 'раздела', 'разделов')}`
             : 'Начнём с основ'}
         </Text>
         <Text style={Type.small}>
           {passed.length > 0
-            ? 'Эти темы отмечены как знакомые. Курс продолжится с первой незнакомой.'
+            ? 'Эти разделы отмечены как знакомые. Курс продолжится с первого незнакомого.'
             : 'Ничего страшного: основы быстро пролетят, а повторения закрепят знания.'}
         </Text>
-        {passed.map(topicId => (
-          <View key={topicId} style={styles.row}>
+        {passed.map(sectionId => (
+          <View key={sectionId} style={styles.row}>
             <Icon name="check" size={16} color={Colors.success} />
-            <Text style={Type.h3}>{topicTitles.get(topicId)}</Text>
+            <Text style={Type.h3}>{sectionTitles.get(sectionId)}</Text>
           </View>
         ))}
       </Screen>
@@ -101,10 +103,10 @@ export default function PlacementScreen() {
   }
 
   const finish = (answers: QuizAnswer[]) => {
-    const topics = passedTopics(items, answers);
-    const lessonIds = topics.flatMap(t => getTopicLessons(t).map(l => l.id));
+    const sections = passedUnits(items, answers);
+    const lessonIds = sections.flatMap(id => getSectionLessons(id).map(l => l.id));
     applyPlacement(lessonIds);
-    setPassed(topics);
+    setPassed(sections);
     setPhase('result');
   };
 
@@ -112,7 +114,6 @@ export default function PlacementScreen() {
     <QuizSession
       items={items.map(i => ({ question: i.question, lessonId: i.lessonId }))}
       label="Вводный тест"
-      color={Colors.accent}
       onExit={decline}
       onFinish={finish}
       shouldStop={shouldStopPlacement}

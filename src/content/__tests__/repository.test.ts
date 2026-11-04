@@ -1,5 +1,12 @@
 import { planWorkout } from '../../domain/review';
-import { getDailyQuestion, getQuestion, questionExists } from '../repository';
+import { LEVEL_SKIPS } from '../../domain/placement';
+import {
+  getDailyQuestion,
+  getLevelPlacement,
+  getQuestion,
+  getSection,
+  questionExists,
+} from '../repository';
 
 describe('content repository', () => {
   it('knows which questions exist in the bundled content', () => {
@@ -27,5 +34,16 @@ describe('content repository', () => {
     const daily = getDailyQuestion('2026-11-04');
     expect(daily?.question.type).toBe('output');
     expect(getQuestion(daily!.question.id)).toBe(daily);
+  });
+
+  it('levels skip real sections and leave the rest of the course', () => {
+    for (const level of ['intermediate', 'advanced'] as const) {
+      for (const id of LEVEL_SKIPS[level]) expect(getSection(id)).toBeDefined();
+      const { lessonIds, startSection } = getLevelPlacement(level);
+      expect(lessonIds.length).toBeGreaterThan(0);
+      expect(startSection).toBeDefined();
+      expect(LEVEL_SKIPS[level]).not.toContain(startSection!.id);
+    }
+    expect(getLevelPlacement('beginner').lessonIds).toEqual([]);
   });
 });
