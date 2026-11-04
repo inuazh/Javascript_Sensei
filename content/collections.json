@@ -508,9 +508,9 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const user = { name: \"Alice\", age: 25 };\nconsole.log(user.name);",
-          "options": ["user", "\"Alice\"", "Alice", "undefined"],
+          "options": ["user", "name", "Alice", "undefined"],
           "correct": 2,
-          "optionExplanations": [null, "console.log выводит строку без кавычек", null, null],
+          "optionExplanations": [null, "Выводится значение свойства, а не его имя", null, null],
           "explanation": "Точечная нотация для доступа к свойству объекта"
         },
         {
@@ -518,12 +518,12 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const key = \"color\";\nconst obj = { [key]: \"red\" };\nconsole.log(obj.color);",
-          "options": ["key", "undefined", "\"red\"", "red"],
+          "options": ["key", "undefined", "Error", "red"],
           "correct": 3,
           "optionExplanations": [
             "В квадратных скобках подставляется значение переменной key, а не её имя",
             null,
-            "console.log выводит строку без кавычек",
+            "Квадратные скобки в литерале объекта — допустимая запись: это вычисляемый ключ",
             null
           ],
           "explanation": "[key] — вычисляемое свойство: именем свойства становится значение переменной key, то есть \"color\"."
@@ -599,7 +599,7 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const obj = { a: 1, b: 2, c: 3 };\nconsole.log(Object.values(obj));",
-          "options": ["['a', 'b', 'c']", "[1, 2, 3]", "3", "Error"],
+          "options": ["[\"a\", \"b\", \"c\"]", "[1, 2, 3]", "3", "Error"],
           "correct": 1,
           "optionExplanations": ["Ключи вернул бы Object.keys", null, null, null],
           "explanation": "Object.values() возвращает массив значений объекта"
@@ -640,7 +640,7 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const obj = { a: 1, b: 2 };\nconst entries = Object.entries(obj);\nconsole.log(entries[0]);",
-          "options": ["\"a\"", "1", "[\"a\", 1]", "[1, \"a\"]"],
+          "options": ["a", "1", "[\"a\", 1]", "[1, \"a\"]"],
           "correct": 2,
           "optionExplanations": [
             "entries возвращает пары, а не только ключи",
@@ -1074,12 +1074,12 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const s = new Set([\"a\", \"b\", \"c\"]);\nlet result = \"\";\nfor (const v of s) {\n  result += v;\n}\nconsole.log(result);",
-          "options": ["abc", "c", "[a, b, c]", "Error"],
+          "options": ["abc", "c", "[\"a\", \"b\", \"c\"]", "Error"],
           "correct": 0,
           "optionExplanations": [
             null,
             "+= дописывает к строке, а не заменяет её — иначе осталось бы только последнее значение",
-            null,
+            "result — строка: += дописывает к ней символы, а не собирает массив",
             null
           ],
           "explanation": "Set итерируемый; for...of перебирает все элементы в порядке добавления"
@@ -1164,9 +1164,14 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const m = new Map();\nm.set(\"name\", \"Alice\");\nconsole.log(m.get(\"name\"));",
-          "options": ["undefined", "\"Alice\"", "Alice", "Error"],
+          "options": ["undefined", "name", "Alice", "Error"],
           "correct": 2,
-          "optionExplanations": [null, "console.log выводит строку без кавычек", null, null],
+          "optionExplanations": [
+            null,
+            "get возвращает значение по ключу, а не сам ключ",
+            null,
+            null
+          ],
           "explanation": ".set() записывает пару ключ-значение, .get() возвращает значение по ключу"
         },
         {
@@ -1255,18 +1260,29 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const m = new Map([[\"x\", 10], [\"y\", 20]]);\nfor (const [k, v] of m) {\n  console.log(k, v);\n}",
-          "options": ["x y", "10 20", "x 10 y 20", "Error"],
+          "options": ["x\ny", "10\n20", "x 10\ny 20", "Error"],
           "correct": 2,
-          "explanation": "for...of по Map даёт пары [key, value], деструктуризуемые в k и v"
+          "explanation": "for...of по Map даёт пары [ключ, значение], и они раскладываются в k и v. console.log(k, v) печатает пару в одну строку, а пар две.",
+          "optionExplanations": [
+            "console.log(k, v) получает два аргумента и выводит в строке и ключ, и значение",
+            "console.log(k, v) получает два аргумента и выводит в строке и ключ, и значение",
+            null,
+            "Map перебираемый, for...of по нему работает"
+          ]
         },
         {
           "id": "set-map-04-q2",
           "type": "output",
           "title": "Что выведет код?",
           "code": "const m = new Map([[\"a\", 1], [\"b\", 2]]);\nconsole.log([...m.keys()]);",
-          "options": ["[1, 2]", "[\"a\", \"b\"]", "Map", "Error"],
+          "options": ["[1, 2]", "[\"a\", \"b\"]", "[[\"a\", 1], [\"b\", 2]]", "Error"],
           "correct": 1,
-          "optionExplanations": ["Значения вернул бы values()", null, null, null],
+          "optionExplanations": [
+            "Значения вернул бы values()",
+            null,
+            "Пары [ключ, значение] вернул бы entries(), а keys() даёт только ключи",
+            null
+          ],
           "explanation": ".keys() возвращает итератор ключей; spread конвертирует в массив"
         },
         {
@@ -1290,7 +1306,7 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const obj = { a: 1, b: 2 };\nconst m = new Map(Object.entries(obj));\nconsole.log(m.get(\"a\"));",
-          "options": ["undefined", "\"a\"", "1", "Error"],
+          "options": ["undefined", "a", "1", "Error"],
           "correct": 2,
           "optionExplanations": [null, "\"a\" — ключ, а get возвращает значение", null, null],
           "explanation": "Object.entries() даёт пары [[\"a\", 1], [\"b\", 2]], из них создаётся Map, и get(\"a\") возвращает 1."

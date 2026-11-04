@@ -233,7 +233,7 @@
           "options": ["then", "?", "if", ":"],
           "correct": 1,
           "optionExplanations": [
-            "then в JavaScript нет — условие от вариантов отделяет ?",
+            "then в JavaScript нет — условие от двух значений отделяет ?",
             null,
             "if — это инструкция, внутри выражения его не написать",
             "Двоеточие разделяет два варианта, а перед ними нужен ?"
@@ -256,7 +256,7 @@
           "code": "let x = true ? false : true;\nconsole.log(x);",
           "options": ["Выведет true", "Выведет false"],
           "correct": 1,
-          "optionExplanations": ["Условие true выбирает первый вариант — а это false", null],
+          "optionExplanations": ["Условие true выбирает значение до двоеточия — а это false", null],
           "explanation": "Условие true, значит возвращается значение до двоеточия — false."
         },
         {
@@ -766,12 +766,12 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const arr = [10, 20, 30];\nfor (const val of arr) {\n  console.log(val);\n}",
-          "options": ["0 1 2", "10 20 30", "arr[0] arr[1]", "Error"],
+          "options": ["0 1 2", "10 20 30", "[10, 20, 30]", "Error"],
           "correct": 1,
           "optionExplanations": [
             "Индексы дал бы for...in, а for...of даёт значения",
             null,
-            null,
+            "val — каждый элемент по очереди, а не весь массив: console.log вызывается три раза",
             null
           ],
           "explanation": "for...of перебирает значения итерируемого объекта"
@@ -913,13 +913,13 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "outer: for (let i = 0; i < 3; i++) {\n  for (let j = 0; j < 3; j++) {\n    if (j === 1) break outer;\n    console.log(i, j);\n  }\n}",
-          "options": ["0 0 0 1 0 2", "0 0", "0 0 1 0 2 0", "Error"],
+          "options": ["0 0\n1 0\n2 0", "0 0", "Ничего", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Так было бы с break без метки — он прервал бы только внутренний цикл",
+            "Так было бы с break без метки: он прервал бы только внутренний цикл, а внешний пошёл бы дальше",
             null,
-            null,
-            null
+            "break outer срабатывает только при j === 1, а при j = 0 вывод успевает выполниться",
+            "Метка перед циклом — допустимый синтаксис, break outer к ней и обращается"
           ],
           "explanation": "break outer прерывает сразу внешний цикл с меткой outer. Успевает выполниться только вывод 0 0."
         },
@@ -1172,9 +1172,14 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "const add = (a, b) => a + b;\nconsole.log(add(3, 5));",
-          "options": ["35", "8", "ab", "Error"],
+          "options": ["35", "8", "undefined", "Error"],
           "correct": 1,
-          "optionExplanations": ["Оба аргумента — числа, они складываются", null, null, null],
+          "optionExplanations": [
+            "Оба аргумента — числа, они складываются",
+            null,
+            "Без фигурных скобок стрелка сама возвращает результат выражения, return не нужен",
+            null
+          ],
           "explanation": "Тело стрелочной функции без фигурных скобок — выражение, и его результат возвращается автоматически: 3 + 5 = 8."
         },
         {

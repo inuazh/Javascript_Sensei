@@ -580,13 +580,13 @@
           "type": "fill",
           "codeBefore": "const re = ",
           "codeAfter": ";\nconsole.log(re.test(\"I love JS\")); // true",
-          "options": ["/JS/", "\"JS\"", "/js/", "/JS /"],
+          "options": ["/JS/", "\"JS\"", "/js/", "JS"],
           "correct": 0,
           "optionExplanations": [
             null,
             "У строк нет метода test: будет TypeError",
             "Без флага i регистр важен, в строке JS большими буквами",
-            "После JS в строке нет пробела, это её конец"
+            "Без слешей JS — это имя переменной, а такой переменной нет: ReferenceError"
           ],
           "explanation": "Регулярку записывают между слешами. Шаблон /JS/ совпадает с концом строки \"I love JS\"."
         },
@@ -1162,7 +1162,7 @@
           "id": "regex-practice-02-q2",
           "type": "output",
           "code": "const text = \"a1 b2 c3\";\nfor (const m of text.matchAll(/([a-z])(\\d)/g)) {\n  console.log(m[2]);\n}",
-          "options": ["1 2 3", "a b c", "a1 b2 c3", "1"],
+          "options": ["1\n2\n3", "a\nb\nc", "a1\nb2\nc3", "1"],
           "correct": 0,
           "optionExplanations": [
             null,

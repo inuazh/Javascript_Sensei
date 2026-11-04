@@ -217,8 +217,8 @@
           "correct": 2,
           "optionExplanations": [
             "Объявление поднимается, а присваивание = 5 — нет: оно выполнится позже",
+            "У var обращение до объявления не падает: переменная уже есть, просто в ней пока undefined",
             null,
-            "У var обращения до объявления не падают",
             null
           ],
           "explanation": "Объявление var поднимается в начало, а присваивание остаётся на своём месте. На момент console.log переменная уже есть, но в ней undefined."
@@ -324,7 +324,13 @@
           "code": "let firstName = \"Anna\";\nlet lastName = \"Smith\";\nconsole.log(firstName + \" \" + lastName);",
           "options": ["firstName lastName", "Anna Smith", "AnnaSmith", "Error"],
           "correct": 1,
-          "explanation": "Выводятся значения переменных, а не их имена. Между ними явно добавлен пробел \" \"."
+          "explanation": "Выводятся значения переменных, а не их имена. Между ними явно добавлен пробел \" \".",
+          "optionExplanations": [
+            "Выводятся значения переменных, а не их имена",
+            null,
+            "Между переменными явно вставлена строка с пробелом \" \"",
+            null
+          ]
         },
         {
           "id": "variables-04-q4",
@@ -432,13 +438,13 @@
           "title": "Заполни пропуск",
           "codeBefore": "let total = 100;\ntotal ",
           "codeAfter": " 20;\nconsole.log(total); // 80",
-          "options": ["= -", "-=", "+ =", "remove"],
+          "options": ["= -", "-=", "+ =", "-"],
           "correct": 1,
           "optionExplanations": [
             "Это total = -20: переменной присваивается минус 20",
             null,
             "Пробел внутри оператора недопустим",
-            null
+            "total - 20 вычисляет 80, но никуда не сохраняет: total остаётся 100"
           ],
           "explanation": "-= вычитает значение из переменной и сохраняет результат: total = total - 20 = 80."
         },
@@ -530,16 +536,28 @@
           "codeAfter": " true);",
           "options": ["type", "typeOf", "typeof", "getType"],
           "correct": 2,
-          "explanation": "typeof — оператор, а не функция: пишется слитно, со строчной o, скобки не нужны."
+          "explanation": "typeof — оператор, а не функция: пишется слитно, со строчной o, скобки не нужны.",
+          "optionExplanations": [
+            "Оператор называется typeof",
+            "JavaScript различает регистр: оператор пишется typeof, со строчной o",
+            null,
+            "Такой функции в JavaScript нет"
+          ]
         },
         {
           "id": "data-types-01-q5",
           "type": "output",
           "title": "Что выведет код?",
           "code": "console.log(typeof undefined);",
-          "options": ["null", "void", "undefined", "nothing"],
+          "options": ["null", "void", "undefined", "object"],
           "correct": 2,
-          "explanation": "typeof undefined возвращает строку 'undefined'."
+          "explanation": "typeof undefined возвращает строку 'undefined'.",
+          "optionExplanations": [
+            null,
+            null,
+            null,
+            "\"object\" typeof возвращает для null, а для undefined — \"undefined\""
+          ]
         }
       ]
     },
@@ -618,7 +636,7 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "console.log(\"abc\".includes(\"b\"));",
-          "options": ["1", "\"b\"", "false", "true"],
+          "options": ["1", "b", "false", "true"],
           "correct": 3,
           "optionExplanations": [
             "includes возвращает boolean, а не позицию — позицию даёт indexOf",
@@ -708,10 +726,16 @@
           "id": "data-types-03-q4",
           "type": "output",
           "title": "Что выведет код?",
-          "code": "console.log(Number(\"42\"));",
-          "options": ["\"42\"", "42", "NaN", "Error"],
+          "code": "console.log(Number(\"42\") + 8);",
+          "options": ["428", "50", "NaN", "Error"],
           "correct": 1,
-          "explanation": "Number() конвертирует строку в число, если строка содержит число"
+          "explanation": "Number() превращает строку из цифр в число 42, и + складывает два числа: 42 + 8 = 50.",
+          "optionExplanations": [
+            "Number уже превратил строку в число, поэтому + складывает, а не склеивает",
+            null,
+            "Строка \"42\" целиком состоит из цифр, Number превращает её в 42",
+            "Number не бросает ошибок: в худшем случае он вернёт NaN"
+          ]
         },
         {
           "id": "data-types-03-q5",
@@ -1083,10 +1107,10 @@
           "title": "Что выведет код?",
           "code": "console.log(null > 0);\nconsole.log(null == 0);\nconsole.log(null >= 0);",
           "options": [
-            "false, false, false",
-            "false, false, true",
-            "true, false, true",
-            "false, true, false"
+            "false\nfalse\nfalse",
+            "false\nfalse\ntrue",
+            "true\nfalse\ntrue",
+            "false\ntrue\nfalse"
           ],
           "correct": 1,
           "optionExplanations": [
@@ -1173,9 +1197,15 @@
           "type": "output",
           "title": "Что выведет код?",
           "code": "console.log(!\"hello\");",
-          "options": ["true", "false", "\"hello\"", "null"],
+          "options": ["true", "false", "hello", "null"],
           "correct": 1,
-          "explanation": "! приводит значение к boolean и инвертирует: 'hello' — truthy, значит !'hello' = false."
+          "explanation": "! приводит значение к boolean и инвертирует: 'hello' — truthy, значит !'hello' = false.",
+          "optionExplanations": [
+            null,
+            null,
+            "! всегда возвращает true или false, а не сам операнд",
+            null
+          ]
         },
         {
           "id": "operators-03-q5",
