@@ -1138,6 +1138,14 @@
           ],
           "shuffled": [2, 4, 0, 3, 1],
           "explanation": "Сначала копируем массив, потом добавляем элемент в копию и возвращаем её. Исходный cart не меняется."
+        },
+        {
+          "id": "common-bugs-01-q6",
+          "type": "findBug",
+          "code": "const steps = [\"старт\", \"середина\", \"финиш\"];\nconst backwards = steps.reverse();\nconsole.log(backwards.join(\" → \")); // ждём финиш → середина → старт\nconsole.log(steps[0]); // ждём старт",
+          "bugLine": 2,
+          "fixed": "const steps = [\"старт\", \"середина\", \"финиш\"];\nconst backwards = [...steps].reverse();\nconsole.log(backwards.join(\" → \")); // финиш → середина → старт\nconsole.log(steps[0]); // старт",
+          "explanation": "`reverse`, как и `sort`, переворачивает исходный массив и возвращает его же, поэтому steps тоже стал задом наперёд и `steps[0]` — «финиш». Переворачивай копию: `[...steps].reverse()` или `steps.toReversed()`."
         }
       ]
     },
@@ -1236,6 +1244,14 @@
           "correct": 0,
           "optionExplanations": [null, "== считает null и undefined равными друг другу"],
           "explanation": "Особое правило: null == undefined истинно. Но типы у них разные, поэтому === даёт false."
+        },
+        {
+          "id": "common-bugs-02-q6",
+          "type": "findBug",
+          "code": "function describeQty(qty) {\n  if (qty == \"\") return \"не указано\";\n  return \"штук: \" + qty;\n}\nconsole.log(describeQty(0)); // ждём штук: 0",
+          "bugLine": 2,
+          "fixed": "function describeQty(qty) {\n  if (qty === \"\") return \"не указано\";\n  return \"штук: \" + qty;\n}\nconsole.log(describeQty(0)); // штук: 0",
+          "explanation": "`==` приводит пустую строку к числу 0, поэтому `0 == \"\"` истинно, и для нуля код пишет «не указано». Сравнивай через `===`: тогда число 0 и строка \"\" не равны."
         }
       ]
     },
@@ -1349,6 +1365,14 @@
           ],
           "shuffled": [4, 1, 5, 2, 0, 3],
           "explanation": "map создаёт массив промисов, Promise.all ждёт их все, и только потом функция возвращает результат."
+        },
+        {
+          "id": "common-bugs-03-q6",
+          "type": "findBug",
+          "code": "const cart = [{ price: 100 }, { price: 250 }];\nconst total = cart.reduce((sum, item) => {\n  sum + item.price;\n}, 0);\nconsole.log(total); // ждём 350",
+          "bugLine": 3,
+          "fixed": "const cart = [{ price: 100 }, { price: 250 }];\nconst total = cart.reduce((sum, item) => {\n  return sum + item.price;\n}, 0);\nconsole.log(total); // 350",
+          "explanation": "Колбэк в фигурных скобках без `return` возвращает undefined, и reduce передаёт этот undefined дальше как sum. Поэтому код выводит undefined. Допиши `return` или убери скобки: `(sum, item) => sum + item.price`."
         }
       ]
     },
@@ -1450,6 +1474,14 @@
             "arr[arr.length] — за концом массива, последний элемент — arr[arr.length - 1]"
           ],
           "explanation": "Последний индекс — length - 1, то есть 2. Элемента с индексом 3 нет."
+        },
+        {
+          "id": "common-bugs-04-q6",
+          "type": "findBug",
+          "code": "const word = \"кот\";\nlet reversed = \"\";\nfor (let i = word.length; i >= 0; i--) {\n  reversed += word[i];\n}\nconsole.log(reversed); // ждём ток",
+          "bugLine": 3,
+          "fixed": "const word = \"кот\";\nlet reversed = \"\";\nfor (let i = word.length - 1; i >= 0; i--) {\n  reversed += word[i];\n}\nconsole.log(reversed); // ток",
+          "explanation": "Последний индекс — `word.length - 1`, а цикл начинает с `word.length`. На первом шаге `word[3]` — undefined, и он приклеивается к строке: выходит «undefinedток». Начинай с `word.length - 1`."
         }
       ]
     },
@@ -1556,6 +1588,14 @@
             "await внутри колбэка задерживает только сам колбэк, а не forEach"
           ],
           "explanation": "forEach не ждёт промисы, которые возвращает async-колбэк, поэтому сообщение выводится сразу. Для ожидания нужен for...of с await или Promise.all."
+        },
+        {
+          "id": "common-bugs-05-q6",
+          "type": "findBug",
+          "code": "const cart = [{ id: 1, name: \"чай\" }, { id: 2, name: \"кофе\" }];\nconst toRemove = { id: 2, name: \"кофе\" };\nconst rest = cart.filter(item => item !== toRemove);\nconsole.log(rest.length); // ждём 1",
+          "bugLine": 3,
+          "fixed": "const cart = [{ id: 1, name: \"чай\" }, { id: 2, name: \"кофе\" }];\nconst toRemove = { id: 2, name: \"кофе\" };\nconst rest = cart.filter(item => item.id !== toRemove.id);\nconsole.log(rest.length); // 1",
+          "explanation": "toRemove — отдельный объект, хоть и с теми же полями. `!==` сравнивает объекты по ссылке, поэтому ни один товар не совпал и в корзине осталось 2. Сравнивай поле: `item.id !== toRemove.id`."
         }
       ]
     }
