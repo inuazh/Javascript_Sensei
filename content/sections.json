@@ -138,11 +138,95 @@
       ]
     },
     {
+      "id": "functional",
+      "title": "Функциональный стиль",
+      "icon": "λ",
+      "color": "#FFFFFF",
+      "order": 5,
+      "description": "Чистые функции, иммутабельность, map/filter/reduce и сборка функций из маленьких частей.",
+      "topics": [
+        {
+          "id": "pure-functions",
+          "title": "Чистые функции",
+          "subtitle": "побочные эффекты, иммутабельность",
+          "order": 0
+        },
+        {
+          "id": "higher-order",
+          "title": "Функции высшего порядка",
+          "subtitle": "map, filter, reduce в цепочках",
+          "order": 1
+        },
+        {
+          "id": "composition",
+          "title": "Композиция и каррирование",
+          "subtitle": "compose, pipe, curry",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "iterators",
+      "title": "Итераторы и генераторы",
+      "icon": "↻",
+      "color": "#FFFFFF",
+      "order": 6,
+      "description": "Как устроен for...of, как писать свои итерируемые объекты и генераторы и перебирать асинхронные данные.",
+      "topics": [
+        {
+          "id": "iteration-protocol",
+          "title": "Протокол итерации",
+          "subtitle": "for...of, Symbol.iterator",
+          "order": 0
+        },
+        {
+          "id": "generators",
+          "title": "Генераторы",
+          "subtitle": "function*, yield",
+          "order": 1
+        },
+        {
+          "id": "async-iteration",
+          "title": "Асинхронная итерация",
+          "subtitle": "for await, async-генераторы",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "title": "JSON и данные",
+      "icon": "{}",
+      "color": "#FFFFFF",
+      "order": 7,
+      "description": "Как сохранять данные в JSON, считать без потери точности и перекладывать массивы и объекты.",
+      "topics": [
+        {
+          "id": "json",
+          "title": "JSON",
+          "subtitle": "stringify, parse и их ловушки",
+          "order": 0
+        },
+        {
+          "id": "numbers-math",
+          "title": "Числа и Math",
+          "subtitle": "округление, toFixed, точность",
+          "order": 1
+        },
+        {
+          "id": "data-transform",
+          "title": "Преобразование данных",
+          "subtitle": "группировка, нормализация, сортировка",
+          "order": 2
+        }
+      ]
+    },
+    {
       "id": "advanced",
       "title": "Продвинутые темы",
       "icon": "🧙",
       "color": "#A78BFA",
-      "order": 5,
+      "order": 8,
       "description": "Замыкания, this и прототипы — как JavaScript устроен изнутри.",
       "topics": [
         {
@@ -170,7 +254,7 @@
       "title": "Асинхронность",
       "icon": "⏳",
       "color": "#F472B6",
-      "order": 6,
+      "order": 9,
       "description": "Колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
       "topics": [
         {
@@ -194,11 +278,39 @@
       ]
     },
     {
+      "id": "patterns",
+      "title": "Паттерны",
+      "icon": "◇",
+      "color": "#FFFFFF",
+      "order": 10,
+      "description": "Debounce, throttle, мемоизация и наблюдатель — приёмы, которые решают частые задачи в реальном коде.",
+      "topics": [
+        {
+          "id": "timing-patterns",
+          "title": "Debounce и throttle",
+          "subtitle": "контроль частоты вызовов",
+          "order": 0
+        },
+        {
+          "id": "memoization",
+          "title": "Мемоизация и кэш",
+          "subtitle": "запоминание результатов",
+          "order": 1
+        },
+        {
+          "id": "observer",
+          "title": "Наблюдатель и модуль",
+          "subtitle": "события, подписки, инкапсуляция",
+          "order": 2
+        }
+      ]
+    },
+    {
       "id": "errors",
       "title": "Ошибки и отладка",
       "icon": "🐞",
       "color": "#FFFFFF",
-      "order": 7,
+      "order": 11,
       "description": "Как ловить и разбирать ошибки и находить типичные баги в своём коде.",
       "topics": [
         {
@@ -226,7 +338,7 @@
       "title": "К собеседованию",
       "icon": "🎤",
       "color": "#FB923C",
-      "order": 8,
+      "order": 12,
       "description": "Каверзные вопросы с собеседований: приведение типов, всплытие и вывод в консоль.",
       "topics": [
         {
@@ -254,7 +366,7 @@
       "title": "Алгоритмы",
       "icon": "🧮",
       "color": "#FFFFFF",
-      "order": 9,
+      "order": 13,
       "description": "Задачи с собеседований: сложность, поиск, сортировка и обработка строк.",
       "topics": [
         {
