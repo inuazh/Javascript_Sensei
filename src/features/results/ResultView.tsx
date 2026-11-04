@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import type { ActivityOutcome } from '../../domain/progress';
 import { getLevelInfo } from '../../domain/levels';
@@ -18,6 +18,13 @@ import {
   Stars,
   Type,
 } from '../../ui';
+
+/**
+ * How long the result takes to appear. It replaces the quiz under the finger,
+ * so its buttons ignore taps until then: the second tap of a double tap on
+ * «завершить» must not restart or close it unseen.
+ */
+const APPEAR_MS = 400;
 
 interface ResultViewProps {
   /** Big score line, e.g. "5/5". */
@@ -53,9 +60,14 @@ export function ResultView({
   const appear = useRef(new Animated.Value(0)).current;
   const feedback = useFeedback();
   useEffect(() => {
-    Animated.timing(appear, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    Animated.timing(appear, { toValue: 1, duration: APPEAR_MS, useNativeDriver: true }).start();
     feedback.celebrate();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), APPEAR_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   const level = getLevelInfo(totalXp);
   const levelUp = outcome.levelAfter > outcome.levelBefore;
@@ -67,7 +79,7 @@ export function ResultView({
       edges={['top', 'bottom']}
       contentStyle={styles.content}
       footer={
-        <View style={styles.footer}>
+        <View style={[styles.footer, !ready && styles.locked]}>
           <Button title={primary.title} icon="arrow-right" onPress={primary.onPress} />
           {secondary ? (
             <Button title={secondary.title} variant="ghost" onPress={secondary.onPress} />
@@ -164,4 +176,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
+  locked: { pointerEvents: 'none' },
 });

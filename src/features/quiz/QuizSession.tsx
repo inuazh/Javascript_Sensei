@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Question } from '../../content/schema';
@@ -8,6 +8,13 @@ import { Button, Colors, Fonts, Icon, Label, ProgressBar, Spacing, Type } from '
 import { FeedbackPanel } from './FeedbackPanel';
 import { quizReducer, restoreQuiz, type QuizAnswer, type QuizItem } from './quizReducer';
 import { getQuestionType, questionTitle } from './registry';
+
+/**
+ * The footer button turns from «проверить» into «дальше» and back under the
+ * finger. It ignores taps for this long after it changes, so a double tap
+ * neither skips the explanation nor checks the next question unseen.
+ */
+const FOOTER_LOCK_MS = 350;
 
 interface QuizSessionProps {
   items: QuizItem<Question>[];
@@ -50,6 +57,13 @@ export function QuizSession({
 
   const item = items[state.index];
   const finished = state.phase === 'finished';
+  const step = `${state.index}:${state.phase}`;
+  const [unlockedStep, setUnlockedStep] = useState<string | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => setUnlockedStep(step), FOOTER_LOCK_MS);
+    return () => clearTimeout(timer);
+  }, [step]);
+  const footerLocked = unlockedStep !== step;
   useEffect(() => {
     if (finished) onFinish(state.answers);
   }, [finished]); // eslint-disable-line react-hooks/exhaustive-deps -- fire once
@@ -160,7 +174,7 @@ export function QuizSession({
         )}
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, footerLocked && styles.locked]}>
         {revealed ? (
           <Button
             title={isLast ? 'завершить' : 'дальше'}
@@ -204,4 +218,5 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
     backgroundColor: Colors.background,
   },
+  locked: { pointerEvents: 'none' },
 });

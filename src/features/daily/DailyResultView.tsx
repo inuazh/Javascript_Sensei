@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import {
   dailyHistory,
@@ -25,6 +25,13 @@ import {
   Type,
 } from '../../ui';
 import { DailyShareButton } from './DailyShare';
+
+/**
+ * How long the result takes to appear. It replaces the quiz under the finger,
+ * so its buttons ignore taps until then: the second tap of a double tap on
+ * «завершить» must not close it unseen.
+ */
+const APPEAR_MS = 400;
 
 interface DailyResultViewProps {
   day: DayKey;
@@ -77,9 +84,14 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
   const result = results[day];
   const correct = !!result?.correct;
   useEffect(() => {
-    Animated.timing(appear, { toValue: 1, duration: 400, useNativeDriver: true }).start();
+    Animated.timing(appear, { toValue: 1, duration: APPEAR_MS, useNativeDriver: true }).start();
     if (outcome?.correct) feedback.celebrate();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), APPEAR_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   const number = dailyNumber(day);
   const streak = dailyStreak(results, day);
@@ -91,7 +103,7 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
       edges={['top', 'bottom']}
       contentStyle={styles.content}
       footer={
-        <View style={styles.footer}>
+        <View style={[styles.footer, !ready && styles.locked]}>
           <DailyShareButton results={results} day={day} />
           <Button title="готово" variant="ghost" onPress={onDone} />
         </View>
@@ -190,4 +202,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
+  locked: { pointerEvents: 'none' },
 });
