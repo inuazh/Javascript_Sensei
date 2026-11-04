@@ -13,7 +13,6 @@ interface QuizSessionProps {
   items: QuizItem<Question>[];
   /** Small label above the question, e.g. the lesson title. */
   label: string;
-  color?: string;
   onExit: () => void;
   onFinish: (answers: QuizAnswer[]) => void;
   /** Called as soon as an answer is checked, before the explanation is read. */
@@ -27,7 +26,6 @@ interface QuizSessionProps {
 export function QuizSession({
   items,
   label,
-  color = Colors.accent,
   onExit,
   onFinish,
   onAnswer,
@@ -111,7 +109,7 @@ export function QuizSession({
         >
           <Icon name="x" size={22} color={Colors.textMuted} />
         </Pressable>
-        <ProgressBar value={progress} color={color} style={styles.progress} />
+        <ProgressBar value={progress} style={styles.progress} />
         <Text style={styles.counter}>
           {state.index + 1}/{items.length}
         </Text>

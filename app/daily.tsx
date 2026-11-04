@@ -10,7 +10,7 @@ import { QuizSession } from '../src/features/quiz/QuizSession';
 import type { QuizAnswer, QuizItem } from '../src/features/quiz/quizReducer';
 import { afterActivity } from '../src/services/activity';
 import { useUserStore } from '../src/stores/useUserStore';
-import { Button, Colors, Screen, Type } from '../src/ui';
+import { Button, Screen, Type } from '../src/ui';
 import { useGoBack } from '../src/hooks/useGoBack';
 
 /** «Задача дня»: one question, one attempt, the same for everyone today. */
@@ -57,7 +57,6 @@ export default function DailyScreen() {
     <QuizSession
       items={items}
       label={`Задача дня #${dailyNumber(day)}`}
-      color={Colors.accent}
       onExit={goBack}
       onAnswer={record}
       onFinish={() => setShowResult(true)}

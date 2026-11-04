@@ -10,7 +10,7 @@ import type { QuizAnswer, QuizItem } from '../src/features/quiz/quizReducer';
 import { ResultView } from '../src/features/results/ResultView';
 import { afterActivity } from '../src/services/activity';
 import { useUserStore } from '../src/stores/useUserStore';
-import { Button, Colors, Screen, Type } from '../src/ui';
+import { Button, Screen, Type } from '../src/ui';
 import { useGoBack } from '../src/hooks/useGoBack';
 
 /** Daily workout: spaced-repetition review of earlier questions. */
@@ -65,13 +65,5 @@ export default function ReviewScreen() {
     afterActivity();
   };
 
-  return (
-    <QuizSession
-      items={plan.items}
-      label="Тренировка"
-      color={Colors.accent}
-      onExit={goBack}
-      onFinish={finish}
-    />
-  );
+  return <QuizSession items={plan.items} label="Тренировка" onExit={goBack} onFinish={finish} />;
 }

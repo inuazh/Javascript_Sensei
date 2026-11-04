@@ -9,7 +9,7 @@ import type { QuizAnswer } from '../../src/features/quiz/quizReducer';
 import { ResultView } from '../../src/features/results/ResultView';
 import { afterActivity } from '../../src/services/activity';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Button, Screen, Type, getSectionColor } from '../../src/ui';
+import { Button, Screen, Type } from '../../src/ui';
 import { useGoBack } from '../../src/hooks/useGoBack';
 
 type Phase = 'theory' | 'quiz' | 'result';
@@ -40,8 +40,7 @@ export default function LessonScreen() {
     );
   }
 
-  const { lesson, topic, section } = ref;
-  const color = getSectionColor(section);
+  const { lesson, topic } = ref;
   const close = goBack;
 
   if (phase === 'theory' && lesson.theory) {
@@ -100,7 +99,6 @@ export default function LessonScreen() {
       key={attempt}
       items={lesson.questions.map(question => ({ question, lessonId: lesson.id }))}
       label={`${topic.title} · ${lesson.title}`}
-      color={color}
       onExit={close}
       onFinish={finish}
     />
