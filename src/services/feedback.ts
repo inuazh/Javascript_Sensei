@@ -17,7 +17,8 @@ export function useFeedback() {
     (player: typeof correctPlayer) => {
       if (!soundEnabled) return;
       try {
-        player.seekTo(0);
+        // seekTo is async: its rejection would escape the try block.
+        player.seekTo(0).catch(() => {});
         player.play();
       } catch {
         // Sound is decorative; ignore playback errors.

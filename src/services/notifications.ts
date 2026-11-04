@@ -16,12 +16,18 @@ Notifications.setNotificationHandler({
   }),
 });
 
+/** Whether reminders may be shown, asking the user if needed. Never rejects. */
 export async function requestNotificationPermission(): Promise<boolean> {
   if (Platform.OS === 'web') return false;
-  const current = await Notifications.getPermissionsAsync();
-  if (current.granted) return true;
-  const asked = await Notifications.requestPermissionsAsync();
-  return asked.granted;
+  try {
+    const current = await Notifications.getPermissionsAsync();
+    if (current.granted) return true;
+    const asked = await Notifications.requestPermissionsAsync();
+    return asked.granted;
+  } catch (e) {
+    console.warn('Failed to request notification permission', e);
+    return false;
+  }
 }
 
 let queue: Promise<void> = Promise.resolve();
