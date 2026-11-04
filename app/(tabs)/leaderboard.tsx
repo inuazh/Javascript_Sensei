@@ -23,7 +23,18 @@ import {
   type PlayerEntry,
 } from '../../src/services/leaderboard';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Button, Card, Colors, Fonts, Icon, Label, Radius, Spacing, Type } from '../../src/ui';
+import {
+  Button,
+  Card,
+  Colors,
+  Fonts,
+  Icon,
+  Label,
+  Radius,
+  Spacing,
+  Type,
+  pad2,
+} from '../../src/ui';
 
 type Mode = 'week' | 'all';
 
@@ -96,9 +107,7 @@ function Row({
 }) {
   return (
     <View style={[styles.row, isYou && styles.rowYou]}>
-      <Text style={[styles.rank, rank <= 3 && { color: Colors.accent }]}>
-        {String(rank).padStart(2, '0')}
-      </Text>
+      <Text style={[styles.rank, rank <= 3 && { color: Colors.accent }]}>{pad2(rank)}</Text>
       <View style={styles.flex}>
         <Text style={[styles.name, isYou && { color: Colors.accent }]} numberOfLines={1}>
           {player.nickname}
@@ -119,8 +128,10 @@ function Row({
 
 export default function LeaderboardScreen() {
   const today = useToday();
-  const settings = useUserStore(s => s.settings);
-  const progress = useUserStore(s => s.progress);
+  const nickname = useUserStore(s => s.settings.nickname);
+  const playerId = useUserStore(s => s.settings.playerId);
+  const totalXp = useUserStore(s => s.progress.totalXp);
+  const myWeekXp = useUserStore(s => weeklyXp(s.progress, today));
   const [mode, setMode] = useState<Mode>('week');
   const [players, setPlayers] = useState<PlayerEntry[] | null>(null);
   const [error, setError] = useState(false);
@@ -137,7 +148,7 @@ export default function LeaderboardScreen() {
 
   useEffect(() => {
     load();
-  }, [load, settings.nickname]);
+  }, [load, nickname]);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -153,7 +164,7 @@ export default function LeaderboardScreen() {
       ? rankWeekly(players, week)
       : rankAllTime(players)
     : [];
-  const myRank = ranked.findIndex(p => p.id === settings.playerId) + 1;
+  const myRank = ranked.findIndex(p => p.id === playerId) + 1;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -181,12 +192,12 @@ export default function LeaderboardScreen() {
         </View>
         {mode === 'week' && (
           <Label>
-            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой xp за неделю: ${weeklyXp(progress, today)}`}
+            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой xp за неделю: ${myWeekXp}`}
           </Label>
         )}
 
-        {!settings.nickname && <JoinCard />}
-        {settings.nickname && myRank > 0 && (
+        {!nickname && <JoinCard />}
+        {nickname && myRank > 0 && (
           <Card tone="accent" style={styles.myRank}>
             <Text style={styles.myRankNumber}>#{myRank}</Text>
             <Text style={Type.small}>
@@ -195,16 +206,12 @@ export default function LeaderboardScreen() {
           </Card>
         )}
 
-        {settings.nickname &&
-          players !== null &&
-          !error &&
-          myRank === 0 &&
-          progress.totalXp > 0 && (
-            <Text style={[Type.small, styles.empty]}>
-              Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
-              отправить ещё раз.
-            </Text>
-          )}
+        {nickname && players !== null && !error && myRank === 0 && totalXp > 0 && (
+          <Text style={[Type.small, styles.empty]}>
+            Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
+            отправить ещё раз.
+          </Text>
+        )}
         {players === null && !error && (
           <ActivityIndicator color={Colors.accent} style={styles.loader} />
         )}
@@ -235,7 +242,7 @@ export default function LeaderboardScreen() {
               rank={i + 1}
               player={p}
               value={mode === 'week' ? p.weekXp : p.xp}
-              isYou={p.id === settings.playerId}
+              isYou={p.id === playerId}
             />
           ))}
         </View>

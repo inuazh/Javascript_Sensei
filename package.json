@@ -11,6 +11,7 @@
     "build:android": "eas build --platform android",
     "build:ios": "eas build --platform ios",
     "validate:content": "tsx scripts/validate-content.ts",
+    "content:publish-ids": "tsx scripts/validate-content.ts --publish-ids",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",

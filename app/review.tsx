@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Text } from 'react-native';
-import { getQuestion } from '../src/content/repository';
+import { getQuestion, questionExists } from '../src/content/repository';
 import type { Question } from '../src/content/schema';
 import { toDayKey } from '../src/domain/dates';
 import type { WorkoutOutcome } from '../src/domain/progress';
@@ -23,7 +23,7 @@ export default function ReviewScreen() {
   // Plan once when the screen opens; answering must not reshuffle the queue.
   const plan = useMemo(() => {
     const review = useUserStore.getState().progress.review;
-    const p = planWorkout(review, toDayKey(new Date()));
+    const p = planWorkout(review, toDayKey(new Date()), { exists: questionExists });
     const items: QuizItem<Question>[] = [];
     for (const id of p.questionIds) {
       const found = getQuestion(id);

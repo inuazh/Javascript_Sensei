@@ -6,7 +6,7 @@
 import { addDays, fromDayKey, toDayKey, type DayKey } from './dates';
 import type { ProgressState } from './progress';
 import { streakDeadline, viewStreak } from './streak';
-import { dueItems } from './review';
+import { countDue, type QuestionExists } from './review';
 
 export const REMINDER_DAYS_AHEAD = 7;
 
@@ -20,12 +20,13 @@ export function planReminders(
   progress: ProgressState,
   time: { hour: number; minute: number },
   now: Date,
+  exists?: QuestionExists,
 ): PlannedReminder[] {
   const today = toDayKey(now);
   const activeToday = progress.streak.lastActiveDay === today;
   const streak = viewStreak(progress.streak, today);
   const deadline = streakDeadline(progress.streak);
-  const dueCount = dueItems(progress.review, today).length;
+  const dueCount = countDue(progress.review, today, exists);
   const reminders: PlannedReminder[] = [];
 
   for (let i = 0; i < REMINDER_DAYS_AHEAD; i++) {

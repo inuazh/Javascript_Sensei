@@ -105,6 +105,15 @@ export function getQuestion(
   return questionIndex.get(questionId);
 }
 
+/**
+ * The question is in the bundled content. Review items and daily results keep
+ * question ids from older content; pass this to the review functions so an
+ * item whose question is gone is skipped instead of counted or asked.
+ */
+export function questionExists(questionId: string): boolean {
+  return getQuestion(questionId) !== undefined;
+}
+
 export function getContentIndex(): ContentIndex {
   return {
     sections: getSections().map(s => ({

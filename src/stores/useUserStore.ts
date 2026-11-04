@@ -1,18 +1,16 @@
 /**
  * Persisted user state: settings and learning progress.
  * Business rules live in src/domain; this store only persists state and
- * wires domain functions to the app. Bump STORE_VERSION and extend
- * `migrate` whenever the persisted shape changes.
+ * wires domain functions to the app. Persisted data is migrated with the
+ * version table in src/domain/migrations.ts and validated with
+ * src/domain/persistence.ts on every load.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { getContentIndex } from '../content/repository';
-import {
-  migrateLegacyState,
-  type ExperienceLevel,
-  type LegacyUserState,
-} from '../domain/migrations';
+import { migratePersistedState, STORE_VERSION } from '../domain/migrations';
+import { sanitizePersistedState, type PersistedState } from '../domain/persistence';
 import {
   completeDaily,
   completeLesson,
@@ -27,46 +25,16 @@ import {
   type WorkoutOutcome,
   type WorkoutResultInput,
 } from '../domain/progress';
+import { defaultSettings, type Settings } from '../domain/settings';
 
-export type { ExperienceLevel };
-
-export interface ReminderSettings {
-  enabled: boolean;
-  hour: number;
-  minute: number;
-}
-
-export interface Settings {
-  onboarded: boolean;
-  dailyGoalXp: number;
-  experience: ExperienceLevel;
-  /** Leaderboard identity; both are null until the user joins the leaderboard. */
-  nickname: string | null;
-  playerId: string | null;
-  soundEnabled: boolean;
-  hapticsEnabled: boolean;
-  reminder: ReminderSettings;
-  /** The placement test was taken or declined. */
-  placementDone: boolean;
-}
+export { defaultSettings };
+export type { ExperienceLevel, ReminderSettings, Settings } from '../domain/settings';
 
 export const DAILY_GOALS = [
   { xp: 50, title: 'Лёгкий', subtitle: '≈ 1 урок в день' },
   { xp: 100, title: 'Нормальный', subtitle: '≈ 2 урока в день' },
   { xp: 150, title: 'Серьёзный', subtitle: '≈ 3 урока в день' },
 ] as const;
-
-export const defaultSettings: Settings = {
-  onboarded: false,
-  dailyGoalXp: 50,
-  experience: 'beginner',
-  nickname: null,
-  playerId: null,
-  soundEnabled: true,
-  hapticsEnabled: true,
-  reminder: { enabled: false, hour: 19, minute: 0 },
-  placementDone: false,
-};
 
 interface UserState {
   settings: Settings;
@@ -81,10 +49,7 @@ interface UserState {
   resetProgress: () => void;
 }
 
-const STORE_VERSION = 1;
 const STORAGE_KEY = 'js-sensei-user';
-
-type PersistedState = Pick<UserState, 'settings' | 'progress'>;
 
 export const useUserStore = create<UserState>()(
   persist(
@@ -147,26 +112,15 @@ export const useUserStore = create<UserState>()(
         settings: state.settings,
         progress: state.progress,
       }),
-      migrate: (persisted, version): PersistedState => {
-        if (version === 0) {
-          const { progress, settings } = migrateLegacyState(persisted as LegacyUserState);
-          return { progress, settings: { ...defaultSettings, ...settings } };
-        }
-        return persisted as PersistedState;
-      },
+      // Runs only when the saved version differs; `merge` validates the result.
+      migrate: (persisted, version) => migratePersistedState(persisted, version) as PersistedState,
       onRehydrateStorage: () => (_state, error) => {
         if (error) handleHydrationError(error);
       },
-      // Keys added later (settings, or progress fields such as `daily`) get their
-      // defaults, so adding a field with a default needs no version bump.
-      merge: (persisted, current) => {
-        const p = (persisted ?? {}) as Partial<PersistedState>;
-        return {
-          ...current,
-          settings: { ...defaultSettings, ...p.settings },
-          progress: { ...initialProgress, ...p.progress },
-        };
-      },
+      // Every load: missing fields at any depth get their defaults and fields of
+      // the wrong type are repaired or dropped, so adding a field with a default
+      // needs no version bump and a damaged field cannot crash a screen.
+      merge: (persisted, current) => ({ ...current, ...sanitizePersistedState(persisted) }),
     },
   ),
 );

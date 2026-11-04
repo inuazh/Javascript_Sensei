@@ -5,7 +5,7 @@
  * which is due right away ("работа над ошибками"). Each correct review moves it
  * to the next box, and higher boxes come back less often.
  */
-import { addDays, daysBetween, type DayKey } from './dates';
+import { addDays, compareDays, type DayKey } from './dates';
 
 /** Days until the next review after landing in box N. */
 export const BOX_INTERVALS = [0, 2, 4, 8, 16, 32] as const;
@@ -86,20 +86,60 @@ export function applyReviewAnswers(
   return next;
 }
 
+/**
+ * Whether a review item can still be asked. Items whose question was removed
+ * from the content are skipped: they never count as due and never reach a
+ * workout. Defaults to "everything exists" for pure domain use and tests.
+ */
+export type QuestionExists = (questionId: string) => boolean;
+
+const anyQuestion: QuestionExists = () => true;
+
+/**
+ * Day keys are zero-padded 'YYYY-MM-DD', so they are compared as strings:
+ * this runs on every store write (tab badge), where parsing dates was the
+ * bottleneck.
+ */
 export function isDue(item: ReviewItem, today: DayKey): boolean {
-  return daysBetween(item.due, today) >= 0;
+  return item.due <= today;
 }
 
-export function dueItems(items: ReviewItems, today: DayKey): ReviewItem[] {
+/** Due first by box (mistakes first), then the longest overdue, then the most lapses. */
+const byUrgency = (a: ReviewItem, b: ReviewItem) =>
+  a.box - b.box || compareDays(a.due, b.due) || b.lapses - a.lapses;
+
+export function dueItems(
+  items: ReviewItems,
+  today: DayKey,
+  exists: QuestionExists = anyQuestion,
+): ReviewItem[] {
   return Object.values(items)
-    .filter(i => isDue(i, today))
-    .sort((a, b) => a.box - b.box || daysBetween(b.due, a.due) || b.lapses - a.lapses);
+    .filter(i => i.due <= today && exists(i.questionId))
+    .sort(byUrgency);
+}
+
+/** Same as `dueItems(...).length`, without sorting. */
+export function countDue(
+  items: ReviewItems,
+  today: DayKey,
+  exists: QuestionExists = anyQuestion,
+): number {
+  let count = 0;
+  for (const id in items) {
+    const item = items[id];
+    if (item.due <= today && exists(item.questionId)) count++;
+  }
+  return count;
 }
 
 /** Questions answered wrong most often, for the "weak spots" view. */
-export function weakItems(items: ReviewItems, limit = 10): ReviewItem[] {
+export function weakItems(
+  items: ReviewItems,
+  limit = 10,
+  exists: QuestionExists = anyQuestion,
+): ReviewItem[] {
   return Object.values(items)
-    .filter(i => i.lapses > 0)
+    .filter(i => i.lapses > 0 && exists(i.questionId))
     .sort((a, b) => a.box - b.box || b.lapses - a.lapses)
     .slice(0, limit);
 }
@@ -115,12 +155,17 @@ export interface WorkoutPlan {
  * Picks questions for a workout: due items first, then the least-known items
  * as extra practice so the workout is never empty once lessons were completed.
  */
-export function planWorkout(items: ReviewItems, today: DayKey, size = WORKOUT_SIZE): WorkoutPlan {
-  const due = dueItems(items, today).slice(0, size);
+export function planWorkout(
+  items: ReviewItems,
+  today: DayKey,
+  { size = WORKOUT_SIZE, exists = anyQuestion }: { size?: number; exists?: QuestionExists } = {},
+): WorkoutPlan {
+  const due = dueItems(items, today, exists).slice(0, size);
   const dueIds = due.map(i => i.questionId);
+  const taken = new Set(dueIds);
   const extra = Object.values(items)
-    .filter(i => !dueIds.includes(i.questionId))
-    .sort((a, b) => a.box - b.box || daysBetween(b.due, a.due))
+    .filter(i => !taken.has(i.questionId) && exists(i.questionId))
+    .sort((a, b) => a.box - b.box || compareDays(a.due, b.due))
     .slice(0, size - due.length)
     .map(i => i.questionId);
   return { questionIds: [...dueIds, ...extra], dueIds };
