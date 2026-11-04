@@ -46,7 +46,7 @@ function History({ marks }: { marks: DailyMark[] }) {
     <View
       style={styles.history}
       accessible
-      accessibilityLabel={`Последние задачи дня: ${description}`}
+      accessibilityLabel={`последние задачи дня: ${description}`}
     >
       {marks.map((mark, i) => (
         <View
@@ -93,7 +93,7 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
       footer={
         <View style={styles.footer}>
           <DailyShareButton results={results} day={day} />
-          <Button title="Готово" variant="ghost" onPress={onDone} />
+          <Button title="готово" variant="ghost" onPress={onDone} />
         </View>
       }
     >
@@ -109,7 +109,7 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
         ]}
       >
         <Label dot>задача дня</Label>
-        <Text style={styles.number} accessibilityLabel={`Задача дня номер ${number}`}>
+        <Text style={styles.number} accessibilityLabel={`задача дня номер ${number}`}>
           #{number}
         </Text>
         <View
@@ -124,19 +124,19 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
           />
         </View>
         <Text style={Type.h2} accessibilityRole="header">
-          {correct ? 'Решено' : 'Не в этот раз'}
+          {correct ? 'решено' : 'не в этот раз'}
         </Text>
         <Text style={[Type.small, styles.center]}>
           {correct
-            ? 'С первой попытки. Завтра — новая задача.'
-            : 'Вопрос добавлен в повторение. Завтра — новая задача.'}
+            ? 'с первой попытки. завтра будет новая задача.'
+            : 'вопрос добавлен в повторение. завтра будет новая задача.'}
         </Text>
       </Animated.View>
 
       <Card>
         <History marks={dailyHistory(results, day)} />
         <Row label="серия задач дня" value={String(streak)} accent={streak > 0} />
-        {outcome && <Row label="xp" value={xp > 0 ? `+${xp}` : '0'} accent={xp > 0} />}
+        {outcome && <Row label="XP" value={xp > 0 ? `+${xp}` : '0'} accent={xp > 0} />}
         {outcome?.streakExtended && <Row label="стрик" value={days(outcome.streakDays)} />}
         {outcome && outcome.freezesEarned > 0 && <Row label="заморозка" value="+1" accent />}
       </Card>

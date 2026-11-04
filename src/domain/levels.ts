@@ -15,11 +15,11 @@ export interface LevelInfo {
 }
 
 const TITLES: { fromLevel: number; title: string }[] = [
-  { fromLevel: 1, title: 'Newbie' },
-  { fromLevel: 3, title: 'Beginner' },
-  { fromLevel: 6, title: 'Junior Dev' },
-  { fromLevel: 10, title: 'Middle Dev' },
-  { fromLevel: 14, title: 'Senior Dev' },
+  { fromLevel: 1, title: 'newbie' },
+  { fromLevel: 3, title: 'beginner' },
+  { fromLevel: 6, title: 'junior dev' },
+  { fromLevel: 10, title: 'middle dev' },
+  { fromLevel: 14, title: 'senior dev' },
   { fromLevel: 18, title: 'JS Sensei' },
 ];
 

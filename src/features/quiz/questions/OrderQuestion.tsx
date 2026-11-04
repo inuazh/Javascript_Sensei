@@ -98,14 +98,14 @@ export function OrderQuestion({
               {...(revealed ? {} : handlers[idx])}
               accessible
               accessibilityRole="adjustable"
-              accessibilityLabel={`Строка ${idx + 1}: ${question.lines[lineIndex]}`}
-              accessibilityHint={revealed ? undefined : 'Смахни вверх или вниз, чтобы переместить'}
+              accessibilityLabel={`строка ${idx + 1}: ${question.lines[lineIndex]}`}
+              accessibilityHint={revealed ? undefined : 'смахни вверх или вниз, чтобы переместить'}
               accessibilityActions={
                 revealed
                   ? []
                   : [
-                      { name: 'decrement', label: 'Переместить вверх' },
-                      { name: 'increment', label: 'Переместить вниз' },
+                      { name: 'decrement', label: 'переместить вверх' },
+                      { name: 'increment', label: 'переместить вниз' },
                     ]
               }
               onAccessibilityAction={e => {

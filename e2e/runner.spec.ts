@@ -43,7 +43,7 @@ test('run code: a theory block prints its console output', async ({ page }) => {
   await completeOnboarding(page);
   await page.goto('/reference/variables-01');
   await page
-    .getByRole('button', { name: 'Запустить код' })
+    .getByRole('button', { name: 'запустить код' })
     .filter({ visible: true })
     .first()
     .click();

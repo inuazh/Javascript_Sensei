@@ -17,7 +17,7 @@ export function confirmAction({
   title,
   message,
   confirmText,
-  cancelText = 'Отмена',
+  cancelText = 'отмена',
   onConfirm,
 }: ConfirmOptions): void {
   if (Platform.OS === 'web') {

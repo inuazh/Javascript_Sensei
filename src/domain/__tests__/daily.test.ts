@@ -144,7 +144,7 @@ describe('dailyHistory and dailyShareText', () => {
   it('builds a compact card without the question or the answer', () => {
     const text = dailyShareText(results, '2026-11-05');
     expect(text).toBe(
-      ['JS Sensei · Задача дня #5', '🟥⬛⬜🟥🟥 серия 2', '✅ решено с первой попытки'].join('\n'),
+      ['JS Sensei · задача дня #5', '🟥⬛⬜🟥🟥 серия 2', '✅ решено с первой попытки'].join('\n'),
     );
     expect(text).not.toContain('secret-question');
   });

@@ -53,8 +53,8 @@ export default function SettingsScreen() {
     const reminder = { ...settings.reminder, ...patch };
     if (patch.enabled && !(await requestNotificationPermission())) {
       showNotice(
-        'Уведомления выключены',
-        'Разреши уведомления для JS Sensei в настройках телефона.',
+        'уведомления выключены',
+        'разреши уведомления для JS Sensei в настройках телефона.',
       );
       return;
     }
@@ -64,14 +64,14 @@ export default function SettingsScreen() {
 
   const confirmLeave = () =>
     confirmAction({
-      title: 'Выйти из рейтинга?',
-      message: 'Твоя запись и ник будут удалены из рейтинга.',
-      confirmText: 'Выйти',
+      title: 'выйти из рейтинга?',
+      message: 'твоя запись и ник будут удалены из рейтинга.',
+      confirmText: 'выйти',
       onConfirm: async () => {
         if (!(await leaveLeaderboard())) {
           showNotice(
-            'Запись не удалена',
-            'Не удалось связаться с сервером. Напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
+            'запись не удалена',
+            'не удалось связаться с сервером. напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
           );
         }
       },
@@ -79,9 +79,9 @@ export default function SettingsScreen() {
 
   const confirmReset = () =>
     confirmAction({
-      title: 'Сбросить прогресс?',
-      message: 'Уроки, XP, стрик и достижения будут удалены. Это нельзя отменить.',
-      confirmText: 'Сбросить',
+      title: 'сбросить прогресс?',
+      message: 'уроки, XP, стрик и достижения будут удалены. это нельзя отменить.',
+      confirmText: 'сбросить',
       onConfirm: () => {
         resetProgress();
         afterActivity();
@@ -91,7 +91,7 @@ export default function SettingsScreen() {
   return (
     <Screen edges={['top', 'bottom']}>
       <BackButton />
-      <Text style={Type.h1}>Настройки</Text>
+      <Text style={Type.h1}>настройки</Text>
 
       <Label>цель дня</Label>
       {DAILY_GOALS.map(g => (
@@ -107,7 +107,7 @@ export default function SettingsScreen() {
       <Label>напоминания</Label>
       <Card style={styles.gap}>
         <ToggleRow
-          label="Напоминать заниматься"
+          label="напоминать заниматься"
           value={settings.reminder.enabled}
           onChange={enabled => setReminder({ enabled })}
         />
@@ -118,7 +118,7 @@ export default function SettingsScreen() {
               minute={settings.reminder.minute}
               onChange={t => setReminder(t)}
             />
-            <Text style={Type.small}>Если ты уже позанимался сегодня, напоминание не придёт.</Text>
+            <Text style={Type.small}>если ты уже позанимался сегодня, напоминание не придёт.</Text>
           </>
         )}
       </Card>
@@ -126,12 +126,12 @@ export default function SettingsScreen() {
       <Label>звук и вибрация</Label>
       <Card style={styles.gap}>
         <ToggleRow
-          label="Звуки"
+          label="звуки"
           value={settings.soundEnabled}
           onChange={v => updateSettings({ soundEnabled: v })}
         />
         <ToggleRow
-          label="Вибрация"
+          label="вибрация"
           value={settings.hapticsEnabled}
           onChange={v => updateSettings({ hapticsEnabled: v })}
         />
@@ -141,24 +141,24 @@ export default function SettingsScreen() {
       <Card style={styles.gap}>
         {settings.nickname ? (
           <>
-            <Text style={Type.body}>Ник: {settings.nickname}</Text>
+            <Text style={Type.body}>ник: {settings.nickname}</Text>
             <Pressable onPress={confirmLeave} accessibilityRole="button">
-              <Text style={styles.danger}>Выйти из рейтинга</Text>
+              <Text style={styles.danger}>выйти из рейтинга</Text>
             </Pressable>
           </>
         ) : (
           <Text style={Type.small}>
-            Ты не участвуешь в рейтинге. Присоединиться можно на вкладке «Рейтинг».
+            ты не участвуешь в рейтинге. присоединиться можно на вкладке «рейтинг».
           </Text>
         )}
       </Card>
 
       <Card style={styles.gap}>
         <Pressable onPress={() => router.push('/privacy-policy')} accessibilityRole="link">
-          <Text style={styles.link}>Политика конфиденциальности</Text>
+          <Text style={styles.link}>политика конфиденциальности</Text>
         </Pressable>
         <Pressable onPress={confirmReset} accessibilityRole="button">
-          <Text style={styles.danger}>Сбросить прогресс</Text>
+          <Text style={styles.danger}>сбросить прогресс</Text>
         </Pressable>
       </Card>
       <Text style={[Type.small, styles.version]}>

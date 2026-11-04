@@ -56,7 +56,7 @@ export default function ProfileScreen() {
   const level = getLevelInfo(progress.totalXp);
   const streak = viewStreak(progress.streak, today);
   const lessons = Object.values(progress.lessons).filter(l => !l.skipped);
-  const initial = nickname ? nickname.charAt(0).toUpperCase() : String(level.level);
+  const initial = nickname ? nickname.charAt(0) : String(level.level);
 
   const weeks = useMemo(() => {
     const start = addDays(weekStart(today), -7 * (HEATMAP_WEEKS - 1));
@@ -95,7 +95,7 @@ export default function ProfileScreen() {
           onPress={() => router.push('/settings')}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Настройки"
+          accessibilityLabel="настройки"
         >
           <Icon name="settings" size={22} color={Colors.textSecondary} />
         </Pressable>
@@ -104,7 +104,7 @@ export default function ProfileScreen() {
       <Card>
         <View style={styles.rowBetween}>
           <Text style={styles.xp}>
-            {progress.totalXp} <Text style={styles.xpUnit}>xp</Text>
+            {progress.totalXp} <Text style={styles.xpUnit}>XP</Text>
           </Text>
           <Text style={styles.toNext}>
             до lvl {level.level + 1}: {level.nextXp - progress.totalXp}

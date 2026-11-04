@@ -12,12 +12,12 @@ describe('validateNickname', () => {
 
   it('trims the input first', () => {
     expect(validateNickname('  Alice  ')).toBeNull();
-    expect(validateNickname(' A ')).toBe('Минимум 2 символа');
+    expect(validateNickname(' A ')).toBe('минимум 2 символа');
   });
 
   it('checks the length', () => {
-    expect(validateNickname('A')).toBe('Минимум 2 символа');
-    expect(validateNickname('a'.repeat(21))).toBe('Максимум 20 символов');
+    expect(validateNickname('A')).toBe('минимум 2 символа');
+    expect(validateNickname('a'.repeat(21))).toBe('максимум 20 символов');
   });
 
   it.each([
@@ -34,13 +34,13 @@ describe('validateNickname', () => {
     ['symbols', 'a<b>'],
   ])('rejects %s', (_, nickname) => {
     expect(validateNickname(nickname)).toBe(
-      'Только латиница или кириллица, цифры, пробел, «_», «.» и «-»',
+      'только латиница или кириллица, цифры, пробел, «_», «.» и «-»',
     );
   });
 
   it('rejects names that mix Latin and Cyrillic', () => {
-    expect(validateNickname('Alicе')).toBe('Не смешивай латиницу и кириллицу'); // Cyrillic е
-    expect(validateNickname('Петя Pro')).toBe('Не смешивай латиницу и кириллицу');
+    expect(validateNickname('Alicе')).toBe('не смешивай латиницу и кириллицу'); // Cyrillic е
+    expect(validateNickname('Петя Pro')).toBe('не смешивай латиницу и кириллицу');
   });
 
   it.each([
@@ -64,7 +64,7 @@ describe('validateNickname', () => {
     'модератор',
     'Сенсей',
   ])('rejects the reserved name %j', nickname => {
-    expect(validateNickname(nickname)).toBe('Этот ник занят');
+    expect(validateNickname(nickname)).toBe('этот ник занят');
   });
 
   it('allows names that only contain a reserved word in the middle', () => {

@@ -46,10 +46,10 @@ export default function WorkoutTab() {
 
   return (
     <Screen>
-      <Text style={Type.h1}>Тренировка</Text>
+      <Text style={Type.h1}>тренировка</Text>
       <Text style={Type.small}>
-        Вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
-        Ошибки — в первую очередь.
+        вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
+        ошибки идут в первую очередь.
       </Text>
 
       <Card style={styles.hero}>
@@ -60,15 +60,15 @@ export default function WorkoutTab() {
             <Text style={Type.h3}>
               {due.length > 0
                 ? `${plural(due.length, 'вопрос', 'вопроса', 'вопросов')} на повторение`
-                : 'Всё повторено'}
+                : 'всё повторено'}
             </Text>
             <Text style={Type.small}>
               {due.length > 0
-                ? `+${XP.perCorrectReview} xp за верный ответ${doneToday ? '' : `, +${XP.dailyWorkoutBonus} xp за первую тренировку дня`}`
-                : 'Можно потренироваться на свежих вопросах — без XP, но с пользой.'}
+                ? `+${XP.perCorrectReview} XP за верный ответ${doneToday ? '' : `, +${XP.dailyWorkoutBonus} XP за первую тренировку дня`}`
+                : 'можно потренироваться на свежих вопросах: без XP, но с пользой.'}
             </Text>
             <Button
-              title={due.length > 0 ? 'Начать тренировку' : 'Свободная практика'}
+              title={due.length > 0 ? 'начать тренировку' : 'свободная практика'}
               icon="arrow-right"
               variant={due.length > 0 ? 'primary' : 'secondary'}
               onPress={() => router.push('/review')}
@@ -77,10 +77,10 @@ export default function WorkoutTab() {
           </>
         ) : (
           <>
-            <Text style={Type.h3}>Здесь будут повторения</Text>
-            <Text style={Type.small}>Пройди первый урок — его вопросы появятся в тренировке.</Text>
+            <Text style={Type.h3}>здесь будут повторения</Text>
+            <Text style={Type.small}>пройди первый урок, и его вопросы появятся в тренировке.</Text>
             <Button
-              title="К урокам"
+              title="к урокам"
               variant="secondary"
               onPress={() => router.push('/')}
               style={styles.button}
@@ -106,13 +106,13 @@ export default function WorkoutTab() {
               <View
                 key={item.questionId}
                 accessible
-                accessibilityLabel={`${place ? `Раздел «${place.sectionTitle}», ` : ''}урок «${found.lesson.title}»: ${questionPreview(found.question)}. Ошибок: ${item.lapses}`}
+                accessibilityLabel={`${place ? `раздел «${place.sectionTitle}», ` : ''}урок «${found.lesson.title}»: ${questionPreview(found.question)}. ошибок: ${item.lapses}`}
                 style={styles.weak}
               >
                 <View style={styles.flex}>
                   {place && (
                     <Text style={styles.section} numberOfLines={1}>
-                      {pad2(place.sectionNumber)} · {place.sectionTitle.toLowerCase()}
+                      {pad2(place.sectionNumber)} · {place.sectionTitle}
                     </Text>
                   )}
                   <Text style={styles.weakTitle}>{found.lesson.title}</Text>

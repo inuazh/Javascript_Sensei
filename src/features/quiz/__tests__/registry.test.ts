@@ -25,13 +25,13 @@ describe('findBug question type', () => {
   });
 
   it('shows the fixed code as the correct answer when there is one', () => {
-    expect(def.correctAnswer(findBug())).toEqual({ text: 'Строка 3' });
+    expect(def.correctAnswer(findBug())).toEqual({ text: 'строка 3' });
     const fixed = '// sum\nconst a = 1;\nconst b = 2;\nconsole.log(a + b);';
     expect(def.correctAnswer(findBug({ fixed }))).toEqual({ code: fixed });
   });
 
   it('has a default title and a preview', () => {
-    expect(questionTitle(findBug())).toBe('Найди строку с ошибкой');
+    expect(questionTitle(findBug())).toBe('найди строку с ошибкой');
     expect(questionTitle(findBug({ title: 'Где ошибка?' }))).toBe('Где ошибка?');
     expect(questionPreview(findBug())).toBe('// sum');
   });

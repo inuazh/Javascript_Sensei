@@ -25,18 +25,18 @@ export function TimePicker({
         style={styles.btn}
         onPress={() => shift(-STEP_MINUTES)}
         accessibilityRole="button"
-        accessibilityLabel="Раньше"
+        accessibilityLabel="раньше"
       >
         <Text style={styles.btnText}>−</Text>
       </Pressable>
-      <Text style={styles.time} accessibilityLabel={`Время ${label}`}>
+      <Text style={styles.time} accessibilityLabel={`время ${label}`}>
         {label}
       </Text>
       <Pressable
         style={styles.btn}
         onPress={() => shift(STEP_MINUTES)}
         accessibilityRole="button"
-        accessibilityLabel="Позже"
+        accessibilityLabel="позже"
       >
         <Text style={styles.btnText}>+</Text>
       </Pressable>

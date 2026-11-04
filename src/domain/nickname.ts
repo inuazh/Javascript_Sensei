@@ -88,14 +88,14 @@ export function isReservedNickname(nickname: string): boolean {
 /** Error message for the user, or null if the nickname can be used. */
 export function validateNickname(raw: string): string | null {
   const nickname = raw.trim();
-  if (nickname.length < NICKNAME_MIN) return `Минимум ${NICKNAME_MIN} символа`;
-  if (nickname.length > NICKNAME_MAX) return `Максимум ${NICKNAME_MAX} символов`;
+  if (nickname.length < NICKNAME_MIN) return `минимум ${NICKNAME_MIN} символа`;
+  if (nickname.length > NICKNAME_MAX) return `максимум ${NICKNAME_MAX} символов`;
   if (!NICKNAME_RE.test(nickname)) {
-    return 'Только латиница или кириллица, цифры, пробел, «_», «.» и «-»';
+    return 'только латиница или кириллица, цифры, пробел, «_», «.» и «-»';
   }
   if (LATIN_RE.test(nickname) && CYRILLIC_RE.test(nickname)) {
-    return 'Не смешивай латиницу и кириллицу';
+    return 'не смешивай латиницу и кириллицу';
   }
-  if (isReservedNickname(nickname)) return 'Этот ник занят';
+  if (isReservedNickname(nickname)) return 'этот ник занят';
   return null;
 }

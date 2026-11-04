@@ -112,8 +112,8 @@ export function dailyShareText(results: DailyResults, today: DayKey): string {
     .map(m => MARK_EMOJI[m])
     .join('');
   return [
-    `JS Sensei · Задача дня #${dailyNumber(today)}`,
+    `JS Sensei · задача дня #${dailyNumber(today)}`,
     `${history} серия ${streak}`,
-    result?.correct ? '✅ решено с первой попытки' : '❌ не сегодня — завтра новая',
+    result?.correct ? '✅ решено с первой попытки' : '❌ не сегодня, завтра новая',
   ].join('\n');
 }

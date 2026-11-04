@@ -22,22 +22,22 @@ type Choice = ExperienceLevel | 'test';
 
 const startsWith = (level: ExperienceLevel) => {
   const title = getLevelPlacement(level).startSection?.title;
-  return title ? `Начнёшь с раздела «${title}»` : '';
+  return title ? `начнёшь с раздела «${title}»` : '';
 };
 
 const CHOICES: { id: Choice; title: string; subtitle: string; icon: IconName }[] = [
-  { id: 'beginner', title: 'Новичок', subtitle: 'Начинаю с нуля', icon: 'sprout' },
+  { id: 'beginner', title: 'новичок', subtitle: 'начинаю с нуля', icon: 'sprout' },
   {
     id: 'intermediate',
-    title: 'Знаю основы',
+    title: 'знаю основы',
     subtitle: startsWith('intermediate'),
     icon: 'rocket',
   },
-  { id: 'advanced', title: 'Есть опыт', subtitle: startsWith('advanced'), icon: 'cpu' },
+  { id: 'advanced', title: 'есть опыт', subtitle: startsWith('advanced'), icon: 'cpu' },
   {
     id: 'test',
-    title: 'Не уверен',
-    subtitle: `Пройти тест — займёт около ${PLACEMENT_MINUTES}\u00a0минут`,
+    title: 'не уверен',
+    subtitle: `пройти тест, это около ${PLACEMENT_MINUTES}\u00a0минут`,
     icon: 'compass',
   },
 ];
@@ -104,7 +104,7 @@ export default function OnboardingScreen() {
       <Screen
         edges={['top', 'bottom']}
         contentStyle={styles.welcome}
-        footer={footer({ title: 'Начать', onPress: () => setStep(1) })}
+        footer={footer({ title: 'начать', onPress: () => setStep(1) })}
       >
         <Logo size={44} />
         <Text style={styles.prompt}>
@@ -122,10 +122,10 @@ export default function OnboardingScreen() {
     return (
       <Screen
         edges={['top', 'bottom']}
-        footer={footer({ title: 'Дальше', onPress: () => setStep(2) })}
+        footer={footer({ title: 'дальше', onPress: () => setStep(2) })}
       >
         {dots}
-        <Text style={Type.h1}>Какой у тебя опыт?</Text>
+        <Text style={Type.h1}>какой у тебя опыт?</Text>
         {CHOICES.map(c => (
           <OptionCard
             key={c.id}
@@ -136,7 +136,7 @@ export default function OnboardingScreen() {
             onPress={() => setChoice(c.id)}
           />
         ))}
-        <Text style={Type.small}>Пропущенные разделы можно пройти в любой момент.</Text>
+        <Text style={Type.small}>пропущенные разделы можно пройти в любой момент.</Text>
       </Screen>
     );
   }
@@ -145,11 +145,11 @@ export default function OnboardingScreen() {
     return (
       <Screen
         edges={['top', 'bottom']}
-        footer={footer({ title: 'Дальше', onPress: () => setStep(3) })}
+        footer={footer({ title: 'дальше', onPress: () => setStep(3) })}
       >
         {dots}
-        <Text style={Type.h1}>Цель на день</Text>
-        <Text style={[Type.small]}>Её можно поменять в настройках.</Text>
+        <Text style={Type.h1}>цель на день</Text>
+        <Text style={[Type.small]}>её можно поменять в настройках.</Text>
         {DAILY_GOALS.map(g => (
           <OptionCard
             key={g.xp}
@@ -167,14 +167,14 @@ export default function OnboardingScreen() {
     <Screen
       edges={['top', 'bottom']}
       footer={footer(
-        { title: 'Напоминать', onPress: () => finish(true) },
-        { title: 'Не сейчас', onPress: () => finish(false) },
+        { title: 'напоминать', onPress: () => finish(true) },
+        { title: 'не сейчас', onPress: () => finish(false) },
       )}
     >
       {dots}
-      <Text style={Type.h1}>Когда напомнить?</Text>
+      <Text style={Type.h1}>когда напомнить?</Text>
       <Text style={Type.small}>
-        Одно уведомление в день, и только если ты ещё не занимался. Привычка складывается из
+        одно уведомление в день, и только если ты ещё не занимался. привычка складывается из
         регулярности.
       </Text>
       <View style={styles.time}>

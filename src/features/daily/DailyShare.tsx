@@ -6,8 +6,8 @@ import { shareText, type ShareResult } from '../../services/share';
 import { Button, Colors, Fonts, Spacing } from '../../ui';
 
 const STATUS: Partial<Record<ShareResult, string>> = {
-  copied: 'Скопировано — вставь в чат',
-  failed: 'Не получилось поделиться',
+  copied: 'скопировано, вставь в чат',
+  failed: 'не получилось поделиться',
 };
 
 /** «Поделиться» for a finished daily challenge, with a note when text was copied. */
@@ -35,12 +35,12 @@ export function DailyShareButton({
   return (
     <View style={[styles.wrap, style]}>
       <Button
-        title="Поделиться"
+        title="поделиться"
         icon="share"
         variant={variant}
         loading={busy}
         onPress={share}
-        accessibilityHint="Отправить результат задачи дня без ответа"
+        accessibilityHint="отправить результат задачи дня без ответа"
       />
       {note ? (
         <Text

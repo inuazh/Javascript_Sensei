@@ -37,15 +37,15 @@ export default function ReviewScreen() {
     return (
       <ResultView
         score={`${outcome.correct}/${outcome.total}`}
-        title={perfect ? 'Всё помнишь' : 'Тренировка завершена'}
+        title={perfect ? 'всё помнишь' : 'тренировка завершена'}
         subtitle={
           outcome.mistakesFixed > 0
-            ? `Исправлено ошибок: ${outcome.mistakesFixed}`
-            : 'Повторение — мать учения'
+            ? `исправлено ошибок: ${outcome.mistakesFixed}`
+            : 'повторение закрепляет знания'
         }
         outcome={outcome}
         totalXp={totalXp}
-        primary={{ title: 'Готово', onPress: goBack }}
+        primary={{ title: 'готово', onPress: goBack }}
       />
     );
   }
@@ -53,9 +53,9 @@ export default function ReviewScreen() {
   if (plan.items.length === 0) {
     return (
       <Screen edges={['top', 'bottom']}>
-        <Text style={Type.h2}>Пока нечего повторять</Text>
-        <Text style={Type.small}>Пройди пару уроков — вопросы из них появятся в тренировке.</Text>
-        <Button title="Назад" onPress={goBack} />
+        <Text style={Type.h2}>пока нечего повторять</Text>
+        <Text style={Type.small}>пройди пару уроков, и вопросы из них появятся в тренировке.</Text>
+        <Button title="назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -65,5 +65,5 @@ export default function ReviewScreen() {
     afterActivity();
   };
 
-  return <QuizSession items={plan.items} label="Тренировка" onExit={goBack} onFinish={finish} />;
+  return <QuizSession items={plan.items} label="тренировка" onExit={goBack} onFinish={finish} />;
 }
