@@ -62,6 +62,16 @@ export function weekStart(key: DayKey): DayKey {
   return addDays(key, -((dow + 6) % 7));
 }
 
+/**
+ * The week of `key` as a number: days from 1970-01-01 to its Monday
+ * (2026-11-02 → 20759; a Monday is always ≡ 4 mod 7). The leaderboard keeps
+ * weekly scores under this number, because database rules can do arithmetic
+ * on numbers but cannot parse a date string.
+ */
+export function weekNumber(key: DayKey): number {
+  return daysBetween('1970-01-01', weekStart(key));
+}
+
 /** The seven day keys (Mon..Sun) of the week containing `key`. */
 export function weekDays(key: DayKey): DayKey[] {
   const start = weekStart(key);

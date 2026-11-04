@@ -73,7 +73,17 @@ scripts/                валидатор контента: схема, свя�
 
 ## Рейтинг и Firebase
 
-Как включить защиту рейтинга (анонимный вход + правила базы) — в [`docs/firebase.md`](./docs/firebase.md).
+Рейтинг хранится в Firebase Realtime Database (`leaderboard/{uid}` и `weekly/{week}/{uid}`), защищён анонимным входом и правилами из `database.rules.json`. Анонимный вход включается **только если при сборке задана переменная `EXPO_PUBLIC_FIREBASE_API_KEY`**; без неё приложение может читать рейтинг, но правила не дают в него писать.
+
+Как включить:
+
+1. Firebase Console → Authentication → Sign-in method → Anonymous → Enable.
+2. Project settings → General → скопируй «Web API Key».
+3. `eas env:set --name EXPO_PUBLIC_FIREBASE_API_KEY --value <ключ> --environment production --visibility plaintext` (или на expo.dev → проект → Environment variables).
+4. Собери и выпусти приложение.
+5. Опубликуй правила: `npx firebase-tools deploy --only database`.
+
+Подробности, формат данных и что проверяют правила — в [`docs/firebase.md`](./docs/firebase.md).
 
 ## Сборка
 
