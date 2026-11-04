@@ -20,7 +20,6 @@ export const SECTION_FILES: Record<string, () => SectionFile> = {
   async: () => require('./async.json'),
   interview: () => require('./interview.json'),
   strings: () => require('./strings.json'),
-  strings: () => require('./strings.json'),
 };
 
 export function loadSectionDefs(): SectionDef[] {
