@@ -7,14 +7,24 @@
       "color": "#34D399",
       "order": 0,
       "topics": [
-        { "id": "variables", "title": "Переменные", "subtitle": "let, const, var", "order": 0 },
+        {
+          "id": "variables",
+          "title": "Переменные",
+          "subtitle": "let, const, var",
+          "order": 0
+        },
         {
           "id": "data-types",
           "title": "Типы данных",
           "subtitle": "string, number, boolean",
           "order": 1
         },
-        { "id": "operators", "title": "Операторы", "subtitle": "арифметика, сравнение", "order": 2 }
+        {
+          "id": "operators",
+          "title": "Операторы",
+          "subtitle": "арифметика, сравнение",
+          "order": 2
+        }
       ]
     },
     {
@@ -24,9 +34,24 @@
       "color": "#60A5FA",
       "order": 1,
       "topics": [
-        { "id": "conditions", "title": "Условия", "subtitle": "if, else, switch", "order": 0 },
-        { "id": "loops", "title": "Циклы", "subtitle": "for, while, do...while", "order": 1 },
-        { "id": "functions", "title": "Функции", "subtitle": "объявление, стрелочные", "order": 2 }
+        {
+          "id": "conditions",
+          "title": "Условия",
+          "subtitle": "if, else, switch",
+          "order": 0
+        },
+        {
+          "id": "loops",
+          "title": "Циклы",
+          "subtitle": "for, while, do...while",
+          "order": 1
+        },
+        {
+          "id": "functions",
+          "title": "Функции",
+          "subtitle": "объявление, стрелочные",
+          "order": 2
+        }
       ]
     },
     {
@@ -36,9 +61,80 @@
       "color": "#FACC15",
       "order": 2,
       "topics": [
-        { "id": "arrays", "title": "Массивы", "subtitle": "map, filter, reduce", "order": 0 },
-        { "id": "objects", "title": "Объекты", "subtitle": "ключи, деструктуризация", "order": 1 },
-        { "id": "set-map", "title": "Set & Map", "subtitle": "уникальные коллекции", "order": 2 }
+        {
+          "id": "arrays",
+          "title": "Массивы",
+          "subtitle": "map, filter, reduce",
+          "order": 0
+        },
+        {
+          "id": "objects",
+          "title": "Объекты",
+          "subtitle": "ключи, деструктуризация",
+          "order": 1
+        },
+        {
+          "id": "set-map",
+          "title": "Set & Map",
+          "subtitle": "уникальные коллекции",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "advanced",
+      "title": "Продвинутые темы",
+      "icon": "🧙",
+      "color": "#A78BFA",
+      "order": 3,
+      "description": "Замыкания, this и прототипы — как JavaScript устроен изнутри.",
+      "topics": [
+        {
+          "id": "closures",
+          "title": "Замыкания",
+          "subtitle": "область видимости, замыкания",
+          "order": 0
+        },
+        {
+          "id": "this-context",
+          "title": "this и контекст",
+          "subtitle": "call, apply, bind",
+          "order": 1
+        },
+        {
+          "id": "prototypes-classes",
+          "title": "Прототипы и классы",
+          "subtitle": "prototype, class, extends",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "async",
+      "title": "Асинхронность",
+      "icon": "⏳",
+      "color": "#F472B6",
+      "order": 4,
+      "description": "Колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
+      "topics": [
+        {
+          "id": "event-loop",
+          "title": "Колбэки и Event Loop",
+          "subtitle": "setTimeout, очередь задач",
+          "order": 0
+        },
+        {
+          "id": "promises",
+          "title": "Promise",
+          "subtitle": "then, catch, Promise.all",
+          "order": 1
+        },
+        {
+          "id": "async-await",
+          "title": "async/await",
+          "subtitle": "асинхронные функции",
+          "order": 2
+        }
       ]
     },
     {

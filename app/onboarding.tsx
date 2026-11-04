@@ -30,7 +30,7 @@ export default function OnboardingScreen() {
     const reminder = { enabled, ...time };
     updateSettings({ onboarded: true, experience, dailyGoalXp: goal, reminder });
     syncReminders(reminder, useUserStore.getState().progress);
-    router.replace('/(tabs)');
+    router.replace(experience === 'beginner' ? '/(tabs)' : '/placement');
   };
 
   const dots = (

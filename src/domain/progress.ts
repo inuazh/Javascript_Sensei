@@ -22,6 +22,11 @@ export interface LessonProgress {
   attempts: number;
   firstCompletedAt: string;
   lastCompletedAt: string;
+  /**
+   * Marked as known by the placement test without being taken. Counts as done
+   * for the course path, but not for XP, stars or achievements.
+   */
+  skipped?: boolean;
 }
 
 export interface DayActivity {
@@ -117,9 +122,10 @@ export function computeStats(
   now: Date,
 ): AchievementStats {
   const today = toDayKey(now);
-  const lessons = Object.values(state.lessons);
+  const lessons = Object.values(state.lessons).filter(l => !l.skipped);
+  const taken = (id: string) => id in state.lessons && !state.lessons[id].skipped;
   const sectionDone = content.sections.filter(
-    s => s.lessonIds.length > 0 && s.lessonIds.every(id => id in state.lessons),
+    s => s.lessonIds.length > 0 && s.lessonIds.every(taken),
   );
   return {
     lessonsCompleted: lessons.length,
@@ -228,7 +234,9 @@ export function completeLesson(
   const total = input.answers.length;
   const correct = input.answers.filter(a => a.correct).length;
   const stars = starsFor(correct, total);
-  const previous = state.lessons[input.lessonId];
+  const stored = state.lessons[input.lessonId];
+  // A lesson skipped by the placement test is taken for the first time now.
+  const previous = stored && !stored.skipped ? stored : undefined;
   const xpEarned = lessonXp(correct, total, previous ? previous.bestCorrect : null);
   const nowIso = ctx.now.toISOString();
 
@@ -313,4 +321,26 @@ export function completeWorkout(
       firstWorkoutToday,
     },
   };
+}
+
+/**
+ * Marks lessons as known after the placement test. Already taken lessons are
+ * left as they are. No XP, streak or achievements: nothing was learned here.
+ */
+export function skipLessons(state: ProgressState, lessonIds: string[], now: Date): ProgressState {
+  const nowIso = now.toISOString();
+  const lessons = { ...state.lessons };
+  for (const id of lessonIds) {
+    if (lessons[id]) continue;
+    lessons[id] = {
+      bestCorrect: 0,
+      total: 0,
+      stars: 0,
+      attempts: 0,
+      firstCompletedAt: nowIso,
+      lastCompletedAt: nowIso,
+      skipped: true,
+    };
+  }
+  return { ...state, lessons };
 }

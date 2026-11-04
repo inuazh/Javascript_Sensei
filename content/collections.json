@@ -5,6 +5,26 @@
       "topicId": "arrays",
       "title": "Создание массивов",
       "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Массив — упорядоченный список. Элементы нумеруются **с нуля**, длину даёт `length`. Несуществующий индекс не вызывает ошибку — вернётся `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const arr = [\"a\", \"b\", \"c\"];\nconsole.log(arr[0]);     // a\nconsole.log(arr.length); // 3\nconsole.log(arr[10]);    // undefined"
+          },
+          {
+            "type": "text",
+            "text": "`push` добавляет элемент в конец, `pop` удаляет последний. Для начала массива есть пара `unshift` и `shift`."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [1, 2, 3];\nnums.push(4);\nconsole.log(nums); // [1, 2, 3, 4]\nnums.pop();\nnums.shift();\nconsole.log(nums); // [2, 3]"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "arrays-01-q1",
@@ -13,7 +33,8 @@
           "code": "const arr = [1, 2, 3];\nconsole.log(arr[0]);",
           "options": ["1", "2", "3", "undefined"],
           "correct": 0,
-          "explanation": "Индексация массивов начинается с 0: arr[0] = 1"
+          "optionExplanations": [null, "Индексы начинаются с 0, а не с 1", null, null],
+          "explanation": "Индексы массива начинаются с 0: arr[0] — первый элемент, 1."
         },
         {
           "id": "arrays-01-q2",
@@ -31,6 +52,12 @@
           "code": "const arr = [1, 2, 3];\narr.push(4);\nconsole.log(arr[3]);",
           "options": ["undefined", "3", "4", "Error"],
           "correct": 2,
+          "optionExplanations": [
+            "После push элемент с индексом 3 уже есть",
+            "3 — это arr[2], последний элемент до push",
+            null,
+            null
+          ],
           "explanation": ".push() добавляет элемент в конец; arr[3] = 4"
         },
         {
@@ -38,19 +65,25 @@
           "type": "fill",
           "title": "Заполни пропуск — удалить последний",
           "codeBefore": "const arr = [1, 2, 3];\narr.",
-          "codeAfter": "();\nconsole.log(arr.length); // 2",
+          "codeAfter": "();\nconsole.log(arr); // [1, 2]",
           "options": ["push", "pop", "shift", "unshift"],
           "correct": 1,
-          "explanation": ".pop() удаляет и возвращает последний элемент массива"
+          "optionExplanations": [
+            "push добавляет элемент, а не удаляет",
+            null,
+            "shift удаляет первый элемент — останется [2, 3]",
+            "unshift добавляет элемент в начало"
+          ],
+          "explanation": "pop() удаляет последний элемент массива. shift() тоже удаляет, но первый."
         },
         {
           "id": "arrays-01-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const arr = [1, 2, 3];\nconsole.log(arr[10]); // undefined",
+          "code": "const arr = [1, 2, 3];\nconsole.log(arr[10]);",
           "options": ["Выведет undefined", "Вызовет Error"],
           "correct": 0,
-          "explanation": "Обращение к несуществующему индексу возвращает undefined, не ошибку"
+          "explanation": "Обращение к несуществующему индексу не вызывает ошибку, а возвращает undefined."
         }
       ]
     },
@@ -59,6 +92,30 @@
       "topicId": "arrays",
       "title": "map и filter",
       "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`map` вызывает функцию для каждого элемента и собирает результаты в **новый** массив той же длины. Исходный массив не меняется."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [1, 2, 3, 4];\nconst doubled = nums.map(n => n * 2);\nconsole.log(doubled); // [2, 4, 6, 8]\nconsole.log(nums);    // [1, 2, 3, 4]"
+          },
+          {
+            "type": "text",
+            "text": "`filter` оставляет только элементы, для которых функция вернула `true`. Он тоже создаёт новый массив."
+          },
+          {
+            "type": "code",
+            "code": "const words = [\"js\", \"python\", \"go\"];\nconsole.log(words.filter(w => w.length <= 2)); // [\"js\", \"go\"]"
+          },
+          {
+            "type": "tip",
+            "text": "Запомни: `map` — преобразовать каждый элемент, `filter` — отобрать часть."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "arrays-02-q1",
@@ -67,6 +124,7 @@
           "code": "const arr = [1, 2, 3];\nconst doubled = arr.map(n => n * 2);\nconsole.log(doubled[1]);",
           "options": ["2", "4", "3", "6"],
           "correct": 1,
+          "optionExplanations": ["2 — это arr[1], а doubled[1] = 2 * 2", null, null, null],
           "explanation": ".map() создаёт новый массив [2, 4, 6]; индекс 1 = 4"
         },
         {
@@ -76,6 +134,12 @@
           "code": "const arr = [1, 2, 3, 4, 5];\nconst evens = arr.filter(n => n % 2 === 0);\nconsole.log(evens.length);",
           "options": ["2", "3", "5", "1"],
           "correct": 0,
+          "optionExplanations": [
+            null,
+            "Нечётных три (1, 3, 5), а filter оставил чётные",
+            "filter убирает элементы, не прошедшие проверку",
+            null
+          ],
           "explanation": ".filter() оставляет только чётные [2, 4]; длина = 2"
         },
         {
@@ -83,19 +147,26 @@
           "type": "fill",
           "title": "Заполни пропуск",
           "codeBefore": "const names = [\"Alice\", \"Bob\", \"Charlie\"];\nconst upper = names.",
-          "codeAfter": "(s => s.toUpperCase());\nconsole.log(upper[0]); // \"ALICE\"",
+          "codeAfter": "(s => s.toUpperCase());\nconsole.log(upper[0]); // ALICE",
           "options": ["filter", "map", "reduce", "find"],
           "correct": 1,
+          "optionExplanations": [
+            "filter не меняет элементы, только отбирает их — останется \"Alice\"",
+            null,
+            "reduce сворачивает массив в одно значение, а не возвращает новый массив",
+            "find вернёт сам элемент-строку, а не массив"
+          ],
           "explanation": ".map() трансформирует каждый элемент: 'Alice' → 'ALICE'"
         },
         {
           "id": "arrays-02-q4",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const arr = [1, 2, 3];\nconst mapped = arr.map(n => n * 2);\nconsole.log(arr[0]); // 1",
+          "code": "const arr = [1, 2, 3];\nconst mapped = arr.map(n => n * 2);\nconsole.log(arr[0]);",
           "options": ["Выведет 1", "Выведет 2"],
           "correct": 0,
-          "explanation": ".map() не изменяет исходный массив, создаёт новый"
+          "optionExplanations": [null, "map создаёт новый массив, исходный arr не меняется"],
+          "explanation": "map() не изменяет исходный массив, а создаёт новый. arr[0] по-прежнему 1."
         },
         {
           "id": "arrays-02-q5",
@@ -104,7 +175,7 @@
           "code": "const words = [\"js\", \"python\", \"go\"];\nconst short = words.filter(w => w.length <= 2);\nconsole.log(short);",
           "options": ["[\"js\", \"go\"]", "[\"js\"]", "[\"python\"]", "[]"],
           "correct": 0,
-          "explanation": "Только 'js' (2 символа) и 'go' (2 символа) проходят фильтр"
+          "explanation": "Фильтр пропускает слова длиной не больше 2: 'js' и 'go'. filter возвращает массив."
         }
       ]
     },
@@ -113,6 +184,30 @@
       "topicId": "arrays",
       "title": "reduce, find, indexOf",
       "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`reduce` сворачивает массив в одно значение. Функция получает накопитель `acc` и текущий элемент, а второй аргумент `reduce` — начальное значение `acc`."
+          },
+          {
+            "type": "code",
+            "code": "const arr = [1, 2, 3, 4];\nconsole.log(arr.reduce((acc, n) => acc + n, 0)); // 10\nconsole.log(arr.reduce((acc, n) => acc * n, 1)); // 24"
+          },
+          {
+            "type": "text",
+            "text": "`find` возвращает **первый** подходящий элемент (или `undefined`), `indexOf` — индекс значения (или `-1`, если его нет)."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [5, 12, 8, 30];\nconsole.log(nums.find(n => n > 10)); // 12\nconsole.log(nums.indexOf(8));        // 2\nconsole.log(nums.indexOf(99));       // -1"
+          },
+          {
+            "type": "tip",
+            "text": "Для суммы начинай `reduce` с `0`, для произведения — с `1`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "arrays-03-q1",
@@ -121,7 +216,13 @@
           "code": "const arr = [1, 2, 3, 4];\nconst sum = arr.reduce((acc, n) => acc + n, 0);\nconsole.log(sum);",
           "options": ["0", "4", "10", "24"],
           "correct": 2,
-          "explanation": ".reduce() накапливает значение: 0+1+2+3+4 = 10"
+          "optionExplanations": [
+            "0 — только начальное значение накопителя",
+            "4 — последний элемент, а reduce проходит по всем",
+            null,
+            "24 — это произведение, а здесь сложение"
+          ],
+          "explanation": "reduce накапливает значение, начиная с 0: 0 + 1 + 2 + 3 + 4 = 10."
         },
         {
           "id": "arrays-03-q2",
@@ -130,7 +231,13 @@
           "code": "const arr = [5, 12, 8, 3];\nconst found = arr.find(n => n > 10);\nconsole.log(found);",
           "options": ["12", "8", "[12]", "undefined"],
           "correct": 0,
-          "explanation": ".find() возвращает первый элемент, удовлетворяющий условию: 12"
+          "optionExplanations": [
+            null,
+            "8 не больше 10",
+            "Массив вернул бы filter, а find возвращает сам элемент",
+            null
+          ],
+          "explanation": "find() возвращает первый элемент, подходящий под условие, — сам элемент, а не массив."
         },
         {
           "id": "arrays-03-q3",
@@ -149,16 +256,22 @@
           "codeAfter": "((acc, n) => acc * n, 1);\nconsole.log(product); // 120",
           "options": ["map", "filter", "reduce", "find"],
           "correct": 2,
-          "explanation": ".reduce() с начальным значением 1 перемножает все элементы: 1*2*3*4*5=120"
+          "optionExplanations": [
+            "map вернёт массив, а не одно число",
+            "filter вернёт массив, а не одно число",
+            null,
+            "find вернёт один элемент массива"
+          ],
+          "explanation": "reduce с начальным значением 1 перемножает все элементы: 1 * 1 * 2 * 3 * 4 * 5 = 120."
         },
         {
           "id": "arrays-03-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const arr = [1, 2, 3];\nconsole.log(arr.indexOf(99)); // -1",
+          "code": "const arr = [1, 2, 3];\nconsole.log(arr.indexOf(99));",
           "options": ["Выведет -1", "Вызовет Error"],
           "correct": 0,
-          "explanation": ".indexOf() возвращает -1 если элемент не найден"
+          "explanation": "indexOf() не бросает ошибку, если элемента нет, а возвращает -1."
         }
       ]
     },
@@ -167,6 +280,30 @@
       "topicId": "arrays",
       "title": "slice, splice, spread",
       "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`slice(start, end)` возвращает **копию** части массива: `start` включительно, `end` — нет. Spread `...` раскладывает массив на элементы — так копируют и склеивают массивы."
+          },
+          {
+            "type": "code",
+            "code": "const arr = [1, 2, 3, 4, 5];\nconsole.log(arr.slice(1, 3)); // [2, 3]\nconsole.log([...arr, 6]);     // [1, 2, 3, 4, 5, 6]"
+          },
+          {
+            "type": "text",
+            "text": "`splice(start, count)` **меняет** массив на месте: удаляет `count` элементов, начиная с индекса `start`."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [1, 2, 3, 4];\nnums.splice(1, 2);\nconsole.log(nums); // [1, 4]"
+          },
+          {
+            "type": "warning",
+            "text": "`sort()` без аргументов сравнивает элементы **как строки**: `[10, 9, 1].sort()` даёт `[1, 10, 9]`. Для чисел передавай функцию: `sort((a, b) => a - b)`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "arrays-04-q1",
@@ -175,7 +312,13 @@
           "code": "const arr = [1, 2, 3, 4, 5];\nconsole.log(arr.slice(1, 3));",
           "options": ["[1, 2, 3]", "[2, 3]", "[2, 3, 4]", "[1, 3]"],
           "correct": 1,
-          "explanation": ".slice(start, end) — от start включительно до end не включая: [2, 3]"
+          "optionExplanations": [
+            "Индекс end не включается, и отсчёт идёт с 0",
+            null,
+            "Элемент с индексом 3 не входит — end не включается",
+            null
+          ],
+          "explanation": "slice(start, end) берёт элементы с индекса start включительно до end, не включая его: индексы 1 и 2 — [2, 3]."
         },
         {
           "id": "arrays-04-q2",
@@ -184,7 +327,7 @@
           "code": "const a = [1, 2];\nconst b = [3, 4];\nconst c = [...a, ...b];\nconsole.log(c.length);",
           "options": ["2", "4", "3", "Error"],
           "correct": 1,
-          "explanation": "Spread оператор разворачивает массивы: [1, 2, 3, 4], длина 4"
+          "explanation": "Spread разворачивает оба массива в новый: [1, 2, 3, 4], длина 4."
         },
         {
           "id": "arrays-04-q3",
@@ -194,7 +337,7 @@
           "codeAfter": "original];\ncopy.push(4);\nconsole.log(original.length); // 3",
           "options": [".", "..", "...", "&"],
           "correct": 2,
-          "explanation": "... spread создаёт поверхностную копию массива"
+          "explanation": "Spread ... раскладывает элементы в новый массив — получается поверхностная копия, и push в копию не меняет оригинал."
         },
         {
           "id": "arrays-04-q4",
@@ -203,16 +346,26 @@
           "code": "const arr = [1, 2, 3, 4];\narr.splice(1, 2);\nconsole.log(arr);",
           "options": ["[1, 4]", "[1, 2, 3, 4]", "[2, 3]", "[1, 3]"],
           "correct": 0,
-          "explanation": ".splice(start, deleteCount) изменяет массив на месте: удаляет 2 эл. с индекса 1"
+          "optionExplanations": [
+            null,
+            "splice меняет сам массив",
+            "[2, 3] — это удалённые элементы, splice их возвращает, а в arr остаётся [1, 4]",
+            null
+          ],
+          "explanation": "splice(1, 2) удаляет 2 элемента начиная с индекса 1 прямо в arr. Остаётся [1, 4]."
         },
         {
           "id": "arrays-04-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const arr = [3, 1, 2];\narr.sort();\nconsole.log(arr[0]); // 1",
-          "options": ["Выведет 1", "Выведет 3"],
+          "code": "const arr = [10, 9, 1];\narr.sort();\nconsole.log(arr[1]);",
+          "options": ["Выведет 10", "Выведет 9"],
           "correct": 0,
-          "explanation": ".sort() без аргументов сортирует числа в числовом порядке для небольших чисел"
+          "optionExplanations": [
+            null,
+            "Так было бы при числовой сортировке, но sort() без аргументов сравнивает строки"
+          ],
+          "explanation": "sort() без аргументов сравнивает элементы как строки: \"1\" < \"10\" < \"9\". Массив станет [1, 10, 9], и arr[1] = 10. Для чисел нужна функция сравнения (a, b) => a - b."
         }
       ]
     },
@@ -221,6 +374,30 @@
       "topicId": "arrays",
       "title": "Массивы: закрепление",
       "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`every` возвращает `true`, если условие выполнено для **всех** элементов, `some` — если хотя бы для **одного**."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [1, 2, 3, 4];\nconsole.log(nums.every(n => n > 0));      // true\nconsole.log(nums.some(n => n % 2 === 0)); // true"
+          },
+          {
+            "type": "text",
+            "text": "`flat()` раскрывает вложенные массивы на один уровень. Методы, которые возвращают массив, можно соединять в цепочку."
+          },
+          {
+            "type": "code",
+            "code": "console.log([1, [2, [3]]].flat()); // [1, 2, [3]]\nconsole.log([1, 2, 3].map(n => n * 2).filter(n => n > 3)); // [4, 6]"
+          },
+          {
+            "type": "tip",
+            "text": "Убрать дубли из массива можно так: `[...new Set(arr)]`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "arrays-05-q1",
@@ -229,7 +406,13 @@
           "code": "const arr = [1, [2, 3], [4, [5]]];\nconsole.log(arr.flat().length);",
           "options": ["3", "5", "4", "Error"],
           "correct": 1,
-          "explanation": ".flat() раскрывает вложенность на один уровень: [1, 2, 3, 4, [5]], длина 5"
+          "optionExplanations": [
+            "flat раскрывает вложенные массивы, элементов станет больше",
+            null,
+            null,
+            null
+          ],
+          "explanation": "flat() раскрывает вложенность на один уровень: [1, 2, 3, 4, [5]] — 5 элементов, [5] остаётся массивом."
         },
         {
           "id": "arrays-05-q2",
@@ -238,7 +421,7 @@
           "code": "const nums = [1, 2, 3, 4, 5];\nconsole.log(nums.every(n => n > 0));",
           "options": ["false", "true", "5", "undefined"],
           "correct": 1,
-          "explanation": ".every() возвращает true если все элементы удовлетворяют условию"
+          "explanation": "every() возвращает true, если условие выполняется для всех элементов. Все числа больше 0."
         },
         {
           "id": "arrays-05-q3",
@@ -248,7 +431,13 @@
           "codeAfter": "(n => n % 2 === 0);\nconsole.log(hasEven); // true",
           "options": ["every", "find", "some", "includes"],
           "correct": 2,
-          "explanation": ".some() возвращает true если хотя бы один элемент удовлетворяет условию"
+          "optionExplanations": [
+            "every требует, чтобы условие выполнялось для всех элементов, а нечётные есть",
+            "find вернёт сам элемент — 2",
+            null,
+            "includes ищет значение, а не проверяет условие-функцию"
+          ],
+          "explanation": "some() возвращает true, если условие выполняется хотя бы для одного элемента."
         },
         {
           "id": "arrays-05-q4",
@@ -257,6 +446,12 @@
           "code": "const arr = [1, 2, 3];\nconst result = arr.map(n => n * 2).filter(n => n > 3);\nconsole.log(result);",
           "options": ["[2, 4, 6]", "[4, 6]", "[6]", "[1, 2, 3]"],
           "correct": 1,
+          "optionExplanations": [
+            "Это результат только map, а filter ещё отбирает элементы",
+            null,
+            null,
+            null
+          ],
           "explanation": "map → [2, 4, 6]; filter n > 3 → [4, 6]"
         },
         {
@@ -270,7 +465,7 @@
             "console.log(sorted);"
           ],
           "shuffled": [2, 0, 3, 1],
-          "explanation": "Массив, удаление дублей через Set, сортировка, вывод"
+          "explanation": "Сначала массив, затем Set убирает дубли, sort с функцией (a, b) => a - b сортирует числа, и вывод: [1, 3, 4, 5, 9]."
         }
       ]
     },
@@ -279,6 +474,26 @@
       "topicId": "objects",
       "title": "Создание объектов",
       "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Объект хранит пары **ключ: значение**. Читать свойство можно через точку, добавлять — простым присваиванием. Несуществующее свойство — не ошибка, а `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Alice\" };\nuser.age = 25;\nconsole.log(user.name);               // Alice\nconsole.log(Object.keys(user).length); // 2\nconsole.log(user.email);              // undefined"
+          },
+          {
+            "type": "text",
+            "text": "Если имя свойства совпадает с именем переменной, хватит одного слова — это **сокращённая запись**. А `[выражение]` в литерале делает именем свойства значение выражения."
+          },
+          {
+            "type": "code",
+            "code": "const x = 10;\nconst key = \"color\";\nconst obj = { x, [key]: \"red\" };\nconsole.log(obj); // { x: 10, color: \"red\" }"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "objects-01-q1",
@@ -287,6 +502,7 @@
           "code": "const user = { name: \"Alice\", age: 25 };\nconsole.log(user.name);",
           "options": ["user", "\"Alice\"", "Alice", "undefined"],
           "correct": 2,
+          "optionExplanations": [null, "console.log выводит строку без кавычек", null, null],
           "explanation": "Точечная нотация для доступа к свойству объекта"
         },
         {
@@ -296,7 +512,13 @@
           "code": "const key = \"color\";\nconst obj = { [key]: \"red\" };\nconsole.log(obj.color);",
           "options": ["key", "undefined", "\"red\"", "red"],
           "correct": 3,
-          "explanation": "[key] — вычисляемое свойство, значение переменной key становится именем свойства"
+          "optionExplanations": [
+            "В квадратных скобках подставляется значение переменной key, а не её имя",
+            null,
+            "console.log выводит строку без кавычек",
+            null
+          ],
+          "explanation": "[key] — вычисляемое свойство: именем свойства становится значение переменной key, то есть \"color\"."
         },
         {
           "id": "objects-01-q3",
@@ -304,9 +526,15 @@
           "title": "Заполни пропуск",
           "codeBefore": "const x = 10;\nconst obj = { ",
           "codeAfter": " };\nconsole.log(obj.x); // 10",
-          "options": ["x: x", "x", "\"x\": x", "x = x"],
+          "options": ["x:", "x", "...x", "x = x"],
           "correct": 1,
-          "explanation": "Shorthand свойства: если имя переменной = имени свойства, можно написать просто x"
+          "optionExplanations": [
+            "После двоеточия нужно значение — SyntaxError",
+            null,
+            "...x раскладывает свойства x, а у числа их нет: obj будет пустым",
+            "Знак = внутри литерала объекта недопустим — SyntaxError"
+          ],
+          "explanation": "Сокращённая запись свойства: если имя переменной совпадает с именем свойства, достаточно написать x — это то же, что x: x."
         },
         {
           "id": "objects-01-q4",
@@ -315,13 +543,13 @@
           "code": "const obj = {};\nobj.name = \"Bob\";\nconsole.log(Object.keys(obj).length);",
           "options": ["0", "1", "2", "Error"],
           "correct": 1,
-          "explanation": "Object.keys() возвращает массив ключей; после добавления name — 1 ключ"
+          "explanation": "Свойство можно добавить простым присваиванием. Object.keys() вернёт [\"name\"] — один ключ."
         },
         {
           "id": "objects-01-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const obj = { a: 1 };\nconsole.log(obj.b); // undefined",
+          "code": "const obj = { a: 1 };\nconsole.log(obj.b);",
           "options": ["Выведет undefined", "Вызовет Error"],
           "correct": 0,
           "explanation": "Обращение к несуществующему свойству возвращает undefined"
@@ -333,6 +561,30 @@
       "topicId": "objects",
       "title": "Методы объектов",
       "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Object.keys`, `Object.values` и `Object.entries` возвращают массивы ключей, значений и пар `[ключ, значение]`."
+          },
+          {
+            "type": "code",
+            "code": "const obj = { a: 1, b: 2 };\nconsole.log(Object.keys(obj));    // [\"a\", \"b\"]\nconsole.log(Object.values(obj));  // [1, 2]\nconsole.log(Object.entries(obj)); // [[\"a\", 1], [\"b\", 2]]"
+          },
+          {
+            "type": "text",
+            "text": "Spread `{ ...a, ...b }` собирает свойства в новый объект. Проверить, есть ли у объекта своё свойство, можно методом `hasOwnProperty`."
+          },
+          {
+            "type": "code",
+            "code": "const merged = { ...{ x: 1 }, ...{ y: 2 } };\nconsole.log(merged);                     // { x: 1, y: 2 }\nconsole.log(merged.hasOwnProperty(\"x\")); // true"
+          },
+          {
+            "type": "warning",
+            "text": "`Object.freeze(obj)` запрещает менять объект. В обычном скрипте запись молча игнорируется, а в строгом режиме вызовет `TypeError`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "objects-02-q1",
@@ -341,6 +593,7 @@
           "code": "const obj = { a: 1, b: 2, c: 3 };\nconsole.log(Object.values(obj));",
           "options": ["['a', 'b', 'c']", "[1, 2, 3]", "3", "Error"],
           "correct": 1,
+          "optionExplanations": ["Ключи вернул бы Object.keys", null, null, null],
           "explanation": "Object.values() возвращает массив значений объекта"
         },
         {
@@ -350,6 +603,12 @@
           "code": "const a = { x: 1 };\nconst b = { y: 2 };\nconst c = { ...a, ...b };\nconsole.log(c.x + c.y);",
           "options": ["undefined", "12", "3", "Error"],
           "correct": 2,
+          "optionExplanations": [
+            null,
+            "Значения — числа, они складываются, а не склеиваются",
+            null,
+            null
+          ],
           "explanation": "Spread объединяет объекты: c = { x: 1, y: 2 }; 1 + 2 = 3"
         },
         {
@@ -360,7 +619,13 @@
           "codeAfter": ".hasOwnProperty(\"a\");\nconsole.log(has); // true",
           "options": ["Object", "obj", "\"a\"", "this"],
           "correct": 1,
-          "explanation": ".hasOwnProperty() вызывается на экземпляре объекта"
+          "optionExplanations": [
+            "Object.hasOwnProperty(\"a\") проверит сам конструктор Object, а не obj",
+            null,
+            "У строки \"a\" нет своего свойства \"a\"",
+            "Здесь this — не obj"
+          ],
+          "explanation": "hasOwnProperty() вызывают на том объекте, который проверяют: obj.hasOwnProperty(\"a\")."
         },
         {
           "id": "objects-02-q4",
@@ -369,16 +634,23 @@
           "code": "const obj = { a: 1, b: 2 };\nconst entries = Object.entries(obj);\nconsole.log(entries[0]);",
           "options": ["\"a\"", "1", "[\"a\", 1]", "[1, \"a\"]"],
           "correct": 2,
+          "optionExplanations": [
+            "entries возвращает пары, а не только ключи",
+            null,
+            null,
+            "В паре сначала ключ, потом значение"
+          ],
           "explanation": "Object.entries() возвращает массив пар [key, value]; первая = ['a', 1]"
         },
         {
           "id": "objects-02-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const obj = Object.freeze({ x: 1 });\nobj.x = 99;\nconsole.log(obj.x); // 1",
+          "code": "const obj = Object.freeze({ x: 1 });\nobj.x = 99;\nconsole.log(obj.x);",
           "options": ["Выведет 1", "Выведет 99"],
           "correct": 0,
-          "explanation": "Object.freeze() запрещает изменение свойств объекта"
+          "optionExplanations": [null, "Замороженный объект менять нельзя: запись проигнорирована"],
+          "explanation": "Object.freeze() запрещает менять свойства. В обычном скрипте запись молча игнорируется (в строгом режиме была бы TypeError), поэтому x остаётся 1."
         }
       ]
     },
@@ -387,6 +659,30 @@
       "topicId": "objects",
       "title": "Деструктуризация",
       "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Деструктуризация** достаёт свойства объекта в переменные с теми же именами. Можно задать значение по умолчанию и переименовать: `свойство: новоеИмя`."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Bob\", age: 30 };\nconst { name: userName, city = \"Moscow\" } = user;\nconsole.log(userName, city); // Bob Moscow"
+          },
+          {
+            "type": "text",
+            "text": "Массивы деструктурируют по позиции, а лишние элементы пропускают запятой. Шаблоны можно вкладывать друг в друга."
+          },
+          {
+            "type": "code",
+            "code": "const [first, , third] = [10, 20, 30];\nconsole.log(first, third); // 10 30\n\nconst { scores: [top] } = { scores: [90, 70] };\nconsole.log(top); // 90"
+          },
+          {
+            "type": "tip",
+            "text": "Значение по умолчанию срабатывает, только если свойства нет (или в нём `undefined`)."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "objects-03-q1",
@@ -404,6 +700,12 @@
           "code": "const { x = 10, y = 20 } = { x: 5 };\nconsole.log(x + y);",
           "options": ["30", "25", "15", "Error"],
           "correct": 1,
+          "optionExplanations": [
+            "x есть в объекте, поэтому значение по умолчанию 10 не используется",
+            null,
+            null,
+            null
+          ],
           "explanation": "x = 5 (из объекта), y = 20 (значение по умолчанию); 5 + 20 = 25"
         },
         {
@@ -414,7 +716,13 @@
           "codeAfter": " } = { name: \"Bob\" };\nconsole.log(userName);",
           "options": ["nameVar", "\"userName\"", "userName", "user_name"],
           "correct": 2,
-          "explanation": "Синтаксис { name: userName } извлекает name и сохраняет в переменную userName"
+          "optionExplanations": [
+            "Переменная получит имя nameVar, а выводится userName — ReferenceError",
+            "Имя переменной пишут без кавычек",
+            null,
+            "Переменная получит имя user_name, а выводится userName — ReferenceError"
+          ],
+          "explanation": "Запись { name: userName } берёт свойство name и кладёт его в переменную userName."
         },
         {
           "id": "objects-03-q4",
@@ -423,6 +731,7 @@
           "code": "const [first, , third] = [10, 20, 30];\nconsole.log(third);",
           "options": ["10", "20", "30", "undefined"],
           "correct": 2,
+          "optionExplanations": [null, "20 пропущено запятой", null, null],
           "explanation": "Деструктуризация массива с пропуском: first=10, пропуск 20, third=30"
         },
         {
@@ -435,7 +744,7 @@
             "console.log(name, first);"
           ],
           "shuffled": [1, 2, 0],
-          "explanation": "Объект, затем вложенная деструктуризация, затем вывод"
+          "explanation": "Сначала объект, затем вложенная деструктуризация (name и первый элемент scores), затем вывод."
         }
       ]
     },
@@ -444,6 +753,30 @@
       "topicId": "objects",
       "title": "Методы объекта",
       "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Функция внутри объекта — **метод**. В обычном методе `this` — объект, на котором метод вызвали, то есть то, что стоит перед точкой."
+          },
+          {
+            "type": "code",
+            "code": "const cat = {\n  name: \"Whiskers\",\n  speak() {\n    return \"Meow, I'm \" + this.name;\n  },\n};\nconsole.log(cat.speak()); // Meow, I'm Whiskers"
+          },
+          {
+            "type": "warning",
+            "text": "У стрелочной функции нет своего `this`: она берёт его снаружи. Поэтому стрелка в роли метода не видит свойств объекта."
+          },
+          {
+            "type": "text",
+            "text": "`delete obj.key` удаляет свойство. `Object.assign({}, obj)` копирует свойства в новый объект — копию можно менять, не трогая оригинал."
+          },
+          {
+            "type": "code",
+            "code": "const obj = { a: 1, b: 2 };\ndelete obj.b;\nconst copy = Object.assign({}, obj);\ncopy.a = 99;\nconsole.log(obj);  // { a: 1 }\nconsole.log(copy); // { a: 99 }"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "objects-04-q1",
@@ -452,26 +785,42 @@
           "code": "const cat = {\n  name: \"Whiskers\",\n  speak() {\n    return `Meow, I'm ${this.name}`;\n  }\n};\nconsole.log(cat.speak());",
           "options": ["Meow, I'm undefined", "Meow, I'm this.name", "Meow, I'm Whiskers", "Error"],
           "correct": 2,
+          "optionExplanations": [
+            "speak вызван как cat.speak(), поэтому this — это cat",
+            "Внутри ${} вычисляется выражение this.name",
+            null,
+            null
+          ],
           "explanation": "this внутри метода указывает на объект cat"
         },
         {
           "id": "objects-04-q2",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const obj = {\n  val: 42,\n  getVal: () => this.val\n};\nconsole.log(obj.getVal()); // undefined",
+          "code": "const obj = {\n  val: 42,\n  getVal: () => this.val\n};\nconsole.log(obj.getVal());",
           "options": ["Выведет undefined", "Выведет 42"],
           "correct": 0,
-          "explanation": "Стрелочная функция не имеет своего this — this берётся из внешней области (не obj)"
+          "optionExplanations": [
+            null,
+            "Так было бы с обычным методом getVal() { ... }, но у стрелки нет своего this"
+          ],
+          "explanation": "У стрелочной функции нет своего this — он берётся снаружи объекта. Там this — глобальный объект, у которого нет свойства val."
         },
         {
           "id": "objects-04-q3",
           "type": "fill",
           "title": "Заполни пропуск",
           "codeBefore": "const counter = {\n  count: 0,\n  inc() {\n    ",
-          "codeAfter": ".count++;\n  }\n};\ncounter.inc();\nconsole.log(counter.count); // 1",
+          "codeAfter": ".count++;\n  },\n};\nconst clicks = { count: 0, inc: counter.inc };\nclicks.inc();\nconsole.log(clicks.count); // 1",
           "options": ["counter", "self", "this", "me"],
           "correct": 2,
-          "explanation": "this внутри обычного метода — это объект, на котором вызван метод"
+          "optionExplanations": [
+            "Метод всегда менял бы counter, даже когда вызван как clicks.inc()",
+            "self в JavaScript не означает текущий объект",
+            null,
+            "me — не ключевое слово"
+          ],
+          "explanation": "this — объект, на котором вызван метод. clicks.inc() вызывает метод на clicks, поэтому увеличится clicks.count."
         },
         {
           "id": "objects-04-q4",
@@ -480,6 +829,7 @@
           "code": "const obj = { a: 1, b: 2, c: 3 };\ndelete obj.b;\nconsole.log(Object.keys(obj).length);",
           "options": ["3", "1", "2", "Error"],
           "correct": 2,
+          "optionExplanations": ["delete действительно удаляет свойство", null, null, null],
           "explanation": "delete удаляет свойство b, остаётся 2 свойства: a и c"
         },
         {
@@ -489,7 +839,13 @@
           "code": "const obj = { x: 1 };\nconst cloned = Object.assign({}, obj);\ncloned.x = 99;\nconsole.log(obj.x);",
           "options": ["99", "1", "undefined", "Error"],
           "correct": 1,
-          "explanation": "Object.assign({}, obj) создаёт поверхностную копию; изменение копии не влияет на оригинал"
+          "optionExplanations": [
+            "Object.assign создал новый объект, cloned и obj — разные объекты",
+            null,
+            null,
+            null
+          ],
+          "explanation": "Object.assign({}, obj) копирует свойства в новый объект. Изменение копии не влияет на оригинал."
         }
       ]
     },
@@ -498,6 +854,26 @@
       "topicId": "objects",
       "title": "Объекты: закрепление",
       "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Переменная хранит не сам объект, а **ссылку** на него. `const b = a` копирует ссылку: изменения через `b` видны в `a`. И `===` сравнивает объекты по ссылке."
+          },
+          {
+            "type": "code",
+            "code": "const a = { x: 1 };\nconst b = a;\nb.x = 99;\nconsole.log(a.x);                   // 99\nconsole.log(a === b);               // true\nconsole.log({ x: 1 } === { x: 1 }); // false"
+          },
+          {
+            "type": "text",
+            "text": "Оператор `in` проверяет, есть ли в объекте свойство. При слиянии через spread побеждает свойство, которое идёт **позже**."
+          },
+          {
+            "type": "code",
+            "code": "const defaults = { color: \"blue\", size: 10 };\nconst result = { ...defaults, color: \"red\" };\nconsole.log(result);           // { color: \"red\", size: 10 }\nconsole.log(\"size\" in result); // true"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "objects-05-q1",
@@ -506,7 +882,13 @@
           "code": "const a = { x: 1 };\nconst b = a;\nb.x = 99;\nconsole.log(a.x);",
           "options": ["1", "99", "undefined", "Error"],
           "correct": 1,
-          "explanation": "Объекты передаются по ссылке: b и a указывают на один объект"
+          "optionExplanations": [
+            "b = a не копирует объект, а копирует ссылку на тот же объект",
+            null,
+            null,
+            null
+          ],
+          "explanation": "b = a копирует ссылку, а не объект: a и b указывают на один объект, поэтому изменение через b видно в a."
         },
         {
           "id": "objects-05-q2",
@@ -515,6 +897,7 @@
           "code": "const obj = { a: { b: 42 } };\nconst { a: { b } } = obj;\nconsole.log(b);",
           "options": ["{ b: 42 }", "undefined", "42", "Error"],
           "correct": 2,
+          "optionExplanations": ["Это значение a, а шаблон достаёт из него b", null, null, null],
           "explanation": "Вложенная деструктуризация извлекает b из вложенного объекта a"
         },
         {
@@ -525,7 +908,13 @@
           "codeAfter": " obj); // true",
           "options": ["in", "of", "has", "==="],
           "correct": 0,
-          "explanation": "in проверяет есть ли свойство в объекте: 'a' in obj = true"
+          "optionExplanations": [
+            null,
+            "of используется только в цикле for...of",
+            "has — метод Set и Map, а не оператор",
+            "Строка \"a\" и объект не равны"
+          ],
+          "explanation": "Оператор in проверяет, есть ли свойство в объекте: 'a' in obj — true."
         },
         {
           "id": "objects-05-q4",
@@ -534,7 +923,8 @@
           "code": "const obj1 = { a: 1 };\nconst obj2 = { a: 1 };\nconsole.log(obj1 === obj2);",
           "options": ["true", "false"],
           "correct": 1,
-          "explanation": "Объекты сравниваются по ссылке, а не по значению; это разные объекты"
+          "optionExplanations": ["Содержимое одинаковое, но это два разных объекта", null],
+          "explanation": "Объекты сравниваются по ссылке, а не по содержимому: obj1 и obj2 — разные объекты."
         },
         {
           "id": "objects-05-q5",
@@ -542,12 +932,12 @@
           "title": "Расставь строки по порядку",
           "lines": [
             "const defaults = { color: \"blue\", size: 10 };",
-            "const custom = { color: \"red\" };",
+            "const custom = { color: \"red\", size: defaults.size * 2 };",
             "const result = { ...defaults, ...custom };",
-            "console.log(result.color);"
+            "console.log(result.color, result.size);"
           ],
           "shuffled": [3, 1, 0, 2],
-          "explanation": "Defaults, кастомные параметры, merge через spread (custom перезаписывает defaults), вывод"
+          "explanation": "custom использует defaults.size, поэтому defaults объявляется первым. При слиянии custom идёт позже и перезаписывает оба свойства: red 20."
         }
       ]
     },
@@ -556,6 +946,30 @@
       "topicId": "set-map",
       "title": "Set — уникальные значения",
       "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Set` — коллекция **уникальных** значений. Повторы при создании и при `add` игнорируются. Размер хранится в свойстве `size`."
+          },
+          {
+            "type": "code",
+            "code": "const s = new Set([1, 2, 2, 3]);\ns.add(3);\nconsole.log(s.size);   // 3\nconsole.log(s.has(2)); // true\ns.delete(2);\nconsole.log([...s]);   // [1, 3]"
+          },
+          {
+            "type": "text",
+            "text": "Чтобы убрать дубли из массива, создай `Set` и разверни его обратно в массив."
+          },
+          {
+            "type": "code",
+            "code": "const unique = [...new Set([1, 1, 2])];\nconsole.log(unique); // [1, 2]"
+          },
+          {
+            "type": "warning",
+            "text": "`Set` создаётся только через `new`: `Set(arr)` без `new` вызовет `TypeError`."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "set-map-01-q1",
@@ -564,6 +978,7 @@
           "code": "const s = new Set([1, 2, 2, 3, 3, 3]);\nconsole.log(s.size);",
           "options": ["6", "2", "3", "Error"],
           "correct": 2,
+          "optionExplanations": ["Set не хранит повторы", null, null, null],
           "explanation": "Set хранит только уникальные значения: {1, 2, 3}, size = 3"
         },
         {
@@ -573,26 +988,33 @@
           "code": "const s = new Set();\ns.add(1);\ns.add(1);\ns.add(2);\nconsole.log(s.size);",
           "options": ["3", "1", "2", "Error"],
           "correct": 2,
+          "optionExplanations": ["Повторный add(1) ничего не добавляет", null, null, null],
           "explanation": ".add() добавляет только если значения ещё нет; 1 уже есть, итого 2"
         },
         {
           "id": "set-map-01-q3",
           "type": "fill",
           "title": "Заполни пропуск — создать уникальный массив",
-          "codeBefore": "const arr = [1, 2, 2, 3];\nconst unique = [...",
+          "codeBefore": "const arr = [1, 2, 2, 3];\nconst unique = [...new ",
           "codeAfter": "(arr)];\nconsole.log(unique.length); // 3",
           "options": ["Array", "Object", "Set", "Map"],
           "correct": 2,
-          "explanation": "new Set() + spread — быстрый способ получить уникальные элементы массива"
+          "optionExplanations": [
+            "new Array(arr) создаст массив из одного элемента — самого arr",
+            "new Object(arr) вернёт тот же массив с дублями",
+            null,
+            "Map ждёт пары [ключ, значение], а не числа — TypeError"
+          ],
+          "explanation": "new Set(arr) оставляет только уникальные значения, а spread превращает Set обратно в массив: [1, 2, 3]."
         },
         {
           "id": "set-map-01-q4",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const s = new Set([1, 2, 3]);\nconsole.log(s.has(2)); // true",
+          "code": "const s = new Set([1, 2, 3]);\nconsole.log(s.has(2));",
           "options": ["Выведет true", "Вызовет Error"],
           "correct": 0,
-          "explanation": ".has() проверяет наличие элемента в Set"
+          "explanation": "has() проверяет, есть ли значение в Set, и возвращает true или false."
         },
         {
           "id": "set-map-01-q5",
@@ -601,7 +1023,7 @@
           "code": "const s = new Set([1, 2, 3]);\ns.delete(2);\nconsole.log([...s]);",
           "options": ["[1, 2, 3]", "[1, 3]", "[2]", "Error"],
           "correct": 1,
-          "explanation": ".delete() удаляет элемент из Set; spread конвертирует в массив"
+          "explanation": "delete() удаляет значение из Set, а spread превращает оставшееся в массив."
         }
       ]
     },
@@ -610,6 +1032,26 @@
       "topicId": "set-map",
       "title": "Set: итерация и методы",
       "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Set` итерируемый: `for...of` и spread обходят значения в порядке добавления. `Array.from(set)` превращает его в массив, а `clear()` удаляет всё."
+          },
+          {
+            "type": "code",
+            "code": "const s = new Set([\"a\", \"b\", \"c\"]);\nfor (const v of s) console.log(v); // a, b, c\nconsole.log(Array.from(s)); // [\"a\", \"b\", \"c\"]\ns.clear();\nconsole.log(s.size); // 0"
+          },
+          {
+            "type": "warning",
+            "text": "Объекты сравниваются по ссылке: два разных `{}` — два разных значения, и `Set` сохранит оба."
+          },
+          {
+            "type": "code",
+            "code": "const set = new Set();\nset.add({});\nset.add({});\nconsole.log(set.size); // 2"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "set-map-02-q1",
@@ -618,6 +1060,7 @@
           "code": "const s = new Set([\"a\", \"b\", \"c\"]);\nlet result = \"\";\nfor (const v of s) {\n  result += v;\n}\nconsole.log(result);",
           "options": ["abc", "a b c", "[a, b, c]", "Error"],
           "correct": 0,
+          "optionExplanations": [null, "Значения склеиваются в строку без пробелов", null, null],
           "explanation": "Set итерируемый; for...of перебирает все элементы в порядке добавления"
         },
         {
@@ -637,16 +1080,23 @@
           "codeAfter": "(s);\nconsole.log(arr[0]); // 1",
           "options": ["of", "isArray", "from", "create"],
           "correct": 2,
-          "explanation": "Array.from() конвертирует итерируемый объект (включая Set) в массив"
+          "optionExplanations": [
+            "Array.of(s) создаст массив из одного элемента — самого Set",
+            "isArray проверяет, массив ли это, и вернёт false",
+            null,
+            "Array.create не существует"
+          ],
+          "explanation": "Array.from() превращает итерируемый объект, в том числе Set, в массив."
         },
         {
           "id": "set-map-02-q4",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const s = new Set();\ns.add({});\ns.add({});\nconsole.log(s.size); // 2",
+          "code": "const s = new Set();\ns.add({});\ns.add({});\nconsole.log(s.size);",
           "options": ["Выведет 2", "Выведет 1"],
           "correct": 0,
-          "explanation": "Каждый {} создаёт новый объект с уникальной ссылкой, оба добавляются"
+          "optionExplanations": [null, "Два {} выглядят одинаково, но это два разных объекта"],
+          "explanation": "Каждый {} — новый объект со своей ссылкой. Для Set это разные значения, поэтому добавляются оба."
         },
         {
           "id": "set-map-02-q5",
@@ -658,7 +1108,7 @@
             "console.log(unique.size);"
           ],
           "shuffled": [2, 0, 1],
-          "explanation": "Массив с дублями, создание Set (дубли удалены), вывод размера"
+          "explanation": "Массив с дублями, затем Set без повторов (\"hello\" остаётся один раз), затем вывод размера — 3."
         }
       ]
     },
@@ -667,6 +1117,26 @@
       "topicId": "set-map",
       "title": "Map — ключ-значение",
       "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Map` хранит пары **ключ → значение**. Записать — `set`, прочитать — `get`, проверить ключ — `has`, удалить — `delete`, размер — `size`."
+          },
+          {
+            "type": "code",
+            "code": "const m = new Map([[\"a\", 1], [\"b\", 2]]);\nm.set(\"c\", 3);\nconsole.log(m.get(\"a\")); // 1\nconsole.log(m.has(\"b\")); // true\nm.delete(\"b\");\nconsole.log(m.size);     // 2"
+          },
+          {
+            "type": "text",
+            "text": "В отличие от обычного объекта, ключом `Map` может быть что угодно — число, объект, функция."
+          },
+          {
+            "type": "code",
+            "code": "const key = { id: 1 };\nconst users = new Map();\nusers.set(key, \"Alice\");\nconsole.log(users.get(key)); // Alice"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "set-map-03-q1",
@@ -675,6 +1145,7 @@
           "code": "const m = new Map();\nm.set(\"name\", \"Alice\");\nconsole.log(m.get(\"name\"));",
           "options": ["undefined", "\"Alice\"", "Alice", "Error"],
           "correct": 2,
+          "optionExplanations": [null, "console.log выводит строку без кавычек", null, null],
           "explanation": ".set() записывает пару ключ-значение, .get() возвращает значение по ключу"
         },
         {
@@ -684,6 +1155,12 @@
           "code": "const m = new Map([[\"a\", 1], [\"b\", 2]]);\nconsole.log(m.size);",
           "options": ["1", "2", "4", "Error"],
           "correct": 1,
+          "optionExplanations": [
+            null,
+            null,
+            "size — количество пар, а не всех значений внутри",
+            null
+          ],
           "explanation": "Map создаётся из массива пар; в нём 2 записи, size = 2"
         },
         {
@@ -694,6 +1171,12 @@
           "codeAfter": "(1)); // true",
           "options": ["get", "has", "includes", "contains"],
           "correct": 1,
+          "optionExplanations": [
+            "get вернёт значение \"one\", а не true",
+            null,
+            "includes есть у массивов и строк, но не у Map",
+            "contains в JavaScript нет"
+          ],
           "explanation": ".has() проверяет наличие ключа в Map"
         },
         {
@@ -703,7 +1186,11 @@
           "code": "const m = new Map();\nconst key = {};\nm.set(key, \"value\");\nconsole.log(m.get(key));",
           "options": ["Выведет 'value'", "Выведет undefined"],
           "correct": 0,
-          "explanation": "Map может использовать любой тип как ключ, включая объекты"
+          "optionExplanations": [
+            null,
+            "Используется тот же объект key, поэтому значение находится"
+          ],
+          "explanation": "Ключом Map может быть любое значение, включая объект. get(key) находит запись по той же ссылке."
         },
         {
           "id": "set-map-03-q5",
@@ -721,6 +1208,26 @@
       "topicId": "set-map",
       "title": "Map: итерация",
       "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`for...of` по `Map` даёт пары `[ключ, значение]` — их удобно сразу деструктурировать. `keys()` и `values()` возвращают ключи и значения отдельно."
+          },
+          {
+            "type": "code",
+            "code": "const m = new Map([[\"x\", 10], [\"y\", 20]]);\nfor (const [k, v] of m) console.log(k, v); // x 10, y 20\nconsole.log([...m.keys()]);   // [\"x\", \"y\"]\nconsole.log([...m.values()]); // [10, 20]"
+          },
+          {
+            "type": "text",
+            "text": "`Object.entries(obj)` превращает объект в массив пар — из него сразу получается `Map`. Повторный `set` с тем же ключом **перезаписывает** значение, а не добавляет пару."
+          },
+          {
+            "type": "code",
+            "code": "const map = new Map(Object.entries({ a: 1 }));\nmap.set(\"a\", 99);\nconsole.log(map.get(\"a\"), map.size); // 99 1"
+          }
+        ]
+      },
       "questions": [
         {
           "id": "set-map-04-q1",
@@ -738,6 +1245,7 @@
           "code": "const m = new Map([[\"a\", 1], [\"b\", 2]]);\nconsole.log([...m.keys()]);",
           "options": ["[1, 2]", "[\"a\", \"b\"]", "Map", "Error"],
           "correct": 1,
+          "optionExplanations": ["Значения вернул бы values()", null, null, null],
           "explanation": ".keys() возвращает итератор ключей; spread конвертирует в массив"
         },
         {
@@ -748,6 +1256,12 @@
           "codeAfter": "()];\nconsole.log(vals); // [1, 2]",
           "options": ["keys", "values", "entries", "pairs"],
           "correct": 1,
+          "optionExplanations": [
+            "keys() вернёт ключи [\"a\", \"b\"]",
+            null,
+            "entries() вернёт пары [[\"a\", 1], [\"b\", 2]]",
+            "pairs у Map нет"
+          ],
           "explanation": ".values() возвращает итератор значений Map"
         },
         {
@@ -757,15 +1271,20 @@
           "code": "const obj = { a: 1, b: 2 };\nconst m = new Map(Object.entries(obj));\nconsole.log(m.get(\"a\"));",
           "options": ["undefined", "\"a\"", "1", "Error"],
           "correct": 2,
-          "explanation": "Object.entries() даёт пары [[\"a\",1],[\"b\",2]], Map создаётся из них"
+          "optionExplanations": [null, "\"a\" — ключ, а get возвращает значение", null, null],
+          "explanation": "Object.entries() даёт пары [[\"a\", 1], [\"b\", 2]], из них создаётся Map, и get(\"a\") возвращает 1."
         },
         {
           "id": "set-map-04-q5",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const m = new Map([[\"a\", 1]]);\nm.set(\"a\", 99);\nconsole.log(m.size); // 1",
+          "code": "const m = new Map([[\"a\", 1]]);\nm.set(\"a\", 99);\nconsole.log(m.size);",
           "options": ["Выведет 1", "Выведет 2"],
           "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключ \"a\" уже есть, поэтому set обновляет значение, а не добавляет пару"
+          ],
           "explanation": "Повторный .set() с тем же ключом обновляет значение, не добавляет новую пару"
         }
       ]
@@ -775,6 +1294,30 @@
       "topicId": "set-map",
       "title": "Set и Map: закрепление",
       "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Частая задача — подсчёт частоты. Если ключа ещё нет, `get` вернёт `undefined`, поэтому подставляем `0`."
+          },
+          {
+            "type": "code",
+            "code": "const freq = new Map();\nfor (const ch of \"abca\") {\n  freq.set(ch, (freq.get(ch) || 0) + 1);\n}\nconsole.log(freq.get(\"a\")); // 2\nconsole.log(freq.get(\"z\")); // undefined"
+          },
+          {
+            "type": "text",
+            "text": "Операции над множествами собираются из `filter` и `has`: пересечение — элементы, которые есть в обоих, разность — те, которых нет во втором."
+          },
+          {
+            "type": "code",
+            "code": "const a = new Set([1, 2, 3]);\nconst b = new Set([2, 3, 4]);\nconsole.log([...a].filter(x => b.has(x)));  // [2, 3]\nconsole.log([...a].filter(x => !b.has(x))); // [1]"
+          },
+          {
+            "type": "tip",
+            "text": "У `Set` и `Map` проверка наличия — `has`, а не `includes`: `includes` есть у массивов и строк."
+          }
+        ]
+      },
       "questions": [
         {
           "id": "set-map-05-q1",
@@ -783,7 +1326,7 @@
           "code": "const freq = new Map();\n[\"a\",\"b\",\"a\",\"c\",\"b\",\"a\"].forEach(ch => {\n  freq.set(ch, (freq.get(ch) || 0) + 1);\n});\nconsole.log(freq.get(\"a\"));",
           "options": ["1", "2", "3", "undefined"],
           "correct": 2,
-          "explanation": "Map подсчитывает частоту: 'a' встречается 3 раза"
+          "explanation": "Для каждой буквы берём текущий счётчик (или 0) и прибавляем 1. 'a' встречается 3 раза."
         },
         {
           "id": "set-map-05-q2",
@@ -792,7 +1335,13 @@
           "code": "const setA = new Set([1, 2, 3, 4]);\nconst setB = new Set([3, 4, 5, 6]);\nconst intersection = [...setA].filter(x => setB.has(x));\nconsole.log(intersection.length);",
           "options": ["2", "4", "8", "6"],
           "correct": 0,
-          "explanation": "Пересечение множеств: [3, 4] — элементы, которые есть в обоих"
+          "optionExplanations": [
+            null,
+            "Это размер одного множества, а нужны общие элементы",
+            null,
+            null
+          ],
+          "explanation": "Пересечение — элементы, которые есть в обоих множествах: [3, 4], длина 2."
         },
         {
           "id": "set-map-05-q3",
@@ -802,15 +1351,22 @@
           "codeAfter": "(x));\nconsole.log(diff); // [1]",
           "options": ["includes", "has", "get", "find"],
           "correct": 1,
-          "explanation": ".has() для Set — O(1) проверка; !s2.has(x) даёт элементы только в s1"
+          "optionExplanations": [
+            "includes есть у массивов, а у Set — has",
+            null,
+            "get есть у Map, а у Set его нет",
+            "find — метод массивов, у Set его нет"
+          ],
+          "explanation": "has() проверяет, есть ли значение в Set. !s2.has(x) оставляет элементы, которых нет в s2."
         },
         {
           "id": "set-map-05-q4",
           "type": "trueFalse",
           "title": "True или False?",
-          "code": "const m = new Map();\nconsole.log(m.get(\"missing\")); // undefined",
+          "code": "const m = new Map();\nconsole.log(m.get(\"missing\"));",
           "options": ["Выведет undefined", "Вызовет Error"],
           "correct": 0,
+          "optionExplanations": [null, "Отсутствующий ключ — не ошибка"],
           "explanation": ".get() с отсутствующим ключом возвращает undefined"
         },
         {
@@ -818,16 +1374,15 @@
           "type": "order",
           "title": "Расставь строки по порядку",
           "lines": [
-            "const cache = new Map();",
-            "function memoize(fn) {",
-            "  return x => {",
-            "    if (!cache.has(x)) cache.set(x, fn(x));",
-            "    return cache.get(x);",
-            "  };",
-            "}"
+            "const words = [\"a\", \"b\", \"a\"];",
+            "const counts = new Map(words.map(w => [w, 0]));",
+            "for (const w of words) {",
+            "  counts.set(w, counts.get(w) + 1);",
+            "}",
+            "console.log(counts.get(\"a\"));"
           ],
-          "shuffled": [5, 1, 0, 6, 3, 2, 4],
-          "explanation": "Cache Map, функция memoize, возврат обёртки, проверка/запись, возврат результата"
+          "shuffled": [5, 2, 0, 4, 1, 3],
+          "explanation": "Сначала массив слов, затем Map со счётчиком 0 для каждого слова (он строится из words). Потом цикл увеличивает счётчики, и выводим результат: \"a\" встречается 2 раза."
         }
       ]
     }
