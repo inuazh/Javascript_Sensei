@@ -12,7 +12,7 @@
           ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 20"
         },
         "xp": {
-          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 5000)"
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
         },
         "weekXp": {
           ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('xp').val()"

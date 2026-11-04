@@ -96,6 +96,25 @@ export function OrderQuestion({
                 ],
               }}
               {...(revealed ? {} : handlers[idx])}
+              accessible
+              accessibilityRole="adjustable"
+              accessibilityLabel={`Строка ${idx + 1}: ${question.lines[lineIndex]}`}
+              accessibilityHint={revealed ? undefined : 'Смахни вверх или вниз, чтобы переместить'}
+              accessibilityActions={
+                revealed
+                  ? []
+                  : [
+                      { name: 'decrement', label: 'Переместить вверх' },
+                      { name: 'increment', label: 'Переместить вниз' },
+                    ]
+              }
+              onAccessibilityAction={e => {
+                const to = e.nativeEvent.actionName === 'decrement' ? idx - 1 : idx + 1;
+                if (to < 0 || to >= order.length) return;
+                const next = [...order];
+                [next[idx], next[to]] = [next[to], next[idx]];
+                onChange(next);
+              }}
             >
               <View
                 style={[

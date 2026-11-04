@@ -78,6 +78,7 @@ interface UserState {
 }
 
 const STORE_VERSION = 1;
+const STORAGE_KEY = 'js-sensei-user';
 
 type PersistedState = Pick<UserState, 'settings' | 'progress'>;
 
@@ -117,10 +118,14 @@ export const useUserStore = create<UserState>()(
           settings: { ...state.settings, placementDone: true },
         })),
 
-      resetProgress: () => set({ progress: initialProgress }),
+      resetProgress: () =>
+        set(state => ({
+          progress: initialProgress,
+          settings: { ...state.settings, placementDone: false },
+        })),
     }),
     {
-      name: 'js-sensei-user',
+      name: STORAGE_KEY,
       version: STORE_VERSION,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state): PersistedState => ({
@@ -133,6 +138,9 @@ export const useUserStore = create<UserState>()(
           return { progress, settings: { ...defaultSettings, ...settings } };
         }
         return persisted as PersistedState;
+      },
+      onRehydrateStorage: () => (_state, error) => {
+        if (error) handleHydrationError(error);
       },
       // New settings keys added later get their defaults.
       merge: (persisted, current) => {
@@ -147,13 +155,36 @@ export const useUserStore = create<UserState>()(
   ),
 );
 
-/** Resolves once the persisted state has been loaded. */
+const HYDRATION_TIMEOUT_MS = 8000;
+let hydrationFailed = false;
+const failureListeners = new Set<() => void>();
+
+/**
+ * Stored state could not be read or migrated. The app starts with defaults so
+ * it never hangs on the splash screen; the raw value is copied aside first so
+ * the next write does not destroy it.
+ */
+function handleHydrationError(error: unknown) {
+  console.warn('Failed to restore saved progress', error);
+  hydrationFailed = true;
+  AsyncStorage.getItem(STORAGE_KEY)
+    .then(raw => (raw ? AsyncStorage.setItem(`${STORAGE_KEY}.corrupt`, raw) : undefined))
+    .catch(() => {});
+  failureListeners.forEach(listener => listener());
+}
+
+/** Resolves once the persisted state has been loaded, failed to load, or timed out. */
 export function waitForHydration(): Promise<void> {
-  if (useUserStore.persist.hasHydrated()) return Promise.resolve();
+  if (useUserStore.persist.hasHydrated() || hydrationFailed) return Promise.resolve();
   return new Promise(resolve => {
-    const unsub = useUserStore.persist.onFinishHydration(() => {
+    const done = () => {
       unsub();
+      failureListeners.delete(done);
+      clearTimeout(timer);
       resolve();
-    });
+    };
+    const unsub = useUserStore.persist.onFinishHydration(done);
+    failureListeners.add(done);
+    const timer = setTimeout(done, HYDRATION_TIMEOUT_MS);
   });
 }

@@ -207,3 +207,20 @@ describe('skipLessons', () => {
     expect(after.lessons.b1).toBe(taken.lessons.b1);
   });
 });
+
+describe('free practice', () => {
+  it('pays no daily bonus when nothing was due', () => {
+    const afterLesson = completeLesson(
+      initialProgress,
+      { lessonId: 'b1', answers: answers('b1', perfect) },
+      ctx('2026-11-04T12:00:00'),
+    ).state;
+    const { outcome } = completeWorkout(
+      afterLesson,
+      { answers: [{ questionId: 'b1-q0', lessonId: 'b1', correct: true }], dueIds: [] },
+      ctx('2026-11-04T18:00:00'),
+    );
+    expect(outcome.xpEarned).toBe(0);
+    expect(outcome.firstWorkoutToday).toBe(false);
+  });
+});
