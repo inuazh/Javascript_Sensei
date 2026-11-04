@@ -13,13 +13,20 @@ import {
   Spacing,
   Type,
 } from '../../ui';
+import { RunCode } from '../runner/RunCode';
 
-function Block({ block }: { block: TheoryBlock }) {
+/** `earlier`: code of the code blocks above this one on the card. */
+function Block({ block, earlier }: { block: TheoryBlock; earlier: string[] }) {
   switch (block.type) {
     case 'text':
       return <RichText text={block.text} />;
     case 'code':
-      return <CodeBlock code={block.code} caption={block.caption} />;
+      return (
+        <View style={styles.code}>
+          <CodeBlock code={block.code} caption={block.caption} />
+          <RunCode code={block.code} earlier={earlier} />
+        </View>
+      );
     case 'tip':
     case 'warning': {
       const color = block.type === 'tip' ? Colors.info : Colors.warning;
@@ -68,14 +75,19 @@ export function TheoryView({ title, label, theory, onStart, onClose }: TheoryVie
       <Label>{`теория · ${label.toLowerCase()}`}</Label>
       <Text style={Type.h1}>{title}</Text>
       {theory.blocks.map((block, i) => (
-        <Block key={i} block={block} />
+        <Block key={i} block={block} earlier={earlierCode(theory, i)} />
       ))}
     </Screen>
   );
 }
 
+function earlierCode(theory: Theory, index: number): string[] {
+  return theory.blocks.slice(0, index).flatMap(b => (b.type === 'code' ? [b.code] : []));
+}
+
 const styles = StyleSheet.create({
   close: { alignSelf: 'flex-start' },
+  code: { gap: Spacing.sm },
   callout: {
     backgroundColor: Colors.surface,
     borderWidth: 1,

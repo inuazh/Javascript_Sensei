@@ -130,6 +130,7 @@ export function QuizSession({
             explanation={question.explanation}
             correctAnswer={def.correctAnswer(question)}
             note={def.answerNote?.(question, state.answer) ?? null}
+            runnableCode={def.runnableCode(question)}
           />
         )}
       </ScrollView>

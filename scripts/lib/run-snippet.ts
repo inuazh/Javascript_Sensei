@@ -4,6 +4,7 @@
  * promise callbacks are drained between them.
  */
 import vm from 'node:vm';
+import { FORMAT_VALUE_JS } from '../../src/services/runnerHarness';
 
 const RUN_TIMEOUT_MS = 2000;
 
@@ -13,44 +14,13 @@ export interface RunResult {
   error: string | null;
 }
 
-/** Formats a value roughly like the browser console, in the style used by lesson options. */
-export function formatValue(v: unknown, nested = false, seen = new Set<object>()): string {
-  if (typeof v === 'string') return nested ? JSON.stringify(v) : v;
-  if (typeof v === 'bigint') return `${v}n`;
-  if (typeof v === 'symbol') return v.toString();
-  if (typeof v === 'function') return v.name ? `[Function: ${v.name}]` : '[Function (anonymous)]';
-  if (v === null || typeof v !== 'object') return String(v);
-  if (seen.has(v)) return '[Circular]';
-  seen.add(v);
-  const fmt = (x: unknown) => formatValue(x, true, seen);
-  try {
-    if (Array.isArray(v)) return `[${v.map(fmt).join(', ')}]`;
-    const tag = Object.prototype.toString.call(v).slice(8, -1);
-    if (v instanceof Map || tag === 'Map') {
-      const m = v as Map<unknown, unknown>;
-      return `Map(${m.size}) {${[...m].map(([k, x]) => `${fmt(k)} => ${fmt(x)}`).join(', ')}}`;
-    }
-    if (v instanceof Set || tag === 'Set') {
-      const s = v as Set<unknown>;
-      return `Set(${s.size}) {${[...s].map(fmt).join(', ')}}`;
-    }
-    if (tag === 'Error') {
-      const e = v as Error;
-      return `${e.name}: ${e.message}`;
-    }
-    if (tag === 'Promise') return 'Promise';
-    if (tag === 'Date') return (v as Date).toISOString();
-    const keys = Object.keys(v);
-    if (keys.length === 0) return '{}';
-    const rec = v as Record<string, unknown>;
-    const props = keys.map(
-      k => `${/^[A-Za-z_$][\w$]*$/.test(k) ? k : JSON.stringify(k)}: ${fmt(rec[k])}`,
-    );
-    return `{ ${props.join(', ')} }`;
-  } finally {
-    seen.delete(v);
-  }
-}
+/**
+ * Formats a value like the browser console, in the style used by lesson options.
+ * The source is shared with the in-app code runner (src/services/runnerHarness.ts).
+ */
+export const formatValue = new Function(`${FORMAT_VALUE_JS}\nreturn formatValue;`)() as (
+  v: unknown,
+) => string;
 
 const flushMicrotasks = () => new Promise<void>(resolve => setImmediate(resolve));
 

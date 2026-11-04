@@ -1,12 +1,20 @@
 import type { ComponentType } from 'react';
-import type { ChoiceQuestion as ChoiceQuestionT, Question } from '../../content/schema';
+import type {
+  ChoiceQuestion as ChoiceQuestionT,
+  OrderQuestion as OrderQuestionT,
+  Question,
+} from '../../content/schema';
 import { ChoiceQuestion } from './questions/ChoiceQuestion';
 import { OrderQuestion } from './questions/OrderQuestion';
 import type { QuestionRegistry, QuestionTypeDef, QuestionViewProps } from './types';
 
-function choice<Q extends ChoiceQuestionT>(defaultTitle: string): QuestionTypeDef<Q, number> {
+function choice<Q extends ChoiceQuestionT>(
+  defaultTitle: string,
+  runnableCode: (question: Q) => string | null,
+): QuestionTypeDef<Q, number> {
   return {
     defaultTitle,
+    runnableCode,
     Component: ChoiceQuestion as ComponentType<QuestionViewProps<Q, number>>,
     initialAnswer: () => null,
     isCorrect: (q, a) => a === q.correct,
@@ -15,16 +23,23 @@ function choice<Q extends ChoiceQuestionT>(defaultTitle: string): QuestionTypeDe
   };
 }
 
+/** Lines in the correct order, unless they are steps in prose rather than code. */
+function orderCode(q: OrderQuestionT): string | null {
+  if (q.lines.some(line => /^\s*[А-Яа-яЁё]/.test(line))) return null;
+  return q.lines.join('\n');
+}
+
 export const QUESTION_TYPES: QuestionRegistry = {
-  output: choice('Что выведет код?'),
-  trueFalse: choice('Верно или нет?'),
-  fill: choice('Заполни пропуск'),
+  output: choice('Что выведет код?', q => q.code),
+  trueFalse: choice('Верно или нет?', q => (q.code?.trim() ? q.code : null)),
+  fill: choice('Заполни пропуск', q => q.codeBefore + q.options[q.correct] + q.codeAfter),
   order: {
     defaultTitle: 'Расставь строки по порядку',
     Component: OrderQuestion,
     initialAnswer: q => q.shuffled,
     isCorrect: (_q, a: number[]) => a.every((lineIndex, i) => lineIndex === i),
     correctAnswer: q => ({ code: q.lines.join('\n') }),
+    runnableCode: orderCode,
   },
 };
 

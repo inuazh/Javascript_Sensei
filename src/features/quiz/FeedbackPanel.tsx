@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { CodeBlock, Colors, Fonts, Icon, Radius, RichText, Spacing } from '../../ui';
+import { RunCode } from '../runner/RunCode';
 import type { CorrectAnswerView } from './types';
 
 interface FeedbackPanelProps {
@@ -7,11 +8,19 @@ interface FeedbackPanelProps {
   explanation: string;
   correctAnswer: CorrectAnswerView;
   note: string | null;
+  /** Code to run with «Запустить», if the question has any. */
+  runnableCode: string | null;
 }
 
 const PRAISE = ['Верно', 'Точно', 'В точку', 'Правильно', 'Отлично'];
 
-export function FeedbackPanel({ correct, explanation, correctAnswer, note }: FeedbackPanelProps) {
+export function FeedbackPanel({
+  correct,
+  explanation,
+  correctAnswer,
+  note,
+  runnableCode,
+}: FeedbackPanelProps) {
   const color = correct ? Colors.success : Colors.danger;
   const praise = PRAISE[explanation.length % PRAISE.length];
   return (
@@ -28,6 +37,7 @@ export function FeedbackPanel({ correct, explanation, correctAnswer, note }: Fee
       {!correct && correctAnswer.code ? <CodeBlock code={correctAnswer.code} /> : null}
       {!correct && note ? <RichText text={note} style={styles.note} /> : null}
       <RichText text={explanation} style={styles.explanation} />
+      {runnableCode ? <RunCode code={runnableCode} /> : null}
     </View>
   );
 }
