@@ -392,7 +392,8 @@ const styles = StyleSheet.create({
   },
   topicNext: { backgroundColor: Colors.surface },
   pressed: { backgroundColor: Colors.surfaceRaised },
-  topicIndex: { width: 28, fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
+  // Wide enough for two-digit sections: "10.1".
+  topicIndex: { width: 34, fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   status: { width: 16, alignItems: 'center' },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.textDisabled },
   topicTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 15, color: Colors.textPrimary },

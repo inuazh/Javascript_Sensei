@@ -252,6 +252,8 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontFamily: Fonts.mono,
     fontSize: 15,
+    // The surrounding pill is the field; no browser focus ring on the web.
+    outlineWidth: 0,
   },
   list: { paddingBottom: Spacing.xxxl },
   listLabel: { marginBottom: Spacing.xs },

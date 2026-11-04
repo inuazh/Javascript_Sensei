@@ -1,13 +1,13 @@
-import { useRouter } from 'expo-router';
+import { useGoBack } from '../hooks/useGoBack';
 import { Pressable, StyleSheet } from 'react-native';
 import { Icon } from './Icon';
 import { Colors } from './theme';
 
 export function BackButton({ onPress }: { onPress?: () => void }) {
-  const router = useRouter();
+  const goBack = useGoBack();
   return (
     <Pressable
-      onPress={onPress ?? (() => router.back())}
+      onPress={onPress ?? goBack}
       hitSlop={12}
       accessibilityRole="button"
       accessibilityLabel="Назад"

@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Text } from 'react-native';
 import { getDailyQuestion } from '../src/content/repository';
@@ -12,10 +11,11 @@ import type { QuizAnswer, QuizItem } from '../src/features/quiz/quizReducer';
 import { afterActivity } from '../src/services/activity';
 import { useUserStore } from '../src/stores/useUserStore';
 import { Button, Colors, Screen, Type } from '../src/ui';
+import { useGoBack } from '../src/hooks/useGoBack';
 
 /** «Задача дня»: one question, one attempt, the same for everyone today. */
 export default function DailyScreen() {
-  const router = useRouter();
+  const goBack = useGoBack();
   const completeDaily = useUserStore(s => s.completeDaily);
   const results = useUserStore(s => s.progress.daily);
   const [outcome, setOutcome] = useState<DailyOutcome | null>(null);
@@ -32,12 +32,7 @@ export default function DailyScreen() {
 
   if ((doneBefore || showResult) && results[day]) {
     return (
-      <DailyResultView
-        day={day}
-        results={results}
-        outcome={outcome ?? undefined}
-        onDone={() => router.back()}
-      />
+      <DailyResultView day={day} results={results} outcome={outcome ?? undefined} onDone={goBack} />
     );
   }
 
@@ -46,7 +41,7 @@ export default function DailyScreen() {
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>Задачи на сегодня нет</Text>
         <Text style={Type.small}>Загляни завтра.</Text>
-        <Button title="Назад" onPress={() => router.back()} />
+        <Button title="Назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -63,7 +58,7 @@ export default function DailyScreen() {
       items={items}
       label={`Задача дня #${dailyNumber(day)}`}
       color={Colors.accent}
-      onExit={() => router.back()}
+      onExit={goBack}
       onAnswer={record}
       onFinish={() => setShowResult(true)}
       confirmExitAfterAnswer={false}

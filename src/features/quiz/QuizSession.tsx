@@ -1,7 +1,8 @@
 import { useEffect, useReducer, useRef } from 'react';
-import { Alert, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Question } from '../../content/schema';
+import { confirmAction } from '../../services/dialog';
 import { useFeedback } from '../../services/feedback';
 import { Button, Colors, Fonts, Icon, Label, ProgressBar, Spacing, Type } from '../../ui';
 import { FeedbackPanel } from './FeedbackPanel';
@@ -87,10 +88,13 @@ export function QuizSession({
 
   const confirmExit = () => {
     if (state.answers.length === 0 || !confirmExitAfterAnswer) return onExit();
-    Alert.alert('Прервать?', 'Прогресс этой сессии не сохранится.', [
-      { text: 'Остаться', style: 'cancel' },
-      { text: 'Выйти', style: 'destructive', onPress: onExit },
-    ]);
+    confirmAction({
+      title: 'Прервать?',
+      message: 'Прогресс этой сессии не сохранится.',
+      confirmText: 'Выйти',
+      cancelText: 'Остаться',
+      onConfirm: onExit,
+    });
   };
   exitRef.current = confirmExit;
 

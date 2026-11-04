@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
-import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 import { afterActivity, leaveLeaderboard } from '../src/services/activity';
+import { confirmAction, showNotice } from '../src/services/dialog';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ReminderSettings } from '../src/stores/useUserStore';
 import {
@@ -34,6 +35,8 @@ function ToggleRow({
         onValueChange={onChange}
         trackColor={{ true: Colors.accent, false: Colors.borderStrong }}
         thumbColor={Colors.textPrimary}
+        // react-native-web colours the "on" thumb separately (teal by default).
+        {...(Platform.OS === 'web' ? { activeThumbColor: Colors.textPrimary } : null)}
         accessibilityLabel={label}
       />
     </View>
@@ -49,7 +52,7 @@ export default function SettingsScreen() {
   const setReminder = async (patch: Partial<ReminderSettings>) => {
     const reminder = { ...settings.reminder, ...patch };
     if (patch.enabled && !(await requestNotificationPermission())) {
-      Alert.alert(
+      showNotice(
         'Уведомления выключены',
         'Разреши уведомления для JS Sensei в настройках телефона.',
       );
@@ -60,38 +63,30 @@ export default function SettingsScreen() {
   };
 
   const confirmLeave = () =>
-    Alert.alert('Выйти из рейтинга?', 'Твоя запись и ник будут удалены из рейтинга.', [
-      { text: 'Отмена', style: 'cancel' },
-      {
-        text: 'Выйти',
-        style: 'destructive',
-        onPress: async () => {
-          if (!(await leaveLeaderboard())) {
-            Alert.alert(
-              'Запись не удалена',
-              'Не удалось связаться с сервером. Напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
-            );
-          }
-        },
+    confirmAction({
+      title: 'Выйти из рейтинга?',
+      message: 'Твоя запись и ник будут удалены из рейтинга.',
+      confirmText: 'Выйти',
+      onConfirm: async () => {
+        if (!(await leaveLeaderboard())) {
+          showNotice(
+            'Запись не удалена',
+            'Не удалось связаться с сервером. Напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
+          );
+        }
       },
-    ]);
+    });
 
   const confirmReset = () =>
-    Alert.alert(
-      'Сбросить прогресс?',
-      'Уроки, XP, стрик и достижения будут удалены. Это нельзя отменить.',
-      [
-        { text: 'Отмена', style: 'cancel' },
-        {
-          text: 'Сбросить',
-          style: 'destructive',
-          onPress: () => {
-            resetProgress();
-            afterActivity();
-          },
-        },
-      ],
-    );
+    confirmAction({
+      title: 'Сбросить прогресс?',
+      message: 'Уроки, XP, стрик и достижения будут удалены. Это нельзя отменить.',
+      confirmText: 'Сбросить',
+      onConfirm: () => {
+        resetProgress();
+        afterActivity();
+      },
+    });
 
   return (
     <Screen edges={['top', 'bottom']}>
