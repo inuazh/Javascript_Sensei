@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { getSections, getTopicLessons } from '../../src/content/repository';
+import { plural } from '../../src/domain/reminders';
 import { useUserStore } from '../../src/stores/useUserStore';
 import {
   BackButton,
@@ -14,9 +15,8 @@ import {
   Spacing,
   Stars,
   Type,
+  pad2,
 } from '../../src/ui';
-
-const pad = (n: number) => String(n).padStart(2, '0');
 
 export default function TopicScreen() {
   const { topicId } = useLocalSearchParams<{ topicId: string }>();
@@ -43,7 +43,7 @@ export default function TopicScreen() {
   return (
     <Screen edges={['top', 'bottom']}>
       <BackButton />
-      <Label>{`${pad(sectionNumber)} · ${section.title.toLowerCase()}`}</Label>
+      <Label>{`${pad2(sectionNumber)} · ${section.title.toLowerCase()}`}</Label>
       <Text style={Type.h1}>{topic.title}</Text>
       <Text style={styles.subtitle}>{topic.subtitle}</Text>
 
@@ -64,7 +64,8 @@ export default function TopicScreen() {
                 <View style={styles.flex}>
                   <Text style={styles.title}>{lesson.title}</Text>
                   <Text style={styles.meta}>
-                    {lesson.questions.length} заданий
+                    {lesson.questions.length}{' '}
+                    {plural(lesson.questions.length, 'задание', 'задания', 'заданий')}
                     {p && p.attempts > 1 ? ` · попыток: ${p.attempts}` : ''}
                   </Text>
                 </View>

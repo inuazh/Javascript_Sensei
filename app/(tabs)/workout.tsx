@@ -1,6 +1,8 @@
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { getContentLookup, getQuestion } from '../../src/content/repository';
+import { useShallow } from 'zustand/react/shallow';
+import { getContentLookup, getQuestion, questionExists } from '../../src/content/repository';
 import { plural } from '../../src/domain/reminders';
 import { BOX_INTERVALS, dueItems, weakItems } from '../../src/domain/review';
 import { XP } from '../../src/domain/rewards';
@@ -8,27 +10,39 @@ import { placeOf } from '../../src/domain/stats';
 import { questionPreview } from '../../src/features/quiz/registry';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Button, Card, Colors, Fonts, Icon, Label, Screen, Spacing, Type } from '../../src/ui';
-
-const pad = (n: number) => String(n).padStart(2, '0');
-
-function Stat({ value, label }: { value: number; label: string }) {
-  return (
-    <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
+import {
+  Button,
+  Card,
+  Colors,
+  Fonts,
+  Icon,
+  Label,
+  Screen,
+  Spacing,
+  Stat,
+  StatRow,
+  Type,
+  pad2,
+} from '../../src/ui';
 
 export default function WorkoutTab() {
   const router = useRouter();
   const today = useToday();
-  const progress = useUserStore(s => s.progress);
-  const due = dueItems(progress.review, today);
-  const weak = weakItems(progress.review, 5);
-  const total = Object.keys(progress.review).length;
-  const doneToday = progress.lastWorkoutDay === today;
+  const { review, lastWorkoutDay, mistakesFixed, workoutsCompleted } = useUserStore(
+    useShallow(s => ({
+      review: s.progress.review,
+      lastWorkoutDay: s.progress.lastWorkoutDay,
+      mistakesFixed: s.progress.mistakesFixed,
+      workoutsCompleted: s.progress.workoutsCompleted,
+    })),
+  );
+  const due = useMemo(() => dueItems(review, today, questionExists), [review, today]);
+  const weak = useMemo(() => weakItems(review, 5, questionExists), [review]);
+  const total = useMemo(
+    () => Object.values(review).filter(i => questionExists(i.questionId)).length,
+    [review],
+  );
+  const doneToday = lastWorkoutDay === today;
 
   return (
     <Screen>
@@ -75,11 +89,11 @@ export default function WorkoutTab() {
         )}
       </Card>
 
-      <View style={styles.stats}>
+      <StatRow>
         <Stat value={total} label="в колоде" />
-        <Stat value={progress.mistakesFixed} label="исправлено" />
-        <Stat value={progress.workoutsCompleted} label="тренировок" />
-      </View>
+        <Stat value={mistakesFixed} label="исправлено" />
+        <Stat value={workoutsCompleted} label="тренировок" />
+      </StatRow>
 
       {weak.length > 0 && (
         <>
@@ -98,7 +112,7 @@ export default function WorkoutTab() {
                 <View style={styles.flex}>
                   {place && (
                     <Text style={styles.section} numberOfLines={1}>
-                      {pad(place.sectionNumber)} · {place.sectionTitle.toLowerCase()}
+                      {pad2(place.sectionNumber)} · {place.sectionTitle.toLowerCase()}
                     </Text>
                   )}
                   <Text style={styles.weakTitle}>{found.lesson.title}</Text>
@@ -128,18 +142,6 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   button: { marginTop: Spacing.md },
-  stats: { flexDirection: 'row', gap: Spacing.sm },
-  stat: {
-    flex: 1,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-  },
-  statValue: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 32, color: Colors.textPrimary },
-  statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mt: { marginTop: Spacing.sm },
   weak: {
     flexDirection: 'row',

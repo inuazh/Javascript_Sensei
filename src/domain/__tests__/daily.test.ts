@@ -51,6 +51,43 @@ describe('pickDailyQuestionId', () => {
     const repeats = picks.filter((p, i) => i > 0 && p === picks[i - 1]).length;
     expect(repeats).toBeLessThanOrEqual(6);
   });
+
+  const year = Array.from({ length: 365 }, (_, i) => addDays(DAILY_EPOCH, i));
+  const changedDays = (before: typeof pool, after: typeof pool) =>
+    year.filter(d => pickDailyQuestionId(before, d) !== pickDailyQuestionId(after, d));
+
+  it('does not depend on the order of the candidates', () => {
+    const reversed = [...pool].reverse();
+    expect(changedDays(pool, reversed)).toEqual([]);
+  });
+
+  it('rarely changes a pick when unrelated questions are added', () => {
+    // 20 output questions; one more takes over about 1/21 of the days.
+    const added = { id: 'new-output', type: 'output' };
+    const after = [...pool.slice(0, 30), added, ...pool.slice(30)];
+    const changed = changedDays(pool, after);
+    expect(changed.length).toBeGreaterThan(0);
+    expect(changed.length).toBeLessThanOrEqual(365 * 0.1);
+    // A day only changes when the new question wins it.
+    for (const d of changed) expect(pickDailyQuestionId(after, d)).toBe('new-output');
+
+    // A whole new section of 10 output questions moves about a third of the days
+    // (10/30); `hash(day) % length` would have moved almost all of them.
+    const section = Array.from({ length: 10 }, (_, i) => ({ id: `s-${i}`, type: 'output' }));
+    const grown = changedDays(pool, [...pool, ...section]);
+    expect(grown.length).toBeLessThanOrEqual(365 * 0.45);
+  });
+
+  it('never changes a pick when non-output questions are added', () => {
+    const more = Array.from({ length: 50 }, (_, i) => ({ id: `tf-${i}`, type: 'trueFalse' }));
+    expect(changedDays(pool, [...pool, ...more])).toEqual([]);
+  });
+
+  it('only changes the days a removed question had won', () => {
+    const removed = 'q0';
+    const after = pool.filter(q => q.id !== removed);
+    for (const d of changedDays(pool, after)) expect(pickDailyQuestionId(pool, d)).toBe(removed);
+  });
 });
 
 describe('dailyNumber', () => {

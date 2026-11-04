@@ -3,18 +3,19 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
-const entry = {
+const score = {
   id: 'uid-1',
   nickname: 'Alice',
   xp: 120,
   weekXp: 70,
-  week: '2026-11-02',
-  level: 2,
+  week: 20759,
   streak: 3,
 };
 
+type Call = { url: string; init?: RequestInit };
+
 function mockFetch(responses: Record<string, unknown>) {
-  const calls: { url: string; init?: RequestInit }[] = [];
+  const calls: Call[] = [];
   global.fetch = jest.fn(async (url: string, init?: RequestInit) => {
     calls.push({ url, init });
     const key = Object.keys(responses).find(k => url.includes(k));
@@ -29,62 +30,176 @@ function load(apiKey: string) {
   return require('../leaderboard') as typeof import('../leaderboard');
 }
 
-afterEach(() => {
+type Storage = typeof import('@react-native-async-storage/async-storage').default;
+/** The AsyncStorage mock instance the freshly loaded modules use. */
+function storage(): Storage {
+  const mod = require('@react-native-async-storage/async-storage');
+  return (mod.default ?? mod) as Storage;
+}
+
+const DB = 'https://javascript-sensei-default-rtdb.europe-west1.firebasedatabase.app';
+
+afterEach(async () => {
   delete process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+  await storage().clear();
 });
 
 describe('leaderboard without auth', () => {
-  it('uploads with a server timestamp and no auth token', async () => {
+  it('writes the all-time and weekly entries in one multi-path update', async () => {
     const { uploadScore } = load('');
-    const calls = mockFetch({ '/leaderboard/uid-1.json': null });
-    await uploadScore(entry);
-    expect(calls[0].url).not.toContain('auth=');
-    expect(JSON.parse(String(calls[0].init?.body))).toMatchObject({
-      nickname: 'Alice',
-      updatedAt: { '.sv': 'timestamp' },
+    const calls = mockFetch({ [`${DB}/.json`]: null });
+    await uploadScore(score);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(`${DB}/.json`);
+    expect(calls[0].init?.method).toBe('PATCH');
+    const updatedAt = { '.sv': 'timestamp' };
+    // Exactly the shape database.rules.json accepts: no level, no extra fields.
+    expect(JSON.parse(String(calls[0].init?.body))).toEqual({
+      'leaderboard/uid-1': { nickname: 'Alice', xp: 120, streak: 3, updatedAt },
+      'weekly/20759/uid-1': {
+        nickname: 'Alice',
+        xp: 120,
+        streak: 3,
+        weekXp: 70,
+        week: 20759,
+        updatedAt,
+      },
     });
   });
 
-  it('parses players, hides legacy entries and ranks weekly', async () => {
-    const { fetchPlayers, rankWeekly, rankAllTime } = load('');
+  it('removes the weekly entry when there is no XP this week', async () => {
+    const { uploadScore } = load('');
+    const calls = mockFetch({ [`${DB}/.json`]: null });
+    await uploadScore({ ...score, weekXp: 0 });
+    expect(JSON.parse(String(calls[0].init?.body))['weekly/20759/uid-1']).toBeNull();
+  });
+
+  it('reads with the only queries the rules allow', async () => {
+    const { fetchAllTime, fetchWeek } = load('');
+    const calls = mockFetch({ 'leaderboard.json': {}, 'weekly/20759.json': null });
+    await fetchAllTime();
+    await fetchWeek(20759);
+    expect(calls.map(c => c.url)).toEqual([
+      `${DB}/leaderboard.json?orderBy=%22xp%22&limitToLast=200`,
+      `${DB}/weekly/20759.json?orderBy=%22weekXp%22&limitToLast=200`,
+    ]);
+  });
+
+  it('parses players, derives the level and hides legacy entries', async () => {
+    const { fetchAllTime, rankAllTime } = load('');
     mockFetch({
       'leaderboard.json': {
-        a: { nickname: 'Ann', xp: 300, weekXp: 10, week: '2026-11-02', level: 3, streak: 1 },
-        b: { nickname: 'Bob', xp: 200, weekXp: 90, week: '2026-11-02', level: 2, streak: 5 },
-        c: { nickname: 'Old', xp: 999, weekXp: 999, week: '2026-10-26', level: 9, streak: 0 },
+        a: { nickname: 'Ann', xp: 300, streak: 1 },
+        b: { nickname: 'Bob', xp: 200, streak: 5, level: 99 },
         legacy: { xp: 5000, title: 'Senior Dev', streak: 2 },
       },
     });
-    const players = await fetchPlayers();
-    expect(players.map(p => p.id).sort()).toEqual(['a', 'b', 'c']);
-    expect(rankWeekly(players, '2026-11-02').map(p => p.id)).toEqual(['b', 'a']);
-    expect(rankAllTime(players).map(p => p.id)).toEqual(['c', 'a', 'b']);
+    const players = rankAllTime(await fetchAllTime());
+    expect(players.map(p => [p.id, p.level])).toEqual([
+      ['a', 3],
+      ['b', 2],
+    ]);
+  });
+
+  it('ranks the weekly list by weekXp', async () => {
+    const { fetchWeek, rankWeekly } = load('');
+    mockFetch({
+      'weekly/20759.json': {
+        a: { nickname: 'Ann', xp: 300, weekXp: 10, week: 20759, streak: 1 },
+        b: { nickname: 'Bob', xp: 200, weekXp: 90, week: 20759, streak: 5 },
+        c: { nickname: 'Cat', xp: 50, weekXp: 0, week: 20759, streak: 0 },
+      },
+    });
+    expect(rankWeekly(await fetchWeek(20759)).map(p => p.id)).toEqual(['b', 'a']);
+  });
+
+  it('deletes the entry and this and last week’s weekly entries', async () => {
+    const { deleteScore } = load('');
+    const calls = mockFetch({ [DB]: null });
+    expect(await deleteScore('uid-1', 20759)).toBe(true);
+    expect(calls.map(c => [c.init?.method, c.url])).toEqual([
+      ['DELETE', `${DB}/leaderboard/uid-1.json`],
+      ['DELETE', `${DB}/weekly/20759/uid-1.json`],
+      ['DELETE', `${DB}/weekly/20752/uid-1.json`],
+    ]);
+  });
+
+  it('reports a failed delete instead of throwing', async () => {
+    const { deleteScore } = load('');
+    global.fetch = jest.fn(async () => {
+      throw new TypeError('Failed to fetch');
+    }) as unknown as typeof fetch;
+    expect(await deleteScore('uid-1', 20759)).toBe(false);
   });
 });
 
 describe('leaderboard with anonymous auth', () => {
+  const signUp = {
+    'accounts:signUp': {
+      localId: 'uid-1',
+      idToken: 'token-1',
+      refreshToken: 'r1',
+      expiresIn: '3600',
+    },
+  };
+
   it('signs up once, then writes to its own uid with the token', async () => {
     const { uploadScore, createPlayerId } = load('test-key');
-    const calls = mockFetch({
-      'accounts:signUp': {
-        localId: 'uid-1',
-        idToken: 'token-1',
-        refreshToken: 'r1',
-        expiresIn: '3600',
-      },
-      '/leaderboard/uid-1.json': null,
-    });
+    const calls = mockFetch({ ...signUp, [`${DB}/.json`]: null });
     expect(await createPlayerId()).toBe('uid-1');
-    await uploadScore(entry);
+    await uploadScore(score);
     expect(calls.filter(c => c.url.includes('signUp'))).toHaveLength(1);
-    expect(calls.at(-1)?.url).toContain('auth=token-1');
+    expect(calls.at(-1)?.url).toBe(`${DB}/.json?auth=token-1`);
   });
 
-  it('refuses to write somebody else’s entry', async () => {
-    const { uploadScore } = load('test-key');
-    mockFetch({
+  it('deletes with the token', async () => {
+    const { deleteScore } = load('test-key');
+    const calls = mockFetch({ ...signUp, [DB]: null });
+    expect(await deleteScore('uid-1', 20759)).toBe(true);
+    const deletes = calls.filter(c => c.init?.method === 'DELETE');
+    expect(deletes).toHaveLength(3);
+    expect(deletes.every(c => c.url.endsWith('.json?auth=token-1'))).toBe(true);
+  });
+
+  it('refuses to write or delete somebody else’s entry', async () => {
+    const { uploadScore, deleteScore } = load('test-key');
+    const calls = mockFetch({
       'accounts:signUp': { localId: 'uid-2', idToken: 't', refreshToken: 'r', expiresIn: '3600' },
     });
-    await expect(uploadScore(entry)).rejects.toThrow('does not match');
+    await expect(uploadScore(score)).rejects.toThrow('does not match');
+    expect(await deleteScore('uid-1', 20759)).toBe(false);
+    expect(calls.filter(c => c.url.startsWith(DB))).toHaveLength(0);
+  });
+
+  it('discards a corrupt saved session and signs up again', async () => {
+    const { createPlayerId } = load('test-key');
+    await storage().setItem('js-sensei-auth', '{not json');
+    const calls = mockFetch(signUp);
+    expect(await createPlayerId()).toBe('uid-1');
+    expect(calls.map(c => c.url.split('?')[0])).toEqual([
+      'https://identitytoolkit.googleapis.com/v1/accounts:signUp',
+    ]);
+    expect(JSON.parse((await storage().getItem('js-sensei-auth')) ?? '')).toEqual({
+      uid: 'uid-1',
+      refreshToken: 'r1',
+    });
+  });
+
+  it('discards a saved session without a refresh token', async () => {
+    const { createPlayerId } = load('test-key');
+    await storage().setItem('js-sensei-auth', '"just a string"');
+    const calls = mockFetch(signUp);
+    expect(await createPlayerId()).toBe('uid-1');
+    expect(calls.some(c => c.url.includes('securetoken'))).toBe(false);
+  });
+
+  it('refreshes a valid saved session instead of signing up', async () => {
+    const { createPlayerId } = load('test-key');
+    await storage().setItem('js-sensei-auth', JSON.stringify({ uid: 'uid-9', refreshToken: 'r9' }));
+    const calls = mockFetch({
+      securetoken: { id_token: 't9', refresh_token: 'r10', user_id: 'uid-9', expires_in: '3600' },
+    });
+    expect(await createPlayerId()).toBe('uid-9');
+    expect(calls).toHaveLength(1);
   });
 });

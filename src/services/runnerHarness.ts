@@ -1,7 +1,7 @@
 /**
  * The page-side half of «Запустить код»: a plain-JS harness that runs a snippet
- * in a fresh JS realm (a hidden WebView page on native, a Worker on web) and
- * reports what the browser console would show.
+ * in a fresh JS realm (a hidden WebView page on native; on web, a Worker inside a
+ * sandboxed, opaque-origin iframe) and reports what the browser console would show.
  *
  * The harness ships as source text because it runs in another JS engine. Keep
  * this file free of React Native imports: the content validator and the tests
@@ -14,6 +14,12 @@ export const RUN_TIMEOUT_MS = 3000;
 export const WATCHDOG_MS = RUN_TIMEOUT_MS + 3000;
 /** Console lines kept; the rest is replaced with a single `…`. */
 export const MAX_LINES = 200;
+/** Longest console line, completion value or error message, in UTF-16 units (≈2 KB). */
+export const MAX_LINE_LENGTH = 2048;
+/** Total length of the console lines kept (≈50 KB); the rest is replaced with `…`. */
+export const MAX_OUTPUT_LENGTH = 50_000;
+/** Marks cut output. */
+export const ELLIPSIS = '…';
 
 export interface RunError {
   /** 'TypeError', 'ReferenceError', ... Empty when a non-error value was thrown. */
@@ -89,6 +95,42 @@ function formatValue(v, nested, seen) {
 }`;
 
 /**
+ * `clipText(s, max)`: `s` cut to at most `max` characters, ending with `…` when cut.
+ * Never splits a surrogate pair. Mirrors clipText() below.
+ */
+const CLIP_TEXT_JS = String.raw`
+function clipText(s, max) {
+  s = String(s);
+  if (s.length <= max) return s;
+  var end = max - 1;
+  var c = s.charCodeAt(end - 1);
+  if (c >= 0xd800 && c <= 0xdbff) end--;
+  return s.slice(0, end) + '${ELLIPSIS}';
+}`;
+
+/**
+ * Globals a snippet must not reach: network, storage, and new realms (a nested
+ * Worker would come with a fresh, unpatched global object).
+ */
+const BLOCKED_GLOBALS = [
+  'fetch',
+  'XMLHttpRequest',
+  'WebSocket',
+  'WebSocketStream',
+  'WebTransport',
+  'EventSource',
+  'importScripts',
+  'indexedDB',
+  'caches',
+  'localStorage',
+  'sessionStorage',
+  'Worker',
+  'SharedWorker',
+  'RTCPeerConnection',
+  'webkitRTCPeerConnection',
+];
+
+/**
  * Defines `__jsSenseiRun(job, post, execScript)` on the global object.
  *
  * - `post(result)` receives a RunResult once.
@@ -101,6 +143,27 @@ function formatValue(v, nested, seen) {
 export const HARNESS_JS = String.raw`
 var __jsSenseiRun = (function () {
   ${FORMAT_VALUE_JS}
+  ${CLIP_TEXT_JS}
+
+  /**
+   * Hides a global from the snippet. Web APIs often live on the prototype of the
+   * global object (Object.getPrototypeOf(self).fetch), so they are deleted along
+   * the whole chain. The own property stays configurable and writable: snippets
+   * may still declare their own fetch.
+   */
+  function hideGlobal(g, name) {
+    for (var o = Object.getPrototypeOf(g); o; o = Object.getPrototypeOf(o)) {
+      try {
+        if (Object.getOwnPropertyDescriptor(o, name)) delete o[name];
+      } catch (e) {}
+      try {
+        if (Object.getOwnPropertyDescriptor(o, name)) {
+          Object.defineProperty(o, name, { value: undefined, configurable: true, writable: true });
+        }
+      } catch (e) {}
+    }
+    try { Object.defineProperty(g, name, { value: undefined, configurable: true, writable: true }); } catch (e) {}
+  }
 
   var g = globalThis;
   var realSetTimeout = g.setTimeout;
@@ -109,6 +172,8 @@ var __jsSenseiRun = (function () {
 
   return function run(job, post, execScript) {
     var lines = [];
+    var outputLength = 0;
+    var full = false;
     var error = null;
     var value;
     var finished = false;
@@ -118,12 +183,19 @@ var __jsSenseiRun = (function () {
     var idleChecks = 0;
 
     function log() {
-      if (!main || finished) return;
-      if (lines.length === ${MAX_LINES}) lines.push('…');
-      if (lines.length > ${MAX_LINES}) return;
+      if (!main || finished || full) return;
       var parts = [];
-      for (var i = 0; i < arguments.length; i++) parts.push(formatValue(arguments[i]));
-      lines.push(parts.join(' '));
+      for (var i = 0; i < arguments.length; i++) {
+        parts.push(clipText(formatValue(arguments[i]), ${MAX_LINE_LENGTH}));
+      }
+      var line = clipText(parts.join(' '), ${MAX_LINE_LENGTH});
+      if (lines.length >= ${MAX_LINES} || outputLength + line.length > ${MAX_OUTPUT_LENGTH}) {
+        lines.push('${ELLIPSIS}');
+        full = true;
+        return;
+      }
+      outputLength += line.length;
+      lines.push(line);
     }
     ['log', 'info', 'warn', 'error', 'debug'].forEach(function (m) { console[m] = log; });
 
@@ -131,8 +203,11 @@ var __jsSenseiRun = (function () {
       if (!main || finished) return;
       var isError = e !== null && typeof e === 'object' && typeof e.name === 'string';
       error = isError
-        ? { name: e.name, message: String(e.message === undefined ? '' : e.message) }
-        : { name: '', message: formatValue(e) };
+        ? {
+            name: clipText(e.name, ${MAX_LINE_LENGTH}),
+            message: clipText(e.message === undefined ? '' : e.message, ${MAX_LINE_LENGTH}),
+          }
+        : { name: '', message: clipText(formatValue(e), ${MAX_LINE_LENGTH}) };
       if (inPromise) error.inPromise = true;
       finish(false);
     }
@@ -206,13 +281,11 @@ var __jsSenseiRun = (function () {
       clearTimers(); // timers of setup scripts never run
       main = true;
       started = Date.now();
-      // No network or storage from snippets.
-      ['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'importScripts', 'indexedDB', 'localStorage', 'sessionStorage'].forEach(function (k) {
-        try { Object.defineProperty(g, k, { value: undefined, configurable: true, writable: true }); } catch (e) {}
-      });
+      // No network, storage or nested workers from snippets.
+      ${JSON.stringify(BLOCKED_GLOBALS)}.forEach(function (k) { hideGlobal(g, k); });
       try {
         var v = (0, eval)(job.code);
-        if (v !== undefined) value = formatValue(v);
+        if (v !== undefined) value = clipText(formatValue(v), ${MAX_LINE_LENGTH});
       } catch (e) {
         fail(e);
       }
@@ -250,7 +323,9 @@ const WORKER_EXEC_JS = `function (src) {
 
 /** A complete HTML page for react-native-webview. Posts the RunResult as JSON. */
 export function buildRunnerHtml(job: RunJob): string {
-  const csp = "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'";
+  const csp =
+    "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; worker-src 'none'; " +
+    "form-action 'none'; base-uri 'none'";
   return `<!doctype html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="${csp}">
 </head><body><script>
@@ -268,7 +343,109 @@ __jsSenseiRun(${jsLiteral(job)}, function (r) { __post(r); }, ${WORKER_EXEC_JS})
 `;
 }
 
-/** Validates a message coming back from the sandbox. */
+/** Tags the messages the sandbox iframe sends to the app (web). */
+export const FRAME_MESSAGE_SOURCE = 'js-sensei-runner';
+
+/** What the sandbox iframe posts to the app: the worker's message, or why it failed. */
+export type FrameMessage =
+  | { source: typeof FRAME_MESSAGE_SOURCE; result: unknown }
+  | { source: typeof FRAME_MESSAGE_SOURCE; failed: string };
+
+/**
+ * The srcdoc of the sandbox iframe (web). Load it in `<iframe sandbox="allow-scripts">`:
+ * the page gets an opaque origin, so neither it nor its Worker can reach the app's
+ * origin (storage, cookies, same-origin requests). Its CSP, which the Worker
+ * inherits, blocks every request. The page starts a Worker from `workerSource` and
+ * relays the Worker's first message to the parent as a FrameMessage, posted to
+ * `targetOrigin`. Removing the iframe terminates the Worker, even mid-`while (true)`.
+ */
+export function buildSandboxFrameHtml(workerSource: string, targetOrigin: string): string {
+  const csp =
+    "default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob:; worker-src blob: data:; " +
+    "form-action 'none'; base-uri 'none'";
+  const source = jsLiteral(FRAME_MESSAGE_SOURCE);
+  return `<!doctype html><html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="${csp}">
+</head><body><script>
+(function () {
+  var src = ${jsLiteral(workerSource)};
+  var target = ${jsLiteral(targetOrigin)};
+  var sent = false;
+  function send(msg) {
+    if (sent) return;
+    sent = true;
+    msg.source = ${source};
+    parent.postMessage(msg, target);
+  }
+  var worker;
+  try {
+    worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+  } catch (e) {
+    try {
+      worker = new Worker('data:text/javascript;charset=utf-8,' + encodeURIComponent(src));
+    } catch (e2) {
+      return send({ failed: String((e2 && e2.message) || e2) });
+    }
+  }
+  worker.onmessage = function (event) {
+    send({ result: event.data });
+    worker.terminate();
+  };
+  worker.onerror = function (event) {
+    if (event.preventDefault) event.preventDefault();
+    send({ failed: String(event.message || '') });
+    worker.terminate();
+  };
+})();
+</script></body></html>`;
+}
+
+/**
+ * Whether the native runner WebView may load `url`. Only the inline page itself
+ * (served as about:blank) and same-document srcdoc frames are allowed; every other
+ * navigation is blocked: a snippet must not open sites, and a data: page would
+ * load without the runner's CSP.
+ */
+export function isRunnerNavigationAllowed(url: string): boolean {
+  return /^about:(blank|srcdoc)([?#]|$)/.test(url);
+}
+
+/**
+ * `text` cut to at most `max` characters (UTF-16 units), ending with `…` when
+ * cut. Never splits a surrogate pair. Mirrors clipText() in the harness.
+ */
+export function clipText(text: string, max: number = MAX_LINE_LENGTH): string {
+  if (text.length <= max) return text;
+  let end = max - 1;
+  const c = text.charCodeAt(end - 1);
+  if (c >= 0xd800 && c <= 0xdbff) end--;
+  return text.slice(0, end) + ELLIPSIS;
+}
+
+/**
+ * Console lines within the output limits: each line at most MAX_LINE_LENGTH, at
+ * most MAX_LINES lines and MAX_OUTPUT_LENGTH characters in all, then a single `…`.
+ * Same rules as the harness, so its output passes through unchanged.
+ */
+export function limitLines(lines: readonly unknown[]): string[] {
+  const kept: string[] = [];
+  let length = 0;
+  for (const raw of lines.slice(0, MAX_LINES + 1)) {
+    const line = clipText(String(raw));
+    if (kept.length >= MAX_LINES || length + line.length > MAX_OUTPUT_LENGTH) {
+      kept.push(ELLIPSIS);
+      break;
+    }
+    length += line.length;
+    kept.push(line);
+  }
+  return kept;
+}
+
+/**
+ * Validates a message coming back from the sandbox. The sandbox runs untrusted
+ * code, so the output limits are enforced again here.
+ */
 export function parseRunResult(data: unknown): RunResult | null {
   let value = data;
   if (typeof value === 'string') {
@@ -280,13 +457,16 @@ export function parseRunResult(data: unknown): RunResult | null {
   }
   const r = value as Partial<RunResult> | null;
   if (!r || typeof r !== 'object' || !Array.isArray(r.lines)) return null;
+  let error: RunError | null = null;
+  if (r.error && typeof r.error === 'object') {
+    error = { name: clipText(String(r.error.name)), message: clipText(String(r.error.message)) };
+    if (r.error.inPromise === true) error.inPromise = true;
+  }
   return {
-    lines: r.lines.map(String),
-    error: r.error
-      ? { ...r.error, name: String(r.error.name), message: String(r.error.message) }
-      : null,
-    timedOut: !!r.timedOut,
-    ...(typeof r.value === 'string' ? { value: r.value } : null),
+    lines: limitLines(r.lines),
+    error,
+    timedOut: r.timedOut === true,
+    ...(typeof r.value === 'string' ? { value: clipText(r.value) } : null),
   };
 }
 

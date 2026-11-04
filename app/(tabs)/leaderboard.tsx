@@ -10,24 +10,36 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { addDays, daysBetween, weekStart } from '../../src/domain/dates';
+import { addDays, daysBetween, weekNumber, weekStart } from '../../src/domain/dates';
+import { NICKNAME_MAX, NICKNAME_MIN, validateNickname } from '../../src/domain/nickname';
 import { weeklyXp } from '../../src/domain/progress';
 import { plural } from '../../src/domain/reminders';
 import { useToday } from '../../src/hooks/useToday';
 import { publishScore } from '../../src/services/activity';
 import {
-  fetchPlayers,
+  fetchAllTime,
+  fetchWeek,
   rankAllTime,
   rankWeekly,
-  validateNickname,
   type PlayerEntry,
 } from '../../src/services/leaderboard';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Button, Card, Colors, Fonts, Icon, Label, Radius, Spacing, Type } from '../../src/ui';
+import {
+  Button,
+  Card,
+  Colors,
+  Fonts,
+  Icon,
+  Label,
+  Radius,
+  Spacing,
+  Type,
+  pad2,
+} from '../../src/ui';
 
 type Mode = 'week' | 'all';
 
-function JoinCard() {
+function JoinCard({ outdated }: { outdated: boolean }) {
   const updateSettings = useUserStore(s => s.updateSettings);
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +63,9 @@ function JoinCard() {
       <Label>войти в рейтинг</Label>
       <Text style={Type.h3}>Выбери ник</Text>
       <Text style={Type.small}>
-        В рейтинг попадут только ник, XP, уровень и стрик. Выйти можно в настройках.
+        {outdated
+          ? 'Твой ник не подходит под новые правила рейтинга. Выбери другой, чтобы остаться в рейтинге.'
+          : 'В рейтинг попадут только ник, XP, уровень и стрик. Выйти можно в настройках.'}
       </Text>
       <View style={styles.inputRow}>
         <Text style={styles.prompt}>$</Text>
@@ -63,7 +77,7 @@ function JoinCard() {
           }}
           placeholder="nickname"
           placeholderTextColor={Colors.textDisabled}
-          maxLength={20}
+          maxLength={NICKNAME_MAX}
           autoCapitalize="none"
           autoCorrect={false}
           style={styles.input}
@@ -77,7 +91,7 @@ function JoinCard() {
         icon="arrow-right"
         onPress={join}
         loading={saving}
-        disabled={nickname.trim().length < 3}
+        disabled={nickname.trim().length < NICKNAME_MIN}
       />
     </Card>
   );
@@ -96,9 +110,7 @@ function Row({
 }) {
   return (
     <View style={[styles.row, isYou && styles.rowYou]}>
-      <Text style={[styles.rank, rank <= 3 && { color: Colors.accent }]}>
-        {String(rank).padStart(2, '0')}
-      </Text>
+      <Text style={[styles.rank, rank <= 3 && { color: Colors.accent }]}>{pad2(rank)}</Text>
       <View style={styles.flex}>
         <Text style={[styles.name, isYou && { color: Colors.accent }]} numberOfLines={1}>
           {player.nickname}
@@ -119,25 +131,29 @@ function Row({
 
 export default function LeaderboardScreen() {
   const today = useToday();
-  const settings = useUserStore(s => s.settings);
-  const progress = useUserStore(s => s.progress);
+  const nickname = useUserStore(s => s.settings.nickname);
+  const playerId = useUserStore(s => s.settings.playerId);
+  const totalXp = useUserStore(s => s.progress.totalXp);
+  const myWeekXp = useUserStore(s => weeklyXp(s.progress, today));
   const [mode, setMode] = useState<Mode>('week');
   const [players, setPlayers] = useState<PlayerEntry[] | null>(null);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const week = weekStart(today);
+  const weekId = weekNumber(today);
   const load = useCallback(async () => {
     setError(false);
     try {
-      setPlayers(await fetchPlayers(mode === 'week' ? 'weekXp' : 'xp'));
+      setPlayers(await (mode === 'week' ? fetchWeek(weekId) : fetchAllTime()));
     } catch {
       setError(true);
     }
-  }, [mode]);
+  }, [mode, weekId]);
 
   useEffect(() => {
     load();
-  }, [load, settings.nickname]);
+  }, [load, nickname]);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -146,14 +162,11 @@ export default function LeaderboardScreen() {
     setRefreshing(false);
   };
 
-  const week = weekStart(today);
   const daysLeft = daysBetween(today, addDays(week, 7));
-  const ranked = players
-    ? mode === 'week'
-      ? rankWeekly(players, week)
-      : rankAllTime(players)
-    : [];
-  const myRank = ranked.findIndex(p => p.id === settings.playerId) + 1;
+  const ranked = players ? (mode === 'week' ? rankWeekly(players) : rankAllTime(players)) : [];
+  // A nickname from an older version that the current rules reject must be replaced.
+  const joined = !!nickname && validateNickname(nickname) === null;
+  const myRank = ranked.findIndex(p => p.id === playerId) + 1;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -181,12 +194,12 @@ export default function LeaderboardScreen() {
         </View>
         {mode === 'week' && (
           <Label>
-            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой xp за неделю: ${weeklyXp(progress, today)}`}
+            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой xp за неделю: ${myWeekXp}`}
           </Label>
         )}
 
-        {!settings.nickname && <JoinCard />}
-        {settings.nickname && myRank > 0 && (
+        {!joined && <JoinCard outdated={!!nickname} />}
+        {joined && myRank > 0 && (
           <Card tone="accent" style={styles.myRank}>
             <Text style={styles.myRankNumber}>#{myRank}</Text>
             <Text style={Type.small}>
@@ -195,11 +208,11 @@ export default function LeaderboardScreen() {
           </Card>
         )}
 
-        {settings.nickname &&
+        {joined &&
           players !== null &&
           !error &&
           myRank === 0 &&
-          progress.totalXp > 0 && (
+          (mode === 'week' ? myWeekXp : totalXp) > 0 && (
             <Text style={[Type.small, styles.empty]}>
               Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
               отправить ещё раз.
@@ -235,7 +248,7 @@ export default function LeaderboardScreen() {
               rank={i + 1}
               player={p}
               value={mode === 'week' ? p.weekXp : p.xp}
-              isYou={p.id === settings.playerId}
+              isYou={p.id === playerId}
             />
           ))}
         </View>

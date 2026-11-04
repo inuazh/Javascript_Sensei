@@ -1,20 +1,16 @@
 /**
  * Firebase Anonymous Auth over REST (no Firebase SDK needed).
- * Enabled when a Web API key is configured (app.json → expo.extra.firebaseApiKey
- * or EXPO_PUBLIC_FIREBASE_API_KEY). Without a key the leaderboard writes
- * unauthenticated, which only works with open database rules.
+ * Enabled only when the build has EXPO_PUBLIC_FIREBASE_API_KEY (an EAS
+ * environment variable, inlined at build time). Without it the leaderboard
+ * writes unauthenticated, which the database rules reject.
  * See docs/firebase.md.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
 
 const STORAGE_KEY = 'js-sensei-auth';
 const EXPIRY_MARGIN_MS = 60_000;
 
-export const FIREBASE_API_KEY: string =
-  process.env.EXPO_PUBLIC_FIREBASE_API_KEY ??
-  (Constants.expoConfig?.extra?.firebaseApiKey as string | undefined) ??
-  '';
+export const FIREBASE_API_KEY: string = process.env.EXPO_PUBLIC_FIREBASE_API_KEY ?? '';
 
 export const isAuthEnabled = () => FIREBASE_API_KEY.length > 0;
 
@@ -91,9 +87,23 @@ async function refresh(uid: string, refreshToken: string): Promise<Session> {
   return s;
 }
 
+/** The saved { uid, refreshToken }, or null. A corrupt value is discarded. */
+async function loadStored(): Promise<{ uid: string; refreshToken: string } | null> {
+  const raw = await AsyncStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    const { uid, refreshToken } = (JSON.parse(raw) ?? {}) as Record<string, unknown>;
+    if (typeof uid === 'string' && typeof refreshToken === 'string') return { uid, refreshToken };
+  } catch {
+    // not JSON
+  }
+  await AsyncStorage.removeItem(STORAGE_KEY).catch(() => {});
+  return null;
+}
+
 async function obtain(): Promise<Session> {
   if (session && session.expiresAt - EXPIRY_MARGIN_MS > Date.now()) return session;
-  const stored = session ?? JSON.parse((await AsyncStorage.getItem(STORAGE_KEY)) ?? 'null');
+  const stored = session ?? (await loadStored());
   if (stored?.refreshToken) {
     try {
       return await refresh(stored.uid, stored.refreshToken);

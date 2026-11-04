@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Platform, StyleSheet } from 'react-native';
-import { dueItems } from '../../src/domain/review';
+import { questionExists } from '../../src/content/repository';
+import { countDue } from '../../src/domain/review';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { Colors, Fonts, Icon, type IconName } from '../../src/ui';
@@ -21,7 +22,7 @@ const ICONS = {
 
 export default function TabsLayout() {
   const today = useToday();
-  const dueCount = useUserStore(s => dueItems(s.progress.review, today).length);
+  const dueCount = useUserStore(s => countDue(s.progress.review, today, questionExists));
 
   return (
     <Tabs

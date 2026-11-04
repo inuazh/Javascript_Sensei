@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors, Fonts, Radius, Spacing } from './theme';
+import { pad2 } from '../utils/format';
 
 const STEP_MINUTES = 30;
 
@@ -17,7 +18,7 @@ export function TimePicker({
     const total = (hour * 60 + minute + delta + 24 * 60) % (24 * 60);
     onChange({ hour: Math.floor(total / 60), minute: total % 60 });
   };
-  const label = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+  const label = `${pad2(hour)}:${pad2(minute)}`;
   return (
     <View style={styles.row}>
       <Pressable
