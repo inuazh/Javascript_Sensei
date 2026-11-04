@@ -242,13 +242,13 @@
           "id": "try-catch-03-q1",
           "type": "output",
           "code": "try {\n  try {\n    throw new Error(\"A\");\n  } catch (e) {\n    console.log(\"inner\");\n  }\n} catch (e) {\n  console.log(\"outer\");\n}",
-          "options": ["inner", "inner outer", "outer", "outer inner"],
+          "options": ["inner", "inner outer", "outer", "inner\nError"],
           "correct": 0,
           "optionExplanations": [
             null,
             "Внешний catch сработает, только если внутренний выбросит ошибку снова",
             "Ошибку ловит ближайший catch — внутренний",
-            null
+            "Ошибку поймал внутренний catch, поэтому программа не падает и продолжает работу"
           ],
           "explanation": "Ошибку поймал внутренний catch и не выбросил снова. Для внешнего try всё прошло без ошибок."
         },
@@ -360,9 +360,9 @@
           "type": "output",
           "code": "setTimeout(() => {\n  try {\n    null.x;\n  } catch (e) {\n    console.log(\"поймали\", e.name);\n  }\n}, 0);\nconsole.log(\"старт\");",
           "options": [
-            "старт поймали TypeError",
-            "поймали TypeError старт",
-            "старт TypeError",
+            "старт\nпоймали TypeError",
+            "поймали TypeError\nстарт",
+            "старт\nTypeError",
             "старт"
           ],
           "correct": 0,
@@ -462,9 +462,9 @@
           "type": "output",
           "code": "function parse(s) {\n  try {\n    return JSON.parse(s);\n  } catch (e) {\n    console.log(\"плохой JSON\");\n    throw e;\n  } finally {\n    console.log(\"finally\");\n  }\n}\ntry {\n  parse(\"{\");\n} catch (e) {\n  console.log(e.name);\n}",
           "options": [
-            "плохой JSON finally SyntaxError",
-            "плохой JSON SyntaxError finally",
-            "плохой JSON finally",
+            "плохой JSON\nfinally\nSyntaxError",
+            "плохой JSON\nSyntaxError\nfinally",
+            "плохой JSON\nfinally",
             "SyntaxError"
           ],
           "correct": 0,
@@ -1451,9 +1451,9 @@
         {
           "id": "common-bugs-04-q4",
           "type": "fill",
-          "codeBefore": "const ids = [\"7\", \"08\", \"0x1F\"].map(s => parseInt(s",
-          "codeAfter": "));\nconsole.log(ids); // [7, 8, 0]",
-          "options": [", 10", "", ", 16", ", 8"],
+          "codeBefore": "const ids = [\"7\", \"08\", \"0x1F\"].map(s => ",
+          "codeAfter": ");\nconsole.log(ids); // [7, 8, 0]",
+          "options": ["parseInt(s, 10)", "parseInt(s)", "parseInt(s, 16)", "parseInt(s, 8)"],
           "correct": 0,
           "optionExplanations": [
             null,

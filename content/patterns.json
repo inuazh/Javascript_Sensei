@@ -381,10 +381,13 @@
           "title": "Зачем обёртку в debounce пишут через function, а не стрелкой?",
           "options": [
             "Чтобы получить this от места вызова",
-            "Потому что стрелку нельзя вернуть из функции"
+            "Чтобы обёртка видела переменную timer"
           ],
           "correct": 0,
-          "optionExplanations": [null, "Стрелку можно вернуть из функции, как любое значение"],
+          "optionExplanations": [
+            null,
+            "Стрелка тоже замкнула бы timer: замыкание работает для любых функций. Разница только в this"
+          ],
           "explanation": "Обычная функция получает this от того, как её вызвали: counter.inc() даёт this = counter. У стрелки своего this нет, она взяла бы его из вызова debounce."
         }
       ]
@@ -427,7 +430,7 @@
           "id": "timing-patterns-05-q2",
           "type": "output",
           "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\n\nconst a = debounce(x => console.log(\"a\", x), 100);\nconst b = debounce(x => console.log(\"b\", x), 100);\na(1);\nb(1);\na(2);",
-          "options": ["b 1 a 2", "a 2 b 1", "a 2", "a 1 b 1 a 2"],
+          "options": ["b 1\na 2", "a 2\nb 1", "a 2", "a 1\nb 1\na 2"],
           "correct": 0,
           "optionExplanations": [
             null,
@@ -557,7 +560,7 @@
           "id": "memoization-01-q5",
           "type": "output",
           "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst square = memoize(n => {\n  console.log(\"считаю\", n);\n  return n * n;\n});\nconsole.log(square(3));\nconsole.log(square(3));",
-          "options": ["считаю 3 9 9", "считаю 3 9 считаю 3 9", "9 9", "считаю 3 9"],
+          "options": ["считаю 3\n9\n9", "считаю 3\n9\nсчитаю 3\n9", "9\n9", "считаю 3\n9"],
           "correct": 0,
           "optionExplanations": [
             null,
@@ -812,8 +815,8 @@
           "type": "output",
           "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst greet = memoize(user => console.log(\"Привет, \" + user));\ngreet(\"Аня\");\ngreet(\"Аня\");\ngreet(\"Боб\");",
           "options": [
-            "Привет, Аня Привет, Боб",
-            "Привет, Аня Привет, Аня Привет, Боб",
+            "Привет, Аня\nПривет, Боб",
+            "Привет, Аня\nПривет, Аня\nПривет, Боб",
             "Привет, Аня",
             "Ничего"
           ],

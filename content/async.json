@@ -478,10 +478,10 @@
           "type": "output",
           "code": "let x = 1;\nsetTimeout(() => console.log(\"timeout\", x), 0);\nPromise.resolve().then(() => {\n  x = 3;\n});\nx = 2;\nconsole.log(\"sync\", x);",
           "options": [
-            "sync 2 timeout 3",
-            "sync 2 timeout 2",
-            "sync 1 timeout 1",
-            "sync 2 timeout 1"
+            "sync 2\ntimeout 3",
+            "sync 2\ntimeout 2",
+            "sync 1\ntimeout 1",
+            "sync 2\ntimeout 1"
           ],
           "correct": 0,
           "optionExplanations": [
@@ -728,7 +728,7 @@
           "id": "promises-03-q1",
           "type": "output",
           "code": "Promise.resolve(1)\n  .then(x => {\n    throw new Error(\"упс\");\n  })\n  .then(() => console.log(\"A\"))\n  .catch(err => console.log(\"B\", err.message));",
-          "options": ["B упс", "A", "A B упс", "Error"],
+          "options": ["B упс", "A", "A\nB упс", "Error"],
           "correct": 0,
           "optionExplanations": [
             null,
@@ -1034,11 +1034,11 @@
           "id": "async-await-01-q2",
           "type": "output",
           "code": "async function greet() {\n  return \"Привет\";\n}\ngreet().then(msg => console.log(msg + \"!\"));",
-          "options": ["Привет!", "Promise!", "undefined!", "Привет"],
+          "options": ["Привет!", "[object Promise]!", "undefined!", "Привет"],
           "correct": 0,
           "optionExplanations": [
             null,
-            "then получает результат промиса, а не сам промис",
+            "then получает результат промиса, а не сам промис. Промис при склейке со строкой дал бы \"[object Promise]\"",
             null,
             "Колбэк then добавляет \"!\" к полученной строке"
           ],
@@ -1271,16 +1271,16 @@
           "type": "output",
           "code": "async function load() {\n  const data = await Promise.reject(new Error(\"timeout\"));\n  return data;\n}\nload()\n  .then(d => console.log(\"данные:\", d))\n  .catch(e => console.log(\"ошибка:\", e.message));\nconsole.log(\"запрос отправлен\");",
           "options": [
-            "запрос отправлен ошибка: timeout",
-            "ошибка: timeout запрос отправлен",
-            "данные: undefined запрос отправлен",
-            "запрос отправлен данные: undefined"
+            "запрос отправлен\nошибка: timeout",
+            "ошибка: timeout\nзапрос отправлен",
+            "данные: undefined\nзапрос отправлен",
+            "запрос отправлен\nданные: undefined"
           ],
           "correct": 0,
           "optionExplanations": [
             null,
             "catch срабатывает асинхронно — после синхронного console.log",
-            null,
+            "then пропускается: промис load() отклонён. И любой колбэк промиса ждёт окончания синхронного кода",
             "Неперехваченная ошибка отклоняет промис async-функции: then пропускается"
           ],
           "explanation": "Ошибку внутри load никто не поймал, поэтому промис load() отклоняется и срабатывает catch. Это происходит асинхронно, после синхронного кода."
@@ -1350,7 +1350,7 @@
           "id": "async-await-04-q3",
           "type": "output",
           "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const pa = wait(200, \"A\");\n  const pb = wait(200, \"B\");\n  console.log(await pa, await pb);\n}\nmain();\nsetTimeout(() => console.log(\"300 мс\"), 300);",
-          "options": ["A B 300 мс", "300 мс A B", "A 300 мс B", "B A 300 мс"],
+          "options": ["A B\n300 мс", "300 мс\nA B", "A\n300 мс\nB", "B A\n300 мс"],
           "correct": 0,
           "optionExplanations": [
             null,
