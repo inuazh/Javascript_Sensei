@@ -1,6 +1,6 @@
 {
   "name": "js-sensei",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "JS Sensei - React Native Expo learning app",
   "main": "expo-router/entry",
   "scripts": {
@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm test -- --ci && npm run validate:content"
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm test -- --ci && npm run validate:content",
+    "build:rustore": "eas build --platform android --profile rustore"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
