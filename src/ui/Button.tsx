@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, type ViewStyle } from 'react-native';
-import { Colors, Radius, Spacing, alpha } from './theme';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { Icon, type IconName } from './Icon';
+import { Colors, Fonts, Radius, Spacing } from './theme';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'danger';
 
@@ -7,27 +8,42 @@ interface ButtonProps {
   title: string;
   onPress: () => void;
   variant?: Variant;
+  icon?: IconName;
   disabled?: boolean;
   loading?: boolean;
-  color?: string;
   style?: ViewStyle;
   accessibilityHint?: string;
 }
+
+const FILL: Partial<Record<Variant, string>> = {
+  primary: Colors.inverse,
+  success: Colors.inverse,
+  danger: Colors.accent,
+};
+const TEXT_ON_FILL: Partial<Record<Variant, string>> = {
+  primary: Colors.textOnInverse,
+  success: Colors.textOnInverse,
+  danger: Colors.textOnAccent,
+};
 
 export function Button({
   title,
   onPress,
   variant = 'primary',
+  icon,
   disabled,
   loading,
-  color,
   style,
   accessibilityHint,
 }: ButtonProps) {
-  const accent =
-    color ??
-    (variant === 'success' ? Colors.success : variant === 'danger' ? Colors.danger : Colors.yellow);
-  const filled = variant === 'primary' || variant === 'success' || variant === 'danger';
+  const fill = FILL[variant];
+  const textColor = disabled
+    ? Colors.textDisabled
+    : fill
+      ? (TEXT_ON_FILL[variant] ?? Colors.textOnInverse)
+      : variant === 'ghost'
+        ? Colors.textSecondary
+        : Colors.textPrimary;
   return (
     <Pressable
       accessibilityRole="button"
@@ -37,35 +53,20 @@ export function Button({
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.base,
-        filled && { backgroundColor: accent },
-        variant === 'secondary' && {
-          backgroundColor: alpha(accent, 0.1),
-          borderColor: alpha(accent, 0.35),
-          borderWidth: 1,
-        },
+        fill ? { backgroundColor: fill } : null,
+        variant === 'secondary' && styles.secondary,
         disabled && styles.disabled,
         pressed && !disabled && styles.pressed,
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={filled ? Colors.textOnAccent : accent} />
+        <ActivityIndicator color={textColor} />
       ) : (
-        <Text
-          style={[
-            styles.text,
-            {
-              color: filled
-                ? Colors.textOnAccent
-                : variant === 'ghost'
-                  ? Colors.textSecondary
-                  : accent,
-            },
-            disabled && styles.textDisabled,
-          ]}
-        >
-          {title}
-        </Text>
+        <View style={styles.row}>
+          <Text style={[styles.text, { color: textColor }]}>{title}</Text>
+          {icon ? <Icon name={icon} size={17} color={textColor} /> : null}
+        </View>
       )}
     </Pressable>
   );
@@ -73,14 +74,19 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 52,
+    minHeight: 54,
     paddingHorizontal: Spacing.xl,
-    borderRadius: Radius.lg,
+    borderRadius: Radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  disabled: { backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'transparent' },
-  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
-  text: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
-  textDisabled: { color: Colors.textDisabled },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  secondary: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
+  },
+  disabled: { backgroundColor: Colors.surface, borderColor: Colors.surface },
+  pressed: { opacity: 0.85 },
+  text: { fontFamily: Fonts.sansSemiBold, fontSize: 16, letterSpacing: -0.2 },
 });

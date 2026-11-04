@@ -7,15 +7,27 @@ import { getLevelInfo } from '../../src/domain/levels';
 import { viewStreak } from '../../src/domain/streak';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Card, Colors, ProgressBar, Radius, Screen, Spacing, Type, alpha } from '../../src/ui';
+import {
+  Card,
+  Colors,
+  Fonts,
+  Icon,
+  type IconName,
+  Label,
+  ProgressBar,
+  Radius,
+  Screen,
+  Spacing,
+  Type,
+  alpha,
+} from '../../src/ui';
 
 const HEATMAP_WEEKS = 15;
-const DAY_LABELS = ['Пн', '', 'Ср', '', 'Пт', '', 'Вс'];
+const DAY_LABELS = ['пн', '', 'ср', '', 'пт', '', 'вс'];
 
-function Stat({ icon, value, label }: { icon: string; value: string | number; label: string }) {
+function Stat({ value, label }: { value: number; label: string }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statIcon}>{icon}</Text>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -60,9 +72,9 @@ export default function ProfileScreen() {
           </Text>
         </View>
         <View style={styles.flex}>
-          <Text style={Type.h2}>{nickname ?? 'Ученик'}</Text>
-          <Text style={[Type.small, { color: Colors.yellow }]}>
-            Уровень {level.level} · {level.title}
+          <Text style={Type.h2}>{nickname ?? 'ученик'}</Text>
+          <Text style={styles.level}>
+            lvl {level.level} · {level.title}
           </Text>
         </View>
         <Pressable
@@ -71,29 +83,31 @@ export default function ProfileScreen() {
           accessibilityRole="button"
           accessibilityLabel="Настройки"
         >
-          <Text style={styles.gear}>⚙️</Text>
+          <Icon name="settings" size={22} color={Colors.textSecondary} />
         </Pressable>
       </View>
 
       <Card>
         <View style={styles.rowBetween}>
-          <Text style={Type.h3}>⚡ {progress.totalXp} XP</Text>
-          <Text style={Type.small}>
-            до {level.level + 1} ур.: {level.nextXp - progress.totalXp} XP
+          <Text style={styles.xp}>
+            {progress.totalXp} <Text style={styles.xpUnit}>xp</Text>
+          </Text>
+          <Text style={styles.toNext}>
+            до lvl {level.level + 1}: {level.nextXp - progress.totalXp}
           </Text>
         </View>
-        <ProgressBar value={level.progress} color={Colors.yellow} style={styles.bar} />
+        <ProgressBar value={level.progress} style={styles.bar} />
       </Card>
 
       <View style={styles.stats}>
-        <Stat icon="🔥" value={streak.days} label="стрик" />
-        <Stat icon="🏅" value={progress.streak.longest} label="рекорд" />
-        <Stat icon="📚" value={lessons.length} label="уроков" />
-        <Stat icon="💯" value={lessons.filter(l => l.stars === 3).length} label="идеально" />
+        <Stat value={streak.days} label="стрик" />
+        <Stat value={progress.streak.longest} label="рекорд" />
+        <Stat value={lessons.length} label="уроков" />
+        <Stat value={lessons.filter(l => l.stars === 3).length} label="идеально" />
       </View>
 
       <Card>
-        <Text style={[Type.caption, styles.mb]}>Активность</Text>
+        <Label style={styles.mb}>активность</Label>
         <View style={styles.heatmap}>
           <View style={styles.dayLabels}>
             {DAY_LABELS.map((l, i) => (
@@ -113,8 +127,8 @@ export default function ProfileScreen() {
                       backgroundColor: cell.future
                         ? 'transparent'
                         : intensity(cell.xp) > 0
-                          ? alpha(Colors.green, 0.2 + intensity(cell.xp) * 0.8)
-                          : 'rgba(255,255,255,0.05)',
+                          ? alpha(Colors.textPrimary, 0.25 + intensity(cell.xp) * 0.75)
+                          : Colors.dotOff,
                     },
                     cell.day === today && styles.cellToday,
                   ]}
@@ -125,29 +139,26 @@ export default function ProfileScreen() {
         </View>
       </Card>
 
-      <Text style={Type.caption}>
-        Достижения · {unlockedCount}/{ACHIEVEMENTS.length}
-      </Text>
+      <Label>{`достижения · ${unlockedCount}/${ACHIEVEMENTS.length}`}</Label>
       <View style={styles.grid}>
         {ACHIEVEMENTS.map(a => {
           const unlocked = a.id in progress.achievements;
-          const color = Colors[a.color];
           return (
             <View
               key={a.id}
               accessible
               accessibilityLabel={`${a.title}: ${a.description}${unlocked ? ', получено' : ''}`}
-              style={[
-                styles.achievement,
-                unlocked
-                  ? { backgroundColor: alpha(color, 0.08), borderColor: alpha(color, 0.3) }
-                  : styles.locked,
-              ]}
+              style={[styles.achievement, unlocked ? styles.unlocked : styles.locked]}
             >
-              <Text style={[styles.achievementIcon, !unlocked && styles.lockedIcon]}>
-                {unlocked ? a.icon : '🔒'}
-              </Text>
-              <Text style={[styles.achievementTitle, unlocked && { color }]} numberOfLines={2}>
+              <Icon
+                name={unlocked ? (a.icon as IconName) : 'lock'}
+                size={22}
+                color={unlocked ? Colors.textPrimary : Colors.textDisabled}
+              />
+              <Text
+                style={[styles.achievementTitle, unlocked && { color: Colors.textPrimary }]}
+                numberOfLines={2}
+              >
                 {a.title}
               </Text>
               <Text style={styles.achievementDesc} numberOfLines={3}>
@@ -164,57 +175,67 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: alpha(Colors.yellow, 0.15),
-    borderWidth: 2,
-    borderColor: alpha(Colors.yellow, 0.5),
+    width: 52,
+    height: 52,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontSize: 22, fontWeight: '900', color: Colors.yellow },
+  avatarText: {
+    fontFamily: Fonts.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: Colors.textOnAccent,
+  },
   flex: { flex: 1 },
-  gear: { fontSize: 24 },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  level: { fontFamily: Fonts.mono, fontSize: 13, color: Colors.accent, marginTop: 2 },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  xp: { fontFamily: Fonts.display, fontSize: 40, lineHeight: 44, color: Colors.textPrimary },
+  xpUnit: { fontSize: 14, color: Colors.textMuted },
+  toNext: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   bar: { marginTop: Spacing.md },
   stats: { flexDirection: 'row', gap: Spacing.sm },
   stat: {
     flex: 1,
-    alignItems: 'center',
     paddingVertical: Spacing.md,
-    borderRadius: Radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    paddingHorizontal: Spacing.sm,
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  statIcon: { fontSize: 18 },
-  statValue: { fontSize: 20, fontWeight: '800', color: Colors.textPrimary, marginTop: 2 },
-  statLabel: { fontSize: 11, color: Colors.textMuted },
+  statValue: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 32, color: Colors.textPrimary },
+  statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mb: { marginBottom: Spacing.md },
   heatmap: { flexDirection: 'row', gap: 3 },
-  dayLabels: { gap: 3, marginRight: 2 },
-  dayLabel: { height: 14, fontSize: 9, color: Colors.textMuted, lineHeight: 14 },
+  dayLabels: { gap: 3, marginRight: 4 },
+  dayLabel: {
+    height: 14,
+    fontFamily: Fonts.mono,
+    fontSize: 9,
+    color: Colors.textMuted,
+    lineHeight: 14,
+  },
   week: { flex: 1, gap: 3 },
-  cell: { aspectRatio: 1, borderRadius: 3, maxHeight: 14 },
-  cellToday: { borderWidth: 1, borderColor: Colors.yellow },
+  cell: { aspectRatio: 1, borderRadius: 999, maxHeight: 14 },
+  cellToday: { backgroundColor: Colors.accent },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   achievement: {
-    width: '31.5%',
+    width: '31.8%',
     padding: Spacing.md,
-    borderRadius: Radius.lg,
+    borderRadius: Radius.xl,
     borderWidth: 1,
-    alignItems: 'center',
-    gap: 4,
+    gap: 6,
+    backgroundColor: Colors.surface,
   },
-  locked: { backgroundColor: 'rgba(255,255,255,0.02)', borderColor: Colors.border, opacity: 0.6 },
-  achievementIcon: { fontSize: 26 },
-  lockedIcon: { opacity: 0.5 },
-  achievementTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: Colors.textSecondary,
-    textAlign: 'center',
+  unlocked: { borderColor: Colors.borderStrong },
+  locked: { borderColor: Colors.border },
+  achievementTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 12, color: Colors.textMuted },
+  achievementDesc: {
+    fontFamily: Fonts.sans,
+    fontSize: 10.5,
+    lineHeight: 14,
+    color: Colors.textMuted,
   },
-  achievementDesc: { fontSize: 10, color: Colors.textMuted, textAlign: 'center' },
 });

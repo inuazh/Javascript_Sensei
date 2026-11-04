@@ -1,5 +1,5 @@
 import { StyleSheet, Text, type TextStyle } from 'react-native';
-import { Colors, Fonts, alpha } from './theme';
+import { Colors, Fonts } from './theme';
 
 /** Renders text with inline `code` and **bold** markup. */
 export function RichText({ text, style }: { text: string; style?: TextStyle }) {
@@ -28,12 +28,12 @@ export function RichText({ text, style }: { text: string; style?: TextStyle }) {
 }
 
 const styles = StyleSheet.create({
-  base: { fontSize: 15, lineHeight: 23, color: Colors.textPrimary },
+  base: { fontFamily: Fonts.sans, fontSize: 15, lineHeight: 23, color: Colors.textPrimary },
   code: {
     fontFamily: Fonts.mono,
-    fontSize: 14,
-    color: Colors.syntax.number,
-    backgroundColor: alpha('#79C0FF', 0.1),
+    fontSize: 13.5,
+    color: Colors.syntax.string,
+    backgroundColor: Colors.surfaceRaised,
   },
-  bold: { fontWeight: '800' },
+  bold: { fontFamily: Fonts.sansBold },
 });

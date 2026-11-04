@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ChoiceQuestion as ChoiceQuestionT } from '../../../content/schema';
-import { CodeBlock, Colors, Fonts, Radius, Spacing, alpha } from '../../../ui';
+import { CodeBlock, Colors, Fonts, Icon, Radius, Spacing, alpha } from '../../../ui';
 import { optionOrder } from '../shuffle';
 import type { QuestionViewProps } from '../types';
 
-const LABELS = ['A', 'B', 'C', 'D', 'E', 'F'];
+const LABELS = ['a', 'b', 'c', 'd', 'e', 'f'];
 
 type OptionState = 'idle' | 'selected' | 'correct' | 'wrong' | 'dimmed';
 
@@ -21,12 +21,12 @@ function optionState(
   return 'dimmed';
 }
 
-const STATE_COLOR: Record<OptionState, string | null> = {
-  idle: null,
-  selected: Colors.yellow,
+const STATE_COLOR: Record<OptionState, string> = {
+  idle: Colors.border,
+  selected: Colors.textPrimary,
   correct: Colors.success,
   wrong: Colors.danger,
-  dimmed: null,
+  dimmed: Colors.border,
 };
 
 export function ChoiceQuestion({
@@ -59,6 +59,7 @@ export function ChoiceQuestion({
           const option = question.options[i];
           const state = optionState(i, answer, question.correct, revealed);
           const color = STATE_COLOR[state];
+          const active = state !== 'idle' && state !== 'dimmed';
           return (
             <Pressable
               key={i}
@@ -70,19 +71,27 @@ export function ChoiceQuestion({
               style={({ pressed }) => [
                 styles.option,
                 isTrueFalse && styles.optionTrueFalse,
-                color && { backgroundColor: alpha(color, 0.1), borderColor: alpha(color, 0.6) },
+                { borderColor: color },
+                active && { backgroundColor: alpha(color, 0.06) },
                 state === 'dimmed' && styles.dimmed,
                 pressed && !revealed && styles.pressed,
               ]}
             >
               {!isTrueFalse && (
-                <View style={[styles.label, color && { backgroundColor: alpha(color, 0.2) }]}>
-                  <Text style={[styles.labelText, color && { color }]}>
-                    {state === 'correct' ? '✓' : state === 'wrong' ? '✗' : LABELS[position]}
-                  </Text>
+                <View style={[styles.key, active && { borderColor: color }]}>
+                  {state === 'correct' || state === 'wrong' ? (
+                    <Icon name={state === 'correct' ? 'check' : 'x'} size={14} color={color} />
+                  ) : (
+                    <Text style={[styles.keyText, active && { color }]}>{LABELS[position]}</Text>
+                  )}
                 </View>
               )}
-              <Text style={[isTrueFalse ? styles.textTrueFalse : styles.text, color && { color }]}>
+              <Text
+                style={[
+                  isTrueFalse ? styles.textTrueFalse : styles.text,
+                  active && { color: state === 'selected' ? Colors.textPrimary : color },
+                ]}
+              >
                 {option}
               </Text>
             </Pressable>
@@ -95,36 +104,36 @@ export function ChoiceQuestion({
 
 const styles = StyleSheet.create({
   wrap: { gap: Spacing.lg },
-  list: { gap: Spacing.sm + 2 },
-  row: { flexDirection: 'row', gap: Spacing.md },
+  list: { gap: Spacing.sm },
+  row: { flexDirection: 'row', gap: Spacing.sm },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    paddingVertical: 14,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Radius.md + 2,
-    borderWidth: 1.5,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.08)',
+    paddingVertical: 13,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    backgroundColor: Colors.surface,
   },
   optionTrueFalse: { flex: 1, justifyContent: 'center', paddingVertical: Spacing.lg },
   dimmed: { opacity: 0.45 },
-  pressed: { opacity: 0.8 },
-  label: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
+  pressed: { backgroundColor: Colors.surfaceRaised },
+  key: {
+    width: 26,
+    height: 26,
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderStrong,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  labelText: { fontWeight: '800', fontSize: 12, color: Colors.textMuted },
-  text: { flex: 1, fontFamily: Fonts.mono, fontSize: 14, color: 'rgba(255,255,255,0.9)' },
+  keyText: { fontFamily: Fonts.monoBold, fontSize: 12, color: Colors.textMuted },
+  text: { flex: 1, fontFamily: Fonts.mono, fontSize: 14, color: Colors.textPrimary },
   textTrueFalse: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.9)',
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 14,
+    color: Colors.textPrimary,
     textAlign: 'center',
   },
 });

@@ -18,15 +18,42 @@ import {
   Card,
   Chip,
   Colors,
+  Fonts,
+  Icon,
+  type IconName,
+  Label,
+  Logo,
   ProgressBar,
-  Radius,
   Screen,
   Spacing,
   Stars,
   Type,
-  alpha,
-  getSectionColor,
 } from '../../src/ui';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+function ActionRow({
+  icon,
+  title,
+  subtitle,
+  onPress,
+}: {
+  icon: IconName;
+  title: string;
+  subtitle: string;
+  onPress: () => void;
+}) {
+  return (
+    <Card onPress={onPress} style={styles.action}>
+      <Icon name={icon} size={20} color={Colors.accent} />
+      <View style={styles.flex}>
+        <Text style={Type.h3}>{title}</Text>
+        <Text style={Type.small}>{subtitle}</Text>
+      </View>
+      <Icon name="chevron-right" size={18} color={Colors.textMuted} />
+    </Card>
+  );
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -45,179 +72,171 @@ export default function HomeScreen() {
   const goal = Math.min(1, todayXp / dailyGoalXp);
   const dueCount = dueItems(progress.review, today).length;
   const next = useMemo(() => getFirstUncompleted(id => id in progress.lessons), [progress.lessons]);
+  const sections = getSections();
+  const days = (n: number) => `${n} ${plural(n, 'день', 'дня', 'дней')}`;
 
   const streakLine =
     streak.status === 'done'
-      ? `🔥 Стрик: ${streak.days} ${plural(streak.days, 'день', 'дня', 'дней')} — сегодня засчитан`
+      ? `стрик ${days(streak.days)} · сегодня засчитан`
       : streak.status === 'pending'
-        ? `⏳ Пройди урок, чтобы не потерять стрик (${streak.days} ${plural(streak.days, 'день', 'дня', 'дней')})`
-        : '✨ Пройди урок и начни серию';
+        ? `пройди урок, чтобы сохранить стрик (${days(streak.days)})`
+        : 'пройди урок и начни серию';
 
   return (
     <Screen>
       <View style={styles.header}>
-        <Text style={styles.logo}>⚡ JS Sensei</Text>
+        <Logo />
         <View style={styles.chips}>
           <Chip
-            icon="🔥"
-            color={Colors.orange}
+            icon="flame"
+            color={Colors.warning}
             label={String(streak.days)}
             muted={streak.status !== 'done'}
           />
-          <Chip icon="⚡" label={String(progress.totalXp)} />
+          <Chip icon="lightning" label={String(progress.totalXp)} />
         </View>
       </View>
 
-      <Card color={goal >= 1 ? Colors.green : undefined}>
+      <Card>
         <View style={styles.rowBetween}>
-          <Text style={Type.h3}>{goal >= 1 ? '🎯 Цель дня выполнена!' : '🎯 Цель дня'}</Text>
-          <Text style={styles.mono}>
-            {Math.min(todayXp, dailyGoalXp)}/{dailyGoalXp} XP
+          <Label>цель дня</Label>
+          <Text style={styles.goalValue}>
+            <Text style={{ color: goal >= 1 ? Colors.success : Colors.textPrimary }}>
+              {Math.min(todayXp, dailyGoalXp)}
+            </Text>
+            <Text style={styles.goalTotal}>/{dailyGoalXp} xp</Text>
           </Text>
         </View>
         <ProgressBar
           value={goal}
-          color={goal >= 1 ? Colors.green : Colors.yellow}
+          color={goal >= 1 ? Colors.success : Colors.accent}
           style={styles.goalBar}
         />
-        <Text style={[Type.small, streak.status === 'pending' && { color: Colors.orange }]}>
-          {streakLine}
-        </Text>
+        <View style={styles.streakRow}>
+          <Icon
+            name={streak.status === 'pending' ? 'clock' : 'flame'}
+            size={14}
+            color={streak.status === 'pending' ? Colors.warning : Colors.textMuted}
+          />
+          <Text
+            style={[styles.streakText, streak.status === 'pending' && { color: Colors.warning }]}
+          >
+            {streakLine}
+          </Text>
+        </View>
       </Card>
 
       {next ? (
-        <Card color={getSectionColor(next.section)} style={styles.continueCard}>
-          <Text style={[Type.caption, { color: getSectionColor(next.section) }]}>
-            {Object.keys(progress.lessons).length === 0 ? 'Начни отсюда' : 'Продолжить'} ·{' '}
-            {next.section.title}
+        <Card style={styles.continueCard}>
+          <Label dot>
+            {Object.keys(progress.lessons).length === 0 ? 'начни отсюда' : 'продолжить'}
+          </Label>
+          <Text style={styles.continueMeta}>
+            {pad(sections.findIndex(s => s.id === next.section.id) + 1)} · {next.section.title}
           </Text>
           <Text style={Type.h2}>{next.topic.title}</Text>
-          <Text style={Type.small}>
-            {next.lesson.title}
-            {next.lesson.theory ? ' · 📖 с теорией' : ''}
-          </Text>
+          <Text style={Type.small}>{next.lesson.title}</Text>
           <Button
-            title="Начать урок →"
-            color={getSectionColor(next.section)}
+            title="Начать урок"
+            icon="arrow-right"
             onPress={() => router.push(`/lesson/${next.lesson.id}`)}
             style={styles.continueButton}
           />
         </Card>
       ) : (
-        <Card color={Colors.yellow}>
-          <Text style={Type.h2}>🏆 Курс пройден!</Text>
+        <Card tone="success">
+          <Label>курс пройден</Label>
+          <Text style={Type.h2}>Все уроки пройдены</Text>
           <Text style={Type.small}>
-            Новые разделы уже в работе. А пока — закрепляй знания в тренировке.
+            Новые разделы на подходе. Пока закрепляй знания в тренировке.
           </Text>
         </Card>
       )}
 
       {showPlacement && (
-        <Card
-          color={Colors.blue}
+        <ActionRow
+          icon="compass"
+          title="Уже знаешь основы?"
+          subtitle="Вводный тест засчитает знакомые темы"
           onPress={() => router.push('/placement')}
-          style={styles.reviewCard}
-        >
-          <Text style={styles.reviewIcon}>🧭</Text>
-          <View style={styles.flex}>
-            <Text style={Type.h3}>Уже знаешь основы?</Text>
-            <Text style={Type.small}>Пройди вводный тест и пропусти знакомые темы</Text>
-          </View>
-          <Text style={[styles.arrow, { color: Colors.blue }]}>→</Text>
-        </Card>
+        />
       )}
-
       {dueCount > 0 && (
-        <Card color={Colors.pink} onPress={() => router.push('/review')} style={styles.reviewCard}>
-          <Text style={styles.reviewIcon}>🧠</Text>
-          <View style={styles.flex}>
-            <Text style={Type.h3}>Пора повторить</Text>
-            <Text style={Type.small}>
-              {dueCount} {plural(dueCount, 'вопрос', 'вопроса', 'вопросов')} ждут повторения
-            </Text>
-          </View>
-          <Text style={[styles.arrow, { color: Colors.pink }]}>→</Text>
-        </Card>
+        <ActionRow
+          icon="repeat"
+          title="Пора повторить"
+          subtitle={`${dueCount} ${plural(dueCount, 'вопрос ждёт', 'вопроса ждут', 'вопросов ждут')} повторения`}
+          onPress={() => router.push('/review')}
+        />
       )}
 
-      <Text style={[Type.caption, styles.mapTitle]}>Карта курса</Text>
-      {getSections().map(section => {
-        const color = getSectionColor(section);
+      <Label style={styles.mapTitle}>карта курса</Label>
+      {sections.map((section, sIndex) => {
         const lessons = getSectionLessons(section.id);
         const done = lessons.filter(l => l.id in progress.lessons).length;
         return (
           <View key={section.id} style={styles.section}>
             <View style={styles.sectionHeader}>
-              <View style={[styles.sectionIcon, { backgroundColor: alpha(color, 0.12) }]}>
-                <Text style={styles.sectionEmoji}>{section.icon}</Text>
-              </View>
-              <View style={styles.flex}>
-                <Text style={Type.h3}>{section.title}</Text>
-                <Text style={Type.small}>
-                  {done}/{lessons.length} уроков
-                </Text>
-              </View>
+              <Text style={styles.sectionNumber}>{pad(sIndex + 1)}</Text>
+              <Text style={[Type.h3, styles.flex]}>{section.title}</Text>
+              <Text style={styles.count}>
+                {done}/{lessons.length}
+              </Text>
             </View>
-            <ProgressBar
-              value={lessons.length ? done / lessons.length : 0}
-              color={color}
-              height={6}
-            />
-            {section.topics.map(topic => {
-              const topicLessons = getTopicLessons(topic.id);
-              const completed = topicLessons.filter(l => l.id in progress.lessons);
-              const isDone = completed.length === topicLessons.length && topicLessons.length > 0;
-              const isNext = next?.topic.id === topic.id;
-              const taken = completed.filter(l => !progress.lessons[l.id].skipped);
-              const allSkipped = isDone && taken.length === 0;
-              const minStars =
-                isDone && taken.length === completed.length
-                  ? Math.min(...taken.map(l => progress.lessons[l.id].stars))
-                  : 0;
-              return (
-                <Pressable
-                  key={topic.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${topic.title}, пройдено ${completed.length} из ${topicLessons.length}`}
-                  onPress={() => router.push(`/topic/${topic.id}`)}
-                  style={({ pressed }) => [
-                    styles.topic,
-                    isNext && {
-                      borderColor: alpha(color, 0.45),
-                      backgroundColor: alpha(color, 0.06),
-                    },
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.topicBadge,
-                      {
-                        backgroundColor: isDone ? alpha(color, 0.2) : 'rgba(255,255,255,0.04)',
-                        borderColor: alpha(color, isDone || isNext ? 0.6 : 0.2),
-                      },
+            <ProgressBar value={lessons.length ? done / lessons.length : 0} height={3} />
+            <View style={styles.topics}>
+              {section.topics.map((topic, tIndex) => {
+                const topicLessons = getTopicLessons(topic.id);
+                const completed = topicLessons.filter(l => l.id in progress.lessons);
+                const isDone = completed.length === topicLessons.length && topicLessons.length > 0;
+                const isNext = next?.topic.id === topic.id;
+                const taken = completed.filter(l => !progress.lessons[l.id].skipped);
+                const allSkipped = isDone && taken.length === 0;
+                const minStars =
+                  isDone && taken.length === completed.length
+                    ? Math.min(...taken.map(l => progress.lessons[l.id].stars))
+                    : 0;
+                return (
+                  <Pressable
+                    key={topic.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${topic.title}, пройдено ${completed.length} из ${topicLessons.length}`}
+                    onPress={() => router.push(`/topic/${topic.id}`)}
+                    style={({ pressed }) => [
+                      styles.topic,
+                      isNext && styles.topicNext,
+                      pressed && styles.pressed,
                     ]}
                   >
-                    <Text style={[styles.topicBadgeText, { color }]}>
-                      {isDone ? '✓' : isNext ? '▶' : `${completed.length}`}
+                    <Text style={[styles.topicIndex, isNext && { color: Colors.accent }]}>
+                      {sIndex + 1}.{tIndex + 1}
                     </Text>
-                  </View>
-                  <View style={styles.flex}>
-                    <Text style={styles.topicTitle}>{topic.title}</Text>
-                    <Text style={Type.small}>{topic.subtitle}</Text>
-                  </View>
-                  {allSkipped ? (
-                    <Text style={styles.topicCount}>знакомо</Text>
-                  ) : isDone && minStars > 0 ? (
-                    <Stars count={minStars} size={11} />
-                  ) : (
-                    <Text style={styles.topicCount}>
-                      {completed.length}/{topicLessons.length}
-                    </Text>
-                  )}
-                </Pressable>
-              );
-            })}
+                    <View style={styles.status}>
+                      {isDone ? (
+                        <Icon name="check" size={16} color={Colors.success} />
+                      ) : isNext ? (
+                        <Icon name="play" size={14} color={Colors.accent} />
+                      ) : (
+                        <View style={styles.dot} />
+                      )}
+                    </View>
+                    <View style={styles.flex}>
+                      <Text style={styles.topicTitle}>{topic.title}</Text>
+                      <Text style={styles.topicSubtitle}>{topic.subtitle}</Text>
+                    </View>
+                    {allSkipped ? (
+                      <Text style={styles.count}>знакомо</Text>
+                    ) : isDone && minStars > 0 ? (
+                      <Stars count={minStars} size={12} />
+                    ) : (
+                      <Text style={styles.count}>
+                        {completed.length}/{topicLessons.length}
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
         );
       })}
@@ -227,47 +246,43 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  logo: { fontSize: 22, fontWeight: '900', color: Colors.yellow, letterSpacing: -0.5 },
   chips: { flexDirection: 'row', gap: Spacing.sm },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  mono: { fontWeight: '800', color: Colors.textSecondary },
+  goalValue: { fontFamily: Fonts.display, fontSize: 30, lineHeight: 34 },
+  goalTotal: { color: Colors.textMuted },
   goalBar: { marginVertical: Spacing.md },
+  streakRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  streakText: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   continueCard: { gap: Spacing.xs, padding: Spacing.xl },
-  continueButton: { marginTop: Spacing.md },
-  reviewCard: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  reviewIcon: { fontSize: 28 },
-  arrow: { fontSize: 22, fontWeight: '800' },
-  flex: { flex: 1 },
-  mapTitle: { marginTop: Spacing.sm },
-  section: { gap: Spacing.sm, marginBottom: Spacing.md },
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  sectionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: Radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+  continueMeta: {
+    fontFamily: Fonts.mono,
+    fontSize: 12,
+    color: Colors.accent,
+    marginTop: Spacing.sm,
   },
-  sectionEmoji: { fontSize: 22 },
+  continueButton: { marginTop: Spacing.md },
+  action: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  flex: { flex: 1 },
+  mapTitle: { marginTop: Spacing.md },
+  section: { gap: Spacing.sm, marginBottom: Spacing.lg },
+  sectionHeader: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.md },
+  sectionNumber: { fontFamily: Fonts.monoBold, fontSize: 13, color: Colors.accent },
+  count: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
+  topics: { marginTop: Spacing.xs },
   topic: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    padding: Spacing.md,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: 'transparent',
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
-  pressed: { opacity: 0.7 },
-  topicBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  topicBadgeText: { fontWeight: '800', fontSize: 15 },
-  topicTitle: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
-  topicCount: { color: Colors.textMuted, fontWeight: '700', fontSize: 13 },
+  topicNext: { backgroundColor: Colors.surface },
+  pressed: { backgroundColor: Colors.surfaceRaised },
+  topicIndex: { width: 28, fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
+  status: { width: 16, alignItems: 'center' },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.textDisabled },
+  topicTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 15, color: Colors.textPrimary },
+  topicSubtitle: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted, marginTop: 1 },
 });

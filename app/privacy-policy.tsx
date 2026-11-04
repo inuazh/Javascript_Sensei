@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { BackButton, Colors, Fonts } from '../src/ui';
 
 export default function PrivacyPolicyScreen() {
   const router = useRouter();
@@ -9,11 +10,9 @@ export default function PrivacyPolicyScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.back}>
-          <Text style={styles.backText}>←</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Text style={styles.title}>Политика конфиденциальности</Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 22 }} />
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -81,32 +80,26 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#0A0A0A' },
+  safe: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.06)',
+    borderBottomColor: Colors.border,
   },
-  back: { width: 40, height: 40, justifyContent: 'center' },
-  backText: { fontSize: 22, color: '#fff' },
-  title: { fontSize: 16, fontWeight: '700', color: '#fff' },
+  title: { fontFamily: Fonts.monoBold, fontSize: 14, color: Colors.textPrimary },
   scroll: { flex: 1 },
   content: { padding: 20 },
-  updated: { fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 24 },
+  updated: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted, marginBottom: 24 },
   section: { marginBottom: 24 },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FACC15',
-    marginBottom: 8,
-  },
+  sectionTitle: { fontFamily: Fonts.monoBold, fontSize: 14, color: Colors.accent, marginBottom: 8 },
   sectionBody: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
-    color: 'rgba(255,255,255,0.65)',
+    color: Colors.textSecondary,
     lineHeight: 22,
   },
 });

@@ -45,7 +45,8 @@
           "icon": "./assets/notification-icon.png",
           "color": "#FACC15"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "updates": {
       "enabled": false

@@ -1,50 +1,49 @@
-import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View, type ViewStyle } from 'react-native';
-import { Colors, Radius } from './theme';
+import { useState } from 'react';
+import { StyleSheet, View, type LayoutChangeEvent, type ViewStyle } from 'react-native';
+import { Colors } from './theme';
 
 interface ProgressBarProps {
   /** 0..1 */
   value: number;
   color?: string;
+  /** Dot diameter. */
   height?: number;
   style?: ViewStyle;
 }
 
+/** Dotted progress: a row of dots filling left to right. */
 export function ProgressBar({
   value,
-  color = Colors.yellow,
-  height = 10,
+  color = Colors.textPrimary,
+  height = 6,
   style,
 }: ProgressBarProps) {
-  const anim = useRef(new Animated.Value(0)).current;
+  const [width, setWidth] = useState(0);
   const clamped = Math.max(0, Math.min(1, value));
-  useEffect(() => {
-    Animated.timing(anim, { toValue: clamped, duration: 450, useNativeDriver: false }).start();
-  }, [anim, clamped]);
+  const gap = Math.max(3, Math.round(height * 0.6));
+  const count = width > 0 ? Math.max(1, Math.floor((width + gap) / (height + gap))) : 0;
+  const filled = Math.round(clamped * count);
+  const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
   return (
     <View
+      onLayout={onLayout}
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: Math.round(clamped * 100) }}
-      style={[styles.track, { height }, style]}
+      style={[styles.row, { height, gap }, style]}
     >
-      <Animated.View
-        style={[
-          styles.fill,
-          {
-            backgroundColor: color,
-            width: anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
-          },
-        ]}
-      />
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            width: height,
+            height,
+            borderRadius: height / 2,
+            backgroundColor: i < filled ? color : Colors.dotOff,
+          }}
+        />
+      ))}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  track: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: Radius.pill,
-    overflow: 'hidden',
-  },
-  fill: { height: '100%', borderRadius: Radius.pill },
-});
+const styles = StyleSheet.create({ row: { flexDirection: 'row', overflow: 'hidden' } });

@@ -8,7 +8,7 @@ import { plural } from '../src/domain/reminders';
 import { QuizSession } from '../src/features/quiz/QuizSession';
 import type { QuizAnswer } from '../src/features/quiz/quizReducer';
 import { useUserStore } from '../src/stores/useUserStore';
-import { Button, Card, Colors, Screen, Spacing, Type } from '../src/ui';
+import { Button, Colors, Fonts, Icon, Radius, Screen, Spacing, Type } from '../src/ui';
 
 type Phase = 'intro' | 'quiz' | 'result';
 
@@ -50,21 +50,21 @@ export default function PlacementScreen() {
         contentStyle={styles.center}
         footer={
           <View style={styles.footer}>
-            <Button title="Пройти тест" onPress={() => setPhase('quiz')} />
+            <Button title="Пройти тест" icon="arrow-right" onPress={() => setPhase('quiz')} />
             <Button title="Начать с первого урока" variant="ghost" onPress={decline} />
           </View>
         }
       >
-        <Text style={styles.emoji}>🧭</Text>
-        <Text style={[Type.h1, styles.text]}>Вводный тест</Text>
-        <Text style={[Type.body, styles.text, styles.muted]}>
+        <View style={styles.iconBox}>
+          <Icon name="compass" size={32} color={Colors.accent} />
+        </View>
+        <Text style={Type.h1}>Вводный тест</Text>
+        <Text style={[Type.body, styles.muted]}>
           По одному вопросу на тему. Темы, где ответишь верно, засчитаются, и ты начнёшь с того,
           чего ещё не знаешь. Займёт пару минут — тест закончится сам, если вопросы станут слишком
           сложными.
         </Text>
-        <Text style={[Type.small, styles.text]}>
-          Засчитанные темы можно пройти позже — за них тоже дадут XP.
-        </Text>
+        <Text style={Type.small}>Засчитанные темы можно пройти позже — за них тоже дадут XP.</Text>
       </Screen>
     );
   }
@@ -75,25 +75,26 @@ export default function PlacementScreen() {
         edges={['top', 'bottom']}
         footer={
           <View style={styles.footer}>
-            <Button title="К урокам →" onPress={leave} />
+            <Button title="К урокам" icon="arrow-right" onPress={leave} />
           </View>
         }
       >
-        <Text style={[styles.emoji, styles.text]}>{passed.length > 0 ? '🎯' : '🌱'}</Text>
-        <Text style={[Type.h1, styles.text]}>
+        <Text style={styles.score}>{`${passed.length}/${items.length}`}</Text>
+        <Text style={Type.h1}>
           {passed.length > 0
             ? `Засчитано ${passed.length} ${plural(passed.length, 'тема', 'темы', 'тем')}`
             : 'Начнём с основ'}
         </Text>
-        <Text style={[Type.small, styles.text]}>
+        <Text style={Type.small}>
           {passed.length > 0
             ? 'Эти темы отмечены как знакомые. Курс продолжится с первой незнакомой.'
             : 'Ничего страшного: основы быстро пролетят, а повторения закрепят знания.'}
         </Text>
         {passed.map(topicId => (
-          <Card key={topicId} color={Colors.green} style={styles.row}>
-            <Text style={Type.h3}>✓ {topicTitles.get(topicId)}</Text>
-          </Card>
+          <View key={topicId} style={styles.row}>
+            <Icon name="check" size={16} color={Colors.success} />
+            <Text style={Type.h3}>{topicTitles.get(topicId)}</Text>
+          </View>
         ))}
       </Screen>
     );
@@ -111,7 +112,7 @@ export default function PlacementScreen() {
     <QuizSession
       items={items.map(i => ({ question: i.question, lessonId: i.lessonId }))}
       label="Вводный тест"
-      color={Colors.blue}
+      color={Colors.accent}
       onExit={decline}
       onFinish={finish}
       shouldStop={shouldStopPlacement}
@@ -121,10 +122,32 @@ export default function PlacementScreen() {
 
 const styles = StyleSheet.create({
   center: { flexGrow: 1, justifyContent: 'center' },
-  emoji: { fontSize: 64, textAlign: 'center' },
-  text: { textAlign: 'center' },
+  iconBox: {
+    width: 64,
+    height: 64,
+    borderRadius: Radius.xl,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   muted: { color: Colors.textSecondary },
-  row: { paddingVertical: Spacing.md },
+  score: {
+    fontFamily: Fonts.display,
+    fontSize: 72,
+    lineHeight: 80,
+    color: Colors.textPrimary,
+    marginTop: Spacing.xl,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
   footer: {
     padding: Spacing.xl,
     paddingTop: Spacing.md,

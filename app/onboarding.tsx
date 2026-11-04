@@ -3,16 +3,27 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ExperienceLevel } from '../src/stores/useUserStore';
-import { Button, Colors, OptionCard, Screen, Spacing, TimePicker, Type } from '../src/ui';
+import {
+  Button,
+  Colors,
+  Fonts,
+  type IconName,
+  Logo,
+  OptionCard,
+  Screen,
+  Spacing,
+  TimePicker,
+  Type,
+} from '../src/ui';
 
-const LEVELS: { id: ExperienceLevel; title: string; subtitle: string; icon: string }[] = [
-  { id: 'beginner', title: 'Новичок', subtitle: 'Начинаю с нуля', icon: '🌱' },
-  { id: 'intermediate', title: 'Знаю основы', subtitle: 'Писал немного кода', icon: '🚀' },
+const LEVELS: { id: ExperienceLevel; title: string; subtitle: string; icon: IconName }[] = [
+  { id: 'beginner', title: 'Новичок', subtitle: 'Начинаю с нуля', icon: 'sprout' },
+  { id: 'intermediate', title: 'Знаю основы', subtitle: 'Писал немного кода', icon: 'rocket' },
   {
     id: 'advanced',
     title: 'Есть опыт',
     subtitle: 'Хочу закрыть пробелы и подготовиться к собеседованию',
-    icon: '🦾',
+    icon: 'cpu',
   },
 ];
 
@@ -58,11 +69,13 @@ export default function OnboardingScreen() {
       <Screen
         edges={['top', 'bottom']}
         contentStyle={styles.welcome}
-        footer={footer({ title: 'Начать →', onPress: () => setStep(1) })}
+        footer={footer({ title: 'Начать', onPress: () => setStep(1) })}
       >
-        <Text style={styles.logo}>⚡</Text>
-        <Text style={[Type.h1, styles.center]}>JS Sensei</Text>
-        <Text style={[Type.body, styles.center, styles.muted]}>
+        <Logo size={44} />
+        <Text style={styles.prompt}>
+          <Text style={styles.promptSign}>$ </Text>node learn.js
+        </Text>
+        <Text style={[Type.body, styles.muted]}>
           JavaScript по 5 минут в день: короткая теория, практика на реальном коде и повторения,
           чтобы ничего не забылось.
         </Text>
@@ -118,7 +131,7 @@ export default function OnboardingScreen() {
     <Screen
       edges={['top', 'bottom']}
       footer={footer(
-        { title: '🔔 Напоминать', onPress: () => finish(true) },
+        { title: 'Напоминать', onPress: () => finish(true) },
         { title: 'Не сейчас', onPress: () => finish(false) },
       )}
     >
@@ -136,13 +149,19 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  welcome: { flexGrow: 1, justifyContent: 'center', alignItems: 'center' },
-  logo: { fontSize: 80 },
+  welcome: { flexGrow: 1, justifyContent: 'center' },
   center: { textAlign: 'center' },
   muted: { color: Colors.textSecondary },
+  prompt: {
+    fontFamily: Fonts.mono,
+    fontSize: 15,
+    color: Colors.textSecondary,
+    marginTop: Spacing.xl,
+  },
+  promptSign: { color: Colors.accent },
   dots: { flexDirection: 'row', gap: 6, marginBottom: Spacing.md },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)' },
-  dotActive: { width: 24, backgroundColor: Colors.yellow },
+  dot: { width: 8, height: 4, borderRadius: 2, backgroundColor: Colors.border },
+  dotActive: { width: 24, height: 4, backgroundColor: Colors.accent },
   time: { marginTop: Spacing.xxl },
   footer: { padding: Spacing.xl, paddingTop: Spacing.md, gap: Spacing.xs },
 });

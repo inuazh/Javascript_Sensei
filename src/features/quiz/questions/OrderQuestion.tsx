@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { Animated, PanResponder, StyleSheet, Text, View } from 'react-native';
 import type { OrderQuestion as OrderQuestionT } from '../../../content/schema';
 import { useFeedback } from '../../../services/feedback';
-import { Colors, Fonts, Radius, Spacing, alpha } from '../../../ui';
+import { Colors, Fonts, Icon, Radius, Spacing } from '../../../ui';
 import type { QuestionViewProps } from '../types';
 
 const ITEM_GAP = 8;
@@ -69,7 +69,7 @@ export function OrderQuestion({
 
   return (
     <View style={styles.wrap}>
-      {!revealed && <Text style={styles.hint}>☰ Перетащи строки в правильном порядке</Text>}
+      {!revealed && <Text style={styles.hint}>{'// перетащи строки в правильном порядке'}</Text>}
       <View>
         {order.map((lineIndex, idx) => {
           const isDragging = dragging === idx;
@@ -107,10 +107,10 @@ export function OrderQuestion({
                 ]}
               >
                 <Text style={styles.index}>{idx + 1}</Text>
-                <Text style={[styles.text, isDragging && { color: Colors.yellow }]}>
+                <Text style={[styles.text, isDragging && { color: Colors.accent }]}>
                   {question.lines[lineIndex]}
                 </Text>
-                {!revealed && <Text style={styles.handle}>☰</Text>}
+                {!revealed && <Icon name="menu" size={16} color={Colors.textDisabled} />}
               </View>
             </Animated.View>
           );
@@ -122,32 +122,28 @@ export function OrderQuestion({
 
 const styles = StyleSheet.create({
   wrap: { gap: Spacing.sm },
-  hint: { color: Colors.textMuted, fontSize: 12 },
+  hint: { fontFamily: Fonts.mono, color: Colors.textMuted, fontSize: 12 },
   line: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
     paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: Colors.codeBackground,
+    borderColor: Colors.border,
   },
-  lineDragging: {
-    backgroundColor: alpha(Colors.yellow, 0.1),
-    borderColor: alpha(Colors.yellow, 0.5),
+  lineDragging: { borderColor: Colors.accent, backgroundColor: Colors.surfaceRaised },
+  lineTarget: { borderColor: Colors.accent, borderStyle: 'dashed' },
+  lineRight: { borderColor: Colors.success },
+  lineWrong: { borderColor: Colors.danger },
+  index: {
+    width: 18,
+    fontFamily: Fonts.mono,
+    color: Colors.syntax.lineNumber,
+    fontSize: 13,
+    textAlign: 'right',
   },
-  lineTarget: { borderColor: alpha(Colors.yellow, 0.4), borderStyle: 'dashed' },
-  lineRight: {
-    backgroundColor: alpha(Colors.success, 0.1),
-    borderColor: alpha(Colors.success, 0.5),
-  },
-  lineWrong: {
-    backgroundColor: alpha(Colors.danger, 0.08),
-    borderColor: alpha(Colors.danger, 0.4),
-  },
-  index: { width: 20, color: Colors.textMuted, fontWeight: '700', fontSize: 12 },
-  text: { flex: 1, fontFamily: Fonts.mono, fontSize: 13, color: 'rgba(255,255,255,0.88)' },
-  handle: { color: Colors.textDisabled, fontSize: 16 },
+  text: { flex: 1, fontFamily: Fonts.mono, fontSize: 13, color: Colors.syntax.text },
 });

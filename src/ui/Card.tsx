@@ -1,42 +1,55 @@
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
-import { Colors, Radius, Spacing, alpha } from './theme';
+import { Colors, Radius, Spacing } from './theme';
+
+type Tone = 'default' | 'accent' | 'success' | 'danger' | 'info';
+
+const BORDER: Record<Tone, string> = {
+  default: Colors.surface,
+  accent: Colors.accent,
+  success: Colors.borderStrong,
+  danger: Colors.danger,
+  info: Colors.borderStrong,
+};
 
 interface CardProps {
   children: ReactNode;
-  /** Tints background and border with this colour. */
-  color?: string;
+  /** Border colour that marks the card's role; backgrounds stay neutral. */
+  tone?: Tone;
   onPress?: () => void;
   style?: ViewStyle;
   accessibilityLabel?: string;
 }
 
-export function Card({ children, color, onPress, style, accessibilityLabel }: CardProps) {
-  const tint = color
-    ? { backgroundColor: alpha(color, 0.07), borderColor: alpha(color, 0.2) }
-    : undefined;
+export function Card({
+  children,
+  tone = 'default',
+  onPress,
+  style,
+  accessibilityLabel,
+}: CardProps) {
+  const border = { borderColor: BORDER[tone] };
   if (onPress) {
     return (
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
         onPress={onPress}
-        style={({ pressed }) => [styles.card, tint, pressed && styles.pressed, style]}
+        style={({ pressed }) => [styles.card, border, pressed && styles.pressed, style]}
       >
         {children}
       </Pressable>
     );
   }
-  return <View style={[styles.card, tint, style]}>{children}</View>;
+  return <View style={[styles.card, border, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderRadius: Radius.xl,
-    padding: Spacing.lg,
+    padding: Spacing.xl,
   },
-  pressed: { opacity: 0.8 },
+  pressed: { backgroundColor: Colors.surfaceRaised },
 });
