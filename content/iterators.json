@@ -1,0 +1,1503 @@
+{
+  "lessons": [
+    {
+      "id": "iteration-protocol-01",
+      "topicId": "iteration-protocol",
+      "title": "Что можно перебрать",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`for...of` перебирает **значения** итерируемых объектов. Итерируемы массивы, строки, `Map`, `Set` и `arguments`."
+          },
+          {
+            "type": "code",
+            "code": "for (const ch of \"hi\") console.log(ch); // h, i\n\nfor (const n of new Set([1, 1, 2])) console.log(n); // 1, 2"
+          },
+          {
+            "type": "text",
+            "text": "`Map` отдаёт пары `[ключ, значение]`. Их удобно сразу разбирать деструктуризацией."
+          },
+          {
+            "type": "code",
+            "code": "const ages = new Map([[\"Аня\", 20], [\"Олег\", 25]]);\nfor (const [name, age] of ages) {\n  console.log(name, age); // Аня 20, Олег 25\n}"
+          },
+          {
+            "type": "warning",
+            "text": "Обычный объект `{}` **не итерируемый**: `for...of` по нему бросит `TypeError: obj is not iterable`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "iteration-protocol-01-q1",
+          "type": "output",
+          "code": "let result = \"\";\nfor (const ch of \"abc\") {\n  result = ch + result;\n}\nconsole.log(result);",
+          "options": ["cba", "abc", "210", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Каждый символ добавляется в начало строки, а не в конец",
+            "for...of по строке отдаёт символы, а не индексы",
+            "Строка итерируемая, for...of по ней работает"
+          ],
+          "explanation": "for...of отдаёт символы по очереди: a, b, c. Каждый новый символ ставится перед уже собранными, поэтому строка разворачивается."
+        },
+        {
+          "id": "iteration-protocol-01-q2",
+          "type": "output",
+          "code": "const set = new Set([1, 2, 2, 3]);\nlet sum = 0;\nfor (const n of set) {\n  sum += n;\n}\nconsole.log(sum);",
+          "options": ["6", "8", "3", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set хранит только уникальные значения: вторая двойка не попала в него",
+            "Это количество элементов в Set, а цикл складывает сами значения",
+            "Set итерируемый, for...of по нему работает"
+          ],
+          "explanation": "В Set остаются уникальные значения 1, 2, 3, и for...of отдаёт их по очереди. Сумма — 6."
+        },
+        {
+          "id": "iteration-protocol-01-q3",
+          "type": "output",
+          "code": "const user = { name: \"Аня\", age: 20 };\nfor (const value of user) {\n  console.log(value);\n}",
+          "options": ["TypeError", "Аня 20", "name age", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значения объекта даёт Object.values(user), сам объект for...of не перебирает",
+            "Ключи перебирает for...in, а for...of по объекту не работает",
+            "Цикл не пропускается молча, а бросает ошибку"
+          ],
+          "explanation": "Обычный объект не итерируемый: у него нет метода Symbol.iterator. for...of бросает TypeError: user is not iterable."
+        },
+        {
+          "id": "iteration-protocol-01-q4",
+          "type": "fill",
+          "codeBefore": "const prices = new Map([[\"чай\", 50], [\"кофе\", 90]]);\nfor (const ",
+          "codeAfter": " of prices) {\n  console.log(key, value); // чай 50, затем кофе 90\n}",
+          "options": ["[key, value]", "{ key, value }", "key, value", "(key, value)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Map отдаёт массивы-пары, а не объекты: key и value будут undefined",
+            "Без скобок это SyntaxError: в for...of объявляется одна переменная",
+            "Круглые скобки здесь не деструктуризация, а SyntaxError"
+          ],
+          "explanation": "Каждый элемент Map — массив [ключ, значение], поэтому его разбирают деструктуризацией массива."
+        },
+        {
+          "id": "iteration-protocol-01-q5",
+          "type": "trueFalse",
+          "code": "function show() {\n  for (const arg of arguments) {\n    console.log(arg);\n  }\n}\nshow(1, 2);",
+          "options": ["Выведет 1 и 2", "TypeError: arguments не итерируется"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "arguments не массив, но он итерируемый, как и строки, Map и Set"
+          ],
+          "explanation": "arguments — псевдомассив, но у него есть Symbol.iterator, поэтому for...of по нему работает."
+        }
+      ]
+    },
+    {
+      "id": "iteration-protocol-02",
+      "topicId": "iteration-protocol",
+      "title": "for...of и for...in",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`for...in` перебирает **ключи** — имена свойств, всегда строками. `for...of` перебирает **значения**."
+          },
+          {
+            "type": "code",
+            "code": "const arr = [\"a\", \"b\"];\nfor (const i in arr) console.log(i); // 0, 1 — это строки \"0\" и \"1\"\nfor (const v of arr) console.log(v); // a, b"
+          },
+          {
+            "type": "text",
+            "text": "Чтобы перебрать объект через `for...of`, превращай его в массив: `Object.keys` — ключи, `Object.values` — значения, `Object.entries` — пары `[ключ, значение]`."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", age: 20 };\nfor (const [key, value] of Object.entries(user)) {\n  console.log(key, value); // name Аня, age 20\n}"
+          },
+          {
+            "type": "tip",
+            "text": "Для массивов бери `for...of`: он отдаёт сами элементы, а не индексы-строки."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "iteration-protocol-02-q1",
+          "type": "output",
+          "code": "const arr = [10, 20];\nfor (const x in arr) {\n  console.log(x);\n}",
+          "options": ["0 1", "10 20", "1 2", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значения перебирает for...of, а for...in отдаёт ключи",
+            "Индексы массива начинаются с нуля",
+            "for...in работает и с массивами, и с объектами"
+          ],
+          "explanation": "for...in перебирает ключи, а ключи массива — его индексы 0 и 1."
+        },
+        {
+          "id": "iteration-protocol-02-q2",
+          "type": "output",
+          "code": "const arr = [10, 20];\nlet sum = 0;\nfor (const i in arr) {\n  sum += i;\n}\nconsole.log(sum);",
+          "options": ["001", "1", "30", "01"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы в for...in — строки, поэтому они склеиваются, а не складываются",
+            "Цикл складывает индексы, а не значения: это сделал бы for...of",
+            null
+          ],
+          "explanation": "for...in отдаёт ключи строками \"0\" и \"1\". 0 + \"0\" даёт строку \"00\", а \"00\" + \"1\" — \"001\"."
+        },
+        {
+          "id": "iteration-protocol-02-q3",
+          "type": "fill",
+          "codeBefore": "const prices = { apple: 50, pear: 70 };\nlet total = 0;\nfor (const p of ",
+          "codeAfter": "(prices)) {\n  total += p;\n}\nconsole.log(total); // 120",
+          "options": ["Object.values", "Object.keys", "Object.entries", "Array.from"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Object.keys даёт имена свойств: к 0 приклеятся строки, выйдет \"0applepear\"",
+            "Object.entries даёт пары-массивы, и они склеятся в строку",
+            "У объекта нет length и Symbol.iterator, поэтому Array.from вернёт пустой массив и total останется 0"
+          ],
+          "explanation": "Object.values возвращает массив значений [50, 70], его и перебирает for...of."
+        },
+        {
+          "id": "iteration-protocol-02-q4",
+          "type": "output",
+          "code": "const stock = { a: 1, b: 2 };\nfor (const [k, v] of Object.entries(stock)) {\n  console.log(k + v);\n}",
+          "options": ["a1 b2", "3", "ab 12", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "k — строка, поэтому + склеивает её с числом, а не складывает",
+            "Каждая итерация выводит одну пару: ключ и значение вместе",
+            "Object.entries возвращает массив, а массив итерируемый"
+          ],
+          "explanation": "Object.entries даёт пары [\"a\", 1] и [\"b\", 2]. Строка плюс число — склейка: \"a1\" и \"b2\"."
+        },
+        {
+          "id": "iteration-protocol-02-q5",
+          "type": "findBug",
+          "code": "const scores = { anna: 5, oleg: 4 };\nlet sum = 0;\nfor (const s of scores) {\n  sum += s;\n}\nconsole.log(sum); // ждём 9",
+          "bugLine": 3,
+          "fixed": "const scores = { anna: 5, oleg: 4 };\nlet sum = 0;\nfor (const s of Object.values(scores)) {\n  sum += s;\n}\nconsole.log(sum); // 9",
+          "explanation": "Обычный объект не итерируемый, и for...of бросает TypeError. Значения объекта нужно сначала достать через Object.values."
+        }
+      ]
+    },
+    {
+      "id": "iteration-protocol-03",
+      "topicId": "iteration-protocol",
+      "title": "Symbol.iterator и next()",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Объект **итерируемый**, если у него есть метод `[Symbol.iterator]`. Этот метод возвращает **итератор** — объект с методом `next()`."
+          },
+          {
+            "type": "text",
+            "text": "Каждый `next()` возвращает `{ value, done }`. Когда значения кончились, приходит `done: true`. Именно так работает `for...of`: вызывает `next()`, пока не получит `done: true`."
+          },
+          {
+            "type": "code",
+            "code": "const it = [10, 20][Symbol.iterator]();\nconsole.log(it.next()); // { value: 10, done: false }\nconsole.log(it.next()); // { value: 20, done: false }\nconsole.log(it.next()); // { value: undefined, done: true }"
+          },
+          {
+            "type": "tip",
+            "text": "Итератор массива сам тоже итерируемый. Если отдать его в `for...of`, перебор продолжится с того места, где он остановился."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "iteration-protocol-03-q1",
+          "type": "output",
+          "code": "const it = [\"a\", \"b\", \"c\"][Symbol.iterator]();\nit.next();\nconsole.log(it.next().value);",
+          "options": ["b", "a", "{ value: \"b\", done: false }", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первый next() уже забрал \"a\", итератор сдвинулся дальше",
+            "Выводится не весь результат next(), а только его свойство value",
+            null
+          ],
+          "explanation": "Первый next() вернул \"a\", второй — \"b\". Итератор помнит, на каком месте остановился."
+        },
+        {
+          "id": "iteration-protocol-03-q2",
+          "type": "output",
+          "code": "const it = \"hi\"[Symbol.iterator]();\nit.next();\nit.next();\nconsole.log(it.next());",
+          "options": [
+            "{ value: undefined, done: true }",
+            "{ value: \"i\", done: true }",
+            "undefined",
+            "TypeError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Последний символ приходит ещё с done: false, а done: true означает, что значений больше нет",
+            "next() всегда возвращает объект, даже когда значения кончились",
+            "У строк есть Symbol.iterator"
+          ],
+          "explanation": "Два вызова забрали \"h\" и \"i\". Третий сообщает, что значения кончились: value — undefined, done — true."
+        },
+        {
+          "id": "iteration-protocol-03-q3",
+          "type": "trueFalse",
+          "code": "console.log(typeof {}[Symbol.iterator]);",
+          "options": ["Выведет undefined", "Выведет function"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Метод Symbol.iterator есть у массивов, строк, Map и Set, а у обычного объекта его нет"
+          ],
+          "explanation": "У обычного объекта нет метода Symbol.iterator, поэтому он и не итерируемый."
+        },
+        {
+          "id": "iteration-protocol-03-q4",
+          "type": "output",
+          "code": "const it = [1, 2, 3][Symbol.iterator]();\nit.next();\nfor (const x of it) {\n  console.log(x);\n}",
+          "options": ["2 3", "1 2 3", "3", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "for...of получил не массив, а итератор, который уже отдал 1",
+            null,
+            "Итератор массива сам итерируемый, for...of с ним работает"
+          ],
+          "explanation": "Итератор массива итерируемый и продолжает с текущего места. Значение 1 уже забрал первый next(), поэтому цикл выводит 2 и 3."
+        },
+        {
+          "id": "iteration-protocol-03-q5",
+          "type": "order",
+          "title": "Собери ручной перебор: выведет 5, затем 6",
+          "lines": [
+            "const it = [5, 6][Symbol.iterator]();",
+            "let step = it.next();",
+            "while (!step.done) {",
+            "  console.log(step.value);",
+            "  step = it.next();",
+            "}"
+          ],
+          "shuffled": [2, 4, 0, 5, 3, 1],
+          "explanation": "Так for...of работает внутри: берёт итератор, вызывает next() и, пока done равно false, обрабатывает value и просит следующий шаг."
+        }
+      ]
+    },
+    {
+      "id": "iteration-protocol-04",
+      "topicId": "iteration-protocol",
+      "title": "Свой итерируемый объект",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Чтобы объект перебирался в `for...of`, добавь ему метод `[Symbol.iterator]`. Он должен вернуть итератор — объект с методом `next()`."
+          },
+          {
+            "type": "code",
+            "code": "const range = {\n  from: 1,\n  to: 3,\n  [Symbol.iterator]() {\n    let current = this.from;\n    const last = this.to;\n    return {\n      next() {\n        return current <= last\n          ? { value: current++, done: false }\n          : { value: undefined, done: true };\n      },\n    };\n  },\n};\n\nfor (const n of range) console.log(n); // 1, 2, 3"
+          },
+          {
+            "type": "text",
+            "text": "Каждый `for...of` вызывает `[Symbol.iterator]` заново и получает новый итератор, поэтому `range` можно перебирать сколько угодно раз."
+          },
+          {
+            "type": "warning",
+            "text": "Внутри `next()` `this` — это итератор, а не `range`. Поэтому `from` и `to` читают заранее, в `[Symbol.iterator]`, или делают `next` стрелкой."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "iteration-protocol-04-q1",
+          "type": "output",
+          "code": "const range = {\n  from: 2,\n  to: 4,\n  [Symbol.iterator]() {\n    let current = this.from;\n    const last = this.to;\n    return {\n      next() {\n        return current <= last\n          ? { value: current++, done: false }\n          : { value: undefined, done: true };\n      },\n    };\n  },\n};\nlet sum = 0;\nfor (const n of range) sum += n;\nconsole.log(sum);",
+          "options": ["9", "6", "5", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это сумма 2 и 4, а цикл проходит все числа от from до to",
+            "Условие current <= last включает и 4",
+            "У range есть метод Symbol.iterator, значит, он итерируемый"
+          ],
+          "explanation": "Итератор отдаёт 2, 3 и 4, после чего возвращает done: true. Сумма — 9."
+        },
+        {
+          "id": "iteration-protocol-04-q2",
+          "type": "output",
+          "code": "const tens = {\n  [Symbol.iterator]() {\n    let n = 0;\n    return {\n      next() {\n        n++;\n        return { value: n * 10, done: n > 2 };\n      },\n    };\n  },\n};\nfor (const v of tens) console.log(v);",
+          "options": ["10 20", "10 20 30", "0 10 20", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значение из шага с done: true for...of не берёт",
+            "n увеличивается до вычисления value, поэтому первое значение — 10",
+            null
+          ],
+          "explanation": "На третьем шаге n равно 3 и done становится true. for...of останавливается и значение 30 не выводит."
+        },
+        {
+          "id": "iteration-protocol-04-q3",
+          "type": "fill",
+          "codeBefore": "const letters = {\n  ",
+          "codeAfter": "() {\n    const arr = [\"x\", \"y\"];\n    let i = 0;\n    return {\n      next: () => ({ value: arr[i], done: i++ >= arr.length }),\n    };\n  },\n};\nfor (const ch of letters) console.log(ch); // x, y",
+          "options": ["[Symbol.iterator]", "iterator", "Symbol.iterator", "[\"Symbol.iterator\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Метод с обычным именем iterator for...of не ищет: будет TypeError",
+            "Без квадратных скобок такое имя метода — SyntaxError",
+            "Это обычная строка, а не символ Symbol.iterator: будет TypeError"
+          ],
+          "explanation": "Ключ метода — символ Symbol.iterator, а вычисляемые ключи в объекте пишут в квадратных скобках."
+        },
+        {
+          "id": "iteration-protocol-04-q4",
+          "type": "findBug",
+          "code": "const range = {\n  from: 1, to: 3,\n  [Symbol.iterator]() {\n    let cur = this.from;\n    return {\n      next() { return cur <= this.to ? { value: cur++, done: false } : { done: true }; },\n    };\n  },\n};\nfor (const n of range) console.log(n); // ждём 1 2 3",
+          "bugLine": 6,
+          "fixed": "const range = {\n  from: 1, to: 3,\n  [Symbol.iterator]() {\n    let cur = this.from;\n    return {\n      next: () => (cur <= this.to ? { value: cur++, done: false } : { done: true }),\n    };\n  },\n};\nfor (const n of range) console.log(n); // 1 2 3",
+          "explanation": "Внутри next() this — это итератор, у которого нет свойства to. Сравнение 1 <= undefined ложно, и цикл сразу заканчивается. Стрелка берёт this из [Symbol.iterator], то есть range."
+        },
+        {
+          "id": "iteration-protocol-04-q5",
+          "type": "trueFalse",
+          "code": "const range = {\n  [Symbol.iterator]() {\n    let n = 1;\n    return {\n      next: () => (n <= 3 ? { value: n++, done: false } : { value: undefined, done: true }),\n    };\n  },\n};\nlet sum = 0;\nfor (const x of range) sum += x;\nfor (const x of range) sum += x;\nconsole.log(sum);",
+          "options": ["Выведет 12", "Выведет 6"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Второй цикл не продолжает старый итератор, а получает новый"
+          ],
+          "explanation": "Каждый for...of заново вызывает [Symbol.iterator], и n снова начинается с 1. Оба цикла добавляют по 6."
+        }
+      ]
+    },
+    {
+      "id": "iteration-protocol-05",
+      "topicId": "iteration-protocol",
+      "title": "Spread и деструктуризация",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Spread `...`, деструктуризация массива, `Array.from` и `new Set()` принимают **любой** итерируемый объект. Внутри они используют тот же протокол, что и `for...of`."
+          },
+          {
+            "type": "code",
+            "code": "console.log([...\"hey\"]); // [\"h\", \"e\", \"y\"]\n\nconst [first, second] = new Set([\"a\", \"b\", \"c\"]);\nconsole.log(first, second); // a b\n\nconsole.log([...new Map([[\"x\", 1]])]); // [[\"x\", 1]]"
+          },
+          {
+            "type": "text",
+            "text": "Свой итерируемый объект тоже можно развернуть или передать в функцию через spread."
+          },
+          {
+            "type": "code",
+            "code": "const range = {\n  [Symbol.iterator]() {\n    let n = 0;\n    return {\n      next: () => (n < 3 ? { value: n++, done: false } : { value: undefined, done: true }),\n    };\n  },\n};\nconsole.log([...range]); // [0, 1, 2]\nconsole.log(Math.max(...range)); // 2"
+          },
+          {
+            "type": "warning",
+            "text": "`[...{ a: 1 }]` — `TypeError`: обычный объект не итерируемый. А `{ ...obj }` работает: это копирование свойств в объект, а не перебор."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "iteration-protocol-05-q1",
+          "type": "output",
+          "code": "console.log([...new Set(\"hello\")].join(\"\"));",
+          "options": ["helo", "hello", "heo", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set выбрасывает повторы: вторая буква l не попадёт в него",
+            "Set убирает только повторы, а первая l остаётся",
+            "Строка итерируемая, Set перебирает её символы"
+          ],
+          "explanation": "new Set перебирает строку по символам и оставляет уникальные: h, e, l, o. Spread превращает Set в массив, join склеивает его."
+        },
+        {
+          "id": "iteration-protocol-05-q2",
+          "type": "output",
+          "code": "const [a, , b] = \"xyz\";\nconsole.log(a + b);",
+          "options": ["xz", "xy", "xyz", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустое место между запятыми пропускает второй символ",
+            null,
+            "Строка итерируемая, её можно деструктурировать как массив"
+          ],
+          "explanation": "Деструктуризация берёт символы строки по очереди: a — \"x\", \"y\" пропущен, b — \"z\"."
+        },
+        {
+          "id": "iteration-protocol-05-q3",
+          "type": "trueFalse",
+          "code": "const obj = { a: 1, b: 2 };\nconsole.log([...obj]);",
+          "options": ["Будет TypeError", "Выведет [1, 2]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread в массив перебирает объект по протоколу итерации, а у обычного объекта его нет"
+          ],
+          "explanation": "Spread в квадратных скобках требует итерируемый объект. Чтобы получить значения, пиши [...Object.values(obj)]."
+        },
+        {
+          "id": "iteration-protocol-05-q4",
+          "type": "fill",
+          "codeBefore": "const range = {\n  [Symbol.iterator]() {\n    let n = 0;\n    return {\n      next: () => (n < 3 ? { value: n++, done: false } : { value: undefined, done: true }),\n    };\n  },\n};\nconsole.log(Math.max(",
+          "codeAfter": ")); // 2",
+          "options": ["...range", "range", "[...range]", "...Object.values(range)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Math.max получит сам объект, не сможет превратить его в число и вернёт NaN",
+            "Math.max получит один массив, а не числа: результат NaN",
+            "Symbol-ключи Object.values не видит: массив пустой, и Math.max() вернёт -Infinity"
+          ],
+          "explanation": "Spread перебирает range и передаёт его значения 0, 1, 2 отдельными аргументами."
+        },
+        {
+          "id": "iteration-protocol-05-q5",
+          "type": "output",
+          "code": "const [, second] = new Map([[\"a\", 1], [\"b\", 2]]);\nconsole.log(second);",
+          "options": ["[\"b\", 2]", "2", "b", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Элемент Map — вся пара, а не только значение",
+            "Элемент Map — вся пара, а не только ключ",
+            "Деструктуризация работает с Map: это итерируемый объект"
+          ],
+          "explanation": "Map отдаёт пары [ключ, значение], поэтому второй элемент — пара [\"b\", 2]."
+        }
+      ]
+    },
+    {
+      "id": "generators-01",
+      "topicId": "generators",
+      "title": "function* и yield",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`function*` объявляет **генератор**. Его вызов не выполняет тело, а возвращает объект-генератор. Код запускается по `next()` и доходит до ближайшего `yield`."
+          },
+          {
+            "type": "code",
+            "code": "function* abc() {\n  yield \"a\";\n  yield \"b\";\n}\nconst g = abc();\nconsole.log(g.next()); // { value: \"a\", done: false }\nconsole.log(g.next()); // { value: \"b\", done: false }\nconsole.log(g.next()); // { value: undefined, done: true }"
+          },
+          {
+            "type": "text",
+            "text": "Генератор — одновременно итератор и итерируемый объект. Его перебирают `for...of` и разворачивают spread."
+          },
+          {
+            "type": "code",
+            "code": "function* nums() {\n  yield 1;\n  yield 2;\n  yield 3;\n}\nfor (const n of nums()) console.log(n); // 1, 2, 3\nconsole.log([...nums()]); // [1, 2, 3]"
+          },
+          {
+            "type": "tip",
+            "text": "`yield` работает только внутри `function*`. В обычной функции он вызовет `SyntaxError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "generators-01-q1",
+          "type": "output",
+          "code": "function* gen() {\n  console.log(\"старт\");\n  yield 1;\n}\nconst it = gen();\nconsole.log(\"после вызова\");",
+          "options": ["после вызова", "старт после вызова", "старт", "после вызова старт"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Вызов генератора не выполняет его тело, а только создаёт объект-генератор",
+            "Тело не запускалось, а console.log(\"после вызова\") выполнился",
+            "next() ни разу не вызывался, поэтому тело генератора так и не запустилось"
+          ],
+          "explanation": "gen() только создаёт генератор. Его тело запустилось бы по первому it.next(), а здесь next() нет."
+        },
+        {
+          "id": "generators-01-q2",
+          "type": "output",
+          "code": "function* gen() {\n  yield 1;\n  yield 2;\n}\nconst it = gen();\nconsole.log(it.next().value, it.next().value, it.next().value);",
+          "options": ["1 2 undefined", "1 2 2", "1 1 1", "1 2 TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Когда yield кончились, next() возвращает value: undefined",
+            "Все три next() вызываются на одном и том же генераторе it",
+            "Лишний next() не бросает ошибку, а возвращает { value: undefined, done: true }"
+          ],
+          "explanation": "Каждый next() продолжает с последнего yield. Третий вызов доходит до конца функции: value — undefined, done — true."
+        },
+        {
+          "id": "generators-01-q3",
+          "type": "output",
+          "code": "function* letters() {\n  yield \"x\";\n  yield \"y\";\n}\nconsole.log([...letters()]);",
+          "options": ["[\"x\", \"y\"]", "[]", "[\"x\"]", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread сам вызывает next(), пока не получит done: true",
+            null,
+            "Генератор итерируемый, spread с ним работает"
+          ],
+          "explanation": "Spread перебирает генератор до конца и собирает все значения из yield в массив."
+        },
+        {
+          "id": "generators-01-q4",
+          "type": "fill",
+          "codeBefore": "function* letters() {\n  ",
+          "codeAfter": " \"a\";\n  yield \"b\";\n}\nconsole.log([...letters()]); // [\"a\", \"b\"]",
+          "options": ["yield", "return", "await", "next"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return сразу завершит генератор, и spread получит пустой массив",
+            "await в обычном генераторе не работает: это SyntaxError",
+            "next — метод генератора, его вызывают снаружи, а здесь это SyntaxError"
+          ],
+          "explanation": "yield отдаёт значение и ставит генератор на паузу до следующего next()."
+        },
+        {
+          "id": "generators-01-q5",
+          "type": "trueFalse",
+          "code": "function* gen() {\n  yield 1;\n}\nconsole.log(typeof gen());",
+          "options": ["Выведет object", "Выведет number"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Вызов генератора возвращает не значение из yield, а объект-генератор"
+          ],
+          "explanation": "gen() возвращает объект-генератор. Значение 1 можно получить только через next() или перебор."
+        }
+      ]
+    },
+    {
+      "id": "generators-02",
+      "topicId": "generators",
+      "title": "Ленивость и бесконечность",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Генератор **ленивый**: следующий кусок кода выполняется, только когда попросили `next()`. Поэтому генератор может описывать бесконечную последовательность."
+          },
+          {
+            "type": "code",
+            "code": "function* naturals() {\n  let n = 1;\n  while (true) yield n++;\n}\nconst it = naturals();\nconsole.log(it.next().value); // 1\nconsole.log(it.next().value); // 2"
+          },
+          {
+            "type": "text",
+            "text": "Из бесконечного генератора бери столько, сколько нужно, и останавливайся через `break`."
+          },
+          {
+            "type": "code",
+            "code": "function* naturals() {\n  let n = 1;\n  while (true) yield n++;\n}\nconst first = [];\nfor (const n of naturals()) {\n  if (n > 3) break;\n  first.push(n);\n}\nconsole.log(first); // [1, 2, 3]"
+          },
+          {
+            "type": "warning",
+            "text": "`[...naturals()]` или `for...of` без `break` по бесконечному генератору никогда не закончатся: программа зависнет."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "generators-02-q1",
+          "type": "output",
+          "code": "function* gen() {\n  console.log(\"A\");\n  yield 1;\n  console.log(\"B\");\n  yield 2;\n}\nconst it = gen();\nit.next();\nconsole.log(\"C\");",
+          "options": ["A C", "A B C", "C", "C A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первый next() останавливается на первом yield, до \"B\" дело не дошло",
+            "Тело генератора запустил it.next() — ещё до console.log(\"C\")",
+            null
+          ],
+          "explanation": "next() выполнил тело до первого yield и вывел A. Код после yield ждёт следующего next(), которого нет."
+        },
+        {
+          "id": "generators-02-q2",
+          "type": "output",
+          "code": "function* evens() {\n  let n = 0;\n  while (true) {\n    yield n;\n    n += 2;\n  }\n}\nconst res = [];\nfor (const x of evens()) {\n  if (x > 6) break;\n  res.push(x);\n}\nconsole.log(res);",
+          "options": ["[0, 2, 4, 6]", "[0, 2, 4, 6, 8]", "[2, 4, 6]", "Код зависнет"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "8 больше 6: break срабатывает до push",
+            "Первый yield отдаёт n, пока оно ещё 0",
+            "break останавливает цикл, а генератор не делает лишних шагов"
+          ],
+          "explanation": "Генератор отдаёт 0, 2, 4, 6, 8... Когда приходит 8, срабатывает break, и бесконечный цикл внутри генератора больше не продолжается."
+        },
+        {
+          "id": "generators-02-q3",
+          "type": "trueFalse",
+          "code": "function* ones() {\n  while (true) yield 1;\n}\nconst it = ones();\nconsole.log(it.next().value);",
+          "options": ["Выведет 1", "Зависнет: в генераторе бесконечный цикл"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Генератор ленивый: каждый next() делает один шаг цикла и останавливается на yield"
+          ],
+          "explanation": "while (true) внутри генератора не опасен: на каждом yield генератор встаёт на паузу и ждёт следующего next()."
+        },
+        {
+          "id": "generators-02-q4",
+          "type": "fill",
+          "codeBefore": "function* naturals() {\n  let n = 1;\n  while (true) yield n++;\n}\nconst first = [];\nfor (const n of naturals()) {\n  first.push(n);\n  if (first.length === 3) ",
+          "codeAfter": ";\n}\nconsole.log(first); // [1, 2, 3]",
+          "options": ["break", "continue", "return", "first.length = 0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "continue только переходит к следующему шагу — цикл по бесконечному генератору не закончится",
+            "return вне функции — SyntaxError",
+            "Обнуление массива не останавливает цикл: он станет бесконечным"
+          ],
+          "explanation": "break выходит из for...of, и бесконечный генератор больше не спрашивают о следующих значениях."
+        },
+        {
+          "id": "generators-02-q5",
+          "type": "order",
+          "title": "Собери генератор id: второй вызов вернёт id-2",
+          "lines": [
+            "const ids = function* () {",
+            "  let id = 1;",
+            "  while (true) {",
+            "    yield \"id-\" + id;",
+            "    id++;",
+            "  }",
+            "};",
+            "const gen = ids();",
+            "gen.next();",
+            "console.log(gen.next().value); // id-2"
+          ],
+          "shuffled": [7, 3, 0, 9, 6, 4, 2, 8, 1, 5],
+          "explanation": "Счётчик объявлен до цикла, поэтому он не сбрасывается, а yield стоит перед id++. Первый next() отдаёт id-1, второй — id-2. Бесконечный цикл безопасен: генератор останавливается на каждом yield."
+        }
+      ]
+    },
+    {
+      "id": "generators-03",
+      "topicId": "generators",
+      "title": "return в генераторе",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`return` завершает генератор. Его значение приходит в `next()` вместе с `done: true`, а дальше `next()` отдаёт только `{ value: undefined, done: true }`."
+          },
+          {
+            "type": "code",
+            "code": "function* gen() {\n  yield 1;\n  return 2;\n}\nconst it = gen();\nconsole.log(it.next()); // { value: 1, done: false }\nconsole.log(it.next()); // { value: 2, done: true }\nconsole.log(it.next()); // { value: undefined, done: true }"
+          },
+          {
+            "type": "warning",
+            "text": "`for...of` и spread берут значения, только пока `done: false`. Значение из `return` они **пропускают**."
+          },
+          {
+            "type": "code",
+            "code": "function* gen() {\n  yield 1;\n  return 2;\n}\nconsole.log([...gen()]); // [1]"
+          },
+          {
+            "type": "tip",
+            "text": "Генератор можно закрыть снаружи: `it.return(x)` вернёт `{ value: x, done: true }`, и генератор завершится."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "generators-03-q1",
+          "type": "output",
+          "code": "function* gen() {\n  yield \"a\";\n  return \"b\";\n}\nconsole.log([...gen()]);",
+          "options": ["[\"a\"]", "[\"a\", \"b\"]", "[\"b\"]", "[]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значение из return приходит с done: true, а spread такие значения не берёт",
+            null,
+            "yield \"a\" отдаёт значение с done: false, его spread забирает"
+          ],
+          "explanation": "Spread собирает значения, пока done равно false. \"b\" из return приходит уже с done: true."
+        },
+        {
+          "id": "generators-03-q2",
+          "type": "output",
+          "code": "function* gen() {\n  yield \"a\";\n  return \"b\";\n}\nconst it = gen();\nit.next();\nconsole.log(it.next());",
+          "options": [
+            "{ value: \"b\", done: true }",
+            "{ value: \"b\", done: false }",
+            "{ value: undefined, done: true }",
+            "b"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return завершает генератор, поэтому done — true",
+            "Значение из return не теряется при ручном вызове next()",
+            "Выводится весь объект, который вернул next()"
+          ],
+          "explanation": "Второй next() доходит до return: значение \"b\" приходит вместе с done: true."
+        },
+        {
+          "id": "generators-03-q3",
+          "type": "output",
+          "code": "function* gen() {\n  yield 1;\n  yield 2;\n  yield 3;\n}\nconst it = gen();\nit.next();\nconsole.log(it.return(10).value, it.next().done);",
+          "options": ["10 true", "10 false", "2 false", "undefined true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "После return() генератор закрыт, и next() отвечает done: true",
+            "return() не продолжает генератор, а завершает его",
+            "return(10) возвращает переданное значение"
+          ],
+          "explanation": "it.return(10) закрывает генератор и возвращает { value: 10, done: true }. Оставшиеся yield уже не выполнятся."
+        },
+        {
+          "id": "generators-03-q4",
+          "type": "findBug",
+          "code": "function* parse(items) {\n  for (const item of items) {\n    if (item === \"стоп\") return \"конец\";\n    yield item;\n  }\n}\nconsole.log([...parse([\"a\", \"стоп\", \"b\"])]); // ждём [\"a\", \"конец\"]",
+          "bugLine": 3,
+          "fixed": "function* parse(items) {\n  for (const item of items) {\n    if (item === \"стоп\") { yield \"конец\"; return; }\n    yield item;\n  }\n}\nconsole.log([...parse([\"a\", \"стоп\", \"b\"])]); // [\"a\", \"конец\"]",
+          "explanation": "Значение из return приходит с done: true, и spread его пропускает. Чтобы \"конец\" попал в массив, его нужно отдать через yield и только потом выйти."
+        },
+        {
+          "id": "generators-03-q5",
+          "type": "trueFalse",
+          "code": "function* gen() {\n  yield 1;\n}\nconst it = gen();\nit.next();\nit.next();\nconsole.log(it.next().value);",
+          "options": ["Выведет undefined", "Выведет 1: генератор начнётся заново"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Завершённый генератор не перезапускается: для нового прохода вызывают gen() ещё раз"
+          ],
+          "explanation": "После done: true генератор закончен навсегда, и каждый next() возвращает { value: undefined, done: true }."
+        }
+      ]
+    },
+    {
+      "id": "generators-04",
+      "topicId": "generators",
+      "title": "yield*",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`yield*` отдаёт по очереди все значения другого итерируемого: генератора, массива, строки, `Set`."
+          },
+          {
+            "type": "code",
+            "code": "function* inner() {\n  yield 1;\n  yield 2;\n}\nfunction* outer() {\n  yield 0;\n  yield* inner();\n  yield 3;\n}\nconsole.log([...outer()]); // [0, 1, 2, 3]"
+          },
+          {
+            "type": "code",
+            "code": "function* gen() {\n  yield* \"hi\";\n  yield* [1, 2];\n}\nconsole.log([...gen()]); // [\"h\", \"i\", 1, 2]"
+          },
+          {
+            "type": "warning",
+            "text": "Без звёздочки `yield [1, 2]` отдаст массив **одним** значением, а `yield inner()` — сам объект-генератор."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "generators-04-q1",
+          "type": "output",
+          "code": "function* one() {\n  yield 1;\n}\nfunction* twice() {\n  yield* one();\n  yield* one();\n}\nconsole.log([...twice()]);",
+          "options": ["[1, 1]", "[1]", "[[1], [1]]", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Каждый вызов one() создаёт новый генератор, и оба отдают свою единицу",
+            "yield* отдаёт значения по одному, а не массивом",
+            null
+          ],
+          "explanation": "Каждый yield* one() перебирает новый генератор и отдаёт его единственное значение."
+        },
+        {
+          "id": "generators-04-q2",
+          "type": "output",
+          "code": "function* gen() {\n  yield [1, 2];\n  yield* [3, 4];\n}\nconsole.log([...gen()]);",
+          "options": ["[[1, 2], 3, 4]", "[1, 2, 3, 4]", "[[1, 2], [3, 4]]", "[1, 2, [3, 4]]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "yield без звёздочки отдаёт массив целиком, одним значением",
+            "yield* разворачивает [3, 4] на отдельные значения",
+            null
+          ],
+          "explanation": "yield отдаёт массив [1, 2] как одно значение, а yield* перебирает [3, 4] и отдаёт 3 и 4 по отдельности."
+        },
+        {
+          "id": "generators-04-q3",
+          "type": "fill",
+          "codeBefore": "function* letters() {\n  ",
+          "codeAfter": " \"ab\";\n}\nconsole.log([...letters()]); // [\"a\", \"b\"]",
+          "options": ["yield*", "yield", "return", "yield ..."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "yield отдаст строку целиком: получится [\"ab\"]",
+            "return завершит генератор, и spread вернёт пустой массив",
+            "Spread после yield не работает — это SyntaxError"
+          ],
+          "explanation": "yield* перебирает строку и отдаёт её символы по одному."
+        },
+        {
+          "id": "generators-04-q4",
+          "type": "trueFalse",
+          "code": "function* gen() {\n  yield* new Set([1, 1, 2]);\n}\nconsole.log([...gen()]);",
+          "options": ["Выведет [1, 2]", "TypeError: yield* работает только с генераторами"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "yield* принимает любой итерируемый объект, в том числе Set"
+          ],
+          "explanation": "yield* перебирает любой итерируемый объект. В Set остались 1 и 2, их генератор и отдал."
+        },
+        {
+          "id": "generators-04-q5",
+          "type": "order",
+          "title": "Собери генератор: выведет [\"a\", \"b\", \"c\", \"d\"]",
+          "lines": [
+            "const outer = function* () {",
+            "  yield \"a\";",
+            "  yield* [\"b\", \"c\"];",
+            "  yield \"d\";",
+            "};",
+            "console.log([...outer()]); // [\"a\", \"b\", \"c\", \"d\"]"
+          ],
+          "shuffled": [2, 5, 0, 3, 1, 4],
+          "explanation": "Генератор отдаёт значения в порядке строк: \"a\", потом всё из массива через yield*, потом \"d\"."
+        }
+      ]
+    },
+    {
+      "id": "generators-05",
+      "topicId": "generators",
+      "title": "next(x) и практика",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`yield` — это выражение. Значение, переданное в `next(x)`, становится результатом того `yield`, на котором генератор стоял."
+          },
+          {
+            "type": "code",
+            "code": "function* chat() {\n  const name = yield \"Как тебя зовут?\";\n  yield \"Привет, \" + name;\n}\nconst it = chat();\nconsole.log(it.next().value); // Как тебя зовут?\nconsole.log(it.next(\"Аня\").value); // Привет, Аня"
+          },
+          {
+            "type": "warning",
+            "text": "Аргумент **первого** `next()` теряется: генератор ещё не дошёл ни до одного `yield`, и значение некуда положить."
+          },
+          {
+            "type": "code",
+            "code": "function* echo() {\n  const x = yield;\n  console.log(\"получил\", x);\n}\nconst it = echo();\nit.next(\"потеряется\");\nit.next(5); // получил 5"
+          },
+          {
+            "type": "tip",
+            "text": "`yield` работает только прямо в теле генератора. Во вложенной функции, например в колбэке `forEach`, он вызовет `SyntaxError` — используй `for...of` или `yield*`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "generators-05-q1",
+          "type": "output",
+          "code": "function* gen() {\n  const a = yield 1;\n  console.log(a);\n}\nconst it = gen();\nit.next();\nit.next(7);",
+          "options": ["7", "1", "undefined", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "1 — это значение, которое yield отдал наружу, а a получает то, что передали в next()",
+            "Во второй next() передали 7, оно и стало результатом yield",
+            "Второй next() продолжает генератор после yield, и console.log выполняется"
+          ],
+          "explanation": "Второй next(7) продолжает генератор с yield, и выражение yield 1 вычисляется в 7."
+        },
+        {
+          "id": "generators-05-q2",
+          "type": "output",
+          "code": "function* sum() {\n  let total = 0;\n  while (true) {\n    const x = yield total;\n    total += x;\n  }\n}\nconst it = sum();\nit.next();\nit.next(5);\nconsole.log(it.next(10).value);",
+          "options": ["15", "10", "5", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "total накапливается: к нему прибавляются оба переданных числа",
+            null,
+            "Первый next() без аргумента лишь доводит генератор до yield и ничего не прибавляет"
+          ],
+          "explanation": "Первый next() доходит до yield total. Затем 5 и 10 по очереди становятся x и прибавляются к total: 0 + 5 + 10 = 15."
+        },
+        {
+          "id": "generators-05-q3",
+          "type": "output",
+          "code": "function* gen() {\n  const x = yield;\n  console.log(x);\n}\nconst it = gen();\nit.next(\"A\");\nit.next(\"B\");",
+          "options": ["B", "A", "A B", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Аргумент первого next() теряется: генератор ещё не стоит ни на одном yield",
+            "console.log выполняется один раз",
+            null
+          ],
+          "explanation": "Первый next(\"A\") только запускает генератор до yield, и \"A\" некуда положить. Второй next(\"B\") продолжает с yield, поэтому x — \"B\"."
+        },
+        {
+          "id": "generators-05-q4",
+          "type": "findBug",
+          "code": "function* flat(arr) {\n  for (const x of arr) {\n    if (Array.isArray(x)) yield flat(x);\n    else yield x;\n  }\n}\nconsole.log([...flat([1, [2, 3]])]); // ждём [1, 2, 3]",
+          "bugLine": 3,
+          "fixed": "function* flat(arr) {\n  for (const x of arr) {\n    if (Array.isArray(x)) yield* flat(x);\n    else yield x;\n  }\n}\nconsole.log([...flat([1, [2, 3]])]); // [1, 2, 3]",
+          "explanation": "yield без звёздочки отдаёт вложенный генератор одним значением. yield* перебирает его и отдаёт 2 и 3 по отдельности."
+        },
+        {
+          "id": "generators-05-q5",
+          "type": "fill",
+          "codeBefore": "function* greeter() {\n  const name = yield;\n  console.log(\"Привет, \" + name);\n}\nconst it = greeter();\nit.next();\n",
+          "codeAfter": "; // Привет, Аня",
+          "options": ["it.next(\"Аня\")", "it.next()", "greeter(\"Аня\")", "it.return(\"Аня\")"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без аргумента yield вернёт undefined: выведет «Привет, undefined»",
+            "Это новый генератор, его тело даже не запустится",
+            "return() закроет генератор, и console.log не выполнится"
+          ],
+          "explanation": "Генератор стоит на yield. next(\"Аня\") продолжает его, и yield возвращает \"Аня\" в переменную name."
+        }
+      ]
+    },
+    {
+      "id": "async-iteration-01",
+      "topicId": "async-iteration",
+      "title": "Async-генераторы",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`async function*` — асинхронный генератор: внутри можно и `await`, и `yield`. Его `next()` возвращает **промис** с `{ value, done }`."
+          },
+          {
+            "type": "code",
+            "code": "async function* gen() {\n  yield 1;\n}\nconst it = gen();\nit.next().then(r => console.log(r)); // { value: 1, done: false }"
+          },
+          {
+            "type": "text",
+            "text": "Перебирают его циклом `for await...of`. Цикл дожидается каждого промиса из `next()` и отдаёт `value`."
+          },
+          {
+            "type": "code",
+            "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function* ticks() {\n  for (let i = 1; i <= 3; i++) {\n    await wait(100);\n    yield i;\n  }\n}\nasync function main() {\n  for await (const t of ticks()) console.log(t);\n}\nmain(); // 1, 2, 3 — каждое через 100 мс"
+          },
+          {
+            "type": "warning",
+            "text": "`for await` пишут только внутри `async`-функции, как и `await`. Обычный `for...of` по async-генератору — `TypeError`: синхронно он не итерируется."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-iteration-01-q1",
+          "type": "output",
+          "code": "async function* gen() {\n  yield \"a\";\n}\nconst it = gen();\nconsole.log(it.next() instanceof Promise);",
+          "options": ["true", "false", "TypeError", "a"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У async-генератора next() всегда возвращает промис",
+            "next() у async-генератора есть, он просто асинхронный",
+            "Значение \"a\" лежит внутри промиса, а не возвращается напрямую"
+          ],
+          "explanation": "next() async-генератора возвращает промис, который выполнится объектом { value: \"a\", done: false }."
+        },
+        {
+          "id": "async-iteration-01-q2",
+          "type": "output",
+          "code": "async function* gen() {\n  yield 1;\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) {\n    console.log(x * 10);\n  }\n}\nmain();",
+          "options": ["10 20", "NaN NaN", "1 2", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "for await отдаёт уже готовые значения, а не промисы",
+            "Цикл выводит x * 10, а не сам x",
+            "for await умеет перебирать async-генераторы"
+          ],
+          "explanation": "for await дожидается каждого результата next() и кладёт в x само значение: 1, потом 2."
+        },
+        {
+          "id": "async-iteration-01-q3",
+          "type": "output",
+          "code": "async function* gen() {\n  yield 1;\n}\nfor (const x of gen()) {\n  console.log(x);\n}",
+          "options": ["TypeError", "1", "Promise", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значения async-генератора приходят в промисах, обычный for...of их не ждёт",
+            "Обычный for...of даже не начнёт цикл: async-генератор не итерируется синхронно",
+            "Цикл не пропускается молча, а бросает ошибку"
+          ],
+          "explanation": "У async-генератора нет Symbol.iterator, только Symbol.asyncIterator. Обычный for...of его не принимает — нужен for await."
+        },
+        {
+          "id": "async-iteration-01-q4",
+          "type": "fill",
+          "codeBefore": "async function* gen() {\n  yield \"a\";\n  yield \"b\";\n}\nasync function main() {\n  for ",
+          "codeAfter": " (const x of gen()) console.log(x); // a, b\n}\nmain();",
+          "options": ["await", "async", "yield", "*"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "async ставят перед функцией, а цикл пишут как for await",
+            "yield отдаёт значения из генератора, а не забирает их — здесь это SyntaxError",
+            "Звёздочка относится к объявлению генератора, а не к циклу"
+          ],
+          "explanation": "Асинхронный перебор пишется for await (... of ...). Только он ждёт промисы из next()."
+        },
+        {
+          "id": "async-iteration-01-q5",
+          "type": "trueFalse",
+          "code": "async function* gen() {\n  yield 1;\n}\ngen().next().then(r => console.log(r.value));\nconsole.log(\"sync\");",
+          "options": ["Выведет sync, потом 1", "Выведет 1, потом sync"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "then всегда срабатывает асинхронно, после синхронного кода"
+          ],
+          "explanation": "next() возвращает промис, а колбэк then выполняется только после того, как закончится синхронный код."
+        }
+      ]
+    },
+    {
+      "id": "async-iteration-02",
+      "topicId": "async-iteration",
+      "title": "for await...of",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`for await...of` перебирает и обычный массив промисов: дожидается каждого **по порядку** и отдаёт его результат. Обычные значения он отдаёт как есть."
+          },
+          {
+            "type": "code",
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  for await (const v of [wait(200, \"A\"), wait(100, \"B\")]) {\n    console.log(v);\n  }\n}\nmain(); // A, B — порядок массива, а не порядок готовности"
+          },
+          {
+            "type": "text",
+            "text": "Следующая итерация начинается, только когда закончилась текущая, включая все `await` в теле цикла. При этом сам цикл не блокирует программу: код после `main()` выполнится сразу."
+          },
+          {
+            "type": "tip",
+            "text": "Промисы в массиве уже запущены в момент его создания. Цикл лишь дожидается их по очереди, поэтому массив из трёх таймеров по 100 мс переберётся примерно за 100 мс, а не за 300."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-iteration-02-q1",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  for await (const v of [wait(300, \"медленно\"), \"сразу\", wait(100, \"быстро\")]) {\n    console.log(v);\n  }\n}\nmain();",
+          "options": [
+            "медленно сразу быстро",
+            "сразу быстро медленно",
+            "быстро медленно сразу",
+            "TypeError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "for await идёт по порядку массива и ждёт первый промис, даже если другие готовы раньше",
+            null,
+            "for await принимает и промисы, и обычные значения"
+          ],
+          "explanation": "Цикл идёт по массиву строго по порядку: сначала ждёт первый промис 300 мс, потом отдаёт \"сразу\", а второй промис к этому моменту уже готов."
+        },
+        {
+          "id": "async-iteration-02-q2",
+          "type": "output",
+          "code": "async function main() {\n  for await (const x of [1, Promise.resolve(2)]) {\n    console.log(x);\n  }\n  console.log(\"конец\");\n}\nmain();\nconsole.log(\"старт\");",
+          "options": ["старт 1 2 конец", "1 2 конец старт", "1 старт 2 конец", "старт конец 1 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "for await ждёт даже обычные значения, поэтому main уступает управление уже на первом шаге",
+            "Даже для обычного значения for await делает паузу, прежде чем выполнить тело цикла",
+            "«конец» выводится после цикла, а цикл ждёт оба значения"
+          ],
+          "explanation": "Каждый шаг for await — это ожидание, даже для числа 1. Поэтому main сразу уступает управление, и первым выводится «старт»."
+        },
+        {
+          "id": "async-iteration-02-q3",
+          "type": "trueFalse",
+          "code": "const wait = ms => new Promise(r => setTimeout(() => r(ms), ms));\n\nasync function main() {\n  for await (const v of [wait(100), wait(100), wait(100)]) {\n    console.log(v);\n  }\n}\nmain();",
+          "options": [
+            "Цикл закончится примерно через 100 мс",
+            "Цикл закончится примерно через 300 мс"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Все три таймера запустились при создании массива, цикл только дожидается их по очереди"
+          ],
+          "explanation": "wait(100) запускает таймер сразу при вызове, поэтому все три таймера идут одновременно. К моменту, когда готов первый, остальные тоже готовы."
+        },
+        {
+          "id": "async-iteration-02-q4",
+          "type": "order",
+          "title": "Собери код: выведет 1, затем 2",
+          "lines": [
+            "const main = async () => {",
+            "  for await (const v of [Promise.resolve(1), 2])",
+            "    console.log(v);",
+            "};",
+            "main();"
+          ],
+          "shuffled": [2, 4, 0, 3, 1],
+          "explanation": "for await пишут внутри async-функции. Стрелку в const нельзя вызвать до объявления, поэтому main() идёт последней строкой."
+        },
+        {
+          "id": "async-iteration-02-q5",
+          "type": "output",
+          "code": "async function main() {\n  for await (const x of [\"a\", \"b\"]) {\n    console.log(x + 1);\n    await null;\n    console.log(x + 2);\n  }\n}\nmain();\nconsole.log(\"sync\");",
+          "options": [
+            "sync a1 a2 b1 b2",
+            "a1 sync a2 b1 b2",
+            "sync a1 b1 a2 b2",
+            "a1 a2 b1 b2 sync"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Перед первой итерацией for await уже ждёт значение, поэтому тело не выполняется синхронно",
+            "Следующая итерация не начнётся, пока не закончится тело текущей, включая await",
+            "main уступает управление на первом же шаге for await"
+          ],
+          "explanation": "for await сразу делает паузу, и первым выводится sync. Дальше итерации идут строго по очереди: b1 появится только после того, как тело для a доработает до конца."
+        }
+      ]
+    },
+    {
+      "id": "async-iteration-03",
+      "topicId": "async-iteration",
+      "title": "Порядок выполнения",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Код async-генератора, как и обычного, выполняется только по `next()`. `for await` просит значение, ждёт его, выполняет тело цикла и лишь потом просит следующее. Генератор и цикл работают **по очереди**."
+          },
+          {
+            "type": "code",
+            "code": "async function* gen() {\n  yield 1;\n  console.log(\"gen продолжил\");\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) console.log(\"тело\", x);\n}\nmain();\n// тело 1, gen продолжил, тело 2"
+          },
+          {
+            "type": "text",
+            "text": "Пока генератор ждёт `await`, остальная программа работает: срабатывают таймеры и выполняется синхронный код."
+          },
+          {
+            "type": "code",
+            "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function* gen() {\n  await wait(100);\n  yield \"данные\";\n}\nasync function main() {\n  for await (const d of gen()) console.log(d);\n}\nmain();\nconsole.log(\"не ждём\");\n// не ждём, данные"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-iteration-03-q1",
+          "type": "output",
+          "code": "async function* gen() {\n  yield 1;\n  console.log(\"g\");\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) console.log(x);\n}\nmain();",
+          "options": ["1 g 2", "g 1 2", "1 2 g", "1 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Код после первого yield выполняется только по второму next()",
+            "Цикл просит второе значение сразу после тела первой итерации, и генератор продолжает работу",
+            "Генератор доходит до второго yield и по пути выводит g"
+          ],
+          "explanation": "Цикл получил 1 и вывел его, затем попросил следующее значение. Генератор продолжил с первого yield, вывел g и отдал 2."
+        },
+        {
+          "id": "async-iteration-03-q2",
+          "type": "output",
+          "code": "async function* gen() {\n  yield \"x\";\n}\nasync function main() {\n  console.log(\"A\");\n  for await (const v of gen()) console.log(v);\n  console.log(\"C\");\n}\nmain();\nconsole.log(\"B\");",
+          "options": ["A B x C", "A x C B", "B A x C", "A x B C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значение из async-генератора приходит асинхронно, main встаёт на паузу",
+            "Код main до первого ожидания выполняется синхронно при вызове",
+            "Синхронный код после main() выполнится раньше любого значения из генератора"
+          ],
+          "explanation": "A выводится синхронно при вызове main. На for await функция уступает управление, выводится B, а затем приходят x и C."
+        },
+        {
+          "id": "async-iteration-03-q3",
+          "type": "output",
+          "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function* gen() {\n  await wait(100);\n  yield \"данные\";\n}\nasync function main() {\n  for await (const d of gen()) console.log(d);\n}\nmain();\nsetTimeout(() => console.log(\"таймер\"), 50);",
+          "options": ["таймер данные", "данные таймер", "данные", "таймер"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Генератор ждёт 100 мс, а таймер на 50 мс срабатывает раньше",
+            "Таймер выполнится: генератор не блокирует программу",
+            "Цикл дождётся генератора и выведет данные"
+          ],
+          "explanation": "Пока генератор ждёт 100 мс, программа не стоит: через 50 мс срабатывает таймер. Данные приходят позже."
+        },
+        {
+          "id": "async-iteration-03-q4",
+          "type": "findBug",
+          "code": "async function* load() {\n  yield \"a\";\n  yield \"b\";\n}\nasync function main() {\n  for (const x of load()) console.log(x);\n}\nmain(); // ждём a b",
+          "bugLine": 6,
+          "fixed": "async function* load() {\n  yield \"a\";\n  yield \"b\";\n}\nasync function main() {\n  for await (const x of load()) console.log(x);\n}\nmain(); // a b",
+          "explanation": "Async-генератор не итерируется синхронно, и обычный for...of бросает TypeError. Нужен for await."
+        },
+        {
+          "id": "async-iteration-03-q5",
+          "type": "trueFalse",
+          "code": "async function* gen() {\n  console.log(\"запрос 1\");\n  yield 1;\n  console.log(\"запрос 2\");\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) {\n    console.log(\"обработал\", x);\n  }\n}\nmain();",
+          "options": [
+            "«обработал 1» выведется раньше, чем «запрос 2»",
+            "«запрос 2» выведется раньше, чем «обработал 1»"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Генератор не работает наперёд: второй шаг начнётся, только когда цикл попросит следующее значение"
+          ],
+          "explanation": "for await просит следующее значение только после тела цикла. Пока «обработал 1» не выведен, генератор стоит на первом yield."
+        }
+      ]
+    },
+    {
+      "id": "async-iteration-04",
+      "topicId": "async-iteration",
+      "title": "Пагинация",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Async-генератор удобен для **пагинации**: он сам запрашивает страницы по одной и отдаёт элементы, а снаружи остаётся простой цикл."
+          },
+          {
+            "type": "code",
+            "code": "const db = [[\"Аня\", \"Олег\"], [\"Ира\"]];\nconst fetchPage = n =>\n  new Promise(r => setTimeout(() => r({ items: db[n], next: n + 1 < db.length ? n + 1 : null }), 100));\n\nasync function* users() {\n  let page = 0;\n  while (page !== null) {\n    const res = await fetchPage(page);\n    yield* res.items;\n    page = res.next;\n  }\n}\nasync function main() {\n  for await (const name of users()) console.log(name);\n}\nmain(); // Аня, Олег, Ира"
+          },
+          {
+            "type": "text",
+            "text": "`yield*` в async-генераторе разворачивает и обычный массив: элементы страницы уходят наружу по одному."
+          },
+          {
+            "type": "tip",
+            "text": "Страница запрашивается, только когда цикл до неё дошёл. Если выйти через `break` на первом имени, вторую страницу никто не загрузит."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-iteration-04-q1",
+          "type": "output",
+          "code": "let requests = 0;\nconst fetchPage = p => {\n  requests++;\n  return new Promise(r => setTimeout(() => r([p * 10, p * 10 + 1]), 100));\n};\nasync function* items() {\n  for (let p = 1; p <= 3; p++) {\n    const page = await fetchPage(p);\n    yield* page;\n  }\n}\nasync function main() {\n  for await (const x of items()) {\n    if (x === 20) break;\n  }\n  console.log(requests);\n}\nmain();",
+          "options": ["2", "3", "1", "6"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Третью страницу никто не попросил: break сработал на первом элементе второй",
+            "Число 20 есть только на второй странице, значит, её тоже загрузили",
+            "Запрос делается на страницу, а не на каждый элемент"
+          ],
+          "explanation": "Генератор ленивый: первая страница дала 10 и 11, вторая — 20, и на нём сработал break. До третьего запроса дело не дошло."
+        },
+        {
+          "id": "async-iteration-04-q2",
+          "type": "output",
+          "code": "const db = [[1, 2], [3], []];\nconst fetchPage = n => new Promise(r => setTimeout(() => r(db[n]), 100));\n\nasync function* all() {\n  let n = 0;\n  while (true) {\n    const items = await fetchPage(n++);\n    if (items.length === 0) return;\n    yield* items;\n  }\n}\nasync function main() {\n  const res = [];\n  for await (const x of all()) res.push(x);\n  console.log(res);\n}\nmain();",
+          "options": ["[1, 2, 3]", "[[1, 2], [3]]", "[[1, 2], [3], []]", "[]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "yield* отдаёт элементы страницы по одному, а не массивом",
+            "На пустой странице генератор выходит через return и ничего не отдаёт",
+            null
+          ],
+          "explanation": "yield* разворачивает каждую страницу на отдельные элементы. Пустая третья страница завершает генератор."
+        },
+        {
+          "id": "async-iteration-04-q3",
+          "type": "fill",
+          "codeBefore": "const db = [[\"Аня\"], [\"Ира\"]];\nconst fetchPage = n =>\n  new Promise(r => setTimeout(() => r({ items: db[n], next: n + 1 < db.length ? n + 1 : null }), 100));\n\nasync function* users() {\n  let page = 0;\n  while (page !== null) {\n    const res = ",
+          "codeAfter": " fetchPage(page);\n    yield* res.items;\n    page = res.next;\n  }\n}\nasync function main() {\n  for await (const name of users()) console.log(name); // Аня, Ира\n}\nmain();",
+          "options": ["await", "yield", "async", "new"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "yield отдаст страницу наружу, а в res попадёт undefined из next(): будет TypeError",
+            "async ставят перед функцией, здесь это SyntaxError",
+            "Стрелочную функцию нельзя вызывать через new — TypeError"
+          ],
+          "explanation": "await дожидается промиса из fetchPage и кладёт в res объект со страницей."
+        },
+        {
+          "id": "async-iteration-04-q4",
+          "type": "order",
+          "title": "Собери генератор, который грузит страницы по очереди",
+          "noRun": true,
+          "lines": [
+            "const pages = async function* () {",
+            "  for (let p = 1; p <= 2; p++) {",
+            "    const items = await fetchPage(p);",
+            "    yield* items;",
+            "  }",
+            "};"
+          ],
+          "shuffled": [3, 0, 5, 2, 4, 1],
+          "explanation": "Сначала дождаться страницы через await, потом отдать её элементы через yield*. Цикл повторяет это для каждой страницы."
+        },
+        {
+          "id": "async-iteration-04-q5",
+          "type": "output",
+          "code": "const fetchPage = p => {\n  console.log(\"запрос\", p);\n  return new Promise(r => setTimeout(() => r([p]), 100));\n};\nasync function* gen() {\n  for (let p = 1; p <= 2; p++) {\n    const items = await fetchPage(p);\n    yield* items;\n  }\n}\nasync function main() {\n  for await (const x of gen()) console.log(\"получил\", x);\n}\nmain();",
+          "options": [
+            "запрос 1 получил 1 запрос 2 получил 2",
+            "запрос 1 запрос 2 получил 1 получил 2",
+            "получил 1 запрос 1 получил 2 запрос 2",
+            "запрос 1 получил 1 получил 2 запрос 2"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Генератор не запрашивает следующую страницу заранее: он ждёт, пока цикл попросит значение",
+            "Элемент нельзя получить раньше, чем загружена его страница",
+            null
+          ],
+          "explanation": "Генератор работает по требованию: вторую страницу он запрашивает, только когда цикл обработал элемент с первой."
+        }
+      ]
+    },
+    {
+      "id": "async-iteration-05",
+      "topicId": "async-iteration",
+      "title": "Практика: асинхронные потоки",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Async-генераторы можно соединять в цепочку: один отдаёт данные, другой через `for await` берёт их и преобразует."
+          },
+          {
+            "type": "code",
+            "code": "async function* nums() {\n  yield 1;\n  yield 2;\n}\nasync function* double(source) {\n  for await (const x of source) yield x * 2;\n}\nasync function main() {\n  for await (const x of double(nums())) console.log(x);\n}\nmain(); // 2, 4"
+          },
+          {
+            "type": "text",
+            "text": "`break` в `for await` закрывает генератор: код после текущего `yield` больше не выполнится."
+          },
+          {
+            "type": "warning",
+            "text": "Spread и обычный `for...of` с async-генератором не работают — это `TypeError`. Собирай значения в массив внутри `for await`."
+          },
+          {
+            "type": "tip",
+            "text": "`yield` работает только прямо в теле генератора. Внутри колбэка, например `forEach`, это `SyntaxError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-iteration-05-q1",
+          "type": "output",
+          "code": "async function* nums() {\n  yield 1;\n  yield 2;\n  yield 3;\n}\nasync function* double(source) {\n  for await (const x of source) yield x * 2;\n}\nasync function main() {\n  const res = [];\n  for await (const x of double(nums())) res.push(x);\n  console.log(res);\n}\nmain();",
+          "options": ["[2, 4, 6]", "[1, 2, 3]", "[]", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "main перебирает не nums, а double, который удваивает каждое значение",
+            "console.log выполняется после цикла, когда массив уже заполнен",
+            "for await принимает async-генератор, в том числе как аргумент другого генератора"
+          ],
+          "explanation": "double берёт значения из nums и отдаёт их удвоенными. main собирает их в массив и выводит после цикла."
+        },
+        {
+          "id": "async-iteration-05-q2",
+          "type": "output",
+          "code": "async function* gen() {\n  yield 1;\n}\nconsole.log([...gen()]);",
+          "options": ["TypeError", "[1]", "[Promise]", "[]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread перебирает синхронно, а async-генератор так не умеет",
+            "Spread не создаёт промисы — он вообще не может начать перебор",
+            "Spread не возвращает пустой массив, а бросает ошибку"
+          ],
+          "explanation": "Spread требует Symbol.iterator, а у async-генератора есть только Symbol.asyncIterator."
+        },
+        {
+          "id": "async-iteration-05-q3",
+          "type": "output",
+          "code": "async function* gen() {\n  yield 1;\n  console.log(\"после yield\");\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) {\n    console.log(x);\n    break;\n  }\n  console.log(\"конец\");\n}\nmain();",
+          "options": ["1 конец", "1 после yield конец", "1 2 конец", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "break закрывает генератор, и он не продолжает работу после yield",
+            "break выходит из цикла после первого значения",
+            "Код после цикла выполняется и после break"
+          ],
+          "explanation": "break выходит из цикла и закрывает генератор. Он так и остался на первом yield, поэтому «после yield» не выводится."
+        },
+        {
+          "id": "async-iteration-05-q4",
+          "type": "fill",
+          "codeBefore": "async function* nums() {\n  yield 1;\n  yield 2;\n  yield 3;\n  yield 4;\n}\nasync function* evens(source) {\n  for await (const x of source) {\n    if (x % 2 === 0) ",
+          "codeAfter": " x;\n  }\n}\nasync function main() {\n  const res = [];\n  for await (const x of evens(nums())) res.push(x);\n  console.log(res); // [2, 4]\n}\nmain();",
+          "options": ["yield", "return", "yield*", "await"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return завершит генератор на первом же чётном: будет []",
+            "yield* ждёт итерируемый объект, а x — число: будет TypeError",
+            "await только дождётся значения, но ничего не отдаст наружу: будет []"
+          ],
+          "explanation": "yield отдаёт чётное число наружу и продолжает перебор, поэтому в массив попадают и 2, и 4."
+        },
+        {
+          "id": "async-iteration-05-q5",
+          "type": "findBug",
+          "code": "async function* fromPages(pages) {\n  for (const page of pages) {\n    const items = await page;\n    items.forEach(item => yield item);\n  }\n}\nasync function main() {\n  for await (const x of fromPages([Promise.resolve([1, 2])])) console.log(x);\n}\nmain(); // ждём 1 2",
+          "bugLine": 4,
+          "fixed": "async function* fromPages(pages) {\n  for (const page of pages) {\n    const items = await page;\n    yield* items;\n  }\n}\nasync function main() {\n  for await (const x of fromPages([Promise.resolve([1, 2])])) console.log(x);\n}\nmain(); // 1 2",
+          "explanation": "yield работает только в теле самого генератора, а стрелка в forEach — отдельная функция. Это SyntaxError, и код не запустится. Отдать элементы массива помогает yield*."
+        }
+      ]
+    }
+  ]
+}
