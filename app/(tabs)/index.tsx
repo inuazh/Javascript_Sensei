@@ -81,8 +81,8 @@ function DailyCard({ today }: { today: string }) {
         </View>
         <Text style={Type.h3}>{questionTitle(question)}</Text>
         <Text style={Type.small}>
-          одна попытка, одна задача для всех.
-          {streak > 0 ? ` серия: ${streak}.` : ''}
+          одна попытка, одна задача для всех
+          {streak > 0 ? `. серия: ${streak}` : ''}
         </Text>
         <Button
           title="решить"
