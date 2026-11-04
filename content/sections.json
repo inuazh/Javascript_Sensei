@@ -276,6 +276,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "functional",
+      "title": "Функциональный стиль",
+      "icon": "λ",
+      "color": "#FFFFFF",
+      "order": 20,
+      "description": "Чистые функции, иммутабельность, map/filter/reduce и сборка функций из маленьких частей.",
+      "topics": [
+        {
+          "id": "pure-functions",
+          "title": "Чистые функции",
+          "subtitle": "побочные эффекты, иммутабельность",
+          "order": 0
+        },
+        {
+          "id": "higher-order",
+          "title": "Функции высшего порядка",
+          "subtitle": "map, filter, reduce в цепочках",
+          "order": 1
+        },
+        {
+          "id": "composition",
+          "title": "Композиция и каррирование",
+          "subtitle": "compose, pipe, curry",
+          "order": 2
+        }
+      ]
     }
   ]
 }
