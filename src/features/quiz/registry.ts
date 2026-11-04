@@ -21,6 +21,7 @@ function choice<Q extends ChoiceQuestionT>(
     isCorrect: (q, a) => a === q.correct,
     correctAnswer: q => ({ text: q.options[q.correct] }),
     answerNote: (q, a) => q.optionExplanations?.[a] ?? null,
+    answerText: (q, a) => q.options[a] ?? String(a),
   };
 }
 
@@ -40,6 +41,7 @@ export const QUESTION_TYPES: QuestionRegistry = {
     isCorrect: (_q, a: number[]) => a.every((lineIndex, i) => lineIndex === i),
     correctAnswer: q => ({ code: q.lines.join('\n') }),
     runnableCode: orderCode,
+    answerText: (q, a: number[]) => a.map(i => q.lines[i] ?? String(i)).join('\n'),
   },
   findBug: {
     defaultTitle: 'найди строку с ошибкой',
@@ -49,6 +51,10 @@ export const QUESTION_TYPES: QuestionRegistry = {
     correctAnswer: q => (q.fixed ? { code: q.fixed } : { text: `строка ${q.bugLine}` }),
     // Run the buggy code: seeing the wrong output is the point of the question.
     runnableCode: q => q.code,
+    answerText: (q, a: number) => {
+      const line = q.code.split('\n')[a - 1]?.trim();
+      return line ? `строка ${a}: ${line}` : `строка ${a}`;
+    },
   },
 };
 

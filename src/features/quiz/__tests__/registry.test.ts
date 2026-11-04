@@ -30,6 +30,11 @@ describe('findBug question type', () => {
     expect(def.correctAnswer(findBug({ fixed }))).toEqual({ code: fixed });
   });
 
+  it('describes the chosen line for an error report', () => {
+    expect(def.answerText(findBug(), 3)).toBe('строка 3: const b = "2";');
+    expect(def.answerText(findBug(), 9)).toBe('строка 9');
+  });
+
   it('has a default title and a preview', () => {
     expect(questionTitle(findBug())).toBe('найди строку с ошибкой');
     expect(questionTitle(findBug({ title: 'Где ошибка?' }))).toBe('Где ошибка?');

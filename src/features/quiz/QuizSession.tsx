@@ -6,7 +6,7 @@ import { confirmAction } from '../../services/dialog';
 import { useFeedback } from '../../services/feedback';
 import { Button, Colors, Fonts, Icon, Label, ProgressBar, Spacing, Type } from '../../ui';
 import { FeedbackPanel } from './FeedbackPanel';
-import { initQuiz, quizReducer, type QuizAnswer, type QuizItem } from './quizReducer';
+import { quizReducer, restoreQuiz, type QuizAnswer, type QuizItem } from './quizReducer';
 import { getQuestionType, questionTitle } from './registry';
 
 interface QuizSessionProps {
@@ -15,8 +15,13 @@ interface QuizSessionProps {
   label: string;
   onExit: () => void;
   onFinish: (answers: QuizAnswer[]) => void;
-  /** Called as soon as an answer is checked, before the explanation is read. */
-  onAnswer?: (answer: QuizAnswer) => void;
+  /**
+   * Called as soon as an answer is checked, before the explanation is read,
+   * with every answer of the session so far (this one included).
+   */
+  onAnswer?: (answer: QuizAnswer, answers: QuizAnswer[]) => void;
+  /** Answers of a saved session: it continues at the next question. */
+  initialAnswers?: QuizAnswer[];
   /** Ask before leaving a started session. Off when answers are saved as they come. */
   confirmExitAfterAnswer?: boolean;
   /** Ends the session early, e.g. after too many mistakes in a placement test. */
@@ -31,11 +36,16 @@ export function QuizSession({
   onAnswer,
   confirmExitAfterAnswer = true,
   shouldStop,
+  initialAnswers = [],
 }: QuizSessionProps) {
   const feedback = useFeedback();
   const scrollRef = useRef<ScrollView>(null);
-  const [state, dispatch] = useReducer(quizReducer, items[0], first =>
-    initQuiz(first ? getQuestionType(first.question).initialAnswer(first.question) : null),
+  const [state, dispatch] = useReducer(quizReducer, items[initialAnswers.length], first =>
+    restoreQuiz(
+      initialAnswers,
+      items.length,
+      first ? getQuestionType(first.question).initialAnswer(first.question) : null,
+    ),
   );
 
   const item = items[state.index];
@@ -68,7 +78,8 @@ export function QuizSession({
     if (correct) feedback.success();
     else feedback.error();
     dispatch({ type: 'CHECK', correct, item });
-    onAnswer?.({ questionId: question.id, lessonId: item.lessonId, correct });
+    const answer: QuizAnswer = { questionId: question.id, lessonId: item.lessonId, correct };
+    onAnswer?.(answer, [...state.answers, answer]);
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
   };
 
@@ -140,6 +151,11 @@ export function QuizSession({
             correctAnswer={def.correctAnswer(question)}
             note={def.answerNote?.(question, state.answer) ?? null}
             runnableCode={def.runnableCode(question)}
+            report={{
+              questionId: question.id,
+              lessonId: item.lessonId,
+              answer: state.answer === null ? '' : def.answerText(question, state.answer),
+            }}
           />
         )}
       </ScrollView>

@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { afterActivity, leaveLeaderboard } from '../src/services/activity';
 import { confirmAction, showNotice } from '../src/services/dialog';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
+import { SUPPORT_EMAIL } from '../src/services/support';
 import { DAILY_GOALS, useUserStore, type ReminderSettings } from '../src/stores/useUserStore';
 import {
   BackButton,
@@ -71,7 +72,7 @@ export default function SettingsScreen() {
         if (!(await leaveLeaderboard())) {
           showNotice(
             'запись не удалена',
-            'не удалось связаться с сервером. напиши на jssensei.app@gmail.com, и мы удалим её вручную',
+            `не удалось связаться с сервером. напиши на ${SUPPORT_EMAIL}, и мы удалим её вручную`,
           );
         }
       },
