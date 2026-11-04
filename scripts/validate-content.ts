@@ -267,6 +267,16 @@ async function main() {
         } else if (q.type === 'findBug' && q.fixed !== undefined) {
           for (const w of await checkFindBugFix(q)) warn(where, w);
           executed += 2;
+        } else if (q.type === 'order' && !q.steps && !q.noRun) {
+          // «Запустить» runs the lines as they are, so they must not rely on missing helpers.
+          const run = await runSnippet(q.lines.join('\n'));
+          if (run.error === 'ReferenceError') {
+            error(
+              where,
+              'lines use names that are not defined in the question; define them or set "noRun": true',
+            );
+          }
+          executed++;
         }
       }
     }
