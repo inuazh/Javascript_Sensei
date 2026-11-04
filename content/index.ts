@@ -17,6 +17,7 @@ export const SECTION_FILES: Record<string, () => SectionFile> = {
   control: () => require('./control.json'),
   collections: () => require('./collections.json'),
   advanced: () => require('./advanced.json'),
+  async: () => require('./async.json'),
 };
 
 export function loadSectionDefs(): SectionDef[] {

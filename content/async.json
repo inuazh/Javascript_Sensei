@@ -1,0 +1,1495 @@
+{
+  "lessons": [
+    {
+      "id": "event-loop-01",
+      "topicId": "event-loop",
+      "title": "Колбэки",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Колбэк** — функция, которую передают в другую функцию как аргумент, чтобы та вызвала её сама, когда придёт время."
+          },
+          {
+            "type": "code",
+            "code": "function greet(name, callback) {\n  callback(\"Привет, \" + name);\n}\n\ngreet(\"Аня\", msg => console.log(msg)); // Привет, Аня"
+          },
+          {
+            "type": "text",
+            "text": "Многие колбэки вызываются **синхронно** — прямо во время работы функции. Например, `forEach` вызывает колбэк для каждого элемента и только потом отдаёт управление следующей строке."
+          },
+          {
+            "type": "code",
+            "code": "[1, 2].forEach(n => console.log(n));\nconsole.log(\"готово\");\n// 1\n// 2\n// готово"
+          },
+          {
+            "type": "warning",
+            "text": "Передавай саму функцию, а не результат её вызова: `run(sayHi)`, а не `run(sayHi())`. Со скобками функция выполнится сразу, а в `run` уйдёт то, что она вернула."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "event-loop-01-q1",
+          "type": "output",
+          "code": "function run(callback) {\n  console.log(\"A\");\n  callback();\n  console.log(\"C\");\n}\nrun(() => console.log(\"B\"));",
+          "options": ["A B C", "A C B", "B A C", "C B A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Колбэк здесь не откладывается: run вызывает его сразу, синхронно",
+            "Колбэк вызывается внутри run, после console.log(\"A\")",
+            "Код run выполняется сверху вниз"
+          ],
+          "explanation": "run вызывает колбэк прямо посреди своей работы — между выводом A и C. Ничего не откладывается."
+        },
+        {
+          "id": "event-loop-01-q2",
+          "type": "output",
+          "code": "const nums = [1, 2, 3];\nnums.forEach(n => console.log(n * 10));\nconsole.log(\"конец\");",
+          "options": ["10 20 30 конец", "конец 10 20 30", "10 конец 20 30", "1 2 3 конец"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "forEach не откладывает колбэки — они выполняются до следующей строки",
+            null,
+            "Колбэк умножает каждое число на 10"
+          ],
+          "explanation": "forEach синхронно вызывает колбэк для каждого элемента и только потом передаёт управление следующей строке."
+        },
+        {
+          "id": "event-loop-01-q3",
+          "type": "fill",
+          "codeBefore": "function calc(a, b, callback) {\n  return callback(a, b);\n}\nconsole.log(calc(2, 3, ",
+          "codeAfter": ")); // 5",
+          "options": ["(a, b) => a + b", "(a, b) => a * b", "a + b", "sum(a, b)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Эта функция перемножит числа: 2 * 3 = 6",
+            "Это не функция, а выражение: снаружи calc переменных a и b нет — ReferenceError",
+            "Функции sum нет, да и передать нужно функцию, а не результат вызова"
+          ],
+          "explanation": "В calc нужно передать функцию, которая сложит два аргумента. calc сама вызовет её с числами 2 и 3."
+        },
+        {
+          "id": "event-loop-01-q4",
+          "type": "trueFalse",
+          "code": "function sayHi() {\n  console.log(\"Привет\");\n}\nfunction run(fn) {\n  fn();\n}\nrun(sayHi());",
+          "options": [
+            "Выведет «Привет» и завершится без ошибок",
+            "Выведет «Привет», а потом упадёт с TypeError"
+          ],
+          "correct": 1,
+          "explanation": "Скобки вызывают sayHi сразу, и в run уходит её результат — undefined. Внутри run вызов undefined() бросает TypeError."
+        },
+        {
+          "id": "event-loop-01-q5",
+          "type": "order",
+          "lines": [
+            "const loadUser = (id, callback) => {",
+            "  const user = { id: id, name: \"Аня\" };",
+            "  callback(user);",
+            "};",
+            "loadUser(1, user => console.log(user.name));"
+          ],
+          "shuffled": [4, 2, 0, 3, 1],
+          "explanation": "Функцию, объявленную через const, можно вызвать только после объявления. Внутри сначала готовим данные и только потом передаём их в колбэк."
+        }
+      ]
+    },
+    {
+      "id": "event-loop-02",
+      "topicId": "event-loop",
+      "title": "setTimeout",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`setTimeout(fn, ms)` просит выполнить `fn` не раньше чем через `ms` миллисекунд. Сам вызов ничего не ждёт: код ниже выполняется сразу, а колбэк — потом."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"старт\");\nsetTimeout(() => console.log(\"таймер\"), 1000);\nconsole.log(\"финиш\");\n// старт\n// финиш\n// таймер (через секунду)"
+          },
+          {
+            "type": "text",
+            "text": "Даже `setTimeout(fn, 0)` не выполняет `fn` сразу: колбэк ждёт, пока доработает весь синхронный код. Таймеры срабатывают по возрастанию задержки, а при равной задержке — в порядке создания."
+          },
+          {
+            "type": "code",
+            "code": "setTimeout(() => console.log(\"B\"), 100);\nsetTimeout(() => console.log(\"A\"), 0);\nconsole.log(\"C\");\n// C\n// A\n// B"
+          },
+          {
+            "type": "tip",
+            "text": "`setTimeout` возвращает id таймера. Передай его в `clearTimeout(id)` — и колбэк не выполнится."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "event-loop-02-q1",
+          "type": "output",
+          "code": "console.log(1);\nsetTimeout(() => console.log(2), 0);\nconsole.log(3);",
+          "options": ["1 2 3", "1 3 2", "2 1 3", "3 1 2"],
+          "correct": 1,
+          "optionExplanations": [
+            "Задержка 0 не значит «сразу»: колбэк таймера ждёт, пока выполнится весь синхронный код",
+            null,
+            "Таймер не может сработать раньше синхронного кода",
+            "Синхронный код выполняется сверху вниз: 1 раньше 3"
+          ],
+          "explanation": "Колбэк таймера выполняется только после всего синхронного кода, даже с задержкой 0."
+        },
+        {
+          "id": "event-loop-02-q2",
+          "type": "output",
+          "code": "setTimeout(() => console.log(\"A\"), 300);\nsetTimeout(() => console.log(\"B\"), 100);\nsetTimeout(() => console.log(\"C\"), 200);",
+          "options": ["A B C", "B C A", "C B A", "A C B"],
+          "correct": 1,
+          "optionExplanations": [
+            "Таймеры упорядочены по задержке, а не по порядку в коде",
+            null,
+            null,
+            null
+          ],
+          "explanation": "Таймеры срабатывают по возрастанию задержки: 100, 200, 300 мс. Порядок в коде важен только при равной задержке."
+        },
+        {
+          "id": "event-loop-02-q3",
+          "type": "trueFalse",
+          "code": "const id = setTimeout(() => console.log(\"Бум!\"), 1000);\nclearTimeout(id);",
+          "options": ["Через секунду выведет «Бум!»", "Ничего не выведет"],
+          "correct": 1,
+          "explanation": "clearTimeout отменяет таймер по его id, поэтому колбэк так и не вызовется."
+        },
+        {
+          "id": "event-loop-02-q4",
+          "type": "fill",
+          "codeBefore": "setTimeout(",
+          "codeAfter": ", 500);\n// через полсекунды должно вывести «Готово»",
+          "options": [
+            "() => console.log(\"Готово\")",
+            "console.log(\"Готово\")",
+            "() => \"Готово\"",
+            "console.log"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Скобки вызывают console.log сразу, а не через 500 мс; в setTimeout уйдёт undefined",
+            "Функция вернёт строку, но ничего не выведет — return не печатает",
+            "console.log вызовется без аргументов и выведет пустую строку"
+          ],
+          "explanation": "setTimeout нужна функция, которую он вызовет через 500 мс. Стрелка оборачивает console.log(\"Готово\") в такую функцию."
+        },
+        {
+          "id": "event-loop-02-q5",
+          "type": "output",
+          "code": "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nsetTimeout(() => console.log(\"C\"), 0);\nconsole.log(\"D\");",
+          "options": ["A B C D", "A D B C", "A D C B", "D A B C"],
+          "correct": 1,
+          "optionExplanations": [
+            "Задержка 0 не значит «сразу»: таймеры ждут синхронный код",
+            null,
+            "При одинаковой задержке таймеры срабатывают в порядке создания",
+            null
+          ],
+          "explanation": "Сначала весь синхронный код: A и D. Потом таймеры; при равной задержке — в порядке создания: B, C."
+        }
+      ]
+    },
+    {
+      "id": "event-loop-03",
+      "topicId": "event-loop",
+      "title": "Стек вызовов и Event Loop",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "JavaScript выполняет код в одном потоке. **Стек вызовов** хранит функции, которые работают прямо сейчас: вызов кладёт функцию наверх, а когда она заканчивается, её снимают."
+          },
+          {
+            "type": "code",
+            "code": "function a() {\n  b();\n  console.log(\"a\");\n}\nfunction b() {\n  console.log(\"b\");\n}\na();\n// b\n// a"
+          },
+          {
+            "type": "text",
+            "text": "Колбэки сработавших таймеров ждут в **очереди задач**. **Event Loop** берёт оттуда следующую задачу, только когда стек пуст, то есть когда весь синхронный код доработал."
+          },
+          {
+            "type": "warning",
+            "text": "Долгий синхронный код блокирует всё: пока крутится тяжёлый цикл, ни один таймер не сработает, даже если его время давно прошло."
+          },
+          {
+            "type": "code",
+            "code": "setTimeout(() => console.log(\"таймер\"), 0);\nfor (let i = 0; i < 1e9; i++) {} // долгая работа\nconsole.log(\"цикл закончился\");\n// цикл закончился\n// таймер"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "event-loop-03-q1",
+          "type": "output",
+          "code": "function first() {\n  console.log(\"1\");\n  second();\n  console.log(\"3\");\n}\nfunction second() {\n  console.log(\"2\");\n}\nfirst();",
+          "options": ["1 2 3", "1 3 2", "2 1 3", "3 2 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Вызов second() синхронный: first ждёт, пока он закончится",
+            "second вызывается уже после вывода \"1\"",
+            null
+          ],
+          "explanation": "second ложится на стек поверх first. first продолжит работу только после того, как second закончится."
+        },
+        {
+          "id": "event-loop-03-q2",
+          "type": "output",
+          "code": "function task() {\n  setTimeout(() => console.log(\"таймер\"), 0);\n  console.log(\"task\");\n}\ntask();\nconsole.log(\"конец\");",
+          "options": [
+            "task конец таймер",
+            "таймер task конец",
+            "task таймер конец",
+            "конец task таймер"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            null,
+            "Колбэк таймера ждёт, пока опустеет весь стек, а не только функция task",
+            null
+          ],
+          "explanation": "Колбэк таймера выполнится, только когда стек полностью опустеет — после task и после console.log(\"конец\")."
+        },
+        {
+          "id": "event-loop-03-q3",
+          "type": "trueFalse",
+          "code": "setTimeout(() => console.log(\"таймер\"), 100);\nconst start = Date.now();\nwhile (Date.now() - start < 3000) {} // крутимся 3 секунды\nconsole.log(\"цикл\");",
+          "options": ["Выведет «таймер», потом «цикл»", "Выведет «цикл», потом «таймер»"],
+          "correct": 1,
+          "explanation": "Через 100 мс таймер готов, но стек занят циклом. Event Loop возьмёт колбэк только после окончания синхронного кода."
+        },
+        {
+          "id": "event-loop-03-q4",
+          "type": "fill",
+          "codeBefore": "setTimeout(() => console.log(\"B\"), ",
+          "codeAfter": ");\nsetTimeout(() => console.log(\"A\"), 50);\n// Вывод: A B",
+          "options": ["0", "50", "100", "-1"],
+          "correct": 2,
+          "optionExplanations": [
+            "B сработает через 0 мс — раньше A",
+            "При равной задержке таймеры срабатывают в порядке создания — B создан первым",
+            null,
+            "Отрицательная задержка считается нулевой"
+          ],
+          "explanation": "B должен сработать позже A, значит его задержка должна быть больше 50 мс."
+        },
+        {
+          "id": "event-loop-03-q5",
+          "type": "output",
+          "code": "setTimeout(() => console.log(\"A\"), 0);\nfunction heavy() {\n  for (let i = 0; i < 3; i++) console.log(i);\n}\nheavy();\nconsole.log(\"B\");",
+          "options": ["0 1 2 B A", "A 0 1 2 B", "0 A 1 2 B", "0 1 2 A B"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Таймер с задержкой 0 всё равно ждёт весь синхронный код",
+            "Таймер не может прервать работающую функцию",
+            "console.log(\"B\") — тоже синхронный код, он выполнится раньше таймера"
+          ],
+          "explanation": "Цикл и console.log(\"B\") — синхронный код. Колбэк таймера встанет в очередь и выполнится, когда стек опустеет."
+        }
+      ]
+    },
+    {
+      "id": "event-loop-04",
+      "topicId": "event-loop",
+      "title": "Микрозадачи",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Задачи бывают двух видов. **Макрозадачи** — колбэки таймеров и событий. **Микрозадачи** — колбэки промисов (`then`) и функции из `queueMicrotask(fn)`."
+          },
+          {
+            "type": "text",
+            "text": "После синхронного кода и после **каждой** макрозадачи Event Loop выполняет **все** микрозадачи из очереди и только потом берёт следующую макрозадачу. Поэтому `then` срабатывает раньше `setTimeout(fn, 0)`."
+          },
+          {
+            "type": "code",
+            "code": "setTimeout(() => console.log(\"timeout\"), 0);\nPromise.resolve().then(() => console.log(\"promise\"));\nconsole.log(\"sync\");\n// sync\n// promise\n// timeout"
+          },
+          {
+            "type": "warning",
+            "text": "Микрозадача, добавленная из другой микрозадачи, тоже выполнится раньше таймеров: очередь микрозадач опустошается полностью."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "event-loop-04-q1",
+          "type": "output",
+          "code": "setTimeout(() => console.log(\"A\"), 0);\nPromise.resolve().then(() => console.log(\"B\"));\nconsole.log(\"C\");",
+          "options": ["C B A", "A B C", "C A B", "B C A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Синхронный код всегда выполняется раньше колбэков",
+            "Таймер создан раньше, но микрозадачи (then) выполняются до следующей макрозадачи",
+            "Колбэк then ждёт окончания синхронного кода"
+          ],
+          "explanation": "Сначала синхронный C. Затем все микрозадачи — B. И только потом макрозадача-таймер — A."
+        },
+        {
+          "id": "event-loop-04-q2",
+          "type": "trueFalse",
+          "code": "queueMicrotask(() => console.log(\"микро\"));\nconsole.log(\"синхронно\");",
+          "options": ["Сначала выведет «микро»", "Сначала выведет «синхронно»"],
+          "correct": 1,
+          "explanation": "Микрозадача выполняется раньше таймеров, но всё равно после текущего синхронного кода."
+        },
+        {
+          "id": "event-loop-04-q3",
+          "type": "output",
+          "code": "setTimeout(() => console.log(1), 0);\nqueueMicrotask(() => {\n  console.log(2);\n  queueMicrotask(() => console.log(3));\n});\nconsole.log(4);",
+          "options": ["4 2 3 1", "4 2 1 3", "1 2 3 4", "4 1 2 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадача, добавленная из микрозадачи, тоже выполнится до таймера — очередь опустошается полностью",
+            "Синхронный код идёт первым",
+            "Микрозадачи выполняются раньше таймеров"
+          ],
+          "explanation": "После синхронного 4 Event Loop выполняет все микрозадачи, включая только что добавленную, и лишь потом таймер."
+        },
+        {
+          "id": "event-loop-04-q4",
+          "type": "fill",
+          "codeBefore": "setTimeout(() => console.log(\"B\"), 0);\n",
+          "codeAfter": "(() => console.log(\"A\"));\n// Вывод: A B",
+          "options": ["queueMicrotask", "setTimeout", "clearTimeout", "Promise.resolve"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это ещё одна макрозадача с той же задержкой: она встанет в очередь после B",
+            "clearTimeout ничего не планирует — A не выведется",
+            "Promise.resolve(fn) создаёт промис со значением fn, но не вызывает её"
+          ],
+          "explanation": "Чтобы A обогнал уже созданный таймер, его нужно поставить в очередь микрозадач."
+        },
+        {
+          "id": "event-loop-04-q5",
+          "type": "output",
+          "code": "setTimeout(() => {\n  console.log(\"t1\");\n  Promise.resolve().then(() => console.log(\"p2\"));\n}, 0);\nsetTimeout(() => console.log(\"t2\"), 0);\nPromise.resolve().then(() => console.log(\"p1\"));",
+          "options": ["p1 t1 p2 t2", "t1 t2 p1 p2", "p1 t1 t2 p2", "p1 p2 t1 t2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадачи выполняются раньше таймеров",
+            "После каждой макрозадачи выполняются все микрозадачи — p2 успевает раньше второго таймера",
+            "p2 появляется в очереди только во время работы t1"
+          ],
+          "explanation": "Сначала микрозадача p1. Потом первый таймер t1, и сразу после него — все микрозадачи, в том числе p2. Только затем второй таймер t2."
+        }
+      ]
+    },
+    {
+      "id": "event-loop-05",
+      "topicId": "event-loop",
+      "title": "Закрепление: порядок вывода",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Алгоритм для любой задачи «в каком порядке выведется»: сначала весь синхронный код сверху вниз, затем все микрозадачи, затем одна макрозадача — и снова все микрозадачи. И так по кругу."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"1\");\nsetTimeout(() => console.log(\"5\"), 0);\nPromise.resolve().then(() => console.log(\"3\"));\nqueueMicrotask(() => console.log(\"4\"));\nconsole.log(\"2\");\n// 1 2 3 4 5"
+          },
+          {
+            "type": "tip",
+            "text": "Таймеры упорядочены по задержке, а при равной задержке — по порядку создания. Микрозадачи выполняются строго в порядке добавления."
+          },
+          {
+            "type": "warning",
+            "text": "Колбэк читает переменные в момент своего запуска, а не в момент планирования. Если значение успело поменяться, колбэк увидит новое."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "event-loop-05-q1",
+          "type": "output",
+          "code": "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 10);\nsetTimeout(() => console.log(\"C\"), 0);\nPromise.resolve().then(() => console.log(\"D\"));\nconsole.log(\"E\");",
+          "options": ["A E D C B", "A E C D B", "A B C D E", "A E D B C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадачи выполняются раньше любого таймера",
+            "Колбэки не выполняются раньше синхронного кода",
+            "Таймеры упорядочены по задержке: 0 мс раньше 10 мс"
+          ],
+          "explanation": "Синхронные A и E, затем микрозадача D, затем таймеры по возрастанию задержки: C (0 мс), B (10 мс)."
+        },
+        {
+          "id": "event-loop-05-q2",
+          "type": "trueFalse",
+          "code": "const id = setTimeout(() => console.log(\"таймер\"), 0);\nPromise.resolve().then(() => clearTimeout(id));\nconsole.log(\"старт\");",
+          "options": ["Выведет «старт» и «таймер»", "Выведет только «старт»"],
+          "correct": 1,
+          "explanation": "Микрозадача выполняется раньше таймера и успевает его отменить, поэтому «таймер» не выведется."
+        },
+        {
+          "id": "event-loop-05-q3",
+          "type": "fill",
+          "codeBefore": "setTimeout(() => console.log(\"A\"), 20);\nsetTimeout(() => console.log(\"B\"), ",
+          "codeAfter": ");\nPromise.resolve().then(() => console.log(\"C\"));\n// Вывод: C B A",
+          "options": ["0", "20", "30", "100"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При равной задержке таймеры срабатывают в порядке создания — A создан раньше",
+            "B сработает через 30 мс — позже A",
+            "B сработает через 100 мс — позже A"
+          ],
+          "explanation": "C — микрозадача, она первая в любом случае. Чтобы B сработал раньше A, его задержка должна быть меньше 20 мс."
+        },
+        {
+          "id": "event-loop-05-q4",
+          "type": "output",
+          "code": "setTimeout(() => console.log(\"t\"), 0);\nPromise.resolve()\n  .then(() => console.log(\"p1\"))\n  .then(() => console.log(\"p2\"));\nconsole.log(\"s\");",
+          "options": ["s p1 p2 t", "s p1 t p2", "p1 p2 s t", "s t p1 p2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Второй then встаёт в очередь микрозадач, а она опустошается полностью до таймера",
+            "Колбэки then ждут окончания синхронного кода",
+            "Микрозадачи выполняются раньше таймеров"
+          ],
+          "explanation": "Второй then — тоже микрозадача. Она добавляется в очередь, пока та ещё не опустела, поэтому выполняется раньше таймера."
+        },
+        {
+          "id": "event-loop-05-q5",
+          "type": "output",
+          "code": "let x = 1;\nsetTimeout(() => console.log(\"timeout\", x), 0);\nPromise.resolve().then(() => {\n  x = 3;\n});\nx = 2;\nconsole.log(\"sync\", x);",
+          "options": [
+            "sync 2 timeout 3",
+            "sync 2 timeout 2",
+            "sync 1 timeout 1",
+            "sync 2 timeout 1"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Микрозадача успевает поменять x до того, как сработает таймер",
+            null,
+            "Колбэк читает x в момент запуска, а не в момент создания таймера"
+          ],
+          "explanation": "Синхронно x становится 2. Затем микрозадача меняет x на 3, и только после неё таймер читает переменную — уже 3."
+        }
+      ]
+    },
+    {
+      "id": "promises-01",
+      "topicId": "promises",
+      "title": "Создание Promise",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Promise** — объект-обещание результата, который появится позже. Его создают через `new Promise`, передавая функцию-исполнитель (executor) с двумя параметрами: `resolve` и `reject`."
+          },
+          {
+            "type": "code",
+            "code": "const p = new Promise((resolve, reject) => {\n  setTimeout(() => resolve(\"готово\"), 1000);\n});\n\np.then(value => console.log(value)); // через секунду: готово"
+          },
+          {
+            "type": "text",
+            "text": "У промиса три состояния: `pending` (ожидание), `fulfilled` (выполнен через `resolve`) и `rejected` (отклонён через `reject`). Состояние меняется **один раз**: повторные `resolve` и `reject` игнорируются."
+          },
+          {
+            "type": "warning",
+            "text": "Executor запускается **синхронно**, прямо при создании промиса. Асинхронно вызываются только колбэки `then`."
+          },
+          {
+            "type": "code",
+            "code": "new Promise(resolve => {\n  console.log(\"executor\");\n  resolve();\n}).then(() => console.log(\"then\"));\nconsole.log(\"после\");\n// executor\n// после\n// then"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "promises-01-q1",
+          "type": "order",
+          "lines": [
+            "const p = new Promise(resolve => {",
+            "  resolve(\"ok\");",
+            "});",
+            "p.then(v => console.log(v));"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Сначала создаём промис: внутри executor вызываем resolve. Подписаться через then можно, только когда переменная p уже объявлена."
+        },
+        {
+          "id": "promises-01-q2",
+          "type": "output",
+          "code": "const p = new Promise((resolve, reject) => {\n  resolve(\"первый\");\n  resolve(\"второй\");\n  reject(new Error(\"ошибка\"));\n});\np.then(v => console.log(v));",
+          "options": ["первый", "второй", "первый второй", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Промис меняет состояние один раз — повторный resolve игнорируется",
+            "then вызывается один раз — с единственным результатом промиса",
+            "reject после resolve игнорируется: промис уже выполнен"
+          ],
+          "explanation": "Первый resolve переводит промис в состояние fulfilled. Дальше состояние не меняется, остальные вызовы игнорируются."
+        },
+        {
+          "id": "promises-01-q3",
+          "type": "output",
+          "code": "console.log(\"A\");\nnew Promise(resolve => {\n  console.log(\"B\");\n  resolve();\n}).then(() => console.log(\"C\"));\nconsole.log(\"D\");",
+          "options": ["A B D C", "A D B C", "A B C D", "A D C B"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Executor выполняется синхронно, сразу при создании промиса",
+            "Колбэк then вызывается асинхронно — после всего синхронного кода",
+            null
+          ],
+          "explanation": "Executor выполняется синхронно, поэтому B выводится сразу после A. А колбэк then ждёт окончания синхронного кода."
+        },
+        {
+          "id": "promises-01-q4",
+          "type": "fill",
+          "codeBefore": "const p = new Promise(resolve => {\n  setTimeout(() => ",
+          "codeAfter": "(\"готово\"), 100);\n});\np.then(v => console.log(v)); // готово",
+          "options": ["resolve", "reject", "return", "then"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У этого executor только параметр resolve: reject здесь не объявлен — ReferenceError",
+            "return нельзя писать в стрелке без фигурных скобок — SyntaxError",
+            "Внутри executor нет переменной then — ReferenceError"
+          ],
+          "explanation": "Промис выполняется вызовом resolve, и его значение получает колбэк then."
+        },
+        {
+          "id": "promises-01-q5",
+          "type": "trueFalse",
+          "code": "const p = new Promise(resolve => {\n  setTimeout(resolve, 1000);\n});\n// проверяем p сразу после создания",
+          "options": ["p в состоянии pending", "p в состоянии fulfilled"],
+          "correct": 0,
+          "explanation": "resolve будет вызван только через секунду. До этого промис ждёт — он в состоянии pending."
+        }
+      ]
+    },
+    {
+      "id": "promises-02",
+      "topicId": "promises",
+      "title": "Цепочки then",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`then` возвращает **новый** промис, поэтому вызовы можно выстраивать в цепочку. То, что колбэк вернул через `return`, получит следующий `then`."
+          },
+          {
+            "type": "code",
+            "code": "Promise.resolve(2)\n  .then(x => x * 10)\n  .then(x => x + 1)\n  .then(x => console.log(x)); // 21"
+          },
+          {
+            "type": "text",
+            "text": "Если колбэк вернул промис, цепочка **подождёт** его и передаст дальше уже результат. А `Promise.resolve(value)` сразу создаёт выполненный промис — с него удобно начинать цепочку."
+          },
+          {
+            "type": "code",
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nPromise.resolve(1)\n  .then(x => wait(500, x + 1))\n  .then(x => console.log(x)); // через 0.5 с: 2"
+          },
+          {
+            "type": "warning",
+            "text": "Забыл `return` в фигурных скобках — следующий `then` получит `undefined`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "promises-02-q1",
+          "type": "output",
+          "code": "Promise.resolve(5)\n  .then(x => x * 2)\n  .then(x => console.log(x));",
+          "options": ["10", "5", "undefined", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Следующий then получает то, что вернул предыдущий, а не исходное значение",
+            null,
+            null
+          ],
+          "explanation": "Стрелка без фигурных скобок возвращает 5 * 2, и это значение получает следующий then."
+        },
+        {
+          "id": "promises-02-q2",
+          "type": "output",
+          "code": "Promise.resolve(1)\n  .then(x => {\n    x + 1;\n  })\n  .then(x => console.log(x));",
+          "options": ["undefined", "2", "1", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В фигурных скобках нужен явный return, иначе колбэк возвращает undefined",
+            "Следующий then получает результат предыдущего колбэка, а не исходное значение",
+            null
+          ],
+          "explanation": "В фигурных скобках значение нужно вернуть через return. Здесь его нет, поэтому колбэк возвращает undefined."
+        },
+        {
+          "id": "promises-02-q3",
+          "type": "fill",
+          "codeBefore": "Promise.resolve(3)\n  .then(x => {\n    ",
+          "codeAfter": " x * x;\n  })\n  .then(x => console.log(x)); // 9",
+          "options": ["return", "resolve", "await", "yield"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "resolve — это параметр executor в new Promise, здесь его нет, а такая запись — SyntaxError",
+            "await можно использовать только в async-функции — SyntaxError",
+            "yield работает только в функциях-генераторах — SyntaxError"
+          ],
+          "explanation": "Значение передаётся в следующий then через return."
+        },
+        {
+          "id": "promises-02-q4",
+          "type": "order",
+          "lines": [
+            "Promise.resolve(2)",
+            "  .then(x => x + 3)",
+            "  .then(x => x * 10)",
+            "  .then(x => console.log(x)); // 50"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Значение идёт по цепочке сверху вниз: 2 + 3 = 5, затем 5 * 10 = 50. В обратном порядке получилось бы 2 * 10 + 3 = 23."
+        },
+        {
+          "id": "promises-02-q5",
+          "type": "output",
+          "code": "Promise.resolve(1)\n  .then(x => new Promise(r => setTimeout(() => r(x + 1), 100)))\n  .then(x => console.log(x));",
+          "options": ["2", "Promise", "1", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Если колбэк вернул промис, цепочка ждёт его и передаёт дальше результат, а не сам промис",
+            null,
+            "Стрелка без фигурных скобок возвращает созданный промис"
+          ],
+          "explanation": "Колбэк вернул промис, поэтому цепочка ждёт 100 мс и передаёт в следующий then его результат — 2."
+        }
+      ]
+    },
+    {
+      "id": "promises-03",
+      "topicId": "promises",
+      "title": "catch и finally",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Ошибку в цепочке ловит `catch`. Если промис отклонён или в колбэке `then` случился `throw`, все следующие `then` пропускаются до ближайшего `catch`."
+          },
+          {
+            "type": "code",
+            "code": "Promise.resolve(1)\n  .then(x => {\n    throw new Error(\"сбой\");\n  })\n  .then(x => console.log(\"пропущен\"))\n  .catch(err => console.log(err.message)); // сбой"
+          },
+          {
+            "type": "text",
+            "text": "`catch` тоже возвращает промис: значение, которое он вернул, уходит в следующий `then`, и цепочка идёт дальше. `Promise.reject(err)` сразу создаёт отклонённый промис."
+          },
+          {
+            "type": "code",
+            "code": "Promise.reject(new Error(\"нет данных\"))\n  .catch(() => \"по умолчанию\")\n  .then(v => console.log(v)); // по умолчанию"
+          },
+          {
+            "type": "tip",
+            "text": "`finally` выполняется при любом исходе. Он не получает результат и не меняет его: значение проходит через `finally` дальше."
+          },
+          {
+            "type": "warning",
+            "text": "`throw` внутри executor (`new Promise(() => { throw ... })`) не роняет программу, а отклоняет промис."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "promises-03-q1",
+          "type": "output",
+          "code": "Promise.resolve(1)\n  .then(x => {\n    throw new Error(\"упс\");\n  })\n  .then(() => console.log(\"A\"))\n  .catch(err => console.log(\"B\", err.message));",
+          "options": ["B упс", "A", "A B упс", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "После throw все then до ближайшего catch пропускаются",
+            "После throw все then до ближайшего catch пропускаются",
+            "Ошибку поймал catch, программа не падает"
+          ],
+          "explanation": "throw отклоняет промис, который вернул первый then. Следующий then пропускается, и ошибка попадает в catch."
+        },
+        {
+          "id": "promises-03-q2",
+          "type": "output",
+          "code": "Promise.reject(new Error(\"x\"))\n  .catch(() => 10)\n  .then(v => console.log(v * 2));",
+          "options": ["20", "10", "NaN", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "then умножает полученное значение на 2",
+            "catch вернул число 10 — его и получит then",
+            "catch обработал ошибку и вернул 10 — дальше цепочка идёт как обычно"
+          ],
+          "explanation": "catch обработал ошибку и вернул 10. Дальше цепочка идёт как обычно: then получает 10 и выводит 20."
+        },
+        {
+          "id": "promises-03-q3",
+          "type": "output",
+          "code": "Promise.resolve(\"данные\")\n  .finally(() => console.log(\"finally\"))\n  .then(v => console.log(v));",
+          "options": ["finally данные", "данные finally", "finally undefined", "данные"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Цепочка выполняется сверху вниз: finally стоит раньше then",
+            "finally не меняет результат: значение проходит через него дальше",
+            "finally выполняется при любом исходе, в том числе при успехе"
+          ],
+          "explanation": "finally выполняется по порядку цепочки и пропускает значение дальше без изменений."
+        },
+        {
+          "id": "promises-03-q4",
+          "type": "trueFalse",
+          "code": "const p = new Promise(() => {\n  throw new Error(\"сломалось\");\n});\np.catch(err => console.log(\"поймали:\", err.message));\nconsole.log(\"работаем дальше\");",
+          "options": [
+            "Программа упадёт на throw и ничего не выведет",
+            "Выведет «работаем дальше», потом «поймали: сломалось»"
+          ],
+          "correct": 1,
+          "explanation": "Ошибка в executor отклоняет промис, а не роняет программу. Синхронный код продолжается, а catch сработает асинхронно."
+        },
+        {
+          "id": "promises-03-q5",
+          "type": "fill",
+          "codeBefore": "Promise.reject(new Error(\"timeout\"))\n  .then(v => console.log(\"данные:\", v))\n  .",
+          "codeAfter": "(err => console.log(\"ошибка:\", err.message));\n// ошибка: timeout",
+          "options": ["catch", "finally", "then", "error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Колбэк finally не получает ни ошибку, ни значение: err будет undefined",
+            "then с одним колбэком срабатывает только при успехе",
+            "Метода error у промисов нет — TypeError"
+          ],
+          "explanation": "Отклонённый промис пропускает then и попадает в catch, который получает ошибку."
+        }
+      ]
+    },
+    {
+      "id": "promises-04",
+      "topicId": "promises",
+      "title": "Promise.all, race, allSettled, any",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Несколько промисов удобно ждать вместе. Эти методы принимают массив промисов и возвращают новый промис."
+          },
+          {
+            "type": "code",
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nPromise.all([wait(300, \"A\"), wait(100, \"B\")])\n  .then(res => console.log(res)); // [\"A\", \"B\"]"
+          },
+          {
+            "type": "text",
+            "text": "`Promise.all` ждёт **все** и отдаёт массив результатов в порядке промисов в массиве, а не в порядке завершения. Если хоть один отклонён, весь `all` отклоняется этой ошибкой."
+          },
+          {
+            "type": "text",
+            "text": "`Promise.race` — результат **первого завершившегося**, успехом или ошибкой. `Promise.any` — первого **успешного**. `Promise.allSettled` ждёт все и не отклоняется: он отдаёт массив объектов `{ status, value }` или `{ status, reason }`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "promises-04-q1",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nPromise.all([wait(300, 1), wait(100, 2), wait(200, 3)])\n  .then(res => console.log(res));",
+          "options": ["[1, 2, 3]", "[2, 3, 1]", "2", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Порядок результатов совпадает с порядком промисов в массиве, а не с порядком завершения",
+            "Это результат Promise.race — all ждёт все промисы",
+            null
+          ],
+          "explanation": "Promise.all ждёт все промисы и складывает результаты по их позициям в массиве, а не по времени завершения."
+        },
+        {
+          "id": "promises-04-q2",
+          "type": "trueFalse",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\nconst fail = ms => new Promise((_, reject) => setTimeout(() => reject(new Error(\"ошибка\")), ms));\n\nPromise.race([fail(100), wait(200, \"ok\")])\n  .then(v => console.log(v))\n  .catch(e => console.log(e.message));",
+          "options": ["Выведет «ok»", "Выведет «ошибка»"],
+          "correct": 1,
+          "optionExplanations": [
+            "Первый успешный берёт Promise.any, а race — просто первый завершившийся",
+            null
+          ],
+          "explanation": "race берёт первый завершившийся промис — неважно, успехом или ошибкой. Через 100 мс первым отклонился fail."
+        },
+        {
+          "id": "promises-04-q3",
+          "type": "output",
+          "code": "Promise.all([\n  Promise.resolve(1),\n  Promise.reject(new Error(\"сбой\")),\n  Promise.resolve(3),\n])\n  .then(res => console.log(res))\n  .catch(err => console.log(err.message));",
+          "options": ["сбой", "[1, 3]", "[1, undefined, 3]", "1 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "all не пропускает ошибки: одного отклонённого промиса хватает, чтобы отклонить весь результат",
+            "all не подставляет undefined вместо ошибки — он целиком отклоняется",
+            null
+          ],
+          "explanation": "Одного отклонённого промиса достаточно, чтобы отклонить весь Promise.all. Ошибка уходит в catch."
+        },
+        {
+          "id": "promises-04-q4",
+          "type": "fill",
+          "codeBefore": "Promise.",
+          "codeAfter": "([\n  Promise.reject(new Error(\"сервер 1 недоступен\")),\n  Promise.resolve(\"ответ сервера 2\"),\n]).then(v => console.log(v)); // ответ сервера 2",
+          "options": ["any", "all", "race", "allSettled"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "all отклонится из-за первого промиса и then не сработает",
+            "race берёт первый завершившийся промис — а первым завершился отклонённый",
+            "allSettled отдаст массив объектов со статусами, а не строку"
+          ],
+          "explanation": "Promise.any пропускает отклонённые промисы и берёт первый успешный."
+        },
+        {
+          "id": "promises-04-q5",
+          "type": "output",
+          "code": "Promise.allSettled([\n  Promise.resolve(1),\n  Promise.reject(new Error(\"нет\")),\n]).then(results => console.log(results.map(r => r.status)));",
+          "options": ["[\"fulfilled\", \"rejected\"]", "[1, \"нет\"]", "Error", "[\"fulfilled\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "allSettled отдаёт объекты { status, value } или { status, reason }, а мы выводим только status",
+            "allSettled никогда не отклоняется: он ждёт все промисы и описывает исход каждого",
+            "allSettled не отбрасывает отклонённые промисы"
+          ],
+          "explanation": "allSettled ждёт все промисы и описывает исход каждого: status будет \"fulfilled\" или \"rejected\"."
+        }
+      ]
+    },
+    {
+      "id": "promises-05",
+      "topicId": "promises",
+      "title": "Закрепление: промисы",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Executor работает синхронно, а колбэки `then`, `catch` и `finally` — всегда асинхронно, как микрозадачи. Даже у уже выполненного промиса `then` сработает только после текущего синхронного кода."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"1\");\nPromise.resolve().then(() => console.log(\"3\"));\nconsole.log(\"2\");\n// 1 2 3"
+          },
+          {
+            "type": "text",
+            "text": "В цепочке значение идёт дальше через `return`, ошибка — к ближайшему `catch`, а `finally` просто выполняется и пропускает результат дальше."
+          },
+          {
+            "type": "tip",
+            "text": "Нужны все результаты — `Promise.all`. Самый быстрый ответ — `race`, самый быстрый успешный — `any`, отчёт по всем — `allSettled`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "promises-05-q1",
+          "type": "output",
+          "code": "console.log(\"A\");\nconst p = new Promise(resolve => {\n  console.log(\"B\");\n  resolve(\"C\");\n});\np.then(v => console.log(v));\nsetTimeout(() => console.log(\"D\"), 0);\nconsole.log(\"E\");",
+          "options": ["A B E C D", "A E B C D", "A B C E D", "A B E D C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Executor выполняется синхронно, сразу при создании промиса",
+            "then срабатывает только после синхронного кода, даже если промис уже выполнен",
+            "then — микрозадача, она выполняется раньше таймера"
+          ],
+          "explanation": "Синхронно: A, B (executor), E. Затем микрозадача then — C. Последней — макрозадача-таймер D."
+        },
+        {
+          "id": "promises-05-q2",
+          "type": "output",
+          "code": "Promise.resolve(1)\n  .then(x => x + 1)\n  .catch(() => 100)\n  .then(x => {\n    throw new Error(x);\n  })\n  .catch(err => console.log(err.message))\n  .finally(() => console.log(\"готово\"));",
+          "options": ["2 готово", "100 готово", "готово", "2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первый catch пропускается: ошибки до него не было, и значение 2 проходит мимо",
+            "Второй catch ловит ошибку и выводит её сообщение",
+            "finally выполняется при любом исходе"
+          ],
+          "explanation": "Ошибки до первого catch не было, поэтому он пропускается и значение 2 идёт дальше. Потом throw, второй catch выводит 2, а finally — «готово»."
+        },
+        {
+          "id": "promises-05-q3",
+          "type": "order",
+          "lines": [
+            "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));",
+            "const tasks = [wait(200, \"a\"), wait(100, \"b\")];",
+            "Promise.all(tasks)",
+            "  .then(res => console.log(res.join(\"+\"))); // a+b"
+          ],
+          "shuffled": [2, 3, 0, 1],
+          "explanation": "Сначала объявляем функцию wait, потом создаём промисы, потом ждём их вместе. Результат идёт в порядке массива: a+b."
+        },
+        {
+          "id": "promises-05-q4",
+          "type": "fill",
+          "codeBefore": "Promise.",
+          "codeAfter": "(\"ok\")\n  .then(v => console.log(\"then:\", v))\n  .catch(e => console.log(\"catch:\", e));\n// catch: ok",
+          "options": ["reject", "resolve", "all", "race"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Promise.resolve создаст выполненный промис — сработает then, а не catch",
+            "Строка \"ok\" — итерируемый объект: all выполнится с массивом [\"o\", \"k\"] и сработает then",
+            "race выполнится с первым «элементом» строки — \"o\" — и сработает then"
+          ],
+          "explanation": "Promise.reject сразу создаёт отклонённый промис: then пропускается, и значение попадает в catch."
+        },
+        {
+          "id": "promises-05-q5",
+          "type": "trueFalse",
+          "code": "const p = Promise.resolve(1);\np.then(x => x + 1);\np.then(x => console.log(x));",
+          "options": ["Выведет 2", "Выведет 1"],
+          "correct": 1,
+          "optionExplanations": [
+            "Это не цепочка: второй then вызван у p, а не у результата первого then",
+            null
+          ],
+          "explanation": "Оба then подписаны на один и тот же промис p, а не друг на друга. Результат первого then никуда не передаётся."
+        }
+      ]
+    },
+    {
+      "id": "async-await-01",
+      "topicId": "async-await",
+      "title": "async-функции",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Слово `async` перед функцией делает её асинхронной: она **всегда возвращает Promise**. Значение из `return` становится результатом этого промиса."
+          },
+          {
+            "type": "code",
+            "code": "async function getAge() {\n  return 25;\n}\n\nconsole.log(getAge() instanceof Promise); // true\ngetAge().then(age => console.log(age)); // 25"
+          },
+          {
+            "type": "text",
+            "text": "Если внутри `async`-функции бросить ошибку, она не вылетит наружу в месте вызова, а **отклонит** возвращённый промис."
+          },
+          {
+            "type": "code",
+            "code": "async function fail() {\n  throw new Error(\"упс\");\n}\n\nfail().catch(err => console.log(err.message)); // упс"
+          },
+          {
+            "type": "tip",
+            "text": "`async` работает и со стрелками: `const load = async () => { ... };`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-await-01-q1",
+          "type": "output",
+          "code": "async function getNumber() {\n  return 7;\n}\nconsole.log(typeof getNumber());",
+          "options": ["object", "number", "function", "promise"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "async-функция возвращает не 7, а промис со значением 7",
+            "typeof применяется к результату вызова, а не к самой функции",
+            "Такого результата у typeof нет: промис — это объект"
+          ],
+          "explanation": "async-функция всегда возвращает Promise, а typeof для промиса, как и для любого объекта, — \"object\"."
+        },
+        {
+          "id": "async-await-01-q2",
+          "type": "output",
+          "code": "async function greet() {\n  return \"Привет\";\n}\ngreet().then(msg => console.log(msg + \"!\"));",
+          "options": ["Привет!", "Promise!", "undefined!", "Привет"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "then получает результат промиса, а не сам промис",
+            null,
+            "Колбэк then добавляет \"!\" к полученной строке"
+          ],
+          "explanation": "Значение из return становится результатом промиса, и then получает именно строку \"Привет\"."
+        },
+        {
+          "id": "async-await-01-q3",
+          "type": "fill",
+          "codeBefore": "",
+          "codeAfter": " function load() {\n  return \"данные\";\n}\nload().then(d => console.log(d)); // данные",
+          "options": ["async", "await", "new", "return"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await ждёт промис, а async-функцию объявляют словом async",
+            "new перед функцией создаст объект, а имя load снаружи не будет доступно",
+            "return вне функции — SyntaxError"
+          ],
+          "explanation": "Только async-функция возвращает промис, у которого есть метод then."
+        },
+        {
+          "id": "async-await-01-q4",
+          "type": "trueFalse",
+          "code": "async function check() {\n  throw new Error(\"сбой\");\n}\ncheck().catch(e => console.log(\"поймали\"));\nconsole.log(\"дальше\");",
+          "options": ["Выведет «дальше», потом «поймали»", "Упадёт с ошибкой на вызове check()"],
+          "correct": 0,
+          "explanation": "Ошибка внутри async-функции отклоняет её промис, а не вылетает наружу. catch сработает асинхронно, после синхронного кода."
+        },
+        {
+          "id": "async-await-01-q5",
+          "type": "order",
+          "lines": [
+            "const double = async n => {",
+            "  return n * 2;",
+            "};",
+            "double(21).then(r => console.log(r)); // 42"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Асинхронная стрелка объявляется так же, как обычная, только со словом async. Вызвать её можно после объявления, а результат получить через then."
+        }
+      ]
+    },
+    {
+      "id": "async-await-02",
+      "topicId": "async-await",
+      "title": "await",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`await` ставит `async`-функцию на паузу, пока промис не выполнится, и возвращает его результат. Писать `await` можно только внутри `async`-функции."
+          },
+          {
+            "type": "code",
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const user = await wait(500, \"Аня\");\n  console.log(user); // через 0.5 с: Аня\n}\nmain();"
+          },
+          {
+            "type": "text",
+            "text": "Пауза касается только этой функции. Код **после вызова** `main()` продолжает выполняться сразу, не дожидаясь `await`."
+          },
+          {
+            "type": "code",
+            "code": "async function f() {\n  console.log(\"1\");\n  await null;\n  console.log(\"3\");\n}\nf();\nconsole.log(\"2\");\n// 1 2 3"
+          },
+          {
+            "type": "warning",
+            "text": "До первого `await` тело `async`-функции выполняется синхронно. Всё, что после `await`, продолжится асинхронно — даже если ждём не промис, а обычное значение вроде `null`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-await-02-q1",
+          "type": "output",
+          "code": "async function main() {\n  const x = await Promise.resolve(10);\n  console.log(x + 1);\n}\nmain();",
+          "options": ["11", "[object Promise]1", "undefined", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await достаёт значение из промиса — без await к числу прибавлялся бы сам промис",
+            "await возвращает результат промиса",
+            null
+          ],
+          "explanation": "await достаёт из промиса его результат — число 10."
+        },
+        {
+          "id": "async-await-02-q2",
+          "type": "output",
+          "code": "async function f() {\n  console.log(\"A\");\n  await null;\n  console.log(\"B\");\n}\nf();\nconsole.log(\"C\");",
+          "options": ["A C B", "A B C", "C A B", "C B A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await приостанавливает f, и управление возвращается к коду после вызова f()",
+            "Тело до первого await выполняется синхронно, сразу при вызове",
+            null
+          ],
+          "explanation": "Тело f до await выполняется синхронно — A. На await функция уступает управление, выводится C, а затем f продолжается — B."
+        },
+        {
+          "id": "async-await-02-q3",
+          "type": "trueFalse",
+          "code": "function load() {\n  const data = await Promise.resolve(\"ok\");\n  console.log(data);\n}",
+          "options": [
+            "Код выполнится и выведет ok",
+            "SyntaxError: await работает только в async-функции"
+          ],
+          "correct": 1,
+          "explanation": "load объявлена без async, поэтому await в ней — синтаксическая ошибка. Код даже не запустится."
+        },
+        {
+          "id": "async-await-02-q4",
+          "type": "fill",
+          "codeBefore": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const n = ",
+          "codeAfter": " wait(100, 5);\n  console.log(n * 2); // 10\n}\nmain();",
+          "options": ["await", "async", "return", "then"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "async ставят перед функцией, а ждёт промис await",
+            "return нельзя писать в выражении — SyntaxError",
+            "then — метод промиса, его вызывают через точку"
+          ],
+          "explanation": "await дождётся промиса из wait и вернёт его результат — число 5."
+        },
+        {
+          "id": "async-await-02-q5",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  console.log(\"старт\");\n  const a = await wait(100, \"A\");\n  console.log(a);\n}\nmain();\nsetTimeout(() => console.log(\"таймер\"), 50);\nconsole.log(\"ждём\");",
+          "options": [
+            "старт ждём таймер A",
+            "старт A ждём таймер",
+            "ждём старт таймер A",
+            "старт ждём A таймер"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await не блокирует программу: код после main() выполняется сразу",
+            "Тело main до первого await выполняется синхронно",
+            "Таймер на 50 мс срабатывает раньше, чем промис на 100 мс"
+          ],
+          "explanation": "«старт» выводится синхронно при вызове main, затем main ждёт 100 мс, а код идёт дальше: «ждём». Через 50 мс срабатывает таймер, через 100 мс main продолжает работу."
+        }
+      ]
+    },
+    {
+      "id": "async-await-03",
+      "topicId": "async-await",
+      "title": "Ошибки: try/catch",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Если промис под `await` отклонён, `await` **бросает** ошибку прямо в этой строке. Поэтому ошибки ловят обычным `try/catch`."
+          },
+          {
+            "type": "code",
+            "code": "async function main() {\n  try {\n    await Promise.reject(new Error(\"нет сети\"));\n    console.log(\"не выполнится\");\n  } catch (err) {\n    console.log(\"Ошибка:\", err.message);\n  }\n}\nmain(); // Ошибка: нет сети"
+          },
+          {
+            "type": "text",
+            "text": "`finally` выполнится в любом случае. После `try/catch` функция продолжает работать как обычно."
+          },
+          {
+            "type": "warning",
+            "text": "`try/catch` ловит ошибку промиса, только если его ждут через `await`. Без `await` функция не ждёт промис, и его ошибка пролетает мимо `catch`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-await-03-q1",
+          "type": "output",
+          "code": "async function main() {\n  try {\n    const x = await Promise.reject(new Error(\"404\"));\n    console.log(\"x:\", x);\n  } catch (e) {\n    console.log(\"catch:\", e.message);\n  }\n}\nmain();",
+          "options": ["catch: 404", "x: undefined", "x: 404", "Error"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await отклонённого промиса бросает ошибку — до console.log дело не доходит",
+            "Отклонённый промис не даёт значения: await бросает ошибку",
+            "Ошибку поймал catch, программа не падает"
+          ],
+          "explanation": "await отклонённого промиса бросает ошибку, поэтому строка с x не выполняется и управление переходит в catch."
+        },
+        {
+          "id": "async-await-03-q2",
+          "type": "output",
+          "code": "async function main() {\n  try {\n    await Promise.reject(new Error(\"сбой\"));\n  } catch (e) {\n    console.log(\"A\");\n  } finally {\n    console.log(\"B\");\n  }\n  console.log(\"C\");\n}\nmain();",
+          "options": ["A B C", "A C B", "A B", "B A C"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "finally выполняется сразу после try/catch, до следующего кода",
+            "Ошибка обработана в catch, поэтому функция продолжает работать после try/catch/finally",
+            "finally выполняется после catch"
+          ],
+          "explanation": "catch ловит ошибку, finally выполняется после него, а затем функция продолжает работать как обычно."
+        },
+        {
+          "id": "async-await-03-q3",
+          "type": "trueFalse",
+          "code": "async function main() {\n  try {\n    Promise.reject(new Error(\"сбой\"));\n  } catch (e) {\n    console.log(\"поймали\");\n  }\n  console.log(\"конец\");\n}\nmain();",
+          "options": [
+            "Выведет «поймали», потом «конец»",
+            "Выведет только «конец», ошибка пролетит мимо catch"
+          ],
+          "correct": 1,
+          "explanation": "Без await промис просто создаётся, и try завершается без ошибок. Отклонение случится позже — catch его уже не увидит."
+        },
+        {
+          "id": "async-await-03-q4",
+          "type": "fill",
+          "codeBefore": "async function getUser() {\n  throw new Error(\"не найден\");\n}\n\nasync function main() {\n  try {\n    ",
+          "codeAfter": " getUser();\n  } catch (e) {\n    console.log(e.message); // не найден\n  }\n}\nmain();",
+          "options": ["await", "return", "async", "void"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return без await отдаёт промис наружу, не дожидаясь его, — ошибка случится уже вне try",
+            "async пишут перед объявлением функции, а не перед вызовом — SyntaxError",
+            "void просто отбросит промис — ошибка пролетит мимо catch"
+          ],
+          "explanation": "await дождётся отклонённого промиса и бросит ошибку внутри try — её поймает catch."
+        },
+        {
+          "id": "async-await-03-q5",
+          "type": "output",
+          "code": "async function load() {\n  const data = await Promise.reject(new Error(\"timeout\"));\n  return data;\n}\nload()\n  .then(d => console.log(\"данные:\", d))\n  .catch(e => console.log(\"ошибка:\", e.message));\nconsole.log(\"запрос отправлен\");",
+          "options": [
+            "запрос отправлен ошибка: timeout",
+            "ошибка: timeout запрос отправлен",
+            "данные: undefined запрос отправлен",
+            "запрос отправлен данные: undefined"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "catch срабатывает асинхронно — после синхронного console.log",
+            null,
+            "Неперехваченная ошибка отклоняет промис async-функции: then пропускается"
+          ],
+          "explanation": "Ошибку внутри load никто не поймал, поэтому промис load() отклоняется и срабатывает catch. Это происходит асинхронно, после синхронного кода."
+        }
+      ]
+    },
+    {
+      "id": "async-await-04",
+      "topicId": "async-await",
+      "title": "Последовательно и параллельно",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Каждый `await` ждёт, пока закончится предыдущий. Если запросы не зависят друг от друга, ждать их по очереди — лишняя трата времени."
+          },
+          {
+            "type": "code",
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function sequential() {\n  const a = await wait(1000, \"A\"); // 1 с\n  const b = await wait(1000, \"B\"); // ещё 1 с\n  return a + b; // всего ~2 с\n}"
+          },
+          {
+            "type": "text",
+            "text": "Чтобы запросы шли **параллельно**, запусти их сразу и дождись всех вместе через `Promise.all`. Займёт столько, сколько самый долгий."
+          },
+          {
+            "type": "code",
+            "code": "async function parallel() {\n  const [a, b] = await Promise.all([wait(1000, \"A\"), wait(1000, \"B\")]);\n  return a + b; // всего ~1 с\n}"
+          },
+          {
+            "type": "tip",
+            "text": "Промис начинает работу в момент создания, а не в момент `await`. Можно сначала создать оба промиса, а потом ждать их: `const pa = wait(...); const pb = wait(...);`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-await-04-q1",
+          "type": "trueFalse",
+          "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function main() {\n  await wait(300);\n  await wait(200);\n  console.log(\"готово\");\n}\nmain();",
+          "options": [
+            "«готово» выведется примерно через 300 мс",
+            "«готово» выведется примерно через 500 мс"
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Так было бы при параллельном запуске. Здесь второй wait вызывается только после окончания первого",
+            null
+          ],
+          "explanation": "Второй таймер создаётся только после того, как закончился первый await: 300 + 200 = 500 мс."
+        },
+        {
+          "id": "async-await-04-q2",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const [a, b] = await Promise.all([wait(300, \"A\"), wait(100, \"B\")]);\n  console.log(a, b);\n}\nmain();",
+          "options": ["A B", "B A", "[\"A\", \"B\"]", "A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Результаты Promise.all идут в порядке массива, а не по времени завершения",
+            "Деструктуризация разложила массив по переменным, а console.log(a, b) выводит два значения через пробел",
+            null
+          ],
+          "explanation": "Promise.all отдаёт результаты в порядке массива, а деструктуризация раскладывает их по переменным a и b."
+        },
+        {
+          "id": "async-await-04-q3",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const pa = wait(200, \"A\");\n  const pb = wait(200, \"B\");\n  console.log(await pa, await pb);\n}\nmain();\nsetTimeout(() => console.log(\"300 мс\"), 300);",
+          "options": ["A B 300 мс", "300 мс A B", "A 300 мс B", "B A 300 мс"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Промисы запущены одновременно, поэтому всё готово через 200 мс, а не через 400",
+            "console.log выполнится один раз, когда готовы оба значения",
+            "Аргументы вычисляются слева направо: сначала await pa"
+          ],
+          "explanation": "Оба таймера запускаются сразу при создании промисов. Пока ждём pa, pb тоже готовится, и через 200 мс готовы оба — раньше таймера на 300 мс."
+        },
+        {
+          "id": "async-await-04-q4",
+          "type": "fill",
+          "codeBefore": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  const results = await Promise.",
+          "codeAfter": "([wait(100, 1), wait(200, 2)]);\n  console.log(results); // [1, 2]\n}\nmain();",
+          "options": ["all", "race", "any", "resolve"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "race отдаст только результат первого завершившегося — 1",
+            "any отдаст только первый успешный результат — 1",
+            "Promise.resolve не ждёт промисы внутри массива: получится массив промисов"
+          ],
+          "explanation": "Promise.all ждёт все промисы и отдаёт массив их результатов."
+        },
+        {
+          "id": "async-await-04-q5",
+          "type": "order",
+          "lines": [
+            "async function showPosts() {",
+            "  const user = await getUser();",
+            "  const posts = await getPosts(user.id);",
+            "  console.log(posts);",
+            "}"
+          ],
+          "shuffled": [3, 0, 2, 4, 1],
+          "explanation": "Для getPosts нужен user.id, поэтому здесь запросы идут последовательно. Это тот случай, когда await по очереди оправдан."
+        }
+      ]
+    },
+    {
+      "id": "async-await-05",
+      "topicId": "async-await",
+      "title": "Закрепление: порядок с await",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Как разбирать порядок вывода: тело `async`-функции до первого `await` — обычный синхронный код. Всё после `await` продолжится, когда промис выполнится, — как микрозадача."
+          },
+          {
+            "type": "code",
+            "code": "async function f() {\n  console.log(\"2\");\n  await null;\n  console.log(\"4\");\n}\nconsole.log(\"1\");\nf();\nconsole.log(\"3\");\n// 1 2 3 4"
+          },
+          {
+            "type": "text",
+            "text": "Продолжение после `await` уже выполненного промиса — микрозадача, поэтому оно обгоняет `setTimeout(fn, 0)`. А если промис зависит от таймера, `await` ждёт этот таймер."
+          },
+          {
+            "type": "tip",
+            "text": "На `await` функция уступает управление: пока она ждёт, успевают выполниться код после её вызова и другие функции."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "async-await-05-q1",
+          "type": "output",
+          "code": "async function f() {\n  console.log(\"B\");\n  await null;\n  console.log(\"D\");\n}\nsetTimeout(() => console.log(\"E\"), 0);\nconsole.log(\"A\");\nf();\nconsole.log(\"C\");",
+          "options": ["A B C D E", "A B C E D", "A C B D E", "A B D C E"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Продолжение после await — микрозадача, а таймер — макрозадача: микрозадачи выполняются раньше",
+            "Тело f до первого await выполняется синхронно при вызове",
+            "На await функция f уступает управление коду после её вызова"
+          ],
+          "explanation": "Синхронно: A, B (тело f до await), C. Затем микрозадача — продолжение f: D. И только потом таймер E."
+        },
+        {
+          "id": "async-await-05-q2",
+          "type": "output",
+          "code": "async function a() {\n  console.log(\"a1\");\n  await null;\n  console.log(\"a2\");\n}\nasync function b() {\n  console.log(\"b1\");\n  await null;\n  console.log(\"b2\");\n}\na();\nb();",
+          "options": ["a1 b1 a2 b2", "a1 a2 b1 b2", "a1 b1 b2 a2", "b1 a1 b2 a2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "На await функция a уступает управление — b успевает начаться до продолжения a",
+            "Продолжение a встало в очередь микрозадач раньше, чем продолжение b",
+            "a вызывается первой и выводит a1 сразу"
+          ],
+          "explanation": "a выводит a1 и встаёт на паузу, b выводит b1 и тоже встаёт на паузу. Затем продолжения выполняются в том порядке, в каком встали в очередь: a2, b2."
+        },
+        {
+          "id": "async-await-05-q3",
+          "type": "trueFalse",
+          "code": "async function main() {\n  const value = await new Promise(resolve => {\n    setTimeout(() => resolve(\"таймер\"), 0);\n  });\n  console.log(value);\n}\nmain();\nPromise.resolve().then(() => console.log(\"микро\"));",
+          "options": [
+            "Сначала выведет «таймер», потом «микро»",
+            "Сначала выведет «микро», потом «таймер»"
+          ],
+          "correct": 1,
+          "explanation": "main ждёт промис, который выполнится только в колбэке таймера — макрозадаче. А «микро» — микрозадача, она выполняется раньше."
+        },
+        {
+          "id": "async-await-05-q4",
+          "type": "output",
+          "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  for (const ms of [300, 100]) {\n    const v = await wait(ms, ms);\n    console.log(v);\n  }\n  console.log(\"конец\");\n}\nmain();\nconsole.log(\"старт\");",
+          "options": [
+            "старт 300 100 конец",
+            "старт 100 300 конец",
+            "300 100 конец старт",
+            "старт конец 300 100"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "await внутри цикла ждёт каждый промис по очереди: таймер на 100 мс создаётся только после того, как закончился первый",
+            "На первом await main уступает управление — «старт» выводится сразу",
+            "Цикл с await внутри ждёт каждую итерацию, и только потом идёт к «конец»"
+          ],
+          "explanation": "Цикл ждёт каждый промис по очереди. Таймер на 100 мс создаётся только после того, как закончился первый, поэтому 300 выводится раньше."
+        },
+        {
+          "id": "async-await-05-q5",
+          "type": "fill",
+          "codeBefore": "async function f() {\n  console.log(\"1\");\n  ",
+          "codeAfter": ";\n  console.log(\"3\");\n}\nf();\nconsole.log(\"2\");\n// Вывод: 1 2 3",
+          "options": ["await null", "return", "null", "Promise.resolve()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "return завершит f, и «3» не выведется вообще",
+            "Обычное выражение не прерывает функцию: выведется 1 3 2",
+            "Без await промис просто создаётся, и функция идёт дальше синхронно: 1 3 2"
+          ],
+          "explanation": "await даже на обычном значении ставит функцию на паузу: «2» выводится раньше, чем f продолжит работу."
+        }
+      ]
+    }
+  ]
+}
