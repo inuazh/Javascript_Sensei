@@ -276,6 +276,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "data",
+      "title": "JSON и данные",
+      "icon": "{}",
+      "color": "#FFFFFF",
+      "order": 23,
+      "description": "Как сохранять данные в JSON, считать без потери точности и перекладывать массивы и объекты.",
+      "topics": [
+        {
+          "id": "json",
+          "title": "JSON",
+          "subtitle": "stringify, parse и их ловушки",
+          "order": 0
+        },
+        {
+          "id": "numbers-math",
+          "title": "Числа и Math",
+          "subtitle": "округление, toFixed, точность",
+          "order": 1
+        },
+        {
+          "id": "data-transform",
+          "title": "Преобразование данных",
+          "subtitle": "группировка, нормализация, сортировка",
+          "order": 2
+        }
+      ]
     }
   ]
 }

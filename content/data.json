@@ -1,0 +1,1568 @@
+{
+  "lessons": [
+    {
+      "id": "json-01",
+      "topicId": "json",
+      "title": "JSON.stringify",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**JSON** — текстовый формат обмена данными. `JSON.stringify` превращает значение в **строку**: ключи и строки в двойных кавычках, без лишних пробелов."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", age: 25, tags: [\"js\"] };\nconst json = JSON.stringify(user);\nconsole.log(json);        // {\"name\":\"Аня\",\"age\":25,\"tags\":[\"js\"]}\nconsole.log(typeof json); // string"
+          },
+          {
+            "type": "text",
+            "text": "Примитивы тоже сериализуются. Строка получает кавычки **внутри** результата, а числа, `true` и `null` остаются как есть."
+          },
+          {
+            "type": "code",
+            "code": "console.log(JSON.stringify(\"hi\")); // \"hi\"\nconsole.log(JSON.stringify(42));   // 42\nconsole.log(JSON.stringify(null)); // null"
+          },
+          {
+            "type": "warning",
+            "text": "Результат — строка, а не объект. У строки нет твоих полей: `json.name` даст `undefined`. Чтобы снова получить объект, нужен `JSON.parse`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "json-01-q1",
+          "type": "output",
+          "code": "console.log(JSON.stringify({ x: 1, y: \"2\" }));",
+          "options": [
+            "{\"x\":1,\"y\":\"2\"}",
+            "{\"x\":1,\"y\":2}",
+            "{ x: 1, y: \"2\" }",
+            "{\"x\":\"1\",\"y\":\"2\"}"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка \"2\" остаётся строкой и в JSON записывается в кавычках",
+            "Так console.log печатает объект, а stringify возвращает строку JSON: ключи в двойных кавычках",
+            "Числа в JSON пишутся без кавычек"
+          ],
+          "explanation": "stringify сохраняет типы: число 1 пишется как есть, строка \"2\" — в двойных кавычках. Ключи тоже всегда в двойных кавычках."
+        },
+        {
+          "id": "json-01-q2",
+          "type": "output",
+          "code": "const s = JSON.stringify({ a: 1 });\nconsole.log(typeof s, s.a);",
+          "options": ["string undefined", "object 1", "string 1", "object undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "stringify возвращает строку, а не объект",
+            "s — строка '{\"a\":1}', свойства a у неё нет",
+            "typeof строки — \"string\""
+          ],
+          "explanation": "JSON.stringify возвращает строку. У строки нет свойства a, поэтому s.a — undefined."
+        },
+        {
+          "id": "json-01-q3",
+          "type": "trueFalse",
+          "code": "console.log(JSON.stringify(\"ок\") === \"ок\");",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": ["stringify строки добавляет кавычки внутрь результата", null],
+          "explanation": "JSON.stringify(\"ок\") — это строка из четырёх символов \"ок\" вместе с кавычками, поэтому с \"ок\" она не совпадает."
+        },
+        {
+          "id": "json-01-q4",
+          "type": "fill",
+          "codeBefore": "const data = { id: 7 };\nconst text = ",
+          "codeAfter": "(data);\nconsole.log(text); // {\"id\":7}",
+          "options": ["JSON.stringify", "String", "JSON.parse", "Object.entries"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "String(объект) даёт \"[object Object]\"",
+            "parse разбирает строку, а не объект: объект превратится в \"[object Object]\" и будет SyntaxError",
+            "Object.entries вернёт массив пар [[\"id\", 7]], а не строку JSON"
+          ],
+          "explanation": "Объект в строку JSON превращает JSON.stringify. String вызывает toString и теряет содержимое объекта."
+        },
+        {
+          "id": "json-01-q5",
+          "type": "output",
+          "code": "console.log(JSON.stringify([1, \"a\", true, null]));",
+          "options": [
+            "[1,\"a\",true,null]",
+            "[\"1\",\"a\",\"true\",\"null\"]",
+            "[1,a,true,null]",
+            "[1,\"a\",\"true\",null]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Числа, true и null в JSON пишутся без кавычек",
+            "Строки в JSON всегда в двойных кавычках",
+            "true — логическое значение, кавычки ему не нужны"
+          ],
+          "explanation": "Массив превращается в JSON-массив: строки в кавычках, числа, true и null — без них."
+        }
+      ]
+    },
+    {
+      "id": "json-02",
+      "topicId": "json",
+      "title": "Что теряется при stringify",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "JSON знает только объекты, массивы, строки, числа, `true`/`false` и `null`. Остальное `stringify` выбрасывает или подменяет."
+          },
+          {
+            "type": "code",
+            "code": "const data = {\n  a: undefined,\n  f() {},\n  s: Symbol(\"id\"),\n  n: NaN,\n  inf: Infinity,\n};\nconsole.log(JSON.stringify(data)); // {\"n\":null,\"inf\":null}"
+          },
+          {
+            "type": "text",
+            "text": "Из **массива** элемент выбросить нельзя — съедут индексы. Поэтому `undefined`, функции и `Symbol` там становятся `null`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(JSON.stringify([undefined, () => 1, NaN])); // [null,null,null]"
+          },
+          {
+            "type": "text",
+            "text": "`Date` превращается в строку ISO, а `Map` и `Set` — в пустой объект `{}`: их содержимое не лежит в обычных свойствах."
+          },
+          {
+            "type": "code",
+            "code": "const day = new Date(Date.UTC(2024, 0, 15));\nconsole.log(JSON.stringify({ day })); // {\"day\":\"2024-01-15T00:00:00.000Z\"}\nconsole.log(JSON.stringify(new Map([[\"a\", 1]]))); // {}"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "json-02-q1",
+          "type": "output",
+          "code": "console.log(JSON.stringify({ name: \"Ёж\", age: undefined, greet() {} }));",
+          "options": [
+            "{\"name\":\"Ёж\"}",
+            "{\"name\":\"Ёж\",\"age\":undefined}",
+            "{\"name\":\"Ёж\",\"age\":null}",
+            "{\"name\":\"Ёж\",\"age\":null,\"greet\":null}"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В JSON нет значения undefined",
+            "В null превращается undefined внутри массива, а свойство объекта просто пропадает",
+            "Свойства-функции и undefined в объекте выбрасываются, а не заменяются на null"
+          ],
+          "explanation": "Свойства со значением undefined и методы не попадают в JSON: stringify их пропускает."
+        },
+        {
+          "id": "json-02-q2",
+          "type": "output",
+          "code": "console.log(JSON.stringify([1, undefined, 3]));",
+          "options": ["[1,null,3]", "[1,3]", "[1,undefined,3]", "[1,,3]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Элемент нельзя выбросить: индекс 3 сдвинулся бы на место 1",
+            "В JSON нет undefined",
+            "Пропуски в JSON недопустимы"
+          ],
+          "explanation": "В массиве позиции важны, поэтому undefined не выбрасывается, а заменяется на null."
+        },
+        {
+          "id": "json-02-q3",
+          "type": "output",
+          "code": "console.log(JSON.stringify({ score: NaN, max: Infinity }));",
+          "options": [
+            "{\"score\":null,\"max\":null}",
+            "{\"score\":\"NaN\",\"max\":\"Infinity\"}",
+            "{\"score\":NaN,\"max\":Infinity}",
+            "{}"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "stringify не превращает их в строки",
+            "В JSON нет NaN и Infinity",
+            "Свойства не пропадают: это числа, хоть и особые"
+          ],
+          "explanation": "NaN и Infinity — числа, но в JSON их записать нельзя, поэтому stringify пишет вместо них null."
+        },
+        {
+          "id": "json-02-q4",
+          "type": "trueFalse",
+          "code": "const tags = new Set([\"js\", \"json\"]);\nconsole.log(JSON.stringify({ tags }));",
+          "options": ["Выведет {\"tags\":[\"js\",\"json\"]}", "Выведет {\"tags\":{}}"],
+          "correct": 1,
+          "optionExplanations": [
+            "Set не превращается в массив сам: stringify смотрит только на обычные свойства",
+            null
+          ],
+          "explanation": "У Set нет перечисляемых собственных свойств, поэтому он сериализуется как {}. Сначала преобразуй его: [...tags]."
+        },
+        {
+          "id": "json-02-q5",
+          "type": "findBug",
+          "code": "const cart = new Map();\ncart.set(\"apple\", 2);\ncart.set(\"pear\", 1);\nconst saved = JSON.stringify(cart);\nconsole.log(saved); // ждём {\"apple\":2,\"pear\":1}",
+          "bugLine": 4,
+          "fixed": "const cart = new Map();\ncart.set(\"apple\", 2);\ncart.set(\"pear\", 1);\nconst saved = JSON.stringify(Object.fromEntries(cart));\nconsole.log(saved); // {\"apple\":2,\"pear\":1}",
+          "explanation": "`Map` хранит пары не в свойствах, поэтому `JSON.stringify(cart)` даёт `{}`. Сначала преврати его в обычный объект: `Object.fromEntries(cart)`."
+        }
+      ]
+    },
+    {
+      "id": "json-03",
+      "topicId": "json",
+      "title": "replacer, space и toJSON",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Второй аргумент `stringify` — **replacer**. Массив ключей оставит только их. Функция `(key, value)` может подменить значение, а если вернёт `undefined`, свойство выпадет."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", password: \"123\", age: 25 };\nconsole.log(JSON.stringify(user, [\"name\", \"age\"])); // {\"name\":\"Аня\",\"age\":25}\nconst safe = JSON.stringify(user, (key, value) =>\n  key === \"password\" ? undefined : value\n);\nconsole.log(safe); // {\"name\":\"Аня\",\"age\":25}"
+          },
+          {
+            "type": "text",
+            "text": "Третий аргумент — **space**, отступ для читаемого вывода. Данные от него не меняются, только пробелы и переносы."
+          },
+          {
+            "type": "code",
+            "code": "console.log(JSON.stringify({ a: 1 }, null, 2));\n// {\n//   \"a\": 1\n// }"
+          },
+          {
+            "type": "text",
+            "text": "Если у объекта есть метод `toJSON`, `stringify` запишет то, что он вернёт. Так работает и `Date`."
+          },
+          {
+            "type": "code",
+            "code": "const money = {\n  amount: 500,\n  toJSON() {\n    return this.amount + \" ₽\";\n  },\n};\nconsole.log(JSON.stringify({ price: money })); // {\"price\":\"500 ₽\"}"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "json-03-q1",
+          "type": "output",
+          "code": "const book = { id: 1, title: \"Книга\", price: 300 };\nconsole.log(JSON.stringify(book, [\"id\", \"price\"]));",
+          "options": [
+            "{\"id\":1,\"price\":300}",
+            "{\"title\":\"Книга\"}",
+            "{\"id\":1,\"title\":\"Книга\",\"price\":300}",
+            "[\"id\",\"price\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Массив перечисляет ключи, которые нужно оставить, а не убрать",
+            "replacer-массив отбрасывает все ключи, которых в нём нет",
+            "Сериализуется объект, а массив лишь фильтрует его ключи"
+          ],
+          "explanation": "Массив во втором аргументе — белый список: в JSON попадут только id и price."
+        },
+        {
+          "id": "json-03-q2",
+          "type": "output",
+          "code": "const r = JSON.stringify({ a: 1, b: \"x\", c: 3 }, (key, value) =>\n  typeof value === \"number\" ? value * 10 : value\n);\nconsole.log(r);",
+          "options": [
+            "{\"a\":10,\"b\":\"x\",\"c\":30}",
+            "{\"a\":1,\"b\":\"x\",\"c\":3}",
+            "{\"a\":10,\"c\":30}",
+            "{\"a\":\"10\",\"b\":\"x\",\"c\":\"30\"}"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "replacer вызывается для каждого значения, и его результат попадает в JSON",
+            "Для строки функция вернула value как есть, свойство не пропадает",
+            "value * 10 — число, в кавычки оно не попадёт"
+          ],
+          "explanation": "Функция-replacer вызывается для каждого свойства: числа умножаются на 10, строка возвращается без изменений."
+        },
+        {
+          "id": "json-03-q3",
+          "type": "fill",
+          "codeBefore": "const user = { login: \"ann\", password: \"qwerty\" };\nconst json = JSON.stringify(user, (key, value) =>\n  key === \"password\" ? ",
+          "codeAfter": " : value\n);\nconsole.log(json); // {\"login\":\"ann\"}",
+          "options": ["undefined", "null", "\"\"", "false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "null — обычное значение JSON: получится \"password\":null",
+            "Пустая строка останется в JSON: \"password\":\"\"",
+            "false тоже валидное значение JSON: \"password\":false"
+          ],
+          "explanation": "Только undefined убирает свойство из результата. Любое другое значение будет записано в JSON."
+        },
+        {
+          "id": "json-03-q4",
+          "type": "output",
+          "code": "const temp = {\n  value: 21.5,\n  toJSON() {\n    return `${this.value}°C`;\n  },\n};\nconsole.log(JSON.stringify({ temp }));",
+          "options": [
+            "{\"temp\":\"21.5°C\"}",
+            "{\"temp\":{\"value\":21.5}}",
+            "{\"temp\":{\"value\":21.5,\"toJSON\":null}}",
+            "{\"temp\":\"21.5\"}"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Когда есть toJSON, stringify сериализует его результат, а не сам объект",
+            "Методы в JSON не попадают, а здесь вместо объекта и вовсе берётся результат toJSON",
+            "toJSON вернул строку вместе с °C"
+          ],
+          "explanation": "stringify видит метод toJSON и записывает то, что он вернул, — строку \"21.5°C\"."
+        },
+        {
+          "id": "json-03-q5",
+          "type": "trueFalse",
+          "code": "const obj = { a: 1, b: [2, 3] };\nconst pretty = JSON.stringify(obj, null, 2);\nconst back = JSON.stringify(JSON.parse(pretty));\nconsole.log(back === JSON.stringify(obj));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "space добавляет только пробелы и переносы, данные остаются те же"
+          ],
+          "explanation": "Отступы — лишь оформление. После parse получается тот же объект, и его компактный JSON совпадает с исходным."
+        }
+      ]
+    },
+    {
+      "id": "json-04",
+      "topicId": "json",
+      "title": "JSON.parse и reviver",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`JSON.parse` делает обратное: из строки получает значение. JSON строже JavaScript: ключи и строки только в **двойных** кавычках, без висячих запятых и комментариев."
+          },
+          {
+            "type": "code",
+            "code": "const profile = JSON.parse('{\"name\":\"Аня\",\"langs\":[\"js\"]}');\nconsole.log(profile.langs[0]); // js"
+          },
+          {
+            "type": "text",
+            "text": "Невалидная строка — `SyntaxError`. Если данные пришли извне, оборачивай `parse` в `try...catch`."
+          },
+          {
+            "type": "code",
+            "code": "try {\n  JSON.parse(\"{'a': 1}\");\n} catch (e) {\n  console.log(e.name); // SyntaxError\n}"
+          },
+          {
+            "type": "text",
+            "text": "Второй аргумент — **reviver** `(key, value)`. Он вызывается для каждого значения, и в результат попадает то, что он вернёт. Вернёт `undefined` — свойство удалится."
+          },
+          {
+            "type": "code",
+            "code": "const json = '{\"title\":\"Релиз\",\"at\":\"2024-03-01T00:00:00.000Z\"}';\nconst release = JSON.parse(json, (key, value) =>\n  key === \"at\" ? new Date(value) : value\n);\nconsole.log(release.at.getUTCFullYear()); // 2024"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "json-04-q1",
+          "type": "output",
+          "code": "const data = JSON.parse('{\"count\":\"5\"}');\nconsole.log(data.count + 1);",
+          "options": ["51", "6", "NaN", "SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "\"5\" в JSON записано в кавычках, значит это строка, а не число",
+            "Строка + число — это склейка строк, а не NaN",
+            "JSON валидный: ключ и строка в двойных кавычках"
+          ],
+          "explanation": "parse сохраняет типы из JSON: \"5\" — строка, поэтому + 1 склеивает строки."
+        },
+        {
+          "id": "json-04-q2",
+          "type": "output",
+          "code": "console.log(JSON.parse(\"[1, 2, 3,]\"));",
+          "options": ["SyntaxError", "[1, 2, 3]", "[1, 2, 3, undefined]", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В JavaScript висячая запятая разрешена, а в JSON — нет",
+            "В JSON нет undefined и пустых элементов",
+            "Ошибки разбора JSON — это SyntaxError"
+          ],
+          "explanation": "JSON строже JavaScript: висячая запятая недопустима, и parse бросает SyntaxError."
+        },
+        {
+          "id": "json-04-q3",
+          "type": "trueFalse",
+          "code": "console.log(JSON.parse(\"true\") === true);",
+          "options": ["Выведет true", "Вызовет SyntaxError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "JSON-текстом может быть и отдельный примитив: true, 42, \"строка\", null"
+          ],
+          "explanation": "Строка \"true\" — валидный JSON, parse превращает её в логическое true."
+        },
+        {
+          "id": "json-04-q4",
+          "type": "findBug",
+          "code": "const raw = '{\"items\":[1,2,3]}';\nconst data = JSON.stringify(raw);\nconsole.log(data.items.length); // ждём 3",
+          "bugLine": 2,
+          "fixed": "const raw = '{\"items\":[1,2,3]}';\nconst data = JSON.parse(raw);\nconsole.log(data.items.length); // 3",
+          "explanation": "Строку разбирает `JSON.parse`. `stringify` превратил её в ещё одну строку, у которой нет `items`, поэтому `data.items.length` — `TypeError`."
+        },
+        {
+          "id": "json-04-q5",
+          "type": "output",
+          "code": "const json = '{\"a\":1,\"b\":2,\"c\":3}';\nconst obj = JSON.parse(json, (key, value) =>\n  key === \"b\" ? undefined : value\n);\nconsole.log(obj);",
+          "options": [
+            "{ a: 1, c: 3 }",
+            "{ a: 1, b: undefined, c: 3 }",
+            "{ a: 1, b: 2, c: 3 }",
+            "undefined"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Если reviver вернул undefined, свойство удаляется, а не остаётся с undefined",
+            "Результат reviver заменяет значение, он не просто наблюдает",
+            "Для корневого объекта key — пустая строка, а не \"b\", поэтому объект возвращается"
+          ],
+          "explanation": "reviver вернул undefined для ключа b, поэтому parse удалил это свойство. Остальные значения вернулись как есть."
+        }
+      ]
+    },
+    {
+      "id": "json-05",
+      "topicId": "json",
+      "title": "Глубокая копия через JSON",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`JSON.parse(JSON.stringify(obj))` — старый способ сделать **глубокую копию**: вложенные объекты тоже создаются заново, а не делятся по ссылке."
+          },
+          {
+            "type": "code",
+            "code": "const original = { user: { name: \"Аня\" } };\nconst copy = JSON.parse(JSON.stringify(original));\ncopy.user.name = \"Боб\";\nconsole.log(original.user.name); // Аня"
+          },
+          {
+            "type": "warning",
+            "text": "Копия наследует все потери `stringify`: пропадают `undefined` и функции, `Date` становится строкой, `Map` и `Set` — пустыми объектами, `NaN` — `null`."
+          },
+          {
+            "type": "code",
+            "code": "const src = { at: new Date(Date.UTC(2024, 0, 1)), fn() {}, tags: new Set([\"a\"]) };\nconst clone = JSON.parse(JSON.stringify(src));\nconsole.log(typeof clone.at, clone.fn, clone.tags); // string undefined {}"
+          },
+          {
+            "type": "text",
+            "text": "Объект с циклической ссылкой `stringify` не сериализует вовсе — будет `TypeError`. Для таких данных в браузере есть `structuredClone`."
+          },
+          {
+            "type": "code",
+            "code": "const node = { name: \"a\" };\nnode.self = node;\nJSON.stringify(node); // TypeError"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "json-05-q1",
+          "type": "output",
+          "code": "const a = { list: [1, 2] };\nconst b = { ...a };\nconst c = JSON.parse(JSON.stringify(a));\na.list.push(3);\nconsole.log(b.list.length, c.list.length);",
+          "options": ["3 2", "2 2", "3 3", "2 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread копирует только верхний уровень: b.list — тот же массив, что a.list",
+            "Через JSON создаётся новый массив, push в a.list его не трогает",
+            null
+          ],
+          "explanation": "Spread — поверхностная копия, b.list и a.list — один массив. Копия через JSON глубокая, у c свой массив."
+        },
+        {
+          "id": "json-05-q2",
+          "type": "output",
+          "code": "const event = { title: \"Митап\", at: new Date(Date.UTC(2024, 4, 20)) };\nconst copy = JSON.parse(JSON.stringify(event));\nconsole.log(typeof copy.at);",
+          "options": ["string", "object", "undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "parse не знает, что строка была датой: без reviver она остаётся строкой",
+            "Дата не пропадает, а превращается в строку ISO",
+            "Ошибки нет: Date сериализуется через toJSON"
+          ],
+          "explanation": "stringify превратил Date в строку ISO, а parse оставил её строкой. Это главная ловушка копирования через JSON."
+        },
+        {
+          "id": "json-05-q3",
+          "type": "output",
+          "code": "const settings = { volume: 0.8, mute: undefined, onChange() {} };\nconst copy = JSON.parse(JSON.stringify(settings));\nconsole.log(Object.keys(copy));",
+          "options": [
+            "[\"volume\"]",
+            "[\"volume\", \"mute\", \"onChange\"]",
+            "[\"volume\", \"mute\"]",
+            "[]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "undefined и функции stringify выбрасывает, в копию они не попадут",
+            "Свойство со значением undefined в JSON тоже не попадает",
+            "volume — обычное число, оно сохранится"
+          ],
+          "explanation": "В копию через JSON попадает только то, что JSON умеет хранить. mute и onChange потерялись."
+        },
+        {
+          "id": "json-05-q4",
+          "type": "order",
+          "title": "Собери функцию: разбирает JSON, а при ошибке возвращает fallback",
+          "lines": [
+            "function safeParse(text, fallback) {",
+            "  try { return JSON.parse(text); }",
+            "  catch { return fallback; }",
+            "}"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "parse пробуем внутри try: если строка невалидна, он бросит SyntaxError, и catch вернёт значение по умолчанию."
+        },
+        {
+          "id": "json-05-q5",
+          "type": "trueFalse",
+          "code": "const room = { name: \"Кухня\" };\nroom.self = room;\nconst copy = JSON.parse(JSON.stringify(room));\nconsole.log(copy.name);",
+          "options": ["Выведет Кухня", "Вызовет TypeError"],
+          "correct": 1,
+          "optionExplanations": ["До console.log дело не дойдёт: room ссылается сам на себя", null],
+          "explanation": "У room циклическая ссылка, и stringify бросает TypeError. Такой объект через JSON не скопировать."
+        }
+      ]
+    },
+    {
+      "id": "numbers-math-01",
+      "topicId": "numbers-math",
+      "title": "Округление",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Четыре способа округлить до целого: `floor` — вниз, `ceil` — вверх, `trunc` — отбросить дробную часть, `round` — к ближайшему."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Math.floor(2.7)); // 2\nconsole.log(Math.ceil(2.1));  // 3\nconsole.log(Math.trunc(2.7)); // 2\nconsole.log(Math.round(2.5)); // 3"
+          },
+          {
+            "type": "text",
+            "text": "С отрицательными числами `floor` и `trunc` расходятся: «вниз» — это дальше от нуля, а `trunc` просто отрезает дробь."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Math.floor(-2.7)); // -3\nconsole.log(Math.trunc(-2.7)); // -2\nconsole.log(Math.ceil(-2.7));  // -2"
+          },
+          {
+            "type": "warning",
+            "text": "`Math.round` округляет половинки **вверх**, к плюс бесконечности: `Math.round(-2.5)` — это `-2`, а не `-3`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "numbers-math-01-q1",
+          "type": "output",
+          "code": "console.log(Math.floor(4.9), Math.ceil(4.1));",
+          "options": ["4 5", "5 4", "4 4", "5 5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "floor округляет вниз, ceil — вверх, а не к ближайшему",
+            "ceil всегда округляет вверх, 4.1 → 5",
+            "floor всегда округляет вниз, 4.9 → 4"
+          ],
+          "explanation": "floor отбрасывает до меньшего целого, ceil поднимает до большего, независимо от дробной части."
+        },
+        {
+          "id": "numbers-math-01-q2",
+          "type": "output",
+          "code": "console.log(Math.floor(-1.5), Math.trunc(-1.5));",
+          "options": ["-2 -1", "-1 -1", "-2 -2", "-1 -2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для отрицательных floor идёт вниз, то есть дальше от нуля: -2",
+            "trunc не округляет вниз, а отрезает дробную часть: -1",
+            null
+          ],
+          "explanation": "floor(-1.5) идёт к меньшему числу, это -2. trunc просто отбрасывает .5, остаётся -1."
+        },
+        {
+          "id": "numbers-math-01-q3",
+          "type": "output",
+          "code": "console.log(Math.round(-3.5));",
+          "options": ["-3", "-4", "-3.5", "3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Половинки round округляет к плюс бесконечности, а не от нуля",
+            "round всегда возвращает целое",
+            "Знак round не меняет"
+          ],
+          "explanation": "Math.round округляет .5 вверх по числовой оси: из -3.5 получается -3."
+        },
+        {
+          "id": "numbers-math-01-q4",
+          "type": "fill",
+          "codeBefore": "const items = 41;\nconst perPage = 10;\nconst pages = ",
+          "codeAfter": "(items / perPage);\nconsole.log(pages); // 5",
+          "options": ["Math.ceil", "Math.round", "Math.floor", "Math.trunc"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "round(4.1) — это 4: последний неполный лист потеряется",
+            "floor(4.1) — 4, последнему элементу не хватит страницы",
+            "trunc(4.1) — тоже 4"
+          ],
+          "explanation": "Неполная страница всё равно нужна, поэтому округляем вверх: ceil(4.1) = 5."
+        },
+        {
+          "id": "numbers-math-01-q5",
+          "type": "trueFalse",
+          "code": "console.log(Math.trunc(-0.5) === Math.floor(-0.5));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": ["Для отрицательных дробей floor уходит дальше от нуля", null],
+          "explanation": "trunc(-0.5) отрезает дробь и даёт -0 (то есть 0), а floor(-0.5) округляет вниз до -1."
+        }
+      ]
+    },
+    {
+      "id": "numbers-math-02",
+      "topicId": "numbers-math",
+      "title": "toFixed",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`toFixed(n)` округляет до `n` знаков после запятой и возвращает **строку**. Это формат для показа, а не число для вычислений."
+          },
+          {
+            "type": "code",
+            "code": "const price = 9.5;\nconst text = price.toFixed(2);\nconsole.log(text);        // 9.50\nconsole.log(typeof text); // string\nconsole.log(text + 1);    // 9.501"
+          },
+          {
+            "type": "text",
+            "text": "Нужно число — оберни результат в `Number` или округли через `Math.round`: умножь, округли, раздели."
+          },
+          {
+            "type": "code",
+            "code": "const pi = 3.14159;\nconsole.log(Number(pi.toFixed(2)));        // 3.14\nconsole.log(Math.round(pi * 100) / 100); // 3.14"
+          },
+          {
+            "type": "warning",
+            "text": "Дроби хранятся в двоичном виде неточно: `1.005` на самом деле чуть меньше, поэтому `(1.005).toFixed(2)` — это `\"1.00\"`, а не `\"1.01\"`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "numbers-math-02-q1",
+          "type": "output",
+          "code": "const total = (19.999).toFixed(2);\nconsole.log(total, typeof total);",
+          "options": ["20.00 string", "19.99 string", "20 number", "20.00 number"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "toFixed округляет, а не отрезает лишние знаки",
+            "toFixed возвращает строку и сохраняет нули",
+            "Результат toFixed — строка"
+          ],
+          "explanation": "19.999 округляется до 20.00, и toFixed возвращает это как строку \"20.00\"."
+        },
+        {
+          "id": "numbers-math-02-q2",
+          "type": "output",
+          "code": "const a = (1.5).toFixed(1);\nconst b = (2.5).toFixed(1);\nconsole.log(a + b);",
+          "options": ["1.52.5", "4", "4.0", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "a и b — строки, + их склеивает",
+            "Сложения чисел не будет: обе части — строки",
+            "Строки склеиваются, NaN не возникает"
+          ],
+          "explanation": "toFixed возвращает строки, поэтому + склеивает \"1.5\" и \"2.5\"."
+        },
+        {
+          "id": "numbers-math-02-q3",
+          "type": "fill",
+          "codeBefore": "const raw = 2.71828;\nconst rounded = ",
+          "codeAfter": ";\nconsole.log(rounded + 1); // 3.72",
+          "options": [
+            "Number(raw.toFixed(2))",
+            "raw.toFixed(2)",
+            "Math.round(raw)",
+            "Math.round(raw * 100)"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это строка \"2.72\", и + 1 даст \"2.721\"",
+            "round округляет до целого: 3 + 1 = 4",
+            "Не хватает деления на 100: получится 272 + 1"
+          ],
+          "explanation": "toFixed(2) даёт строку \"2.72\", Number превращает её обратно в число, и сложение работает как ожидается."
+        },
+        {
+          "id": "numbers-math-02-q4",
+          "type": "trueFalse",
+          "code": "console.log((1.005).toFixed(2));",
+          "options": ["Выведет 1.01", "Выведет 1.00"],
+          "correct": 1,
+          "optionExplanations": ["1.005 хранится как 1.00499999…, поэтому округляется вниз", null],
+          "explanation": "В двоичном виде 1.005 чуть меньше, чем выглядит, и toFixed честно округляет его вниз до \"1.00\"."
+        },
+        {
+          "id": "numbers-math-02-q5",
+          "type": "output",
+          "code": "const n = 7;\nconsole.log(n.toFixed(2), Math.round(7.456 * 100) / 100);",
+          "options": ["7.00 7.46", "7 7.46", "7.00 7.45", "7.00 7.456"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "toFixed(2) всегда даёт два знака после точки, дописывая нули",
+            "Math.round округляет к ближайшему: 745.6 → 746",
+            "После деления на 100 остаётся два знака"
+          ],
+          "explanation": "toFixed дописывает нули до нужного количества знаков. Приём с Math.round: 745.6 → 746 → 7.46."
+        }
+      ]
+    },
+    {
+      "id": "numbers-math-03",
+      "topicId": "numbers-math",
+      "title": "Точность: 0.1 + 0.2",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Числа в JS — двоичные дроби. `0.1` и `0.2` нельзя записать точно, и при сложении маленькие ошибки накапливаются."
+          },
+          {
+            "type": "code",
+            "code": "console.log(0.1 + 0.2);         // 0.30000000000000004\nconsole.log(0.1 + 0.2 === 0.3); // false"
+          },
+          {
+            "type": "text",
+            "text": "Дробные результаты сравнивай с допуском: если разница меньше `Number.EPSILON`, числа считаются равными."
+          },
+          {
+            "type": "code",
+            "code": "function nearlyEqual(a, b) {\n  return Math.abs(a - b) < Number.EPSILON;\n}\nconsole.log(nearlyEqual(0.1 + 0.2, 0.3)); // true"
+          },
+          {
+            "type": "warning",
+            "text": "`Number.EPSILON` годится для чисел порядка единицы. Для больших значений бери допуск побольше, например `1e-9`."
+          },
+          {
+            "type": "tip",
+            "text": "Деньги храни в целых копейках: `1999` вместо `19.99`. Целые числа складываются точно."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "numbers-math-03-q1",
+          "type": "output",
+          "code": "console.log(0.1 + 0.2 === 0.3, 0.5 + 0.25 === 0.75);",
+          "options": ["false true", "false false", "true true", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0.5 и 0.25 — степени двойки, они хранятся точно",
+            "0.1 + 0.2 даёт 0.30000000000000004",
+            null
+          ],
+          "explanation": "0.1 и 0.2 в двоичном виде бесконечные дроби, а 0.5 и 0.25 записываются точно, поэтому их сумма ровно 0.75."
+        },
+        {
+          "id": "numbers-math-03-q2",
+          "type": "output",
+          "code": "console.log(0.1 * 3);",
+          "options": ["0.30000000000000004", "0.3", "0.30000000000000003", "0.29999999999999999"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0.1 хранится неточно, и умножение эту ошибку сохраняет",
+            null,
+            null
+          ],
+          "explanation": "Ошибка представления 0.1 не исчезает при умножении: получается то же, что 0.1 + 0.1 + 0.1."
+        },
+        {
+          "id": "numbers-math-03-q3",
+          "type": "fill",
+          "codeBefore": "function nearlyEqual(a, b) {\n  return ",
+          "codeAfter": " < Number.EPSILON;\n}\nconsole.log(nearlyEqual(0.1 + 0.2, 0.3)); // true\nconsole.log(nearlyEqual(1, 2)); // false\nconsole.log(nearlyEqual(2, 1)); // false",
+          "options": ["Math.abs(a - b)", "a - b", "b - a", "Math.abs(a) - Math.abs(b)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для (1, 2) разница -1 меньше EPSILON, и получится true",
+            "Для (2, 1) разница -1 меньше EPSILON, и получится true",
+            "Для (1, 2) это тоже -1: нужен модуль разницы"
+          ],
+          "explanation": "Сравнивать нужно расстояние между числами, а оно не бывает отрицательным: Math.abs(a - b)."
+        },
+        {
+          "id": "numbers-math-03-q4",
+          "type": "output",
+          "code": "let cents = 0;\nfor (let i = 0; i < 3; i++) cents += 10;\nconsole.log(cents / 100);",
+          "options": ["0.3", "0.30000000000000004", "30", "0.03"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Складывались целые 10, а 30 / 100 даёт ближайшее к 0.3 число",
+            "Сумма делится на 100",
+            "30 / 100 — это 0.3"
+          ],
+          "explanation": "Целые складываются точно: получается ровно 30. Одно деление в конце даёт 0.3 без накопленной ошибки."
+        },
+        {
+          "id": "numbers-math-03-q5",
+          "type": "trueFalse",
+          "code": "let total = 0;\nfor (let i = 0; i < 10; i++) total += 0.1;\nconsole.log(total === 1);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": ["Десять раз прибавить 0.1 — это 0.9999999999999999, а не 1", null],
+          "explanation": "Каждое сложение 0.1 добавляет маленькую ошибку, и в сумме получается 0.9999999999999999."
+        }
+      ]
+    },
+    {
+      "id": "numbers-math-04",
+      "topicId": "numbers-math",
+      "title": "Целые числа и парсинг",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Number.isInteger` проверяет, что значение — число без дробной части. Строки он не приводит: `\"5\"` — это строка, а не целое."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Number.isInteger(5.0)); // true\nconsole.log(Number.isInteger(5.5)); // false\nconsole.log(Number.isInteger(\"5\")); // false"
+          },
+          {
+            "type": "text",
+            "text": "Точно хранятся только целые до `Number.MAX_SAFE_INTEGER` (2^53 − 1). Дальше соседние числа сливаются. `Number.isSafeInteger` это проверит."
+          },
+          {
+            "type": "code",
+            "code": "const max = Number.MAX_SAFE_INTEGER;\nconsole.log(max + 1 === max + 2);         // true\nconsole.log(Number.isSafeInteger(max));     // true\nconsole.log(Number.isSafeInteger(max + 1)); // false"
+          },
+          {
+            "type": "text",
+            "text": "`Number(str)` требует, чтобы вся строка была числом (пробелы по краям можно), иначе `NaN`. `parseFloat` читает число с начала строки и останавливается на первом лишнем символе."
+          },
+          {
+            "type": "code",
+            "code": "console.log(Number(\"12.5px\"));     // NaN\nconsole.log(parseFloat(\"12.5px\")); // 12.5\nconsole.log(Number(\"\"));           // 0\nconsole.log(parseFloat(\"\"));       // NaN"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "numbers-math-04-q1",
+          "type": "output",
+          "code": "console.log(Number.isInteger(3.0), Number.isInteger(\"3\"));",
+          "options": ["true false", "false false", "true true", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "3.0 и 3 — одно и то же число, дробной части нет",
+            "Number.isInteger не приводит строку к числу",
+            null
+          ],
+          "explanation": "3.0 — целое число. Строка \"3\" — не число, а Number.isInteger сначала проверяет тип."
+        },
+        {
+          "id": "numbers-math-04-q2",
+          "type": "output",
+          "code": "console.log(parseFloat(\"3.5kg\"), Number(\"3.5kg\"));",
+          "options": ["3.5 NaN", "NaN NaN", "3.5 3.5", "3 NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "parseFloat читает число из начала строки и игнорирует хвост",
+            "Number требует, чтобы вся строка была числом",
+            "parseFloat, в отличие от parseInt, читает дробную часть"
+          ],
+          "explanation": "parseFloat останавливается на «k» и возвращает 3.5. Number видит лишние символы и возвращает NaN."
+        },
+        {
+          "id": "numbers-math-04-q3",
+          "type": "output",
+          "code": "console.log(Number(\"  42  \"), parseFloat(\"4 2\"), Number(\"\"));",
+          "options": ["42 4 0", "NaN 4 0", "42 42 NaN", "42 4 NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пробелы по краям Number отбрасывает",
+            "parseFloat останавливается на пробеле после 4",
+            "Пустая строка для Number — это 0, а не NaN"
+          ],
+          "explanation": "Number обрезает пробелы по краям, а пустую строку считает нулём. parseFloat читает 4 и останавливается на пробеле."
+        },
+        {
+          "id": "numbers-math-04-q4",
+          "type": "trueFalse",
+          "code": "console.log(9007199254740992 === 9007199254740993);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [null, "За пределами MAX_SAFE_INTEGER соседние целые неразличимы"],
+          "explanation": "9007199254740993 нельзя хранить точно, и оно округляется до 9007199254740992. Получается сравнение числа с самим собой."
+        },
+        {
+          "id": "numbers-math-04-q5",
+          "type": "findBug",
+          "code": "const input = \"15px\";\nconst width = Number(input);\nconst doubled = width * 2;\nconsole.log(doubled); // ждём 30",
+          "bugLine": 2,
+          "fixed": "const input = \"15px\";\nconst width = parseFloat(input);\nconst doubled = width * 2;\nconsole.log(doubled); // 30",
+          "explanation": "`Number(\"15px\")` — `NaN`: вся строка должна быть числом. `parseFloat` прочитает 15 и остановится на «px»."
+        }
+      ]
+    },
+    {
+      "id": "numbers-math-05",
+      "topicId": "numbers-math",
+      "title": "BigInt и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Для целых больше `MAX_SAFE_INTEGER` есть **BigInt**: допиши `n` в конце числа или вызови `BigInt(...)`. Он хранит целые любой длины точно."
+          },
+          {
+            "type": "code",
+            "code": "const big = 9007199254740993n;\nconsole.log(big + 1n);   // 9007199254740994n\nconsole.log(typeof big); // bigint"
+          },
+          {
+            "type": "warning",
+            "text": "Смешивать `BigInt` и обычные числа в арифметике нельзя — будет `TypeError`. Приводи явно: `BigInt(1)` или `Number(big)`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(10n + 1); // TypeError"
+          },
+          {
+            "type": "text",
+            "text": "Дробей у `BigInt` нет: деление отбрасывает дробную часть. Сравнивать с обычными числами можно, но `===` учитывает тип."
+          },
+          {
+            "type": "code",
+            "code": "console.log(7n / 2n); // 3n\nconsole.log(5n > 3);  // true\nconsole.log(5n == 5); // true\nconsole.log(5n === 5); // false"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "numbers-math-05-q1",
+          "type": "output",
+          "code": "console.log(7n / 2n, 7 / 2);",
+          "options": ["3n 3.5", "3.5n 3.5", "3n 3", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "BigInt не бывает дробным",
+            "Обычное деление чисел даёт дробь",
+            "Здесь каждое деление в своём типе, смешивания нет"
+          ],
+          "explanation": "BigInt делит нацело и отбрасывает остаток: 3n. Обычные числа делятся с дробной частью."
+        },
+        {
+          "id": "numbers-math-05-q2",
+          "type": "output",
+          "code": "const a = 2n ** 64n;\nconsole.log(typeof a, a > Number.MAX_SAFE_INTEGER);",
+          "options": ["bigint true", "number true", "bigint false", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Степень двух BigInt — тоже BigInt",
+            "2^64 больше, чем 2^53 − 1",
+            "Сравнивать BigInt с числом можно, нельзя только смешивать их в арифметике"
+          ],
+          "explanation": "2n ** 64n — BigInt. Операторы сравнения работают между BigInt и обычными числами."
+        },
+        {
+          "id": "numbers-math-05-q3",
+          "type": "fill",
+          "codeBefore": "const big = 10n;\nconst result = big * ",
+          "codeAfter": ";\nconsole.log(result); // 30n",
+          "options": ["3n", "3", "\"3\"", "Number(3n)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "BigInt нельзя умножать на обычное число: TypeError",
+            "BigInt со строкой тоже не умножается: TypeError",
+            "Number(3n) — обычное число 3, снова TypeError"
+          ],
+          "explanation": "В арифметике оба операнда должны быть BigInt, поэтому нужен литерал 3n."
+        },
+        {
+          "id": "numbers-math-05-q4",
+          "type": "order",
+          "title": "Сложи цены в копейках и выведи сумму",
+          "lines": [
+            "const prices = [19.99, 5.01];",
+            "const cents = prices.map(p => Math.round(p * 100));",
+            "const total = cents.reduce((sum, c) => sum + c, 0);",
+            "console.log((total / 100).toFixed(2)); // 25.00"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Переводим цены в целые копейки с округлением, складываем точно и только для показа делим на 100 и форматируем toFixed."
+        },
+        {
+          "id": "numbers-math-05-q5",
+          "type": "output",
+          "code": "console.log(Math.floor(-0.5), (0.1 + 0.2).toFixed(2), Number.isSafeInteger(2 ** 53));",
+          "options": ["-1 0.30 false", "0 0.30 false", "-1 0.3 false", "-1 0.30 true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "floor отрицательной дроби уходит вниз, к -1",
+            "toFixed(2) всегда оставляет два знака",
+            "2^53 уже на один больше MAX_SAFE_INTEGER"
+          ],
+          "explanation": "floor(-0.5) — это -1. toFixed(2) прячет ошибку 0.1 + 0.2 и даёт \"0.30\". 2^53 больше MAX_SAFE_INTEGER, значит не безопасно."
+        }
+      ]
+    },
+    {
+      "id": "data-transform-01",
+      "topicId": "data-transform",
+      "title": "Object.entries и fromEntries",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Object.entries(obj)` превращает объект в массив пар `[ключ, значение]`, а `Object.fromEntries(pairs)` собирает объект обратно. Между ними работают все методы массивов."
+          },
+          {
+            "type": "code",
+            "code": "const prices = { apple: 50, pear: 80 };\nconsole.log(Object.entries(prices)); // [[\"apple\", 50], [\"pear\", 80]]"
+          },
+          {
+            "type": "code",
+            "code": "const stock = { apple: 50, pear: 80, kiwi: 120 };\nconst cheap = Object.fromEntries(\n  Object.entries(stock).filter(([, price]) => price < 100)\n);\nconsole.log(cheap); // { apple: 50, pear: 80 }"
+          },
+          {
+            "type": "tip",
+            "text": "`Object.keys` и `Object.values` дают только ключи или только значения. Ключи объекта всегда **строки**, даже если ты написал число."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "data-transform-01-q1",
+          "type": "output",
+          "code": "const user = { name: \"Аня\", age: 25 };\nconsole.log(Object.entries(user));",
+          "options": [
+            "[[\"name\", \"Аня\"], [\"age\", 25]]",
+            "[\"name\", \"Аня\", \"age\", 25]",
+            "[{ name: \"Аня\" }, { age: 25 }]",
+            "[\"name\", \"age\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Каждая пара — отдельный массив из двух элементов",
+            "entries возвращает пары-массивы, а не объекты",
+            "Это результат Object.keys"
+          ],
+          "explanation": "Object.entries возвращает массив пар [ключ, значение], по паре на каждое свойство."
+        },
+        {
+          "id": "data-transform-01-q2",
+          "type": "output",
+          "code": "const pairs = [[\"a\", 1], [\"b\", 2]];\nconsole.log(Object.fromEntries(pairs));",
+          "options": ["{ a: 1, b: 2 }", "[[\"a\", 1], [\"b\", 2]]", "{ a: 1 }", "{ a: 2, b: 1 }"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "fromEntries возвращает объект, а не массив",
+            "Каждая пара становится свойством",
+            "Первый элемент пары — ключ, второй — значение"
+          ],
+          "explanation": "fromEntries превращает каждую пару в свойство: первый элемент — ключ, второй — значение."
+        },
+        {
+          "id": "data-transform-01-q3",
+          "type": "fill",
+          "codeBefore": "const scores = { ann: 2, bob: 3 };\nconst doubled = Object.fromEntries(\n  Object.entries(scores).map(",
+          "codeAfter": ")\n);\nconsole.log(doubled); // { ann: 4, bob: 6 }",
+          "options": [
+            "([name, s]) => [name, s * 2]",
+            "([name, s]) => s * 2",
+            "([name, s]) => ({ [name]: s * 2 })",
+            "(name, s) => [name, s * 2]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "fromEntries ждёт пары, а не числа: TypeError",
+            "Нужна пара [ключ, значение], а не объект: ключи потеряются",
+            "map передаёт пару одним аргументом, а s здесь — индекс"
+          ],
+          "explanation": "map должен вернуть новую пару [ключ, значение], чтобы fromEntries собрал из неё объект."
+        },
+        {
+          "id": "data-transform-01-q4",
+          "type": "trueFalse",
+          "code": "const names = { 1: \"Аня\", 2: \"Боб\" };\nconsole.log(typeof Object.keys(names)[0]);",
+          "options": ["Выведет number", "Выведет string"],
+          "correct": 1,
+          "optionExplanations": ["Ключи обычного объекта всегда превращаются в строки", null],
+          "explanation": "Ключ 1 при записи в объект стал строкой \"1\", и Object.keys возвращает строки."
+        },
+        {
+          "id": "data-transform-01-q5",
+          "type": "output",
+          "code": "const stock = { milk: 0, bread: 3, eggs: 0 };\nconst available = Object.entries(stock)\n  .filter(([, count]) => count > 0)\n  .map(([name]) => name);\nconsole.log(available);",
+          "options": ["[\"bread\"]", "[[\"bread\", 3]]", "{ bread: 3 }", "[\"milk\", \"eggs\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "map оставил от пары только имя",
+            "fromEntries не вызывали, результат — массив",
+            "filter оставляет пары, где count > 0"
+          ],
+          "explanation": "filter оставил одну пару [\"bread\", 3], а map взял из неё только имя."
+        }
+      ]
+    },
+    {
+      "id": "data-transform-02",
+      "topicId": "data-transform",
+      "title": "Группировка",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Сгруппировать — значит разложить элементы по ключу: `{ ключ: [элементы] }`. Классический способ — `reduce` с объектом-аккумулятором."
+          },
+          {
+            "type": "code",
+            "code": "const orders = [\n  { id: 1, status: \"new\" },\n  { id: 2, status: \"done\" },\n  { id: 3, status: \"new\" },\n];\nconst byStatus = orders.reduce((acc, order) => {\n  if (!acc[order.status]) acc[order.status] = [];\n  acc[order.status].push(order.id);\n  return acc;\n}, {});\nconsole.log(byStatus); // { new: [1, 3], done: [2] }"
+          },
+          {
+            "type": "tip",
+            "text": "Посчитать вместо собрать: `acc[key] = (acc[key] || 0) + 1`."
+          },
+          {
+            "type": "text",
+            "text": "В современных браузерах есть готовый `Object.groupBy(массив, fn)`: функция возвращает ключ группы, а в группы попадают сами элементы."
+          },
+          {
+            "type": "code",
+            "code": "const words = [\"apple\", \"avocado\", \"banana\"];\nconsole.log(Object.groupBy(words, w => w[0]));\n// { a: [\"apple\", \"avocado\"], b: [\"banana\"] }"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "data-transform-02-q1",
+          "type": "output",
+          "code": "const nums = [1, 2, 3, 4, 5];\nconst groups = nums.reduce((acc, n) => {\n  const key = n % 2 === 0 ? \"even\" : \"odd\";\n  if (!acc[key]) acc[key] = [];\n  acc[key].push(n);\n  return acc;\n}, {});\nconsole.log(groups);",
+          "options": [
+            "{ odd: [1, 3, 5], even: [2, 4] }",
+            "{ odd: [5], even: [4] }",
+            "{ odd: 3, even: 2 }",
+            "[[1, 3, 5], [2, 4]]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Массив группы создаётся один раз, дальше элементы добавляются через push",
+            "Тут собирают элементы, а не считают их",
+            "Аккумулятор — объект {}, а не массив"
+          ],
+          "explanation": "Для каждого ключа массив создаётся при первой встрече, а потом в него добавляются числа. Ключи идут в порядке появления."
+        },
+        {
+          "id": "data-transform-02-q2",
+          "type": "output",
+          "code": "const votes = [\"да\", \"нет\", \"да\", \"да\"];\nconst count = votes.reduce((acc, v) => {\n  acc[v] = (acc[v] || 0) + 1;\n  return acc;\n}, {});\nconsole.log(count.да, count.нет);",
+          "options": ["3 1", "1 1", "NaN NaN", "undefined undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Счётчик увеличивается при каждой встрече ключа",
+            "|| 0 подставляет 0 для нового ключа, поэтому NaN не будет",
+            "Свойства создаются внутри reduce"
+          ],
+          "explanation": "acc[v] || 0 даёт 0 при первой встрече, дальше к счётчику прибавляется по единице."
+        },
+        {
+          "id": "data-transform-02-q3",
+          "type": "findBug",
+          "code": "const people = [\n  { name: \"Аня\", city: \"Казань\" },\n  { name: \"Боб\", city: \"Казань\" },\n];\nconst byCity = people.reduce((acc, p) => {\n  acc[p.city] = [p.name];\n  return acc;\n}, {});\nconsole.log(byCity.Казань); // ждём [\"Аня\", \"Боб\"]",
+          "bugLine": 6,
+          "fixed": "const people = [\n  { name: \"Аня\", city: \"Казань\" },\n  { name: \"Боб\", city: \"Казань\" },\n];\nconst byCity = people.reduce((acc, p) => {\n  if (!acc[p.city]) acc[p.city] = [];\n  acc[p.city].push(p.name);\n  return acc;\n}, {});\nconsole.log(byCity.Казань); // [\"Аня\", \"Боб\"]",
+          "explanation": "Строка 6 каждый раз создаёт новый массив и затирает группу, поэтому остаётся только последний. Создавай массив, только если его ещё нет, и добавляй через `push`."
+        },
+        {
+          "id": "data-transform-02-q4",
+          "type": "output",
+          "code": "const items = [\n  { name: \"чай\", type: \"drink\" },\n  { name: \"сок\", type: \"drink\" },\n  { name: \"хлеб\", type: \"food\" },\n];\nconst groups = Object.groupBy(items, item => item.type);\nconsole.log(groups.drink.length, groups.food[0].name);",
+          "options": ["2 хлеб", "1 хлеб", "2 undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В группу drink попали оба напитка",
+            "В группы попадают сами объекты, у них есть name",
+            "Object.groupBy работает в современных браузерах"
+          ],
+          "explanation": "groupBy раскладывает исходные объекты по ключу из функции: в drink два элемента, в food — хлеб."
+        },
+        {
+          "id": "data-transform-02-q5",
+          "type": "fill",
+          "codeBefore": "const nums = [5, 12, 8, 20];\nconst groups = Object.groupBy(nums, ",
+          "codeAfter": ");\nconsole.log(groups); // { small: [5, 8], big: [12, 20] }",
+          "options": [
+            "n => n < 10 ? \"small\" : \"big\"",
+            "n => n < 10",
+            "n => n > 10 ? \"small\" : \"big\"",
+            "n => { n < 10 ? \"small\" : \"big\" }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключами станут строки \"true\" и \"false\"",
+            "Условие перевёрнуто: маленькие числа попадут в big",
+            "В фигурных скобках без return функция вернёт undefined, ключ будет \"undefined\""
+          ],
+          "explanation": "Функция для groupBy возвращает имя группы. Нужна строка \"small\" или \"big\" в зависимости от числа."
+        }
+      ]
+    },
+    {
+      "id": "data-transform-03",
+      "topicId": "data-transform",
+      "title": "Сортировка по нескольким полям",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`sort` принимает компаратор `(a, b)`: отрицательный результат ставит `a` раньше, положительный — `b` раньше, `0` — оставляет как есть. Для чисел это `a.x - b.x`."
+          },
+          {
+            "type": "code",
+            "code": "const users = [\n  { name: \"Боб\", age: 30 },\n  { name: \"Аня\", age: 25 },\n];\nusers.sort((a, b) => a.age - b.age);\nconsole.log(users[0].name); // Аня"
+          },
+          {
+            "type": "text",
+            "text": "Строки сравнивай через `localeCompare`. Несколько полей соединяй через `||`: если первое сравнение дало `0`, решает второе."
+          },
+          {
+            "type": "code",
+            "code": "const team = [\n  { name: \"Вика\", score: 10 },\n  { name: \"Аня\", score: 12 },\n  { name: \"Боб\", score: 10 },\n];\nteam.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));\nconsole.log(team.map(p => p.name)); // [\"Аня\", \"Боб\", \"Вика\"]"
+          },
+          {
+            "type": "warning",
+            "text": "Без компаратора `sort` сравнивает элементы как строки: `[10, 9].sort()` даёт `[10, 9]`. И `sort` меняет исходный массив — для копии есть `toSorted`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "data-transform-03-q1",
+          "type": "output",
+          "code": "console.log([10, 9, 100].sort());",
+          "options": ["[10, 100, 9]", "[9, 10, 100]", "[100, 10, 9]", "[10, 9, 100]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без компаратора числа сравниваются как строки",
+            "Сортировка по умолчанию — по возрастанию строк",
+            "Массив сортируется, просто по строковым правилам"
+          ],
+          "explanation": "Без компаратора sort сравнивает строки \"10\", \"9\", \"100\": \"1\" меньше \"9\", поэтому 9 оказался в конце."
+        },
+        {
+          "id": "data-transform-03-q2",
+          "type": "output",
+          "code": "const list = [\n  { t: \"b\", p: 2 },\n  { t: \"a\", p: 1 },\n  { t: \"c\", p: 2 },\n];\nlist.sort((x, y) => y.p - x.p || x.t.localeCompare(y.t));\nconsole.log(list.map(i => i.t).join(\"\"));",
+          "options": ["bca", "abc", "cba", "bac"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Главное поле — p по убыванию, а не t",
+            "При равном p буквы идут по возрастанию: b раньше c",
+            "a имеет наименьший p, поэтому идёт последней"
+          ],
+          "explanation": "Сначала по p по убыванию: b и c (p = 2) раньше a. При равном p решает t по алфавиту: b, затем c."
+        },
+        {
+          "id": "data-transform-03-q3",
+          "type": "fill",
+          "codeBefore": "const people = [\n  { name: \"Олег\", age: 30 },\n  { name: \"Аня\", age: 30 },\n  { name: \"Боб\", age: 25 },\n];\npeople.sort(",
+          "codeAfter": ");\nconsole.log(people.map(p => p.name)); // [\"Боб\", \"Аня\", \"Олег\"]",
+          "options": [
+            "(a, b) => a.age - b.age || a.name.localeCompare(b.name)",
+            "(a, b) => a.age - b.age && a.name.localeCompare(b.name)",
+            "(a, b) => a.name.localeCompare(b.name) || a.age - b.age",
+            "(a, b) => b.age - a.age || a.name.localeCompare(b.name)"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При равном возрасте && вернёт 0, и имена не сравнятся",
+            "Здесь главное поле — имя, получится Аня, Боб, Олег",
+            "b.age - a.age сортирует возраст по убыванию"
+          ],
+          "explanation": "Сначала сравниваем возраст. Если он равен, разница — 0, и || переходит к сравнению имён."
+        },
+        {
+          "id": "data-transform-03-q4",
+          "type": "trueFalse",
+          "code": "const nums = [3, 1, 2];\nconst sorted = nums.toSorted((a, b) => a - b);\nconsole.log(nums[0]);",
+          "options": ["Выведет 3", "Выведет 1"],
+          "correct": 0,
+          "optionExplanations": [null, "toSorted возвращает новый массив и не трогает исходный"],
+          "explanation": "toSorted, в отличие от sort, не меняет nums: отсортирована только копия."
+        },
+        {
+          "id": "data-transform-03-q5",
+          "type": "order",
+          "title": "Собери компаратор: сначала по цене, при равной цене — по имени",
+          "lines": [
+            "function compare(a, b) {",
+            "  if (a.price !== b.price) return a.price - b.price;",
+            "  return a.name.localeCompare(b.name);",
+            "}"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Сначала проверяем главное поле: если цены разные, их разница и решает. Только при равных ценах сравниваем имена."
+        }
+      ]
+    },
+    {
+      "id": "data-transform-04",
+      "topicId": "data-transform",
+      "title": "Уникальность по ключу",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Уникальные примитивы — через `Set`: он хранит каждое значение один раз. Обратно в массив — через spread."
+          },
+          {
+            "type": "code",
+            "code": "const tags = [\"js\", \"css\", \"js\"];\nconsole.log([...new Set(tags)]); // [\"js\", \"css\"]"
+          },
+          {
+            "type": "text",
+            "text": "Объекты `Set` сравнивает **по ссылке**, одинаковые на вид объекты он не схлопнет. Для уникальности по полю храни `Set` уже встреченных ключей."
+          },
+          {
+            "type": "code",
+            "code": "const users = [\n  { id: 1, name: \"Аня\" },\n  { id: 2, name: \"Боб\" },\n  { id: 1, name: \"Аня (копия)\" },\n];\nconst seen = new Set();\nconst unique = users.filter(u => {\n  if (seen.has(u.id)) return false;\n  seen.add(u.id);\n  return true;\n});\nconsole.log(unique.map(u => u.name)); // [\"Аня\", \"Боб\"]"
+          },
+          {
+            "type": "tip",
+            "text": "Короче через `Map`: `[...new Map(list.map(x => [x.id, x])).values()]`. Но так остаётся **последний** дубликат, на месте первого."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "data-transform-04-q1",
+          "type": "output",
+          "code": "console.log([...new Set([3, 1, 3, 2, 1])]);",
+          "options": ["[3, 1, 2]", "[1, 2, 3]", "[3, 1, 3, 2, 1]", "[2]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Set не сортирует, а сохраняет порядок первого появления",
+            "Set убирает повторы",
+            "Set оставляет по одному экземпляру каждого значения, а не только неповторяющиеся"
+          ],
+          "explanation": "Set сохраняет каждое значение один раз в порядке первого появления."
+        },
+        {
+          "id": "data-transform-04-q2",
+          "type": "output",
+          "code": "const s = new Set([{ id: 1 }, { id: 1 }]);\nconsole.log(s.size);",
+          "options": ["2", "1", "0", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Объекты сравниваются по ссылке, а это два разных объекта",
+            "Оба объекта добавились",
+            "В Set можно класть любые значения"
+          ],
+          "explanation": "Два литерала { id: 1 } — два разных объекта, для Set они не равны."
+        },
+        {
+          "id": "data-transform-04-q3",
+          "type": "output",
+          "code": "const list = [\n  { id: 1, v: \"a\" },\n  { id: 2, v: \"b\" },\n  { id: 1, v: \"c\" },\n];\nconst unique = [...new Map(list.map(x => [x.id, x])).values()];\nconsole.log(unique.map(x => x.v));",
+          "options": [
+            "[\"c\", \"b\"]",
+            "[\"a\", \"b\"]",
+            "[\"b\", \"c\"]",
+            "[\"a\", \"b\", \"c\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Повторный set по тому же ключу перезаписывает значение",
+            "Перезапись значения не меняет позицию ключа в Map",
+            "Ключи Map уникальны, id 1 встречается один раз"
+          ],
+          "explanation": "Map хранит ключ на месте первого появления, но значение берёт из последнего set: под id 1 оказался объект с v \"c\"."
+        },
+        {
+          "id": "data-transform-04-q4",
+          "type": "fill",
+          "codeBefore": "const users = [\n  { email: \"a@x.ru\" },\n  { email: \"b@x.ru\" },\n  { email: \"a@x.ru\" },\n];\nconst seen = new Set();\nconst unique = users.filter(u => {\n  if (",
+          "codeAfter": ") return false;\n  seen.add(u.email);\n  return true;\n});\nconsole.log(unique.length); // 2",
+          "options": [
+            "seen.has(u.email)",
+            "seen.has(u)",
+            "!seen.has(u.email)",
+            "seen.includes(u.email)"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В seen лежат строки email, а не объекты: has(u) всегда false",
+            "Условие перевёрнуто: все элементы отбросятся",
+            "У Set нет includes, есть has: TypeError"
+          ],
+          "explanation": "Проверяем, встречался ли уже этот email. Если да — выбрасываем элемент, если нет — запоминаем ключ."
+        },
+        {
+          "id": "data-transform-04-q5",
+          "type": "findBug",
+          "code": "const items = [\n  { id: 1 },\n  { id: 2 },\n  { id: 1 },\n];\nconst unique = items.filter(\n  (item, index) => items.findIndex(x => x === item) === index\n);\nconsole.log(unique.length); // ждём 2",
+          "bugLine": 7,
+          "fixed": "const items = [\n  { id: 1 },\n  { id: 2 },\n  { id: 1 },\n];\nconst unique = items.filter(\n  (item, index) => items.findIndex(x => x.id === item.id) === index\n);\nconsole.log(unique.length); // 2",
+          "explanation": "`x === item` сравнивает объекты по ссылке, и каждый элемент находит только сам себя. Сравнивай по ключу: `x.id === item.id`."
+        }
+      ]
+    },
+    {
+      "id": "data-transform-05",
+      "topicId": "data-transform",
+      "title": "Словарь по id и обратно",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Если элементы часто ищут по `id`, преврати массив в **словарь** `{ id: элемент }`: доступ по ключу вместо `find` по всему массиву."
+          },
+          {
+            "type": "code",
+            "code": "const users = [\n  { id: 7, name: \"Аня\" },\n  { id: 9, name: \"Боб\" },\n];\nconst byId = Object.fromEntries(users.map(u => [u.id, u]));\nconsole.log(byId[9].name); // Боб"
+          },
+          {
+            "type": "text",
+            "text": "Обратно в массив — `Object.values`. Но ключи объекта всегда **строки**: число `7` стало `\"7\"`."
+          },
+          {
+            "type": "code",
+            "code": "const index = { 7: { id: 7, name: \"Аня\" } };\nconsole.log(Object.keys(index));   // [\"7\"]\nconsole.log(Object.values(index)); // [{ id: 7, name: \"Аня\" }]"
+          },
+          {
+            "type": "tip",
+            "text": "Числовые ключи объект перечисляет **по возрастанию**, а не в порядке добавления. Если порядок важен, используй `Map`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "data-transform-05-q1",
+          "type": "output",
+          "code": "const list = [\n  { id: 3, title: \"C\" },\n  { id: 1, title: \"A\" },\n];\nconst dict = Object.fromEntries(list.map(x => [x.id, x.title]));\nconsole.log(Object.keys(dict));",
+          "options": ["[\"1\", \"3\"]", "[3, 1]", "[\"3\", \"1\"]", "[1, 3]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключи объекта — строки, и числовые идут по возрастанию",
+            "Числовые ключи упорядочиваются по возрастанию, а не по добавлению",
+            "Object.keys всегда возвращает строки"
+          ],
+          "explanation": "Ключи стали строками, а ключи-целые числа объект перечисляет по возрастанию."
+        },
+        {
+          "id": "data-transform-05-q2",
+          "type": "output",
+          "code": "const products = [\n  { id: \"p1\", price: 10 },\n  { id: \"p2\", price: 20 },\n];\nconst byId = products.reduce((acc, p) => {\n  acc[p.id] = p;\n  return acc;\n}, {});\nbyId.p2.price = 25;\nconsole.log(products[1].price);",
+          "options": ["25", "20", "undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В словаре лежат те же объекты, а не копии",
+            "products[1] — объект с id p2, у него есть price",
+            "byId.p2 существует, ошибки нет"
+          ],
+          "explanation": "Словарь хранит ссылки на те же объекты, поэтому изменение через byId видно и в массиве."
+        },
+        {
+          "id": "data-transform-05-q3",
+          "type": "trueFalse",
+          "code": "const byId = { 5: \"Аня\" };\nconst id = 5;\nconsole.log(byId[id] === byId[\"5\"]);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [null, "Число в квадратных скобках приводится к строке \"5\""],
+          "explanation": "Ключ объекта — строка, поэтому byId[5] и byId[\"5\"] обращаются к одному свойству."
+        },
+        {
+          "id": "data-transform-05-q4",
+          "type": "order",
+          "title": "Собери: массив → словарь по id → обратно в массив",
+          "lines": [
+            "const users = [{ id: 1, name: \"Аня\" }, { id: 2, name: \"Боб\" }];",
+            "const byId = Object.fromEntries(users.map(u => [u.id, u]));",
+            "const back = Object.values(byId);",
+            "console.log(back.map(u => u.name)); // [\"Аня\", \"Боб\"]"
+          ],
+          "shuffled": [3, 1, 0, 2],
+          "explanation": "Каждая строка использует результат предыдущей: массив → пары → словарь → значения словаря → имена."
+        },
+        {
+          "id": "data-transform-05-q5",
+          "type": "output",
+          "code": "const orders = [\n  { id: 2, user: \"ann\", sum: 100 },\n  { id: 1, user: \"bob\", sum: 50 },\n  { id: 3, user: \"ann\", sum: 30 },\n];\nconst totals = orders.reduce((acc, o) => {\n  acc[o.user] = (acc[o.user] || 0) + o.sum;\n  return acc;\n}, {});\nconst top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];\nconsole.log(top);",
+          "options": ["[\"ann\", 130]", "[\"bob\", 50]", "{ ann: 130 }", "[\"ann\", 100]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Сортировка по убыванию суммы: у bob меньше",
+            "entries превращает объект в пары, а [0] берёт первую пару",
+            "Суммы ann складываются: 100 + 30"
+          ],
+          "explanation": "reduce собирает суммы по пользователям, entries превращает их в пары, сортировка по убыванию ставит ann (130) первой."
+        }
+      ]
+    }
+  ]
+}
