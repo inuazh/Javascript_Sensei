@@ -1,30 +1,64 @@
-import { Stack } from 'expo-router';
-import { useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
+import * as Notifications from 'expo-notifications';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { useContentStore } from '../src/stores/useContentStore';
-import { initDB } from '../src/db/database';
+import { syncReminders } from '../src/services/notifications';
+import { useUserStore, waitForHydration } from '../src/stores/useUserStore';
+import { Colors } from '../src/ui';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+function useNotificationNavigation() {
+  useEffect(() => {
+    const open = (response: Notifications.NotificationResponse | null) => {
+      const url = response?.notification.request.content.data?.url;
+      if (typeof url === 'string') router.push(url as never);
+    };
+    Notifications.getLastNotificationResponseAsync()
+      .then(open)
+      .catch(() => {});
+    const sub = Notifications.addNotificationResponseReceivedListener(open);
+    return () => sub.remove();
+  }, []);
+}
 
 export default function RootLayout() {
-  const loadSections = useContentStore(s => s.loadSections);
+  const [ready, setReady] = useState(false);
+  useNotificationNavigation();
 
   useEffect(() => {
-    initDB();
-    loadSections().catch(console.warn);
-    SplashScreen.hideAsync().catch(() => {});
+    waitForHydration().then(() => {
+      setReady(true);
+      SplashScreen.hideAsync().catch(() => {});
+      const { settings, progress } = useUserStore.getState();
+      syncReminders(settings.reminder, progress);
+    });
   }, []);
+
+  if (!ready) return null;
 
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#0A0A0A' } }}>
+      <Stack
+        screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.background } }}
+      >
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" options={{ animation: 'none' }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="lesson/[topicId]" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="lesson/[lessonId]"
+          options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="review"
+          options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+        />
+        <Stack.Screen name="topic/[topicId]" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="privacy-policy" />
       </Stack>
     </SafeAreaProvider>
   );

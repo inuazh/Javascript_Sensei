@@ -1,28 +1,43 @@
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import { dueItems } from '../../src/domain/review';
+import { useToday } from '../../src/hooks/useToday';
+import { useUserStore } from '../../src/stores/useUserStore';
+import { Colors } from '../../src/ui';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
-  return (
-    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.4 }}>{emoji}</Text>
-  );
+  return <Text style={[styles.icon, { opacity: focused ? 1 : 0.45 }]}>{emoji}</Text>;
 }
 
 export default function TabsLayout() {
+  const today = useToday();
+  const dueCount = useUserStore(s => dueItems(s.progress.review, today).length);
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FACC15',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.35)',
+        tabBarActiveTintColor: Colors.yellow,
+        tabBarInactiveTintColor: Colors.textMuted,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.label,
+        sceneStyle: { backgroundColor: Colors.background },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Главная',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
+          title: 'Учёба',
+          tabBarIcon: ({ focused }) => <TabIcon emoji="📚" focused={focused} />,
+        }}
+      />
+      <Tabs.Screen
+        name="workout"
+        options={{
+          title: 'Тренировка',
+          tabBarIcon: ({ focused }) => <TabIcon emoji="🧠" focused={focused} />,
+          tabBarBadge: dueCount > 0 ? dueCount : undefined,
+          tabBarBadgeStyle: styles.badge,
         }}
       />
       <Tabs.Screen
@@ -30,13 +45,6 @@ export default function TabsLayout() {
         options={{
           title: 'Рейтинг',
           tabBarIcon: ({ focused }) => <TabIcon emoji="🏆" focused={focused} />,
-        }}
-      />
-      <Tabs.Screen
-        name="challenges"
-        options={{
-          title: 'Задания',
-          tabBarIcon: ({ focused }) => <TabIcon emoji="🎯" focused={focused} />,
         }}
       />
       <Tabs.Screen
@@ -52,16 +60,16 @@ export default function TabsLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#0A0A0A',
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: Colors.background,
+    borderTopColor: Colors.border,
     borderTopWidth: 1,
-    height: 64,
-    paddingBottom: 8,
-    paddingTop: 6,
   },
-  label: {
+  label: { fontSize: 10, fontWeight: '700' },
+  icon: { fontSize: 20 },
+  badge: {
+    backgroundColor: Colors.pink,
+    color: Colors.textOnAccent,
+    fontWeight: '800',
     fontSize: 10,
-    fontWeight: '700',
-    marginTop: 2,
   },
 });

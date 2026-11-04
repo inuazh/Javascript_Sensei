@@ -1,257 +1,299 @@
-import { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Pressable } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { addDays, daysBetween, weekStart } from '../../src/domain/dates';
+import { weeklyXp } from '../../src/domain/progress';
+import { plural } from '../../src/domain/reminders';
+import { useToday } from '../../src/hooks/useToday';
+import { publishScore } from '../../src/services/activity';
+import {
+  createPlayerId,
+  fetchPlayers,
+  rankAllTime,
+  rankWeekly,
+  validateNickname,
+  type PlayerEntry,
+} from '../../src/services/leaderboard';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Colors, Spacing, Radius } from '../../src/constants/theme';
-import { fetchTopPlayers, FIREBASE_DB_URL, LeaderboardEntry } from '../../src/utils/leaderboard';
-import { getDeviceId } from '../../src/utils/deviceId';
-import { getLevelForXp } from '../../src/constants/gamification';
+import { Button, Card, Colors, Fonts, Radius, Spacing, Type, alpha } from '../../src/ui';
 
-const MEDAL = ['🥇', '🥈', '🥉'];
-const AVATAR_COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#6366F1', '#14B8A6', '#F97316', '#A855F7'];
+type Mode = 'week' | 'all';
+const MEDALS = ['🥇', '🥈', '🥉'];
+const AVATAR_COLORS = [
+  Colors.purple,
+  Colors.pink,
+  Colors.green,
+  Colors.orange,
+  Colors.blue,
+  Colors.yellow,
+];
 
-function avatarLetter(title: string) {
-  return title.charAt(0).toUpperCase() || 'J';
+function avatarColor(id: string) {
+  let h = 0;
+  for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) | 0;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
 }
 
-function PlayerRow({
-  rank, title, xp, streak, avatarColor, isYou,
-}: {
-  rank: number; title: string; xp: number; streak: number;
-  avatarColor: string; isYou: boolean;
-}) {
+function JoinCard() {
+  const updateSettings = useUserStore(s => s.updateSettings);
+  const [nickname, setNickname] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  const join = async () => {
+    const problem = validateNickname(nickname);
+    if (problem) return setError(problem);
+    setSaving(true);
+    const playerId = useUserStore.getState().settings.playerId ?? (await createPlayerId());
+    updateSettings({ nickname: nickname.trim(), playerId });
+    try {
+      await publishScore();
+    } catch {
+      // Will be retried after the next activity.
+    }
+    setSaving(false);
+  };
+
   return (
-    <View style={[styles.playerRow, isYou && styles.playerRowYou, rank === 1 && styles.playerRowFirst]}>
-      <View style={styles.rankBox}>
-        {rank <= 3
-          ? <Text style={styles.medal}>{MEDAL[rank - 1]}</Text>
-          : <Text style={styles.rankNum}>#{rank}</Text>}
-      </View>
+    <Card color={Colors.yellow} style={styles.join}>
+      <Text style={Type.h3}>🏆 Участвуй в рейтинге</Text>
+      <Text style={Type.small}>
+        Выбери ник — в рейтинг попадут только он, твой XP, уровень и стрик. Выйти можно в
+        настройках.
+      </Text>
+      <TextInput
+        value={nickname}
+        onChangeText={t => {
+          setNickname(t);
+          setError(null);
+        }}
+        placeholder="Твой ник"
+        placeholderTextColor={Colors.textDisabled}
+        maxLength={20}
+        autoCapitalize="none"
+        autoCorrect={false}
+        style={styles.input}
+        onSubmitEditing={join}
+        returnKeyType="done"
+      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Button
+        title="Участвовать"
+        onPress={join}
+        loading={saving}
+        disabled={nickname.trim().length < 3}
+      />
+    </Card>
+  );
+}
 
-      <View style={[styles.avatar, { backgroundColor: avatarColor }]}>
-        <Text style={styles.avatarText}>{avatarLetter(title)}</Text>
+function Row({
+  rank,
+  player,
+  value,
+  isYou,
+}: {
+  rank: number;
+  player: PlayerEntry;
+  value: number;
+  isYou: boolean;
+}) {
+  const color = avatarColor(player.id);
+  return (
+    <View style={[styles.row, isYou && styles.rowYou]}>
+      <Text style={styles.rank}>{rank <= 3 ? MEDALS[rank - 1] : rank}</Text>
+      <View style={[styles.avatar, { backgroundColor: alpha(color, 0.25) }]}>
+        <Text style={[styles.avatarText, { color }]}>
+          {player.nickname.charAt(0).toUpperCase()}
+        </Text>
       </View>
-
-      <View style={styles.playerInfo}>
-        <View style={styles.nameRow}>
-          <Text style={[styles.playerName, isYou && styles.playerNameYou]}>{title}</Text>
-          {isYou && <View style={styles.youBadge}><Text style={styles.youBadgeText}>Вы</Text></View>}
-        </View>
-        <Text style={styles.playerStreak}>🔥 {streak} дней стрик</Text>
+      <View style={styles.flex}>
+        <Text style={[styles.name, isYou && { color: Colors.yellow }]} numberOfLines={1}>
+          {player.nickname}
+          {isYou ? ' (ты)' : ''}
+        </Text>
+        <Text style={Type.small}>
+          ур. {player.level} · 🔥 {player.streak}
+        </Text>
       </View>
-
-      <Text style={[styles.playerXp, isYou && styles.playerXpYou]}>{xp} XP</Text>
+      <Text style={[styles.xp, isYou && { color: Colors.yellow }]}>{value} XP</Text>
     </View>
   );
 }
 
 export default function LeaderboardScreen() {
-  const userStore = useUserStore();
-  const userXp = userStore.userProgress.totalXp;
-  const userStreak = userStore.userProgress.currentStreak;
-  const userTitle = getLevelForXp(userXp).title;
-
-  const [players, setPlayers] = useState<LeaderboardEntry[]>([]);
-  const [myDeviceId, setMyDeviceId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const today = useToday();
+  const settings = useUserStore(s => s.settings);
+  const progress = useUserStore(s => s.progress);
+  const [mode, setMode] = useState<Mode>('week');
+  const [players, setPlayers] = useState<PlayerEntry[] | null>(null);
   const [error, setError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    if (!FIREBASE_DB_URL) return;
-    setLoading(true);
     setError(false);
     try {
-      const [top, devId] = await Promise.all([fetchTopPlayers(50), getDeviceId()]);
-      setPlayers(top);
-      setMyDeviceId(devId);
+      setPlayers(await fetchPlayers());
     } catch {
       setError(true);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load, settings.nickname]);
 
-  const isFirebaseConfigured = !!FIREBASE_DB_URL;
+  const refresh = async () => {
+    setRefreshing(true);
+    await publishScore().catch(() => {});
+    await load();
+    setRefreshing(false);
+  };
 
-  // Build display list
-  const displayList: Array<LeaderboardEntry & { isYou: boolean }> = isFirebaseConfigured && players.length > 0
-    ? players.map(p => ({ ...p, isYou: p.id === myDeviceId }))
-    : [
-        { id: 'you', xp: userXp, title: userTitle, streak: userStreak, updatedAt: '', isYou: true },
-        { id: 'p1', xp: 2340, title: 'Senior Dev', streak: 14, updatedAt: '', isYou: false },
-        { id: 'p2', xp: 1890, title: 'Middle Dev', streak: 8, updatedAt: '', isYou: false },
-        { id: 'p3', xp: 1450, title: 'Junior Dev', streak: 5, updatedAt: '', isYou: false },
-        { id: 'p4', xp: 980, title: 'Beginner', streak: 3, updatedAt: '', isYou: false },
-      ].sort((a, b) => b.xp - a.xp);
-
-  const myRank = displayList.findIndex(p => p.isYou) + 1;
+  const week = weekStart(today);
+  const daysLeft = daysBetween(today, addDays(week, 7));
+  const ranked = players
+    ? mode === 'week'
+      ? rankWeekly(players, week)
+      : rankAllTime(players)
+    : [];
+  const myRank = ranked.findIndex(p => p.id === settings.playerId) + 1;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Рейтинг</Text>
-          {myRank > 0 && (
-            <Text style={styles.headerSub}>Вы на {myRank} месте</Text>
-          )}
-        </View>
-
-        {/* Status banner */}
-        {!isFirebaseConfigured ? (
-          <View style={styles.banner}>
-            <Text style={styles.bannerIcon}>🌍</Text>
-            <View style={styles.bannerText}>
-              <Text style={styles.bannerTitle}>Глобальный рейтинг</Text>
-              <Text style={styles.bannerDesc}>Скоро — соревнуйся с игроками по всему миру</Text>
-            </View>
-            <View style={styles.soonBadge}>
-              <Text style={styles.soonBadgeText}>Скоро</Text>
-            </View>
-          </View>
-        ) : error ? (
-          <View style={styles.banner}>
-            <Text style={styles.bannerIcon}>⚠️</Text>
-            <View style={styles.bannerText}>
-              <Text style={styles.bannerTitle}>Нет соединения</Text>
-              <Text style={styles.bannerDesc}>Показаны локальные данные</Text>
-            </View>
-            <Pressable onPress={load} style={styles.retryBtn}>
-              <Text style={styles.retryText}>Повтор</Text>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.yellow} />
+        }
+      >
+        <Text style={Type.h1}>Рейтинг</Text>
+        <View style={styles.tabs}>
+          {(['week', 'all'] as const).map(m => (
+            <Pressable
+              key={m}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: mode === m }}
+              onPress={() => setMode(m)}
+              style={[styles.tab, mode === m && styles.tabActive]}
+            >
+              <Text style={[styles.tabText, mode === m && styles.tabTextActive]}>
+                {m === 'week' ? 'Эта неделя' : 'Всё время'}
+              </Text>
             </Pressable>
-          </View>
-        ) : null}
-
-        <Text style={styles.sectionLabel}>
-          {isFirebaseConfigured ? 'ГЛОБАЛЬНЫЙ РЕЙТИНГ' : 'ЛОКАЛЬНЫЙ РЕЙТИНГ'}
-        </Text>
-
-        {/* Loading */}
-        {loading && (
-          <View style={styles.loadingBox}>
-            <ActivityIndicator color={Colors.yellow} />
-            <Text style={styles.loadingText}>Загружаем рейтинг…</Text>
-          </View>
-        )}
-
-        {/* List */}
-        {!loading && (
-          <View style={styles.leaderboardCard}>
-            {displayList.map((entry, i) => (
-              <PlayerRow
-                key={entry.id}
-                rank={i + 1}
-                title={entry.title}
-                xp={entry.xp}
-                streak={entry.streak}
-                avatarColor={AVATAR_COLORS[i % AVATAR_COLORS.length]}
-                isYou={entry.isYou}
-              />
-            ))}
-          </View>
-        )}
-
-        {/* Motivation */}
-        <View style={styles.motivCard}>
-          <Text style={styles.motivIcon}>🚀</Text>
-          <Text style={styles.motivTitle}>Учись каждый день</Text>
-          <Text style={styles.motivDesc}>
-            Проходи уроки и ежедневные задания, чтобы набирать XP и подниматься в рейтинге
-          </Text>
+          ))}
         </View>
+        {mode === 'week' && (
+          <Text style={Type.small}>
+            Неделя обнулится через {daysLeft} {plural(daysLeft, 'день', 'дня', 'дней')}. Твой XP за
+            неделю: {weeklyXp(progress, today)}.
+          </Text>
+        )}
+
+        {!settings.nickname && <JoinCard />}
+        {settings.nickname && myRank > 0 && (
+          <Card color={Colors.yellow}>
+            <Text style={Type.h3}>
+              Ты на {myRank} месте{myRank <= 3 ? ' 🎉' : ''}
+            </Text>
+          </Card>
+        )}
+
+        {players === null && !error && (
+          <ActivityIndicator color={Colors.yellow} style={styles.loader} />
+        )}
+        {error && (
+          <Card>
+            <Text style={Type.h3}>Не удалось загрузить рейтинг</Text>
+            <Text style={Type.small}>Проверь интернет и попробуй ещё раз.</Text>
+            <Button title="Повторить" variant="secondary" onPress={load} style={styles.retry} />
+          </Card>
+        )}
+        {players !== null && ranked.length === 0 && !error && (
+          <Text style={[Type.small, styles.empty]}>
+            {mode === 'week'
+              ? 'На этой неделе ещё никто не занимался. Стань первым!'
+              : 'Пока пусто.'}
+          </Text>
+        )}
+        {ranked.slice(0, 50).map((p, i) => (
+          <Row
+            key={p.id}
+            rank={i + 1}
+            player={p}
+            value={mode === 'week' ? p.weekXp : p.xp}
+            isYou={p.id === settings.playerId}
+          />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  scrollContent: { paddingBottom: 100 },
-
-  header: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.xl, paddingBottom: Spacing.lg },
-  headerTitle: { fontSize: 28, fontWeight: '800', color: Colors.textPrimary, marginBottom: Spacing.xs },
-  headerSub: { fontSize: 14, color: Colors.textSecondary },
-
-  banner: {
-    marginHorizontal: Spacing.xl, marginBottom: Spacing.xl,
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.lg,
-    backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1,
-    borderColor: 'rgba(99,102,241,0.15)', borderRadius: Radius.xl,
-    padding: Spacing.lg,
+  safe: { flex: 1, backgroundColor: Colors.background },
+  content: { padding: Spacing.xl, gap: Spacing.md, paddingBottom: Spacing.xxxl },
+  tabs: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: Radius.md,
+    padding: 4,
   },
-  bannerIcon: { fontSize: 28 },
-  bannerText: { flex: 1 },
-  bannerTitle: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary, marginBottom: Spacing.xs },
-  bannerDesc: { fontSize: 12, color: Colors.textMuted, lineHeight: 18 },
-  soonBadge: {
-    backgroundColor: 'rgba(99,102,241,0.15)', borderRadius: 99,
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs,
+  tab: { flex: 1, paddingVertical: Spacing.sm, borderRadius: Radius.sm, alignItems: 'center' },
+  tabActive: { backgroundColor: alpha(Colors.yellow, 0.15) },
+  tabText: { color: Colors.textMuted, fontWeight: '700' },
+  tabTextActive: { color: Colors.yellow },
+  join: { gap: Spacing.sm },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    color: Colors.textPrimary,
+    fontSize: 16,
+    backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  soonBadgeText: { fontSize: 11, fontWeight: '700', color: '#818CF8' },
-  retryBtn: {
-    backgroundColor: 'rgba(250,204,21,0.12)', borderRadius: 99,
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs,
+  error: { color: Colors.danger, fontSize: 13 },
+  loader: { marginTop: Spacing.xxl },
+  retry: { marginTop: Spacing.md },
+  empty: { textAlign: 'center', marginTop: Spacing.xl },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    padding: Spacing.md,
+    borderRadius: Radius.lg,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
-  retryText: { fontSize: 11, fontWeight: '700', color: Colors.yellow },
-
-  sectionLabel: {
-    paddingHorizontal: Spacing.xl, marginBottom: Spacing.lg,
-    fontSize: 11, fontWeight: '700', color: Colors.textMuted, letterSpacing: 1,
+  rowYou: { borderColor: alpha(Colors.yellow, 0.4), backgroundColor: alpha(Colors.yellow, 0.06) },
+  rank: {
+    width: 28,
+    textAlign: 'center',
+    color: Colors.textMuted,
+    fontWeight: '800',
+    fontSize: 15,
   },
-
-  loadingBox: { alignItems: 'center', paddingVertical: Spacing.xl, gap: Spacing.md },
-  loadingText: { fontSize: 13, color: Colors.textMuted },
-
-  leaderboardCard: {
-    marginHorizontal: Spacing.xl, marginBottom: Spacing.xl,
-    backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1,
-    borderColor: Colors.border, borderRadius: Radius.xl, overflow: 'hidden',
-  },
-
-  playerRow: {
-    flexDirection: 'row', alignItems: 'center', gap: Spacing.lg,
-    paddingVertical: Spacing.lg, paddingHorizontal: Spacing.lg,
-    borderBottomWidth: 1, borderBottomColor: Colors.border,
-  },
-  playerRowYou: {
-    backgroundColor: 'rgba(250,204,21,0.04)',
-    borderLeftWidth: 2, borderLeftColor: Colors.yellow,
-  },
-  playerRowFirst: { backgroundColor: 'rgba(250,204,21,0.03)' },
-
-  rankBox: { width: 32, alignItems: 'center' },
-  medal: { fontSize: 20 },
-  rankNum: { fontSize: 14, fontWeight: '700', color: Colors.textMuted },
-
   avatar: {
-    width: 40, height: 40, borderRadius: Radius.sm,
-    justifyContent: 'center', alignItems: 'center',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  avatarText: { fontSize: 16, fontWeight: '800', color: '#fff' },
-
-  playerInfo: { flex: 1 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.xs },
-  playerName: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary },
-  playerNameYou: { color: Colors.yellow },
-  youBadge: {
-    backgroundColor: 'rgba(250,204,21,0.12)', borderRadius: 99,
-    paddingHorizontal: Spacing.sm, paddingVertical: 2,
-  },
-  youBadgeText: { fontSize: 10, fontWeight: '700', color: Colors.yellow },
-  playerStreak: { fontSize: 12, color: Colors.textMuted },
-
-  playerXp: { fontSize: 14, fontWeight: '800', color: Colors.textSecondary },
-  playerXpYou: { color: Colors.yellow },
-
-  motivCard: {
-    marginHorizontal: Spacing.xl,
-    backgroundColor: 'rgba(255,255,255,0.02)', borderWidth: 1,
-    borderColor: Colors.border, borderRadius: Radius.xl,
-    padding: Spacing.xl, alignItems: 'center', gap: Spacing.md,
-  },
-  motivIcon: { fontSize: 32 },
-  motivTitle: { fontSize: 18, fontWeight: '800', color: Colors.textPrimary },
-  motivDesc: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center', lineHeight: 20 },
+  avatarText: { fontWeight: '900', fontSize: 16 },
+  flex: { flex: 1 },
+  name: { color: Colors.textPrimary, fontWeight: '700', fontSize: 15 },
+  xp: { fontFamily: Fonts.mono, fontWeight: '800', color: Colors.textSecondary },
 });
