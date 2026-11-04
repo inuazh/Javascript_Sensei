@@ -10,26 +10,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { XP_DAILY_CHALLENGE } from '../../src/constants/gamification';
-import { Colors, Spacing, Radius } from '../../src/constants/theme';
+import { Colors, Spacing, Radius, getSectionColor } from '../../src/constants/theme';
+import { loadSectionDefs } from '../../content';
 
-// All available topics for daily challenge selection
-const ALL_TOPICS = [
-  { id: 'variables', title: 'Переменные', section: 'basics', sectionColor: Colors.green },
-  { id: 'data-types', title: 'Типы данных', section: 'basics', sectionColor: Colors.green },
-  { id: 'operators', title: 'Операторы', section: 'basics', sectionColor: Colors.green },
-  { id: 'conditions', title: 'Условия', section: 'control', sectionColor: Colors.blue },
-  { id: 'loops', title: 'Циклы', section: 'control', sectionColor: Colors.blue },
-  { id: 'functions', title: 'Функции', section: 'control', sectionColor: Colors.blue },
-  { id: 'arrays', title: 'Массивы', section: 'collections', sectionColor: Colors.yellow },
-  { id: 'objects', title: 'Объекты', section: 'collections', sectionColor: Colors.yellow },
-  { id: 'set-map', title: 'Set & Map', section: 'collections', sectionColor: Colors.yellow },
-];
-
-const SECTION_ICONS: Record<string, string> = {
-  basics: '🌱',
-  control: '🔀',
-  collections: '📦',
-};
+// All available topics for daily challenge selection, in section order
+const ALL_TOPICS = loadSectionDefs().flatMap(section =>
+  [...section.topics]
+    .sort((a, b) => a.order - b.order)
+    .map(topic => ({
+      id: topic.id,
+      title: topic.title,
+      sectionTitle: section.title,
+      sectionIcon: section.icon,
+      sectionColor: getSectionColor(section),
+    })),
+);
 
 function getISODate(date: Date): string {
   return date.toISOString().split('T')[0];
@@ -120,13 +115,12 @@ export default function ChallengesScreen() {
           {/* Topic info */}
           <View style={styles.topicRow}>
             <View style={[styles.topicIconBox, { backgroundColor: `${todayTopic.sectionColor}15` }]}>
-              <Text style={styles.topicIcon}>{SECTION_ICONS[todayTopic.section]}</Text>
+              <Text style={styles.topicIcon}>{todayTopic.sectionIcon}</Text>
             </View>
             <View style={styles.topicInfo}>
               <Text style={styles.topicTitle}>{todayTopic.title}</Text>
               <Text style={[styles.topicSection, { color: todayTopic.sectionColor }]}>
-                {todayTopic.section === 'basics' ? 'Основы'
-                  : todayTopic.section === 'control' ? 'Управление' : 'Коллекции'}
+                {todayTopic.sectionTitle}
               </Text>
             </View>
           </View>
@@ -183,7 +177,7 @@ export default function ChallengesScreen() {
               return (
                 <View key={offset} style={styles.weekCard}>
                   <Text style={styles.weekCardDay}>{dayName}</Text>
-                  <Text style={styles.weekCardIcon}>{SECTION_ICONS[futureTopic.section]}</Text>
+                  <Text style={styles.weekCardIcon}>{futureTopic.sectionIcon}</Text>
                   <Text style={styles.weekCardTopic} numberOfLines={1}>{futureTopic.title}</Text>
                 </View>
               );

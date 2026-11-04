@@ -41,6 +41,11 @@ export const SectionColors: Record<string, string> = {
   advanced: Colors.purple,
 };
 
+/** Theme colour for a section, falling back to the colour set in content/sections.json. */
+export function getSectionColor(section: { id: string; color: string }): string {
+  return SectionColors[section.id] ?? section.color;
+}
+
 export const Fonts = {
   mono: 'JetBrainsMono',
   sans: 'SpaceGrotesk',
