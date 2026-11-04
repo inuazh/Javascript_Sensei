@@ -1,4 +1,6 @@
-import { migrateLegacyState } from '../migrations';
+import { toDayKey } from '../dates';
+import { migrateLegacyState, migratePersistedState } from '../migrations';
+import { sanitizePersistedState } from '../persistence';
 import { lessonResultXp } from '../rewards';
 
 describe('migrateLegacyState', () => {
@@ -58,6 +60,50 @@ describe('migrateLegacyState', () => {
       freezes: 1,
     });
     expect(settings).toEqual({ onboarded: true, dailyGoalXp: 100, experience: 'intermediate' });
+  });
+
+  it('turns the UTC lastActiveDate of v0 into the local day of the last lesson', () => {
+    // v0 stored toISOString().split('T')[0]. Whatever the time zone, the last
+    // lesson's local day is the day the streak was last extended.
+    const completedAt = '2026-11-03T22:30:00.000Z';
+    const localDay = toDayKey(new Date(completedAt));
+    const { progress } = migrateLegacyState({
+      userProgress: { currentStreak: 4, longestStreak: 4, lastActiveDate: '2026-11-03' },
+      lessonResults: [
+        { lessonId: 'variables-01', completedAt, correctAnswers: 5, totalQuestions: 5 },
+      ],
+    });
+    expect(progress.streak.lastActiveDay).toBe(localDay);
+    expect(Object.keys(progress.activity)).toEqual([localDay]);
+  });
+
+  it('keeps the XP of valid records when some legacy numbers or ids are corrupt', () => {
+    const state = migratePersistedState(
+      {
+        lessonResults: [
+          {
+            lessonId: 'variables-01',
+            completedAt: '2026-11-01T10:00:00.000Z',
+            correctAnswers: 5,
+            totalQuestions: 5,
+          },
+          {
+            lessonId: 'variables-02',
+            completedAt: '2026-11-01T11:00:00.000Z',
+            correctAnswers: 'five',
+            totalQuestions: 5,
+          },
+        ],
+        unlockedAchievements: [
+          { id: 'first_lesson', unlockedAt: '2026-11-01T10:00:00.000Z' },
+          { id: 'toString', unlockedAt: '2026-11-01T10:00:00.000Z' },
+        ],
+      },
+      0,
+    );
+    const { progress } = sanitizePersistedState(state);
+    expect(progress.totalXp).toBe(lessonResultXp(5, 5) + lessonResultXp(0, 5) + 20);
+    expect(Object.keys(progress.achievements)).toEqual(['first_lesson']);
   });
 
   it('handles an empty legacy state', () => {

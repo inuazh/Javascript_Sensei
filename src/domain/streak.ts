@@ -39,7 +39,8 @@ export function recordActivity(state: StreakState, today: DayKey): StreakUpdate 
   let freezes = state.freezes;
   let freezesUsed = 0;
 
-  if (state.lastActiveDay === null) {
+  // A zero streak has nothing to protect: no freeze is spent on it.
+  if (state.lastActiveDay === null || state.current === 0) {
     current = 1;
   } else {
     const gap = daysBetween(state.lastActiveDay, today);

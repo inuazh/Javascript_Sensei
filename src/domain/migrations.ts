@@ -49,11 +49,19 @@ function cleanLegacyState(state: unknown): LegacyUserState {
   if (!isObject(state)) return {};
   const validTime = (t: unknown): t is string =>
     typeof t === 'string' && !Number.isNaN(new Date(t).getTime());
+  // A non-numeric count would turn the whole recalculated XP into NaN.
+  const count = (n: unknown) => (typeof n === 'number' && Number.isFinite(n) ? n : undefined);
   const lessonResults = Array.isArray(state.lessonResults)
-    ? state.lessonResults.filter(
-        (r): r is NonNullable<LegacyUserState['lessonResults']>[number] =>
-          isObject(r) && typeof r.lessonId === 'string' && validTime(r.completedAt),
-      )
+    ? state.lessonResults
+        .filter(
+          (r): r is NonNullable<LegacyUserState['lessonResults']>[number] =>
+            isObject(r) && typeof r.lessonId === 'string' && validTime(r.completedAt),
+        )
+        .map(r => ({
+          ...r,
+          correctAnswers: count(r.correctAnswers),
+          totalQuestions: count(r.totalQuestions),
+        }))
     : undefined;
   const topicsProgress: LegacyUserState['topicsProgress'] = {};
   if (isObject(state.topicsProgress)) {
@@ -170,7 +178,10 @@ export function migrateLegacyState(old: LegacyUserState): {
   const lessonXpTotal = Object.values(activity).reduce((sum, d) => sum + d.xp, 0);
   const achievements: Record<string, string> = {};
   for (const a of old.unlockedAchievements ?? []) {
-    if (ACHIEVEMENTS_BY_ID[a.id]) achievements[a.id] = a.unlockedAt;
+    // Own keys only: 'toString' and the like are not achievements.
+    if (Object.prototype.hasOwnProperty.call(ACHIEVEMENTS_BY_ID, a.id)) {
+      achievements[a.id] = a.unlockedAt;
+    }
   }
   const achievementXp = Object.keys(achievements).reduce(
     (sum, id) => sum + ACHIEVEMENTS_BY_ID[id].xpReward,
@@ -178,7 +189,13 @@ export function migrateLegacyState(old: LegacyUserState): {
   );
 
   const up = old.userProgress ?? {};
-  const lastActive = up.lastActiveDate || null;
+  // v0 saved lastActiveDate as a UTC date, day keys are local now. It was set
+  // with the last lesson result, whose local day is the one to continue from.
+  const last = sorted[sorted.length - 1];
+  const lastActive =
+    last && up.lastActiveDate === last.completedAt.slice(0, 10)
+      ? toDayKey(new Date(last.completedAt))
+      : up.lastActiveDate || null;
   const progress: ProgressState = {
     ...initialProgress,
     lessons,

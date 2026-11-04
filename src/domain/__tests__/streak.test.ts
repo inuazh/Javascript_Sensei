@@ -39,6 +39,16 @@ describe('streak', () => {
     expect(r.freezesUsed).toBe(1);
   });
 
+  it('spends no freeze on a streak that is already zero', () => {
+    // A v0 save keeps lastActiveDate after the old app reset the streak to 0.
+    const r = recordActivity(
+      s({ current: 0, longest: 5, lastActiveDay: '2026-11-02', freezes: 1 }),
+      '2026-11-04',
+    );
+    expect(r.state).toMatchObject({ current: 1, longest: 5, freezes: 1 });
+    expect(r.freezesUsed).toBe(0);
+  });
+
   it('resets when the gap is longer than the freezes', () => {
     const r = recordActivity(
       s({ current: 10, longest: 10, lastActiveDay: '2026-11-01', freezes: 1 }),

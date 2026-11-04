@@ -224,6 +224,50 @@ describe('free practice', () => {
     expect(outcome.xpEarned).toBe(0);
     expect(outcome.firstWorkoutToday).toBe(false);
   });
+
+  it('does not use up the daily bonus of a later workout with due questions', () => {
+    const afterLesson = completeLesson(
+      initialProgress,
+      { lessonId: 'b1', answers: answers('b1', perfect) },
+      ctx('2026-11-04T08:00:00'),
+    ).state;
+    const practice = completeWorkout(
+      afterLesson,
+      { answers: [{ questionId: 'b1-q0', lessonId: 'b1', correct: true }], dueIds: [] },
+      ctx('2026-11-04T09:00:00'),
+    ).state;
+    // A mistake in the next lesson makes a question due the same day.
+    const withMistake = completeLesson(
+      practice,
+      { lessonId: 'b2', answers: answers('b2', [false, true, true]) },
+      ctx('2026-11-04T10:00:00'),
+    ).state;
+    const { outcome } = completeWorkout(
+      withMistake,
+      { answers: [{ questionId: 'b2-q0', lessonId: 'b2', correct: true }], dueIds: ['b2-q0'] },
+      ctx('2026-11-04T11:00:00'),
+    );
+    expect(outcome.firstWorkoutToday).toBe(true);
+    expect(outcome.xpEarned).toBe(XP.perCorrectReview + XP.dailyWorkoutBonus);
+  });
+});
+
+describe('lesson content changes', () => {
+  it('keeps the best result within the current number of questions', () => {
+    const six = [true, true, true, true, true, true];
+    const before = completeLesson(
+      initialProgress,
+      { lessonId: 'b1', answers: answers('b1', six) },
+      ctx('2026-11-04T12:00:00'),
+    ).state;
+    // An update removed a question from the lesson.
+    const { state } = completeLesson(
+      before,
+      { lessonId: 'b1', answers: answers('b1', perfect) },
+      ctx('2026-11-05T12:00:00'),
+    );
+    expect(state.lessons.b1).toMatchObject({ bestCorrect: 5, total: 5, stars: 3 });
+  });
 });
 
 describe('completeDaily', () => {
@@ -272,6 +316,28 @@ describe('completeDaily', () => {
     const { state, outcome } = completeDaily(first, daily(true), ctx('2026-11-04T10:00:00'));
     expect(state).toBe(first);
     expect(outcome).toMatchObject({ alreadyDone: true, correct: false, xpEarned: 0 });
+  });
+
+  it('reports nothing new for an answered challenge, since nothing is saved', () => {
+    const first = completeDaily(initialProgress, daily(true), ctx('2026-11-04T09:00:00')).state;
+    // Late at night (night owl) and on the next day (streak +1): neither is saved.
+    for (const iso of ['2026-11-04T23:30:00', '2026-11-05T09:00:00']) {
+      const { state, outcome } = completeDaily(first, daily(true), ctx(iso));
+      expect(state).toBe(first);
+      expect(outcome).toMatchObject({
+        alreadyDone: true,
+        xpEarned: 0,
+        achievementXp: 0,
+        achievements: [],
+        streakDays: first.streak.current,
+        streakExtended: false,
+        freezesUsed: 0,
+        freezesEarned: 0,
+        goalReached: false,
+      });
+      expect(outcome.levelAfter).toBe(outcome.levelBefore);
+      expect(outcome.todayXpAfter).toBe(outcome.todayXpBefore);
+    }
   });
 
   it('counts solved days in a row alongside lessons', () => {
