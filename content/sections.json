@@ -136,34 +136,6 @@
           "order": 2
         }
       ]
-    },
-    {
-      "id": "interview",
-      "title": "К собеседованию",
-      "icon": "🎤",
-      "color": "#FB923C",
-      "order": 5,
-      "description": "Каверзные вопросы с собеседований: приведение типов, всплытие и вывод в консоль.",
-      "topics": [
-        {
-          "id": "type-coercion",
-          "title": "Приведение типов",
-          "subtitle": "==, ===, truthy/falsy",
-          "order": 0
-        },
-        {
-          "id": "hoisting",
-          "title": "Hoisting и TDZ",
-          "subtitle": "var, let, function",
-          "order": 1
-        },
-        {
-          "id": "tricky-output",
-          "title": "Что выведет консоль?",
-          "subtitle": "каверзные задачи",
-          "order": 2
-        }
-      ]
     }
   ]
 }
