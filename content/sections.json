@@ -82,11 +82,67 @@
       ]
     },
     {
+      "id": "modern",
+      "title": "Современный синтаксис",
+      "icon": "✨",
+      "color": "#FFFFFF",
+      "order": 3,
+      "description": "Деструктуризация, spread и rest, ?. и ?? — приёмы, которые делают код короче и понятнее.",
+      "topics": [
+        {
+          "id": "destructuring",
+          "title": "Деструктуризация",
+          "subtitle": "объекты, массивы, значения по умолчанию",
+          "order": 0
+        },
+        {
+          "id": "spread-rest",
+          "title": "Spread и rest",
+          "subtitle": "... в массивах, объектах и функциях",
+          "order": 1
+        },
+        {
+          "id": "optional-chaining",
+          "title": "?. и ??",
+          "subtitle": "безопасный доступ и значения по умолчанию",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "strings",
+      "title": "Строки и регулярки",
+      "icon": "🔤",
+      "color": "#FFFFFF",
+      "order": 4,
+      "description": "Методы строк и регулярные выражения: как искать, вырезать и заменять текст.",
+      "topics": [
+        {
+          "id": "string-methods",
+          "title": "Методы строк",
+          "subtitle": "slice, includes, replace",
+          "order": 0
+        },
+        {
+          "id": "regex-basics",
+          "title": "Регулярные выражения",
+          "subtitle": "test, match, флаги",
+          "order": 1
+        },
+        {
+          "id": "regex-practice",
+          "title": "Регулярки на практике",
+          "subtitle": "группы, replace, split",
+          "order": 2
+        }
+      ]
+    },
+    {
       "id": "advanced",
       "title": "Продвинутые темы",
       "icon": "🧙",
       "color": "#A78BFA",
-      "order": 3,
+      "order": 5,
       "description": "Замыкания, this и прототипы — как JavaScript устроен изнутри.",
       "topics": [
         {
@@ -114,7 +170,7 @@
       "title": "Асинхронность",
       "icon": "⏳",
       "color": "#F472B6",
-      "order": 4,
+      "order": 6,
       "description": "Колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
       "topics": [
         {
@@ -138,11 +194,39 @@
       ]
     },
     {
+      "id": "errors",
+      "title": "Ошибки и отладка",
+      "icon": "🐞",
+      "color": "#FFFFFF",
+      "order": 7,
+      "description": "Как ловить и разбирать ошибки и находить типичные баги в своём коде.",
+      "topics": [
+        {
+          "id": "try-catch",
+          "title": "try / catch",
+          "subtitle": "обработка исключений",
+          "order": 0
+        },
+        {
+          "id": "error-types",
+          "title": "Типы ошибок",
+          "subtitle": "TypeError, ReferenceError, свои ошибки",
+          "order": 1
+        },
+        {
+          "id": "common-bugs",
+          "title": "Типичные баги",
+          "subtitle": "найди ошибку в коде",
+          "order": 2
+        }
+      ]
+    },
+    {
       "id": "interview",
       "title": "К собеседованию",
       "icon": "🎤",
       "color": "#FB923C",
-      "order": 5,
+      "order": 8,
       "description": "Каверзные вопросы с собеседований: приведение типов, всплытие и вывод в консоль.",
       "topics": [
         {
@@ -161,6 +245,34 @@
           "id": "tricky-output",
           "title": "Что выведет консоль?",
           "subtitle": "каверзные задачи",
+          "order": 2
+        }
+      ]
+    },
+    {
+      "id": "algorithms",
+      "title": "Алгоритмы",
+      "icon": "🧮",
+      "color": "#FFFFFF",
+      "order": 9,
+      "description": "Задачи с собеседований: сложность, поиск, сортировка и обработка строк.",
+      "topics": [
+        {
+          "id": "complexity",
+          "title": "Сложность",
+          "subtitle": "O(1), O(n), O(n²) на примерах",
+          "order": 0
+        },
+        {
+          "id": "array-algorithms",
+          "title": "Задачи на массивы",
+          "subtitle": "поиск, сортировка, два указателя",
+          "order": 1
+        },
+        {
+          "id": "string-algorithms",
+          "title": "Задачи на строки",
+          "subtitle": "палиндромы, анаграммы, подсчёт",
           "order": 2
         }
       ]

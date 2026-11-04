@@ -104,6 +104,8 @@ export const OrderQuestionSchema = z.object({
   lines: z.array(text).min(2),
   /** Order in which the lines are shown: a permutation of line indexes. */
   shuffled: z.array(z.number().int().min(0)),
+  /** The lines are steps in words (a trace, a ranking), not code: nothing to run. */
+  steps: z.boolean().optional(),
 });
 
 export const FindBugQuestionSchema = z.object({

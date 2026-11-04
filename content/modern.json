@@ -1,0 +1,1559 @@
+{
+  "lessons": [
+    {
+      "id": "destructuring-01",
+      "topicId": "destructuring",
+      "title": "Деструктуризация объектов",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Деструктуризация** раскладывает объект по переменным одной строкой. Имя переменной в фигурных скобках — это имя ключа, из которого берётся значение."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", age: 25 };\nconst { name, age } = user;\nconsole.log(name, age); // Аня 25"
+          },
+          {
+            "type": "text",
+            "text": "Порядок в скобках не важен: значения ищутся по ключу, а не по позиции. Если такого ключа нет, переменная получит `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const { age, name, city } = { name: \"Аня\", age: 25 };\nconsole.log(name, age, city); // Аня 25 undefined"
+          },
+          {
+            "type": "tip",
+            "text": "`const { name } = user` — это короткая запись для `const name = user.name`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "destructuring-01-q1",
+          "type": "output",
+          "code": "const book = { title: \"Дюна\", pages: 412 };\nconst { title, pages } = book;\nconsole.log(title, pages);",
+          "options": ["Дюна 412", "undefined undefined", "412 Дюна", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключи title и pages в объекте есть, значения достаются по ним",
+            "Значения ищутся по именам ключей, поэтому каждая переменная получает своё",
+            "Если деструктурируешь объект, отсутствие ключей не вызывает ошибку, а здесь ключи на месте"
+          ],
+          "explanation": "Переменные title и pages получают значения одноимённых ключей объекта book."
+        },
+        {
+          "id": "destructuring-01-q2",
+          "type": "output",
+          "code": "const { color } = { colour: \"red\" };\nconsole.log(color);",
+          "options": ["undefined", "red", "ReferenceError", "null"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "color и colour — разные ключи: значение ищется по точному имени",
+            "Переменная color объявлена деструктуризацией, просто без значения",
+            "Отсутствующий ключ даёт undefined, а не null"
+          ],
+          "explanation": "В объекте нет ключа color (там colour), поэтому переменная получает undefined — так же, как при обращении obj.color."
+        },
+        {
+          "id": "destructuring-01-q3",
+          "type": "trueFalse",
+          "code": "const { b, a } = { a: 1, b: 2 };\nconsole.log(a, b);",
+          "options": ["Выведет 1 2", "Выведет 2 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У объекта значения берутся по именам ключей, а не по позиции"
+          ],
+          "explanation": "a получает значение ключа a, b — ключа b. Порядок переменных в фигурных скобках не важен."
+        },
+        {
+          "id": "destructuring-01-q4",
+          "type": "fill",
+          "codeBefore": "const point = { x: 3, y: 4 };\nconst ",
+          "codeAfter": " = point;\nconsole.log(x + y); // 7",
+          "options": ["{ x, y }", "[x, y]", "{ a, b }", "(x, y)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Квадратные скобки — деструктуризация массива. Обычный объект не перебираемый — TypeError",
+            "a и b получат undefined, а x и y так и не объявятся — ReferenceError",
+            "Круглые скобки ничего не деструктурируют — SyntaxError"
+          ],
+          "explanation": "Объект раскладывают фигурными скобками, а имена переменных должны совпадать с ключами."
+        },
+        {
+          "id": "destructuring-01-q5",
+          "type": "order",
+          "lines": [
+            "const user = { name: \"Олег\", city: \"Казань\" };",
+            "const { name, city } = user;",
+            "const text = name + \" из \" + city;",
+            "console.log(text); // Олег из Казань"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Сначала создаём объект, потом достаём из него переменные и только после этого их используем: к const нельзя обращаться до объявления."
+        }
+      ]
+    },
+    {
+      "id": "destructuring-02",
+      "topicId": "destructuring",
+      "title": "Деструктуризация массивов",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Массив раскладывают квадратными скобками. Здесь значения берутся **по позиции**: первая переменная получит первый элемент, вторая — второй."
+          },
+          {
+            "type": "code",
+            "code": "const colors = [\"red\", \"green\", \"blue\"];\nconst [first, second] = colors;\nconsole.log(first, second); // red green"
+          },
+          {
+            "type": "text",
+            "text": "Ненужный элемент пропускают пустым местом между запятыми. Если элементов не хватило, переменная получит `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const [, , third, fourth] = [\"red\", \"green\", \"blue\"];\nconsole.log(third, fourth); // blue undefined"
+          },
+          {
+            "type": "tip",
+            "text": "Так удобно поменять значения местами без временной переменной: `[a, b] = [b, a]`."
+          },
+          {
+            "type": "code",
+            "code": "let a = 1;\nlet b = 2;\n[a, b] = [b, a];\nconsole.log(a, b); // 2 1"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "destructuring-02-q1",
+          "type": "output",
+          "code": "const [x, y] = [10, 20, 30];\nconsole.log(x, y);",
+          "options": ["10 20", "20 30", "10 30", "undefined undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первая переменная получает первый элемент, а не второй",
+            "Элементы раскладываются подряд: y получает второй элемент",
+            "Квадратные скобки слева раскладывают массив по позициям, значения находятся"
+          ],
+          "explanation": "x получает элемент с индексом 0, y — с индексом 1. Лишний элемент 30 просто не используется."
+        },
+        {
+          "id": "destructuring-02-q2",
+          "type": "output",
+          "code": "const [, second, , fourth] = [\"a\", \"b\", \"c\"];\nconsole.log(second, fourth);",
+          "options": ["b undefined", "a c", "b c", "c undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустое место перед первой запятой пропускает \"a\"",
+            "Пропуск стоит перед fourth и съедает \"c\", а четвёртого элемента в массиве нет",
+            "Одно пустое место пропускает ровно один элемент"
+          ],
+          "explanation": "Пустое место пропускает \"a\", second получает \"b\", следующее пустое место пропускает \"c\". Четвёртого элемента нет, поэтому fourth — undefined."
+        },
+        {
+          "id": "destructuring-02-q3",
+          "type": "fill",
+          "codeBefore": "let left = \"L\";\nlet right = \"R\";\n",
+          "codeAfter": " = [right, left];\nconsole.log(left, right); // R L",
+          "options": ["[left, right]", "{ left, right }", "left, right", "[right, left]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строку, которая начинается с {, JavaScript читает как блок кода — SyntaxError",
+            "Это не деструктуризация, а оператор запятая: присваивание получит только right, и в нём окажется весь массив",
+            "Переменные получат те же значения, что и были: ничего не поменяется местами"
+          ],
+          "explanation": "Справа создаётся массив [\"R\", \"L\"], а слева он раскладывается обратно в left и right — уже в новом порядке."
+        },
+        {
+          "id": "destructuring-02-q4",
+          "type": "trueFalse",
+          "code": "const [a, b] = [1];\nconsole.log(b);",
+          "options": ["Выведет undefined", "Вызовет ошибку"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Нехватка элементов — не ошибка: переменная просто получает undefined"
+          ],
+          "explanation": "Во втором элементе пусто, поэтому b получает undefined — как при обращении arr[1]."
+        },
+        {
+          "id": "destructuring-02-q5",
+          "type": "output",
+          "code": "let a = \"🍎\";\nlet b = \"🍌\";\n[a, b] = [b, a];\nconsole.log(a, b);",
+          "options": ["🍌 🍎", "🍎 🍌", "🍌 🍌", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Справа сначала создаётся массив из текущих значений, а потом он раскладывается в a и b в новом порядке",
+            "Значения справа берутся до присваивания, поэтому старое значение a не теряется",
+            "Деструктурирующее присваивание работает и с уже объявленными переменными"
+          ],
+          "explanation": "Справа создаётся массив из текущих значений [b, a], затем он раскладывается обратно: a получает банан, b — яблоко."
+        }
+      ]
+    },
+    {
+      "id": "destructuring-03",
+      "topicId": "destructuring",
+      "title": "Переименование и значения по умолчанию",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Чтобы взять ключ под другим именем, пиши `ключ: новоеИмя`. Переменная с именем ключа при этом **не создаётся**."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\" };\nconst { name: userName } = user;\nconsole.log(userName); // Аня"
+          },
+          {
+            "type": "text",
+            "text": "Значение по умолчанию задаётся через `=`. Оно срабатывает, только если значение `undefined`: ключа нет или там явно записан `undefined`."
+          },
+          {
+            "type": "code",
+            "code": "const { role = \"гость\", age = 18 } = { age: null };\nconsole.log(role, age); // гость null"
+          },
+          {
+            "type": "warning",
+            "text": "`null`, `0` и `\"\"` — это значения, а не их отсутствие. Значение по умолчанию на них не срабатывает."
+          },
+          {
+            "type": "tip",
+            "text": "Можно сразу и переименовать, и задать значение по умолчанию: `{ name: userName = \"Аноним\" }`. В массивах тоже работает: `const [a = 1] = []`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "destructuring-03-q1",
+          "type": "output",
+          "code": "const { title: heading } = { title: \"Новости\" };\nconsole.log(heading);",
+          "options": ["Новости", "undefined", "title", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "heading — новое имя для значения ключа title, и значение там есть",
+            "Переменная получает значение ключа, а не его имя",
+            "heading объявлена — это новое имя для title"
+          ],
+          "explanation": "Запись title: heading берёт значение ключа title и кладёт его в переменную heading."
+        },
+        {
+          "id": "destructuring-03-q2",
+          "type": "output",
+          "code": "const { title: heading } = { title: \"Новости\" };\nconsole.log(title);",
+          "options": ["ReferenceError", "Новости", "undefined", "heading"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "При переименовании переменная title не создаётся — только heading",
+            "Обращение к необъявленной переменной — ошибка, а не undefined",
+            "Значение ключа ушло в переменную heading, а title вообще не объявлена"
+          ],
+          "explanation": "При переименовании создаётся только переменная heading. Переменной title нет, обращение к ней — ReferenceError."
+        },
+        {
+          "id": "destructuring-03-q3",
+          "type": "output",
+          "code": "const { size = \"M\", color = \"black\" } = { size: undefined, color: null };\nconsole.log(size, color);",
+          "options": ["M null", "M black", "undefined null", "undefined black"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "null — это значение: по умолчанию срабатывает только на undefined",
+            "Явный undefined считается отсутствием значения, поэтому срабатывает \"M\"",
+            "Наоборот: undefined заменяется на \"M\", а null остаётся"
+          ],
+          "explanation": "Значение по умолчанию срабатывает только на undefined. Явный undefined заменяется на \"M\", а null — это значение, и оно остаётся."
+        },
+        {
+          "id": "destructuring-03-q4",
+          "type": "fill",
+          "codeBefore": "const settings = {};\nconst { theme ",
+          "codeAfter": " } = settings;\nconsole.log(theme); // dark",
+          "options": ["= \"dark\"", ": \"dark\"", "|| \"dark\"", "?? \"dark\""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Двоеточие задаёт новое имя переменной, а строка именем быть не может — SyntaxError",
+            "Внутри шаблона деструктуризации операторы не пишут — SyntaxError",
+            "?? не работает внутри шаблона деструктуризации — SyntaxError. Там для этого есть ="
+          ],
+          "explanation": "Значение по умолчанию в шаблоне задаётся через =. Ключа theme нет, поэтому переменная получает \"dark\"."
+        },
+        {
+          "id": "destructuring-03-q5",
+          "type": "trueFalse",
+          "code": "const [first = 1, second = 2] = [10];\nconsole.log(first, second);",
+          "options": ["Выведет 10 2", "Выведет 1 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значение по умолчанию используется, только если элемента нет. А первый элемент есть — 10"
+          ],
+          "explanation": "Первый элемент есть — 10, поэтому значение по умолчанию для first не нужно. Второго элемента нет, и second получает 2."
+        }
+      ]
+    },
+    {
+      "id": "destructuring-04",
+      "topicId": "destructuring",
+      "title": "Вложенная деструктуризация и параметры",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Шаблон может повторять форму данных. Чтобы достать значение из вложенного объекта или массива, напиши после ключа ещё одни скобки."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", address: { city: \"Казань\" } };\nconst { address: { city } } = user;\nconsole.log(city); // Казань"
+          },
+          {
+            "type": "warning",
+            "text": "Здесь `address` — только путь к данным, переменная `address` не создаётся. Если нужен и сам объект, допиши его отдельно: `{ address, address: { city } }`."
+          },
+          {
+            "type": "text",
+            "text": "Деструктуризация работает и в параметрах функции: функция сразу получает нужные поля. А `= {}` защищает от вызова без аргументов."
+          },
+          {
+            "type": "code",
+            "code": "function greet({ name, age = 18 } = {}) {\n  return name + \", \" + age;\n}\nconsole.log(greet({ name: \"Олег\" })); // Олег, 18\nconsole.log(greet());                // undefined, 18"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "destructuring-04-q1",
+          "type": "output",
+          "code": "const data = { pos: { x: 5, y: 7 } };\nconst { pos: { y } } = data;\nconsole.log(y);",
+          "options": ["7", "5", "undefined", "{ x: 5, y: 7 }"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "y берётся по имени ключа во вложенном объекте, а x не используется",
+            "Ключ y есть во вложенном объекте pos",
+            "Это значение pos, а шаблон достаёт из него только y"
+          ],
+          "explanation": "Шаблон { pos: { y } } заходит в объект pos и достаёт из него значение ключа y."
+        },
+        {
+          "id": "destructuring-04-q2",
+          "type": "output",
+          "code": "const data = { pos: { x: 5, y: 7 } };\nconst { pos: { x } } = data;\nconsole.log(pos);",
+          "options": ["ReferenceError", "{ x: 5, y: 7 }", "undefined", "5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "pos в шаблоне — только путь, переменная pos не создаётся",
+            "Обращение к необъявленной переменной — ошибка, а не undefined",
+            "5 лежит в переменной x, а не в pos"
+          ],
+          "explanation": "pos в шаблоне — только путь к данным. Создаётся одна переменная x, а pos не объявлена, отсюда ReferenceError."
+        },
+        {
+          "id": "destructuring-04-q3",
+          "type": "output",
+          "code": "function show({ title, year = 2000 }) {\n  return title + \" \" + year;\n}\nconsole.log(show({ title: \"Матрица\" }));",
+          "options": ["Матрица 2000", "Матрица undefined", "undefined 2000", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для year задано значение по умолчанию, оно и срабатывает",
+            "title есть в переданном объекте",
+            "Объект передан, деструктурировать его можно"
+          ],
+          "explanation": "Функция раскладывает переданный объект прямо в параметрах. Ключа year нет, поэтому срабатывает значение по умолчанию 2000."
+        },
+        {
+          "id": "destructuring-04-q4",
+          "type": "trueFalse",
+          "code": "function greet({ name }) {\n  return \"Привет, \" + name;\n}\nconsole.log(greet());",
+          "options": ["Выведет «Привет, undefined»", "Вызовет TypeError"],
+          "correct": 1,
+          "optionExplanations": [
+            "Без аргумента раскладывать нечего: деструктуризация undefined — TypeError",
+            null
+          ],
+          "explanation": "Без аргумента параметр равен undefined, а деструктурировать undefined нельзя — TypeError. Защита — значение по умолчанию: { name } = {}."
+        },
+        {
+          "id": "destructuring-04-q5",
+          "type": "fill",
+          "codeBefore": "const order = { id: 7, items: [\"чай\", \"сок\"] };\nconst { items: ",
+          "codeAfter": " } = order;\nconsole.log(firstItem); // чай",
+          "options": ["[firstItem]", "{ firstItem }", "firstItem", "firstItem[0]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У массива нет ключа firstItem, поэтому переменная получит undefined",
+            "Так firstItem получит весь массив items",
+            "В объявлении const после двоеточия может стоять только имя или вложенный шаблон — SyntaxError"
+          ],
+          "explanation": "Значение items — массив, поэтому после двоеточия нужен шаблон массива. [firstItem] берёт его первый элемент."
+        }
+      ]
+    },
+    {
+      "id": "destructuring-05",
+      "topicId": "destructuring",
+      "title": "Деструктуризация: закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Деструктуризацией можно записывать значения и в уже объявленные переменные. Для объекта оберни всё выражение в круглые скобки, иначе `{` в начале строки JavaScript примет за блок кода."
+          },
+          {
+            "type": "code",
+            "code": "let x, y;\n({ x, y } = { x: 1, y: 2 });\nconsole.log(x, y); // 1 2"
+          },
+          {
+            "type": "text",
+            "text": "Приёмы сочетаются: переименование, значение по умолчанию и вложенность в одном шаблоне."
+          },
+          {
+            "type": "code",
+            "code": "const response = { data: { user: { login: \"anya\" } } };\nconst { data: { user: { login: nick, role = \"user\" } } } = response;\nconsole.log(nick, role); // anya user"
+          },
+          {
+            "type": "tip",
+            "text": "Деструктуризация удобна в `for...of`: `for (const [key, value] of Object.entries(obj))` сразу раскладывает пары ключ–значение."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "destructuring-05-q1",
+          "type": "output",
+          "code": "const settings = { theme: { dark: false } };\nconst { theme: { dark: isDark = true } } = settings;\nconsole.log(isDark);",
+          "options": ["false", "true", "undefined", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "false — это значение, а не его отсутствие: по умолчанию срабатывает только на undefined",
+            "Ключ dark есть, и его значение false попадает в isDark",
+            "isDark объявлена в шаблоне — это новое имя для dark"
+          ],
+          "explanation": "dark переименован в isDark. Его значение false — не undefined, поэтому значение по умолчанию true не срабатывает."
+        },
+        {
+          "id": "destructuring-05-q2",
+          "type": "fill",
+          "codeBefore": "let a = 1, b = 2;\n",
+          "codeAfter": ";\nconsole.log(a, b); // 3 4",
+          "options": [
+            "({ a, b } = { a: 3, b: 4 })",
+            "{ a, b } = { a: 3, b: 4 }",
+            "const { a, b } = { a: 3, b: 4 }",
+            "[a, b] = { a: 3, b: 4 }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строку, которая начинается с {, JavaScript читает как блок кода — SyntaxError",
+            "a и b уже объявлены через let, повторное объявление — SyntaxError",
+            "Шаблону массива нужно перебираемое значение, а обычный объект таким не является — TypeError"
+          ],
+          "explanation": "Без объявления деструктуризацию объекта оборачивают в круглые скобки: тогда { в начале строки читается как шаблон, а не как блок."
+        },
+        {
+          "id": "destructuring-05-q3",
+          "type": "output",
+          "code": "const prices = { tea: 50, juice: 80 };\nfor (const [item, price] of Object.entries(prices)) {\n  console.log(item + \"=\" + price);\n}",
+          "options": [
+            "tea=50 juice=80",
+            "tea=undefined juice=undefined",
+            "50=tea 80=juice",
+            "TypeError"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Object.entries возвращает пары [ключ, значение], и шаблон раскладывает каждую",
+            "В паре сначала идёт ключ, потом значение",
+            "Object.entries возвращает обычный массив, его можно перебирать через for...of"
+          ],
+          "explanation": "Object.entries возвращает пары [ключ, значение], и шаблон [item, price] раскладывает каждую пару на две переменные."
+        },
+        {
+          "id": "destructuring-05-q4",
+          "type": "order",
+          "lines": [
+            "const getUser = () => ({ id: 1, profile: { nick: \"anya\" } });",
+            "const { profile: { nick } } = getUser();",
+            "const greeting = \"Привет, \" + nick;",
+            "console.log(greeting); // Привет, anya"
+          ],
+          "shuffled": [1, 3, 0, 2],
+          "explanation": "Сначала объявляем функцию, затем раскладываем её результат, строим приветствие и выводим. К const нельзя обращаться до объявления, поэтому порядок единственный."
+        },
+        {
+          "id": "destructuring-05-q5",
+          "type": "output",
+          "code": "const [{ name }, { name: second = \"?\" } = {}] = [{ name: \"Аня\" }];\nconsole.log(name, second);",
+          "options": ["Аня ?", "Аня undefined", "TypeError", "undefined ?"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В пустом объекте name нет, значит срабатывает значение по умолчанию \"?\"",
+            "Второго элемента нет, но запасной объект = {} спасает от ошибки",
+            "Первый элемент массива — объект с ключом name, и его значение \"Аня\""
+          ],
+          "explanation": "Первый элемент — объект, из него берётся name. Второго элемента нет, поэтому срабатывает = {}, а в пустом объекте нет name — second получает \"?\"."
+        }
+      ]
+    },
+    {
+      "id": "spread-rest-01",
+      "topicId": "spread-rest",
+      "title": "Spread в массивах",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Оператор `...` (spread) **разворачивает** массив в отдельные элементы. Так легко склеить массивы или сделать копию."
+          },
+          {
+            "type": "code",
+            "code": "const a = [1, 2];\nconst b = [3, 4];\nconsole.log([...a, ...b, 5]); // [1, 2, 3, 4, 5]\n\nconst copy = [...a];\nconsole.log(copy === a); // false"
+          },
+          {
+            "type": "text",
+            "text": "Spread работает и при вызове функции: элементы массива становятся отдельными аргументами. Развернуть можно любое перебираемое значение, например строку."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [3, 9, 4];\nconsole.log(Math.max(...nums)); // 9\nconsole.log([...\"hi\"]);         // [\"h\", \"i\"]"
+          },
+          {
+            "type": "warning",
+            "text": "Без `...` массив вставится целиком, одним элементом: `[a, b]` даст `[[1, 2], [3, 4]]`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "spread-rest-01-q1",
+          "type": "output",
+          "code": "const a = [1, 2];\nconst b = [3];\nconsole.log([...a, ...b, 4]);",
+          "options": ["[1, 2, 3, 4]", "[[1, 2], [3], 4]", "[1, 2, [3], 4]", "[4, 1, 2, 3]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Так было бы без ...: spread вставляет элементы, а не сам массив",
+            "b тоже развёрнут через ..., поэтому 3 вставляется отдельно",
+            "Элементы идут в том порядке, в каком написаны в скобках"
+          ],
+          "explanation": "Spread вставляет элементы a и b по одному, в том порядке, в каком они записаны, а затем идёт 4."
+        },
+        {
+          "id": "spread-rest-01-q2",
+          "type": "output",
+          "code": "const a = [1, 2];\nconst b = [a, 3];\nconsole.log(b.length);",
+          "options": ["2", "3", "1", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без ... массив a не разворачивается, а вставляется одним элементом",
+            "В b два элемента: массив a и число 3",
+            null
+          ],
+          "explanation": "Без ... массив a вставляется целиком, как один элемент. В b два элемента: массив [1, 2] и число 3."
+        },
+        {
+          "id": "spread-rest-01-q3",
+          "type": "trueFalse",
+          "code": "const original = [1, 2, 3];\nconst copy = [...original];\ncopy.push(4);\nconsole.log(original.length);",
+          "options": ["Выведет 3", "Выведет 4"],
+          "correct": 0,
+          "optionExplanations": [null, "[...original] — новый массив, push меняет только копию"],
+          "explanation": "[...original] создаёт новый массив. push меняет только копию, оригинал остаётся из трёх элементов."
+        },
+        {
+          "id": "spread-rest-01-q4",
+          "type": "fill",
+          "codeBefore": "const temps = [12, 25, 18];\nconsole.log(Math.max(",
+          "codeAfter": ")); // 25",
+          "options": ["...temps", "temps", "[temps]", "temps..."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Math.max получит один аргумент-массив, не сможет превратить его в число и вернёт NaN",
+            "Math.max получит массив в массиве — снова NaN",
+            "Spread пишется перед значением: ...temps. Иначе SyntaxError"
+          ],
+          "explanation": "Math.max принимает числа отдельными аргументами. ...temps разворачивает массив в три аргумента."
+        },
+        {
+          "id": "spread-rest-01-q5",
+          "type": "output",
+          "code": "const letters = [...\"кот\"];\nconsole.log(letters);",
+          "options": ["[\"к\", \"о\", \"т\"]", "[\"кот\"]", "кот", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread разворачивает строку посимвольно, а не кладёт её целиком",
+            "Квадратные скобки создают массив, а не строку",
+            "Строка перебираемая, её можно развернуть через ..."
+          ],
+          "explanation": "Строка перебираемая: spread разворачивает её посимвольно, и каждый символ становится отдельным элементом."
+        }
+      ]
+    },
+    {
+      "id": "spread-rest-02",
+      "topicId": "spread-rest",
+      "title": "Spread в объектах",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "В объектах `...` копирует все собственные свойства в новый объект. Так объединяют объекты и делают копию."
+          },
+          {
+            "type": "code",
+            "code": "const base = { a: 1, b: 2 };\nconst extra = { c: 3 };\nconsole.log({ ...base, ...extra }); // { a: 1, b: 2, c: 3 }"
+          },
+          {
+            "type": "text",
+            "text": "Если ключ встречается дважды, **побеждает то, что правее**. Ключ остаётся там, где появился впервые, меняется только значение. Поэтому сначала пишут значения по умолчанию, а потом то, что их перекрывает."
+          },
+          {
+            "type": "code",
+            "code": "const defaults = { theme: \"light\", lang: \"ru\" };\nconst options = { theme: \"dark\" };\nconsole.log({ ...defaults, ...options }); // { theme: \"dark\", lang: \"ru\" }\nconsole.log({ ...options, ...defaults }); // { theme: \"light\", lang: \"ru\" }"
+          },
+          {
+            "type": "tip",
+            "text": "С обычными свойствами работает так же: `{ ...user, age: 30 }` — копия `user` с новым `age`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "spread-rest-02-q1",
+          "type": "output",
+          "code": "const a = { x: 1, y: 2 };\nconst b = { y: 3, z: 4 };\nconsole.log({ ...a, ...b });",
+          "options": [
+            "{ x: 1, y: 3, z: 4 }",
+            "{ x: 1, y: 2, z: 4 }",
+            "{ x: 1, y: 2, y: 3, z: 4 }",
+            "{ x: 1, z: 4, y: 3 }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для повторяющегося ключа побеждает значение правее — из b",
+            "Ключи в объекте уникальны: второе y перезаписывает первое",
+            "Ключ остаётся на месте первого появления, меняется только значение"
+          ],
+          "explanation": "b стоит правее, поэтому его y = 3 перезаписывает y = 2. Ключ y остаётся на своём первом месте."
+        },
+        {
+          "id": "spread-rest-02-q2",
+          "type": "output",
+          "code": "const user = { name: \"Аня\", age: 25 };\nconst updated = { age: 30, ...user };\nconsole.log(updated.age);",
+          "options": ["25", "30", "[25, 30]", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "...user стоит правее и перезаписывает age значением из user",
+            "Повторяющийся ключ не превращается в массив: остаётся последнее значение",
+            null
+          ],
+          "explanation": "...user стоит правее age: 30 и перезаписывает его значением из user. Чтобы обновить age, его пишут после spread."
+        },
+        {
+          "id": "spread-rest-02-q3",
+          "type": "fill",
+          "codeBefore": "const defaults = { size: \"M\", color: \"black\" };\nconst choice = { color: \"red\" };\nconst result = ",
+          "codeAfter": ";\nconsole.log(result.size, result.color); // M red",
+          "options": [
+            "{ ...defaults, ...choice }",
+            "{ ...choice, ...defaults }",
+            "{ defaults, choice }",
+            "[...defaults, ...choice]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "defaults правее и вернёт color обратно на \"black\"",
+            "Без ... получится объект с ключами defaults и choice, а size и color будут undefined",
+            "Квадратные скобки создают массив, а обычный объект в массив не развернуть — TypeError"
+          ],
+          "explanation": "Сначала разворачиваем значения по умолчанию, потом выбор пользователя: он правее и перекрывает color."
+        },
+        {
+          "id": "spread-rest-02-q4",
+          "type": "trueFalse",
+          "code": "const a = { n: 1 };\nconst b = { ...a };\nconsole.log(a === b);",
+          "options": ["Выведет false", "Выведет true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Фигурные скобки всегда создают новый объект, а === сравнивает ссылки"
+          ],
+          "explanation": "{ ...a } создаёт новый объект с теми же свойствами. === сравнивает ссылки, а это два разных объекта."
+        },
+        {
+          "id": "spread-rest-02-q5",
+          "type": "order",
+          "lines": [
+            "const defaults = { volume: 50, muted: false };",
+            "const saved = { volume: defaults.volume + 30 };",
+            "const settings = { ...defaults, ...saved };",
+            "console.log(settings.volume); // 80"
+          ],
+          "shuffled": [2, 3, 0, 1],
+          "explanation": "saved использует defaults, а settings собирается из обоих. saved правее, поэтому volume равен 80."
+        }
+      ]
+    },
+    {
+      "id": "spread-rest-03",
+      "topicId": "spread-rest",
+      "title": "Поверхностная копия",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Spread делает **поверхностную** копию: копируется только верхний уровень. Во вложенные объекты и массивы попадает ссылка на тот же самый объект. С массивами так же: `[...arr]` — новый массив, но объекты в нём те же."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", tags: [\"js\"] };\nconst copy = { ...user };\n\ncopy.name = \"Олег\";\ncopy.tags.push(\"css\");\n\nconsole.log(user.name); // Аня\nconsole.log(user.tags); // [\"js\", \"css\"]"
+          },
+          {
+            "type": "text",
+            "text": "Чтобы изменить вложенное значение, не трогая оригинал, скопируй и вложенный уровень."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\", address: { city: \"Казань\" } };\nconst moved = { ...user, address: { ...user.address, city: \"Сочи\" } };\nconsole.log(user.address.city);  // Казань\nconsole.log(moved.address.city); // Сочи"
+          },
+          {
+            "type": "tip",
+            "text": "Для полной, глубокой копии в браузере есть `structuredClone(obj)`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "spread-rest-03-q1",
+          "type": "output",
+          "code": "const a = { n: 1, inner: { m: 1 } };\nconst b = { ...a };\nb.n = 2;\nb.inner.m = 2;\nconsole.log(a.n, a.inner.m);",
+          "options": ["1 2", "1 1", "2 2", "2 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "inner не скопирован: a.inner и b.inner — один и тот же объект",
+            "n скопирован на верхнем уровне, поэтому b.n = 2 не меняет a",
+            "Наоборот: n у копии своё, а inner общий"
+          ],
+          "explanation": "n — значение верхнего уровня, у копии оно своё. А inner не скопирован: a.inner и b.inner — один и тот же объект."
+        },
+        {
+          "id": "spread-rest-03-q2",
+          "type": "trueFalse",
+          "code": "const a = { list: [1, 2] };\nconst b = { ...a };\nconsole.log(a.list === b.list);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Spread не копирует вложенный массив: в b.list лежит ссылка на тот же массив"
+          ],
+          "explanation": "Spread копирует только верхний уровень: b.list хранит ссылку на тот же массив, что и a.list."
+        },
+        {
+          "id": "spread-rest-03-q3",
+          "type": "output",
+          "code": "const users = [{ name: \"Аня\" }];\nconst copy = [...users];\ncopy[0].name = \"Олег\";\ncopy.push({ name: \"Ира\" });\nconsole.log(users.length, users[0].name);",
+          "options": ["1 Олег", "1 Аня", "2 Олег", "2 Аня"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В копии массива лежат те же объекты, поэтому новое имя видно и в users",
+            "push добавляет элемент только в новый массив copy",
+            "push меняет только copy, а вот объект внутри общий"
+          ],
+          "explanation": "copy — новый массив, поэтому push не трогает users. Но объект внутри общий, и новое имя видно через оба массива."
+        },
+        {
+          "id": "spread-rest-03-q4",
+          "type": "fill",
+          "codeBefore": "const state = { user: { name: \"Аня\", age: 25 } };\nconst next = { ...state, user: ",
+          "codeAfter": " };\nnext.user.age = 26;\nconsole.log(state.user.age, next.user.name); // 25 Аня",
+          "options": ["{ ...state.user }", "state.user", "{ state.user }", "{ ...state }"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Это ссылка на тот же объект: новый age попадёт и в state",
+            "Сокращённая запись свойства работает только с именем переменной — SyntaxError",
+            "Так в next.user попадёт копия всего state, а у неё нет name"
+          ],
+          "explanation": "{ ...state.user } создаёт отдельную копию вложенного объекта, поэтому изменение next.user не задевает state."
+        },
+        {
+          "id": "spread-rest-03-q5",
+          "type": "output",
+          "code": "const original = { tags: [\"a\"] };\nconst copy = { ...original, tags: [...original.tags] };\ncopy.tags.push(\"b\");\nconsole.log(original.tags);",
+          "options": ["[\"a\"]", "[\"a\", \"b\"]", "[\"b\"]", "[]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "tags скопирован отдельно, поэтому у копии свой массив",
+            "push не заменяет массив, а добавляет элемент в конец",
+            "push меняет только копию, оригинал остался прежним"
+          ],
+          "explanation": "Массив tags скопирован отдельно через [...original.tags], поэтому push меняет только массив копии."
+        }
+      ]
+    },
+    {
+      "id": "spread-rest-04",
+      "topicId": "spread-rest",
+      "title": "Rest-параметры",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "В параметрах функции `...` работает наоборот: **собирает** оставшиеся аргументы в настоящий массив. Это rest-параметр."
+          },
+          {
+            "type": "code",
+            "code": "function sum(...nums) {\n  return nums.reduce((acc, n) => acc + n, 0);\n}\nconsole.log(sum(1, 2, 3)); // 6\nconsole.log(sum());        // 0"
+          },
+          {
+            "type": "text",
+            "text": "Rest забирает только то, что не досталось обычным параметрам, поэтому он всегда **последний**. В деструктуризации он работает так же."
+          },
+          {
+            "type": "code",
+            "code": "function log(level, ...messages) {\n  console.log(level, messages);\n}\nlog(\"info\", \"a\", \"b\"); // info [\"a\", \"b\"]\n\nconst [first, ...others] = [10, 20, 30];\nconsole.log(others); // [20, 30]\n\nconst { id, ...rest } = { id: 1, x: 2, y: 3 };\nconsole.log(rest); // { x: 2, y: 3 }"
+          },
+          {
+            "type": "warning",
+            "text": "После rest ничего писать нельзя: `function f(...a, b)` — это SyntaxError."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "spread-rest-04-q1",
+          "type": "output",
+          "code": "function count(...items) {\n  return items.length;\n}\nconsole.log(count(\"a\", \"b\", \"c\"));",
+          "options": ["3", "1", "undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Rest собирает в массив все аргументы, а не только первый",
+            "items — настоящий массив, у него есть length",
+            "items — настоящий массив, у него есть length"
+          ],
+          "explanation": "Rest-параметр items собирает все три аргумента в массив, а у массива есть length."
+        },
+        {
+          "id": "spread-rest-04-q2",
+          "type": "output",
+          "code": "function f(first, ...rest) {\n  console.log(first, rest);\n}\nf(1);",
+          "options": ["1 []", "1 undefined", "[1] []", "1 [undefined]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Если аргументов не осталось, rest — пустой массив, а не undefined",
+            "first — обычный параметр, он получает значение, а не массив",
+            "Rest собирает только реально переданные аргументы"
+          ],
+          "explanation": "first забирает единственный аргумент. Остальных нет, поэтому rest — пустой массив, а не undefined."
+        },
+        {
+          "id": "spread-rest-04-q3",
+          "type": "trueFalse",
+          "code": "function f(...args) {\n  console.log(Array.isArray(args));\n}\nf(1, 2);",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В отличие от старого arguments, rest-параметр — настоящий массив"
+          ],
+          "explanation": "Rest-параметр — настоящий массив: у него есть map, filter, reduce и остальные методы."
+        },
+        {
+          "id": "spread-rest-04-q4",
+          "type": "output",
+          "code": "const { a, ...rest } = { a: 1, b: 2, c: 3 };\nconsole.log(rest);",
+          "options": ["{ b: 2, c: 3 }", "{ a: 1, b: 2, c: 3 }", "[2, 3]", "{ c: 3 }"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "a уже забрали в отдельную переменную, rest получает только остальное",
+            "Rest в шаблоне объекта собирает объект, а не массив",
+            "Rest собирает все оставшиеся свойства, а не последнее"
+          ],
+          "explanation": "a уже забрали в отдельную переменную, а rest собирает в новый объект всё остальное."
+        },
+        {
+          "id": "spread-rest-04-q5",
+          "type": "fill",
+          "codeBefore": "function greet(greeting, ",
+          "codeAfter": ") {\n  return greeting + \", \" + names.join(\" и \");\n}\nconsole.log(greet(\"Привет\", \"Аня\", \"Олег\")); // Привет, Аня и Олег",
+          "options": ["...names", "names", "names...", "[names]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "names получит только \"Аня\", а у строки нет метода join — TypeError",
+            "Три точки ставятся перед именем — SyntaxError",
+            "Это деструктуризация второго аргумента: names станет буквой \"А\", а у строки нет join — TypeError"
+          ],
+          "explanation": "...names собирает все аргументы после greeting в массив [\"Аня\", \"Олег\"], а у массива есть join."
+        }
+      ]
+    },
+    {
+      "id": "spread-rest-05",
+      "topicId": "spread-rest",
+      "title": "Spread и rest: закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Одни и те же три точки делают противоположное. **Spread** в литерале массива или объекта и в вызове функции разворачивает значения. **Rest** слева от `=` и в параметрах собирает их."
+          },
+          {
+            "type": "code",
+            "code": "const nums = [1, 2, 3];\nconst more = [...nums, 4];    // spread: разворачивает\nconst [head, ...tail] = more; // rest: собирает\nconsole.log(head, tail);      // 1 [2, 3, 4]"
+          },
+          {
+            "type": "text",
+            "text": "С rest легко получить копию объекта **без** какого-то свойства, не меняя оригинал."
+          },
+          {
+            "type": "code",
+            "code": "const user = { id: 7, name: \"Аня\", password: \"123\" };\nconst { password, ...safeUser } = user;\nconsole.log(safeUser);      // { id: 7, name: \"Аня\" }\nconsole.log(user.password); // 123"
+          },
+          {
+            "type": "tip",
+            "text": "Rest и spread часто идут парой: `(...args) => fn(...args)` собирает аргументы и передаёт их дальше."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "spread-rest-05-q1",
+          "type": "output",
+          "code": "const [a, ...b] = \"abc\";\nconsole.log(a, b);",
+          "options": ["a [\"b\", \"c\"]", "a bc", "a [\"bc\"]", "[\"a\"] [\"b\", \"c\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Rest в шаблоне массива всегда собирает массив, а не строку",
+            "Строка раскладывается посимвольно, каждый символ — отдельный элемент",
+            "a — обычная переменная, она получает один элемент, а не массив"
+          ],
+          "explanation": "Строка раскладывается посимвольно: a получает \"a\", а rest собирает остальные символы в массив."
+        },
+        {
+          "id": "spread-rest-05-q2",
+          "type": "output",
+          "code": "function range(...args) {\n  return Math.max(...args) - Math.min(...args);\n}\nconsole.log(range(4, 10, 1));",
+          "options": ["9", "NaN", "3", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "args развёрнут через ..., поэтому Math.max и Math.min получают числа, а не массив",
+            null,
+            null
+          ],
+          "explanation": "Rest собирает аргументы в массив [4, 10, 1], а spread снова разворачивает его для Math.max и Math.min: 10 − 1 = 9."
+        },
+        {
+          "id": "spread-rest-05-q3",
+          "type": "trueFalse",
+          "code": "const obj = { id: 1, a: 2, b: 3 };\nconst { id, ...rest } = obj;",
+          "options": ["Здесь ... — это spread", "Здесь ... — это rest"],
+          "correct": 1,
+          "optionExplanations": [
+            "Три точки слева от = собирают оставшиеся свойства — это rest",
+            null
+          ],
+          "explanation": "Слева от = три точки не разворачивают, а собирают оставшиеся свойства в новый объект rest."
+        },
+        {
+          "id": "spread-rest-05-q4",
+          "type": "order",
+          "lines": [
+            "const user = { id: 1, name: \"Аня\", temp: true };",
+            "const { temp, ...clean } = user;",
+            "const saved = { ...clean, savedAt: \"сегодня\" };",
+            "console.log(saved); // { id: 1, name: \"Аня\", savedAt: \"сегодня\" }"
+          ],
+          "shuffled": [1, 3, 0, 2],
+          "explanation": "Сначала rest убирает temp, потом spread копирует остальное в новый объект с полем savedAt. Каждая строка использует результат предыдущей."
+        },
+        {
+          "id": "spread-rest-05-q5",
+          "type": "output",
+          "code": "const add = (a, b, c) => a + b + c;\nconst args = [1, 2, 3, 4];\nconsole.log(add(...args));",
+          "options": ["6", "10", "NaN", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У функции три параметра, лишний аргумент 4 игнорируется",
+            "Все три параметра получили числа",
+            "Передавать лишние аргументы можно, ошибки нет"
+          ],
+          "explanation": "Spread передаёт четыре аргумента, но у функции только три параметра: лишняя 4 игнорируется, 1 + 2 + 3 = 6."
+        }
+      ]
+    },
+    {
+      "id": "optional-chaining-01",
+      "topicId": "optional-chaining",
+      "title": "Оператор ?.",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Читать свойство у `undefined` или `null` нельзя — будет TypeError. Оператор `?.` проверяет значение слева: если там `null` или `undefined`, он сразу возвращает `undefined` вместо ошибки."
+          },
+          {
+            "type": "code",
+            "code": "const user = { name: \"Аня\" };\nconsole.log(user.address?.city); // undefined\nconsole.log(user.address.city);  // TypeError"
+          },
+          {
+            "type": "text",
+            "text": "`?.` работает и с методами, и с индексами: `obj.method?.()` вызывает метод, только если он есть, а `arr?.[0]` читает элемент. Если `?.` сработал, остаток цепочки справа тоже пропускается."
+          },
+          {
+            "type": "code",
+            "code": "const list = null;\nconst api = {};\nconsole.log(list?.[0]);          // undefined\nconsole.log(api.load?.());       // undefined\nconsole.log(api.load?.(\"x\").y);  // undefined"
+          },
+          {
+            "type": "warning",
+            "text": "`?.` проверяет только `null` и `undefined`. Если метод есть, но это не функция, `method?.()` всё равно выдаст TypeError."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "optional-chaining-01-q1",
+          "type": "output",
+          "code": "const user = { profile: null };\nconsole.log(user.profile?.avatar);",
+          "options": ["undefined", "null", "TypeError", "false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Если слева null, ?. возвращает undefined, а не сам null",
+            "?. как раз защищает от ошибки при чтении свойства у null",
+            null
+          ],
+          "explanation": "Слева от ?. стоит null, поэтому оператор не читает avatar и сразу возвращает undefined."
+        },
+        {
+          "id": "optional-chaining-01-q2",
+          "type": "output",
+          "code": "const user = {};\nconsole.log(user.settings?.theme);\nconsole.log(user.settings.theme);",
+          "options": ["undefined TypeError", "undefined undefined", "TypeError", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Во второй строке нет ?., а читать свойство у undefined нельзя",
+            "Первая строка успевает вывести undefined до ошибки",
+            "Вторая строка без ?. падает с ошибкой"
+          ],
+          "explanation": "Первая строка защищена ?. и выводит undefined. Во второй ?. нет, а читать свойство у undefined нельзя — TypeError."
+        },
+        {
+          "id": "optional-chaining-01-q3",
+          "type": "fill",
+          "codeBefore": "const cart = { items: [] };\nconsole.log(cart.items[0]",
+          "codeAfter": "price); // undefined",
+          "options": ["?.", ".", "?", "!."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "cart.items[0] — undefined, а читать свойство у undefined — TypeError",
+            "Одиночный ? — начало тернарного оператора, без двоеточия это SyntaxError",
+            "В JavaScript нет оператора !. — SyntaxError"
+          ],
+          "explanation": "Элемента [0] нет, это undefined. ?. видит undefined и возвращает undefined, не читая price."
+        },
+        {
+          "id": "optional-chaining-01-q4",
+          "type": "trueFalse",
+          "code": "const config = { onLoad: \"готово\" };\nconfig.onLoad?.();",
+          "options": ["Код выполнится без ошибок", "Будет TypeError"],
+          "correct": 1,
+          "optionExplanations": [
+            "?. пропускает вызов только для null и undefined, а строку вызвать нельзя",
+            null
+          ],
+          "explanation": "?. пропускает вызов только для null и undefined. onLoad — строка, её пытаются вызвать как функцию, и получается TypeError."
+        },
+        {
+          "id": "optional-chaining-01-q5",
+          "type": "output",
+          "code": "const users = null;\nconsole.log(users?.[0].name.length);",
+          "options": ["undefined", "TypeError", "null", "0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Когда ?. срабатывает, остаток цепочки справа не выполняется, поэтому ошибки нет",
+            "?. возвращает undefined, а не null",
+            "До length дело не доходит: цепочка обрывается на ?."
+          ],
+          "explanation": "users равен null, поэтому ?. сразу возвращает undefined, а остаток цепочки .name.length даже не выполняется."
+        }
+      ]
+    },
+    {
+      "id": "optional-chaining-02",
+      "topicId": "optional-chaining",
+      "title": "?? против ||",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`a ?? b` возвращает `b`, только если `a` равно `null` или `undefined`. Иначе возвращает `a`, даже если это `0`, `\"\"` или `false`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(null ?? \"запасное\"); // запасное\nconsole.log(0 ?? 10);            // 0\nconsole.log(false ?? true);      // false"
+          },
+          {
+            "type": "text",
+            "text": "`||` срабатывает на **любое** ложное значение: `0`, `\"\"`, `false`, `NaN`, `null`, `undefined`. Если `0` или пустая строка — нормальное значение, бери `??`."
+          },
+          {
+            "type": "code",
+            "code": "const count = 0;\nconsole.log(count || 10); // 10\nconsole.log(count ?? 10); // 0"
+          },
+          {
+            "type": "warning",
+            "text": "`??` нельзя смешивать с `||` или `&&` без скобок: `a || b ?? c` — SyntaxError. Пиши `(a || b) ?? c`."
+          },
+          {
+            "type": "tip",
+            "text": "`?.` и `??` хорошо работают вместе: `user?.name ?? \"Гость\"`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "optional-chaining-02-q1",
+          "type": "output",
+          "code": "const volume = 0;\nconsole.log(volume ?? 50, volume || 50);",
+          "options": ["0 50", "50 50", "0 0", "50 0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "?? заменяет только null и undefined, а 0 — обычное значение",
+            "|| считает 0 ложным значением и берёт правую часть",
+            "Наоборот: ?? оставляет 0, а || его заменяет"
+          ],
+          "explanation": "?? заменяет только null и undefined, поэтому 0 остаётся. || считает 0 ложным и берёт 50."
+        },
+        {
+          "id": "optional-chaining-02-q2",
+          "type": "output",
+          "code": "console.log(false ?? true, null ?? true);",
+          "options": ["false true", "true true", "false null", "true null"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "false — не null и не undefined, поэтому ?? его оставляет",
+            "null ?? true даёт правую часть — true",
+            "?? не трогает false, а null заменяет"
+          ],
+          "explanation": "false — не null и не undefined, поэтому ?? его оставляет. А для null берётся правая часть — true."
+        },
+        {
+          "id": "optional-chaining-02-q3",
+          "type": "trueFalse",
+          "code": "const user = { settings: null };\nconsole.log(user.settings?.lang ?? \"ru\");",
+          "options": ["Выведет ru", "Вызовет TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "?. вернёт undefined вместо ошибки, а ?? заменит его на \"ru\""
+          ],
+          "explanation": "?. вернёт undefined вместо ошибки, а ?? заменит undefined на \"ru\"."
+        },
+        {
+          "id": "optional-chaining-02-q4",
+          "type": "fill",
+          "codeBefore": "function getPage(page) {\n  return page ",
+          "codeAfter": " 1;\n}\nconsole.log(getPage(0), getPage(undefined)); // 0 1",
+          "options": ["??", "||", "&&", "?."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "|| заменит и 0, ведь 0 — ложное значение: получится 1 1",
+            "&& вернёт 0 для ложного значения и undefined для undefined",
+            "?. — это доступ к свойству, а не значение по умолчанию: такая запись — SyntaxError"
+          ],
+          "explanation": "Страница 0 — нормальное значение, его нужно сохранить. ?? заменяет только undefined и null."
+        },
+        {
+          "id": "optional-chaining-02-q5",
+          "type": "output",
+          "code": "const a = null;\nconst b = 0;\nconsole.log((a || b) ?? 7);",
+          "options": ["0", "7", "null", "false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0 — не null и не undefined, поэтому ?? его не заменяет",
+            "|| возвращает b, раз a ложное",
+            "|| возвращает само значение b, а не логическое"
+          ],
+          "explanation": "Сначала считаются скобки: a ложное, поэтому a || b даёт 0. А 0 — не null и не undefined, и ?? оставляет его. Без скобок такая запись была бы SyntaxError."
+        }
+      ]
+    },
+    {
+      "id": "optional-chaining-03",
+      "topicId": "optional-chaining",
+      "title": "??=, ||= и &&=",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Логические присваивания совмещают проверку и `=`. `a ??= b` присваивает, только если `a` равно `null` или `undefined`. `a ||= b` — если `a` ложное. `a &&= b` — если `a` истинное."
+          },
+          {
+            "type": "code",
+            "code": "let a = null;\nlet b = 0;\nlet c = \"hi\";\na ??= 5;\nb ||= 5;\nc &&= c.toUpperCase();\nconsole.log(a, b, c); // 5 5 HI"
+          },
+          {
+            "type": "text",
+            "text": "`a ??= b` работает как `a ?? (a = b)`, а не как `a = a ?? b`. Если присваивать не нужно, правая часть **даже не вычисляется**."
+          },
+          {
+            "type": "code",
+            "code": "let count = 0;\nlet calls = 0;\nconst next = () => { calls++; return 10; };\ncount ??= next();\nconsole.log(count, calls); // 0 0"
+          },
+          {
+            "type": "tip",
+            "text": "`??=` удобно задаёт значения по умолчанию в объекте: `options.lang ??= \"ru\"`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "optional-chaining-03-q1",
+          "type": "output",
+          "code": "let x = 0;\nx ??= 5;\nlet y = 0;\ny ||= 5;\nconsole.log(x, y);",
+          "options": ["0 5", "5 5", "0 0", "5 0"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0 — не null и не undefined, поэтому ??= не присваивает",
+            "||= срабатывает на любое ложное значение, включая 0",
+            "Наоборот: ??= оставляет 0, а ||= его заменяет"
+          ],
+          "explanation": "??= присваивает только вместо null и undefined, поэтому x остаётся 0. ||= срабатывает на любое ложное значение, и y становится 5."
+        },
+        {
+          "id": "optional-chaining-03-q2",
+          "type": "output",
+          "code": "const user = { name: \"Аня\" };\nuser.name &&= user.name + \"!\";\nuser.age &&= 30;\nconsole.log(user);",
+          "options": [
+            "{ name: \"Аня!\" }",
+            "{ name: \"Аня!\", age: 30 }",
+            "{ name: \"Аня!\", age: undefined }",
+            "{ name: \"Аня\" }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "&&= присваивает, только если значение истинное, а user.age — undefined",
+            "Присваивания не было вовсе, поэтому ключ age не появился",
+            "name — непустая строка, значение истинное, и &&= его заменил"
+          ],
+          "explanation": "name — непустая строка, поэтому &&= присваивает новое значение. user.age — undefined, присваивания нет, и ключ age не появляется."
+        },
+        {
+          "id": "optional-chaining-03-q3",
+          "type": "fill",
+          "codeBefore": "const options = { lang: \"\", theme: null };\noptions.lang ",
+          "codeAfter": " \"ru\";\noptions.theme ??= \"light\";\nconsole.log(options.lang, options.theme); // ru light",
+          "options": ["||=", "??=", "&&=", "=="],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пустая строка — не null и не undefined, поэтому ??= её не тронет",
+            "&&= присваивает только истинным значениям, а \"\" — ложное",
+            "== только сравнивает и ничего не присваивает"
+          ],
+          "explanation": "Пустая строка — ложное значение, но не null и не undefined. Заменить её может только ||=."
+        },
+        {
+          "id": "optional-chaining-03-q4",
+          "type": "trueFalse",
+          "code": "let total = 100;\ntotal ||= console.log(\"считаю\");",
+          "options": ["Ничего не выведет", "Выведет «считаю»"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "total истинное, поэтому ||= не присваивает и правую часть не вычисляет"
+          ],
+          "explanation": "total истинное, поэтому ||= не присваивает, и правая часть с console.log даже не вычисляется."
+        },
+        {
+          "id": "optional-chaining-03-q5",
+          "type": "output",
+          "code": "const cache = {};\nfunction get(key) {\n  cache[key] ??= key.length;\n  return cache[key];\n}\nconsole.log(get(\"abc\"), get(\"abc\"), Object.keys(cache).length);",
+          "options": ["3 3 1", "3 undefined 1", "3 3 2", "undefined 3 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "??= сохраняет значение в cache, и второй вызов его находит",
+            "Ключ один и тот же — \"abc\", второй раз ??= ничего не добавляет",
+            "??= присваивает до return, поэтому функция возвращает уже сохранённое значение"
+          ],
+          "explanation": "Первый вызов записывает в cache длину строки — 3. Второй находит готовое значение, а ключ всё тот же один — \"abc\"."
+        }
+      ]
+    },
+    {
+      "id": "optional-chaining-04",
+      "topicId": "optional-chaining",
+      "title": "Сокращения в объектах",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Если имя свойства совпадает с именем переменной, достаточно написать его один раз. Методы тоже пишут короче, без `: function`."
+          },
+          {
+            "type": "code",
+            "code": "const name = \"Аня\";\nconst age = 25;\nconst user = {\n  name,     // то же, что name: name\n  age,\n  greet() { // то же, что greet: function () {...}\n    return \"Привет, \" + this.name;\n  },\n};\nconsole.log(user.greet()); // Привет, Аня"
+          },
+          {
+            "type": "text",
+            "text": "Ключ в квадратных скобках — **вычисляемый**: ключом станет значение выражения, а не его текст."
+          },
+          {
+            "type": "code",
+            "code": "const field = \"color\";\nconst n = 2;\nconst obj = { [field]: \"red\", [\"item\" + n]: true };\nconsole.log(obj); // { color: \"red\", item2: true }"
+          },
+          {
+            "type": "warning",
+            "text": "Без скобок `{ field: \"red\" }` создаст ключ с именем `field`, а не `color`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "optional-chaining-04-q1",
+          "type": "output",
+          "code": "const x = 1;\nconst y = 2;\nconst point = { x, y };\nconsole.log(point);",
+          "options": [
+            "{ x: 1, y: 2 }",
+            "[1, 2]",
+            "{ 1: 1, 2: 2 }",
+            "{ x: undefined, y: undefined }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Фигурные скобки создают объект, а не массив",
+            "Ключом становится имя переменной, а не её значение",
+            "Сокращённое свойство берёт значение одноимённой переменной"
+          ],
+          "explanation": "{ x, y } — короткая запись для { x: x, y: y }: имя переменной становится ключом, а её значение — значением."
+        },
+        {
+          "id": "optional-chaining-04-q2",
+          "type": "output",
+          "code": "const key = \"score\";\nconst a = { key: 10 };\nconst b = { [key]: 10 };\nconsole.log(Object.keys(a), Object.keys(b));",
+          "options": [
+            "[\"key\"] [\"score\"]",
+            "[\"score\"] [\"score\"]",
+            "[\"key\"] [\"key\"]",
+            "[\"score\"] [\"key\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без квадратных скобок ключ берётся как написан, а не из переменной",
+            "Квадратные скобки вычисляют выражение: ключом становится значение переменной",
+            "Наоборот: вычисляемый ключ — у b"
+          ],
+          "explanation": "Без скобок key — просто имя ключа. В квадратных скобках вычисляется значение переменной key, и ключом становится \"score\"."
+        },
+        {
+          "id": "optional-chaining-04-q3",
+          "type": "fill",
+          "codeBefore": "const counter = {\n  value: 0,\n  ",
+          "codeAfter": " {\n    this.value++;\n    return this.value;\n  },\n};\nconsole.log(counter.inc()); // 1",
+          "options": ["inc()", "inc: () =>", "function inc()", "inc =>"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У стрелочной функции нет своего this: this.value будет не из counter, и вернётся NaN",
+            "Внутри литерала объекта ключевое слово function перед именем не пишут — SyntaxError",
+            "Так выглядит стрелка, а не метод: без двоеточия это SyntaxError"
+          ],
+          "explanation": "Короткая запись метода — имя и скобки. Такой метод получает this от объекта, через который его вызвали."
+        },
+        {
+          "id": "optional-chaining-04-q4",
+          "type": "trueFalse",
+          "code": "const prop = \"size\";\nconst box = { [prop + \"X\"]: 10 };\nconsole.log(box.sizeX);",
+          "options": ["Выведет 10", "Выведет undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Выражение в квадратных скобках вычисляется, ключом становится \"sizeX\""
+          ],
+          "explanation": "В квадратных скобках можно писать любое выражение: prop + \"X\" даёт \"sizeX\", и это становится ключом."
+        },
+        {
+          "id": "optional-chaining-04-q5",
+          "type": "order",
+          "lines": [
+            "const id = 7;",
+            "const key = \"user\" + id;",
+            "const users = { [key]: { id } };",
+            "console.log(users.user7.id); // 7"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "key собирается из id, объект использует key как вычисляемый ключ и id как сокращённое свойство. Каждая строка зависит от предыдущей."
+        }
+      ]
+    },
+    {
+      "id": "optional-chaining-05",
+      "topicId": "optional-chaining",
+      "title": "?. и ??: закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Шпаргалка: `?.` безопасно читает свойство или элемент и вызывает метод. `??` подставляет запасное значение вместо `null` и `undefined`. `??=` записывает значение, если его ещё нет."
+          },
+          {
+            "type": "code",
+            "code": "function getCity(user) {\n  return user?.address?.city ?? \"не указан\";\n}\nconsole.log(getCity({ address: { city: \"Сочи\" } })); // Сочи\nconsole.log(getCity({}));                           // не указан\nconsole.log(getCity(null));                         // не указан"
+          },
+          {
+            "type": "text",
+            "text": "Сокращённые свойства и вычисляемые ключи помогают собирать объекты из переменных."
+          },
+          {
+            "type": "code",
+            "code": "function makeField(name, value) {\n  return { [name]: value ?? \"\", updated: true };\n}\nconsole.log(makeField(\"email\", null)); // { email: \"\", updated: true }"
+          },
+          {
+            "type": "warning",
+            "text": "Не ставь `?.` везде подряд: он прячет ошибки там, где значение обязано быть. Используй его, когда отсутствие значения — нормальная ситуация."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "optional-chaining-05-q1",
+          "type": "output",
+          "code": "const order = { items: [{ title: \"Чай\" }] };\nconsole.log(order.items?.[1]?.title ?? \"пусто\");",
+          "options": ["пусто", "undefined", "TypeError", "Чай"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "undefined дальше попадает в ??, и тот подставляет \"пусто\"",
+            "?. перед .title защищает от чтения свойства у undefined",
+            "[1] — второй элемент, а в массиве только один"
+          ],
+          "explanation": "Элемента с индексом 1 нет, ?. возвращает undefined, а ?? заменяет его на \"пусто\"."
+        },
+        {
+          "id": "optional-chaining-05-q2",
+          "type": "output",
+          "code": "const settings = { volume: 0, theme: null };\nsettings.volume ??= 50;\nsettings.theme ??= \"dark\";\nconsole.log(settings);",
+          "options": [
+            "{ volume: 0, theme: \"dark\" }",
+            "{ volume: 50, theme: \"dark\" }",
+            "{ volume: 0, theme: null }",
+            "{ volume: 50, theme: null }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "0 — не null и не undefined, поэтому ??= его не заменяет",
+            "theme равен null, и ??= записывает \"dark\"",
+            "Наоборот: 0 остаётся, а null заменяется"
+          ],
+          "explanation": "??= срабатывает только на null и undefined. volume равен 0 и остаётся, а theme равен null и становится \"dark\"."
+        },
+        {
+          "id": "optional-chaining-05-q3",
+          "type": "fill",
+          "codeBefore": "const user = { name: \"Аня\", getAge: null };\nconsole.log(user.",
+          "codeAfter": " ?? \"возраст скрыт\"); // возраст скрыт",
+          "options": ["getAge?.()", "getAge()", "getAge?()", "getAge.?()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "getAge равен null, а вызвать null нельзя — TypeError",
+            "Одиночный ? — начало тернарного оператора, а не безопасный вызов — SyntaxError",
+            "Оператор пишется как ?., а не .? — SyntaxError"
+          ],
+          "explanation": "getAge равен null, поэтому ?.() не вызывает его и возвращает undefined, а ?? подставляет текст."
+        },
+        {
+          "id": "optional-chaining-05-q4",
+          "type": "output",
+          "code": "const lang = \"ru\";\nconst texts = { [lang]: \"Привет\", en: \"Hello\" };\nconst pick = code => texts[code] ?? texts.en;\nconsole.log(pick(\"ru\"), pick(\"de\"));",
+          "options": ["Привет Hello", "Привет undefined", "Hello Hello", "undefined Hello"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключа de нет, texts.de — undefined, и ?? подставляет texts.en",
+            "[lang] — вычисляемый ключ, поэтому в объекте есть ключ ru",
+            "[lang] создаёт ключ ru, а не lang"
+          ],
+          "explanation": "[lang] создаёт ключ ru. Ключа de нет, texts.de — undefined, и ?? подставляет английский текст."
+        },
+        {
+          "id": "optional-chaining-05-q5",
+          "type": "trueFalse",
+          "code": "const count = 0;\nconsole.log(count?.toString() ?? \"нет\");",
+          "options": ["Выведет 0", "Выведет «нет»"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "?. и ?? реагируют только на null и undefined, а 0 — обычное значение"
+          ],
+          "explanation": "0 — не null и не undefined: ?. вызывает toString и получает строку \"0\", а ?? её не трогает."
+        }
+      ]
+    }
+  ]
+}

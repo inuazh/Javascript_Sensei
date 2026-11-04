@@ -24,10 +24,9 @@ function choice<Q extends ChoiceQuestionT>(
   };
 }
 
-/** Lines in the correct order, unless they are steps in prose rather than code. */
+/** Lines in the correct order, unless they are steps in words rather than code. */
 function orderCode(q: OrderQuestionT): string | null {
-  if (q.lines.some(line => /^\s*[А-Яа-яЁё]/.test(line))) return null;
-  return q.lines.join('\n');
+  return q.steps ? null : q.lines.join('\n');
 }
 
 export const QUESTION_TYPES: QuestionRegistry = {

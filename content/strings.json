@@ -1,0 +1,1532 @@
+{
+  "lessons": [
+    {
+      "id": "string-methods-01",
+      "topicId": "string-methods",
+      "title": "Строки и индексы",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Строка — это последовательность символов. `length` хранит её длину, а символ можно достать по индексу: `s[0]` — первый, `s.length - 1` — последний."
+          },
+          {
+            "type": "code",
+            "code": "const s = \"hello\";\nconsole.log(s.length); // 5\nconsole.log(s[0]);     // h\nconsole.log(s[10]);    // undefined"
+          },
+          {
+            "type": "text",
+            "text": "Метод `at` умеет **отрицательные** индексы: `s.at(-1)` — последний символ. Квадратные скобки так не умеют: `s[-1]` даёт `undefined`."
+          },
+          {
+            "type": "warning",
+            "text": "Строки **неизменяемы**. `s[0] = \"H\"` молча ничего не делает, и `length` тоже не перезаписать. Методы строк всегда возвращают новую строку."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-methods-01-q1",
+          "type": "output",
+          "code": "const s = \"hello\";\nconsole.log(s.length, s[1]);",
+          "options": ["5 e", "5 h", "4 e", "6 e"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы начинаются с нуля: s[0] — h, а s[1] — e",
+            "length — количество символов, в hello их 5",
+            null
+          ],
+          "explanation": "В \"hello\" пять символов. Индексы считаются с нуля, поэтому s[1] — вторая буква, e."
+        },
+        {
+          "id": "string-methods-01-q2",
+          "type": "output",
+          "code": "const s = \"кот\";\nconsole.log(s.at(-1), s[-1]);",
+          "options": ["т undefined", "т т", "undefined т", "к undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Квадратные скобки не понимают отрицательных индексов: s[-1] ищет свойство \"-1\", а его нет",
+            null,
+            "at(-1) считает с конца, это последний символ"
+          ],
+          "explanation": "at(-1) отсчитывает с конца строки и возвращает \"т\". В квадратных скобках -1 — просто несуществующий индекс, поэтому undefined."
+        },
+        {
+          "id": "string-methods-01-q3",
+          "type": "trueFalse",
+          "code": "let s = \"cat\";\ns[0] = \"b\";\nconsole.log(s);",
+          "options": ["Выведет bat", "Выведет cat"],
+          "correct": 1,
+          "optionExplanations": [
+            "Строки неизменяемы: присваивание по индексу молча игнорируется",
+            null
+          ],
+          "explanation": "Строку нельзя поменять по индексу. Без строгого режима ошибки нет, присваивание просто ничего не делает."
+        },
+        {
+          "id": "string-methods-01-q4",
+          "type": "fill",
+          "codeBefore": "const word = \"JavaScript\";\nconsole.log(word[",
+          "codeAfter": "]); // t",
+          "options": ["word.length - 1", "word.length", "-1", "word.size - 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индекс word.length уже за концом строки: получится undefined",
+            "Квадратные скобки не понимают отрицательных индексов: будет undefined",
+            "У строк нет свойства size: undefined - 1 даёт NaN, а word[NaN] — undefined"
+          ],
+          "explanation": "Индексы идут от 0 до length - 1, поэтому последний символ лежит по индексу word.length - 1."
+        },
+        {
+          "id": "string-methods-01-q5",
+          "type": "output",
+          "code": "const s = \"hello\";\ns.length = 1;\nconsole.log(s.length);",
+          "options": ["5", "1", "0", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строки неизменяемы, и длину тоже не перезаписать",
+            null,
+            "Без строгого режима такое присваивание молча игнорируется, ошибки нет"
+          ],
+          "explanation": "Строка неизменяема, поэтому присваивание length ни на что не влияет. Длина по-прежнему 5."
+        }
+      ]
+    },
+    {
+      "id": "string-methods-02",
+      "topicId": "string-methods",
+      "title": "slice и substring",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`slice(start, end)` вырезает кусок строки от `start` **до** `end`, не включая его. Без `end` — до конца строки."
+          },
+          {
+            "type": "code",
+            "code": "const s = \"JavaScript\";\nconsole.log(s.slice(0, 4)); // Java\nconsole.log(s.slice(4));    // Script\nconsole.log(s.slice(-6));   // Script"
+          },
+          {
+            "type": "text",
+            "text": "Отрицательный индекс в `slice` считается с конца: `-6` — шестой символ с конца. Если `start` больше `end`, получится пустая строка."
+          },
+          {
+            "type": "text",
+            "text": "`substring` похож на `slice`, но отрицательные числа считает нулём, а если `start` больше `end`, меняет их местами."
+          },
+          {
+            "type": "code",
+            "code": "console.log(s.substring(4, 0)); // Java\nconsole.log(s.substring(-3));   // JavaScript"
+          },
+          {
+            "type": "tip",
+            "text": "Исходная строка не меняется: `slice` и `substring` возвращают новую."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-methods-02-q1",
+          "type": "output",
+          "code": "console.log(\"hello world\".slice(0, 5));",
+          "options": ["hello", "ello", "hell", "o world"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы начинаются с нуля: slice(0, 5) начинает с самого первого символа",
+            "slice(0, 5) берёт пять символов: индексы с 0 по 4",
+            null
+          ],
+          "explanation": "slice(0, 5) берёт символы с индексами 0–4. Символ под индексом 5 — пробел — в результат не входит."
+        },
+        {
+          "id": "string-methods-02-q2",
+          "type": "output",
+          "code": "console.log(\"abcdef\".slice(-2));",
+          "options": ["ef", "ab", "abcd", "f"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Отрицательный индекс отсчитывается с конца, а не с начала",
+            null,
+            "slice(-2) начинает со второго символа с конца и идёт до конца строки"
+          ],
+          "explanation": "Отрицательный start считается с конца: -2 — это e. Без end slice берёт всё до конца строки."
+        },
+        {
+          "id": "string-methods-02-q3",
+          "type": "output",
+          "code": "const s = \"abcdef\";\nconsole.log(s.slice(4, 1).length, s.substring(4, 1));",
+          "options": ["0 bcd", "3 bcd", "3 dcb", "0 dcb"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "slice не меняет аргументы местами: при start > end он возвращает пустую строку",
+            null,
+            "substring меняет местами аргументы, но не переворачивает строку"
+          ],
+          "explanation": "У slice start больше end, поэтому результат — пустая строка длиной 0. substring сам меняет аргументы местами и берёт символы с 1 по 3."
+        },
+        {
+          "id": "string-methods-02-q4",
+          "type": "fill",
+          "codeBefore": "const file = \"photo.png\";\nconst ext = file.slice(",
+          "codeAfter": ");\nconsole.log(ext); // png",
+          "options": ["-3", "3", "-4", "6, 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "slice(3) отрезает первые три символа: получится to.png",
+            "С -4 в результат попадёт и точка: .png",
+            "start больше end, поэтому slice вернёт пустую строку"
+          ],
+          "explanation": "slice(-3) берёт три последних символа. Так удобно получать окончание строки, не зная её длины."
+        },
+        {
+          "id": "string-methods-02-q5",
+          "type": "trueFalse",
+          "code": "const s = \"hello\";\nconst part = s.slice(1, 3);\nconsole.log(s);",
+          "options": ["Выведет hello", "Выведет el"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "slice не меняет исходную строку: el лежит в part, а s остаётся прежней"
+          ],
+          "explanation": "Строки неизменяемы: slice возвращает новую строку el, а s остаётся \"hello\"."
+        }
+      ]
+    },
+    {
+      "id": "string-methods-03",
+      "topicId": "string-methods",
+      "title": "Поиск в строке",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`indexOf` возвращает индекс первого вхождения подстроки или `-1`, если её нет. `includes`, `startsWith` и `endsWith` сразу отвечают `true` или `false`."
+          },
+          {
+            "type": "code",
+            "code": "const s = \"banana\";\nconsole.log(s.indexOf(\"an\"));      // 1\nconsole.log(s.indexOf(\"x\"));       // -1\nconsole.log(s.includes(\"nan\"));    // true\nconsole.log(s.startsWith(\"ba\"));   // true\nconsole.log(s.endsWith(\"na\"));     // true"
+          },
+          {
+            "type": "warning",
+            "text": "`indexOf` может вернуть `0`, а это ложное значение. Поэтому `if (s.indexOf(x))` — ошибка: проверяй `!== -1` или используй `includes`."
+          },
+          {
+            "type": "text",
+            "text": "Поиск чувствителен к регистру. Чтобы его не учитывать, приведи строку к одному регистру через `toLowerCase()` или `toUpperCase()`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"Hello\".includes(\"hello\"));               // false\nconsole.log(\"Hello\".toLowerCase().includes(\"hello\")); // true"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-methods-03-q1",
+          "type": "output",
+          "code": "const s = \"banana\";\nconsole.log(s.indexOf(\"an\"), s.indexOf(\"x\"));",
+          "options": ["1 -1", "3 -1", "1 undefined", "1 false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "indexOf возвращает первое вхождение, а не последнее",
+            "Если подстроки нет, indexOf возвращает -1",
+            "indexOf всегда возвращает число, а не true или false"
+          ],
+          "explanation": "Первое \"an\" начинается с индекса 1. Если подстроки нет, indexOf возвращает -1."
+        },
+        {
+          "id": "string-methods-03-q2",
+          "type": "output",
+          "code": "console.log(\"JavaScript\".includes(\"script\"));",
+          "options": ["false", "true", "4", "-1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Поиск чувствителен к регистру: в строке Script с большой буквы",
+            "includes возвращает true или false, а не индекс",
+            "includes возвращает true или false, а не индекс"
+          ],
+          "explanation": "includes учитывает регистр: \"script\" и \"Script\" — разные подстроки."
+        },
+        {
+          "id": "string-methods-03-q3",
+          "type": "trueFalse",
+          "code": "const s = \"Hello\";\nif (s.indexOf(\"H\")) {\n  console.log(\"нашли\");\n} else {\n  console.log(\"нет\");\n}",
+          "options": ["Выведет нашли", "Выведет нет"],
+          "correct": 1,
+          "optionExplanations": ["H стоит под индексом 0, а 0 в условии — ложное значение", null],
+          "explanation": "indexOf вернул 0, потому что H — первый символ. 0 в if считается false, поэтому сработала ветка else."
+        },
+        {
+          "id": "string-methods-03-q4",
+          "type": "fill",
+          "codeBefore": "const text = \"Привет, МИР\";\nconsole.log(text.",
+          "codeAfter": ".includes(\"мир\")); // true",
+          "options": ["toLowerCase()", "toUpperCase()", "toLowerCase", "trim()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В верхнем регистре будет МИР, а ищем мир",
+            "Без скобок метод не вызывается: у функции нет метода includes, будет TypeError",
+            "trim убирает пробелы по краям, регистр он не меняет"
+          ],
+          "explanation": "toLowerCase() переводит всю строку в нижний регистр, и мир находится. Метод нужно именно вызвать, со скобками."
+        },
+        {
+          "id": "string-methods-03-q5",
+          "type": "output",
+          "code": "const url = \"https://site.ru\";\nconsole.log(url.startsWith(\"https\"), url.endsWith(\".com\"));",
+          "options": ["true false", "true true", "false false", "0 -1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Строка заканчивается на .ru, а не на .com",
+            "Строка действительно начинается с https",
+            "startsWith и endsWith возвращают true или false, а не индекс"
+          ],
+          "explanation": "startsWith проверяет начало строки, endsWith — конец. Адрес начинается с https и заканчивается на .ru."
+        }
+      ]
+    },
+    {
+      "id": "string-methods-04",
+      "topicId": "string-methods",
+      "title": "trim, split и replace",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`trim()` убирает пробелы и переносы строк по краям. Пробелы внутри строки остаются."
+          },
+          {
+            "type": "text",
+            "text": "`split(разделитель)` режет строку в массив, `join(разделитель)` склеивает массив обратно. `split(\"\")` разбивает строку на символы."
+          },
+          {
+            "type": "code",
+            "code": "const parts = \"a,b,c\".split(\",\"); // [\"a\", \"b\", \"c\"]\nconsole.log(parts.join(\" + \"));    // a + b + c\nconsole.log(\"  hi  \".trim());      // hi"
+          },
+          {
+            "type": "warning",
+            "text": "`replace` со строкой заменяет **только первое** вхождение. Чтобы заменить все, используй `replaceAll`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"1-2-3\".replace(\"-\", \":\"));    // 1:2-3\nconsole.log(\"1-2-3\".replaceAll(\"-\", \":\")); // 1:2:3"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-methods-04-q1",
+          "type": "output",
+          "code": "console.log(\"  hi  \".trim().length);",
+          "options": ["2", "6", "4", "3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "trim возвращает строку без пробелов по краям, длина считается уже у неё",
+            "trim убирает пробелы с обеих сторон, а не с одной",
+            null
+          ],
+          "explanation": "trim убирает пробелы с обоих краёв, остаётся \"hi\" — два символа."
+        },
+        {
+          "id": "string-methods-04-q2",
+          "type": "output",
+          "code": "console.log(\"a-b-c\".replace(\"-\", \"+\"));",
+          "options": ["a+b-c", "a+b+c", "a-b+c", "a-b-c"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "replace со строкой заменяет только первое вхождение, все заменяет replaceAll",
+            "replace начинает поиск с начала строки",
+            "replace возвращает новую строку с заменой, её и выводим"
+          ],
+          "explanation": "Когда первый аргумент — строка, replace меняет только первое совпадение. Для всех есть replaceAll."
+        },
+        {
+          "id": "string-methods-04-q3",
+          "type": "output",
+          "code": "const parts = \"red,green,blue\".split(\",\");\nconsole.log(parts.length, parts[1]);",
+          "options": ["3 green", "3 red", "14 g", "2 green"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы массива начинаются с нуля: parts[1] — второй элемент",
+            "После split получается массив из трёх строк, а не исходная строка",
+            "Две запятые делят строку на три части"
+          ],
+          "explanation": "split режет строку по запятым на три части. parts[1] — второй элемент, \"green\"."
+        },
+        {
+          "id": "string-methods-04-q4",
+          "type": "fill",
+          "codeBefore": "const s = \"abc\";\nconsole.log(s.split(\"\").reverse().",
+          "codeAfter": "); // cba",
+          "options": ["join(\"\")", "join()", "toString()", "concat()"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без аргумента join склеивает через запятую: c,b,a",
+            "toString у массива тоже ставит запятые: c,b,a",
+            "concat вернёт копию массива, а не строку"
+          ],
+          "explanation": "join(\"\") склеивает элементы без разделителя. Без аргумента join ставит запятые."
+        },
+        {
+          "id": "string-methods-04-q5",
+          "type": "order",
+          "lines": [
+            "const title = \"  Hello World  \";",
+            "const trimmed = title.trim();",
+            "const lower = trimmed.toLowerCase();",
+            "const slug = lower.replaceAll(\" \", \"-\");",
+            "console.log(slug); // hello-world"
+          ],
+          "shuffled": [3, 0, 4, 2, 1],
+          "explanation": "Каждая строка берёт результат предыдущей: обрезаем пробелы, переводим в нижний регистр, заменяем пробелы на дефисы и выводим."
+        }
+      ]
+    },
+    {
+      "id": "string-methods-05",
+      "topicId": "string-methods",
+      "title": "Шаблонные строки и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Шаблонные строки** пишутся в обратных кавычках. Внутри `${...}` можно вставить любое выражение, а сама строка может занимать несколько строк."
+          },
+          {
+            "type": "code",
+            "code": "const user = \"Аня\";\nconst age = 20;\nconsole.log(`${user}, через год тебе ${age + 1}`);\n// Аня, через год тебе 21"
+          },
+          {
+            "type": "warning",
+            "text": "`${...}` работает только в обратных кавычках. В обычных `\"...\"` это просто текст."
+          },
+          {
+            "type": "text",
+            "text": "`padStart(длина, символ)` дополняет строку слева до нужной длины, `padEnd` — справа. `repeat(n)` повторяет строку n раз."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"5\".padStart(3, \"0\")); // 005\nconsole.log(\"ha\".repeat(3));       // hahaha"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "string-methods-05-q1",
+          "type": "output",
+          "code": "const a = 2, b = 3;\nconsole.log(`${a} + ${b} = ${a + b}`);",
+          "options": ["2 + 3 = 5", "2 + 3 = 23", "${a} + ${b} = ${a + b}", "a + b = 5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внутри ${} складываются два числа, конкатенации строк нет",
+            "В обратных кавычках ${} подставляет значения",
+            "Подставляются значения переменных, а не их имена"
+          ],
+          "explanation": "Каждое ${...} вычисляется и подставляется в строку. a + b внутри фигурных скобок — обычное сложение чисел."
+        },
+        {
+          "id": "string-methods-05-q2",
+          "type": "output",
+          "code": "console.log(\"7\".padStart(3, \"0\"), \"ab\".repeat(3));",
+          "options": ["007 ababab", "0007 ababab", "700 ababab", "007 ab,ab,ab"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Первый аргумент — итоговая длина строки, а не число добавляемых символов",
+            "padStart дополняет слева, справа дополняет padEnd",
+            "repeat возвращает строку, а не массив"
+          ],
+          "explanation": "padStart дополняет строку нулями слева до длины 3. repeat(3) склеивает три копии строки."
+        },
+        {
+          "id": "string-methods-05-q3",
+          "type": "trueFalse",
+          "code": "const name = \"Аня\";\nconsole.log(\"Привет, ${name}!\");",
+          "options": ["Выведет Привет, Аня!", "Выведет Привет, ${name}!"],
+          "correct": 1,
+          "optionExplanations": [
+            "Подстановка работает только в обратных кавычках, а здесь обычные",
+            null
+          ],
+          "explanation": "Строка в двойных кавычках — не шаблон, поэтому ${name} остаётся обычным текстом."
+        },
+        {
+          "id": "string-methods-05-q4",
+          "type": "fill",
+          "codeBefore": "const sec = 7;\nconsole.log(String(sec).",
+          "codeAfter": "); // 07",
+          "options": ["padStart(2, \"0\")", "padEnd(2, \"0\")", "padStart(1, \"0\")", "repeat(2)"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "padEnd дополняет справа: получится 70",
+            "Строка уже длиной 1, дополнять нечего: останется 7",
+            "repeat повторит строку: получится 77"
+          ],
+          "explanation": "padStart(2, \"0\") дополняет строку нулём слева до двух символов. Так форматируют минуты и секунды."
+        },
+        {
+          "id": "string-methods-05-q5",
+          "type": "output",
+          "code": "const s = \"  Ivan Petrov \";\nconst [first, last] = s.trim().split(\" \");\nconsole.log(`${last.toUpperCase()} ${first[0]}.`);",
+          "options": ["PETROV I.", "Petrov I.", "IVAN P.", "PETROV Ivan."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "toUpperCase переводит всю фамилию в верхний регистр",
+            "Деструктуризация берёт элементы по порядку: first — Ivan, last — Petrov",
+            "first[0] — первый символ строки, а не всё имя"
+          ],
+          "explanation": "trim убирает пробелы по краям, split делит строку на имя и фамилию. Шаблон собирает фамилию в верхнем регистре и первую букву имени."
+        }
+      ]
+    },
+    {
+      "id": "regex-basics-01",
+      "topicId": "regex-basics",
+      "title": "Литерал и test",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Регулярное выражение** — шаблон для поиска в строке. Его пишут между слешами: `/cat/`. Метод `test` отвечает, есть ли совпадение в строке."
+          },
+          {
+            "type": "code",
+            "code": "const re = /cat/;\nconsole.log(re.test(\"concatenate\")); // true\nconsole.log(re.test(\"Cat\"));         // false"
+          },
+          {
+            "type": "text",
+            "text": "Совпадение ищется **в любом месте** строки, а регистр по умолчанию важен."
+          },
+          {
+            "type": "text",
+            "text": "Если шаблон собирается из переменной, используй конструктор `new RegExp`. Ему передают строку **без слешей**."
+          },
+          {
+            "type": "code",
+            "code": "const word = \"dog\";\nconst re = new RegExp(word);\nconsole.log(re);               // /dog/\nconsole.log(re.test(\"hotdog\")); // true"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-basics-01-q1",
+          "type": "output",
+          "code": "console.log(/cat/.test(\"Concatenate\"));",
+          "options": ["true", "false", "3", "[\"cat\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Подстрока cat есть внутри слова, а большая C стоит в другом месте",
+            "test возвращает true или false, а не индекс",
+            "test возвращает true или false, а не найденные совпадения"
+          ],
+          "explanation": "test ищет шаблон в любом месте строки. В \"Concatenate\" есть \"cat\" из маленьких букв, начиная с индекса 3."
+        },
+        {
+          "id": "regex-basics-01-q2",
+          "type": "output",
+          "code": "console.log(/Cat/.test(\"my cat\"));",
+          "options": ["false", "true", "-1", "null"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Регулярка по умолчанию различает регистр: Cat и cat — разные",
+            "test не возвращает индексы, только true или false",
+            "test всегда возвращает true или false"
+          ],
+          "explanation": "Без флага i регистр важен: в строке \"cat\" с маленькой буквы, а шаблон ищет \"Cat\"."
+        },
+        {
+          "id": "regex-basics-01-q3",
+          "type": "output",
+          "code": "const word = \"dog\";\nconst re = new RegExp(word);\nconsole.log(re, re.test(\"hotdog\"));",
+          "options": ["/dog/ true", "dog true", "/word/ true", "/dog/ false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "new RegExp создаёт регулярное выражение, а не строку, консоль выводит его со слешами",
+            "В конструктор передаётся значение переменной, а не её имя",
+            "Совпадение ищется в любом месте строки, dog есть в конце"
+          ],
+          "explanation": "new RegExp(word) строит регулярку из значения переменной. Консоль выводит её со слешами, а \"hotdog\" содержит \"dog\"."
+        },
+        {
+          "id": "regex-basics-01-q4",
+          "type": "fill",
+          "codeBefore": "const re = ",
+          "codeAfter": ";\nconsole.log(re.test(\"I love JS\")); // true",
+          "options": ["/JS/", "\"JS\"", "/js/", "/JS /"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У строк нет метода test: будет TypeError",
+            "Без флага i регистр важен, в строке JS большими буквами",
+            "После JS в строке нет пробела, это её конец"
+          ],
+          "explanation": "Регулярку записывают между слешами. Шаблон /JS/ совпадает с концом строки \"I love JS\"."
+        },
+        {
+          "id": "regex-basics-01-q5",
+          "type": "trueFalse",
+          "code": "console.log(new RegExp(\"/hi/\").test(\"hi\"));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": [
+            "Слеши в строке стали частью шаблона: ищется текст /hi/ вместе со слешами",
+            null
+          ],
+          "explanation": "В конструктор передают шаблон без слешей. Здесь слеши попали в шаблон, и он ищет буквально \"/hi/\", которого в строке нет."
+        }
+      ]
+    },
+    {
+      "id": "regex-basics-02",
+      "topicId": "regex-basics",
+      "title": "Классы символов и квантификаторы",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Классы** обозначают один символ из набора: `\\d` — цифра, `\\w` — латинская буква, цифра или `_`, `\\s` — пробельный символ, `.` — любой символ, кроме переноса строки. Заглавные `\\D`, `\\W`, `\\S` — наоборот, всё, кроме них."
+          },
+          {
+            "type": "text",
+            "text": "В квадратных скобках задают свой набор: `[ae]` — a или e, `[a-z]` — диапазон, `[^0-9]` — любой символ, **кроме** цифр."
+          },
+          {
+            "type": "text",
+            "text": "**Квантификатор** говорит, сколько раз повторить предыдущий символ: `+` — один и больше, `*` — ноль и больше, `?` — ноль или один, `{3}` — ровно три, `{2,4}` — от двух до четырёх."
+          },
+          {
+            "type": "code",
+            "code": "console.log(/gr[ae]y/.test(\"grey\"));   // true\nconsole.log(/\\d{3}/.test(\"ab123\"));     // true\nconsole.log(/colou?r/.test(\"color\"));   // true"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-basics-02-q1",
+          "type": "output",
+          "code": "console.log(/\\d+/.test(\"abc\"), /\\d+/.test(\"a1\"));",
+          "options": ["false true", "true true", "false false", "true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В abc нет ни одной цифры, а + требует хотя бы одну",
+            "Шаблону хватает одной цифры в любом месте строки",
+            null
+          ],
+          "explanation": "\\d+ — одна или больше цифр подряд. В \"abc\" цифр нет, а в \"a1\" есть единица."
+        },
+        {
+          "id": "regex-basics-02-q2",
+          "type": "output",
+          "code": "console.log(/c.t/.test(\"cut\"), /c.t/.test(\"ct\"));",
+          "options": ["true false", "true true", "false false", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Точка — ровно один любой символ, она не может совпасть с пустотой",
+            "Точка совпадает с любым символом, в том числе с u",
+            null
+          ],
+          "explanation": "Точка означает ровно один любой символ. В \"cut\" между c и t есть u, а в \"ct\" там ничего нет."
+        },
+        {
+          "id": "regex-basics-02-q3",
+          "type": "fill",
+          "codeBefore": "const re = /colou",
+          "codeAfter": "r/;\nconsole.log(re.test(\"color\"), re.test(\"colour\")); // true true",
+          "options": ["?", "+", "{1}", "."],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "+ требует хотя бы одну u, а в color её нет",
+            "{1} требует ровно одну u, а в color её нет",
+            "Точка — это обязательный дополнительный символ после u"
+          ],
+          "explanation": "? делает предыдущий символ необязательным: u может быть один раз или ни разу."
+        },
+        {
+          "id": "regex-basics-02-q4",
+          "type": "trueFalse",
+          "code": "console.log(/\\d{3}/.test(\"12a45\"));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": [
+            "Цифр в строке четыре, но {3} требует три цифры подряд, а их разделяет буква",
+            null
+          ],
+          "explanation": "\\d{3} — три цифры подряд. В строке цифры идут парами, между ними стоит буква."
+        },
+        {
+          "id": "regex-basics-02-q5",
+          "type": "output",
+          "code": "console.log(/[^0-9]/.test(\"2024\"), /[a-z]+/.test(\"ABC\"));",
+          "options": ["false false", "true false", "false true", "true true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "[^0-9] ищет любой символ, кроме цифры, а в строке только цифры",
+            "Диапазон [a-z] — только маленькие буквы, большие в него не входят",
+            null
+          ],
+          "explanation": "[^0-9] — символ, который не цифра, а в \"2024\" таких нет. [a-z] — маленькие латинские буквы, а в \"ABC\" все большие."
+        }
+      ]
+    },
+    {
+      "id": "regex-basics-03",
+      "topicId": "regex-basics",
+      "title": "match и флаги g, i",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`str.match(re)` возвращает найденное. Без флага `g` — массив с **первым** совпадением: `m[0]` — найденный текст, `m.index` — его позиция."
+          },
+          {
+            "type": "code",
+            "code": "const m = \"price: 250\".match(/\\d+/);\nconsole.log(m[0], m.index); // 250 7"
+          },
+          {
+            "type": "text",
+            "text": "Флаг `g` (global) ищет **все** совпадения, и `match` возвращает массив найденных строк. Флаг `i` отключает учёт регистра. Флаги пишут после слеша и комбинируют: `/cat/gi`."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"a1b22\".match(/\\d+/g));    // [\"1\", \"22\"]\nconsole.log(\"Cat cat\".match(/cat/gi)); // [\"Cat\", \"cat\"]"
+          },
+          {
+            "type": "warning",
+            "text": "Если совпадений нет, `match` возвращает `null`, а не пустой массив. Проверяй результат, прежде чем брать `length`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-basics-03-q1",
+          "type": "output",
+          "code": "console.log(\"a1b22c333\".match(/\\d+/g));",
+          "options": [
+            "[\"1\", \"22\", \"333\"]",
+            "[\"1\", \"2\", \"2\", \"3\", \"3\", \"3\"]",
+            "[\"1\"]",
+            "[1, 22, 333]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "\\d+ жадно захватывает все цифры подряд, а не по одной",
+            "С флагом g match находит все совпадения, а не только первое",
+            "match возвращает найденные строки, а не числа"
+          ],
+          "explanation": "С флагом g match возвращает все совпадения. \\d+ каждый раз захватывает всю группу цифр подряд."
+        },
+        {
+          "id": "regex-basics-03-q2",
+          "type": "output",
+          "code": "console.log(\"Cat cat CAT\".match(/cat/gi).length);",
+          "options": ["3", "1", "2", "9"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С флагом g находятся все совпадения, а не только первое",
+            "Флаг i отключает учёт регистра: CAT тоже подходит",
+            "length — число найденных совпадений, а не символов"
+          ],
+          "explanation": "g ищет все совпадения, i не учитывает регистр. Подходят все три слова."
+        },
+        {
+          "id": "regex-basics-03-q3",
+          "type": "output",
+          "code": "const m = \"price: 250 руб\".match(/\\d+/);\nconsole.log(m[0], m.index);",
+          "options": ["250 7", "250 6", "2 7", "[\"250\"] 7"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Индексы с нуля, но пробел после двоеточия тоже символ: 250 начинается с 7",
+            "\\d+ захватывает все цифры подряд, а не одну",
+            "m[0] — строка с найденным текстом, а не массив"
+          ],
+          "explanation": "Без флага g match возвращает первое совпадение: m[0] — сам текст, m.index — позиция. \"price: \" — семь символов."
+        },
+        {
+          "id": "regex-basics-03-q4",
+          "type": "trueFalse",
+          "code": "const found = \"abc\".match(/\\d/g);\nconsole.log(found.length);",
+          "options": ["Выведет 0", "Вызовет TypeError"],
+          "correct": 1,
+          "optionExplanations": [
+            "Если совпадений нет, match возвращает null, а не пустой массив",
+            null
+          ],
+          "explanation": "Цифр в строке нет, поэтому match вернул null. У null нет свойства length, отсюда TypeError."
+        },
+        {
+          "id": "regex-basics-03-q5",
+          "type": "fill",
+          "codeBefore": "const text = \"Ура, ура, УРА!\";\nconsole.log(text.match(/ура/",
+          "codeAfter": ")); // [\"Ура\", \"ура\", \"УРА\"]",
+          "options": ["gi", "g", "i", "m"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без i регистр важен: найдётся только ура из маленьких букв",
+            "Без g match возвращает только первое совпадение",
+            "Флаг m влияет на ^ и $, а не на регистр и количество совпадений"
+          ],
+          "explanation": "Нужны оба флага: g — чтобы найти все совпадения, i — чтобы не учитывать регистр."
+        }
+      ]
+    },
+    {
+      "id": "regex-basics-04",
+      "topicId": "regex-basics",
+      "title": "Якоря и экранирование",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Якоря** привязывают шаблон к краям строки: `^` — начало, `$` — конец. `/^\\d+$/` значит «строка целиком из цифр»."
+          },
+          {
+            "type": "code",
+            "code": "console.log(/^\\d+$/.test(\"123\"));  // true\nconsole.log(/^\\d+$/.test(\"12a3\")); // false\nconsole.log(/\\d+/.test(\"12a3\"));   // true"
+          },
+          {
+            "type": "text",
+            "text": "С флагом `m` (multiline) `^` и `$` срабатывают в начале и в конце **каждой строки** текста, а не только всего текста."
+          },
+          {
+            "type": "text",
+            "text": "Символы `. * + ? ^ $ ( ) [ ] { } | \\ /` в регулярках особые. Чтобы искать их как обычный текст, ставь перед ними `\\`: `/\\./` — это точка, а не «любой символ»."
+          },
+          {
+            "type": "warning",
+            "text": "В `new RegExp` шаблон — обычная строка, и в ней обратный слеш удваивают: `new RegExp(\"\\\\d\")` — это `/\\d/`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-basics-04-q1",
+          "type": "output",
+          "code": "console.log(/^\\d+$/.test(\"123\"), /^\\d+$/.test(\"12a3\"));",
+          "options": ["true false", "true true", "false false", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С якорями шаблон должен покрыть строку целиком, а буква a мешает",
+            "Строка 123 целиком состоит из цифр",
+            null
+          ],
+          "explanation": "^ и $ требуют, чтобы цифры занимали всю строку от начала до конца. В \"12a3\" посередине буква."
+        },
+        {
+          "id": "regex-basics-04-q2",
+          "type": "output",
+          "code": "console.log(\"1.5\".replace(/./, \"X\"), \"1.5\".replace(/\\./, \"X\"));",
+          "options": ["X.5 1X5", "1X5 1X5", "X.5 X.5", "XXX 1X5"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Неэкранированная точка — любой символ, первым подходит 1",
+            null,
+            "Без флага g replace заменяет только первое совпадение"
+          ],
+          "explanation": "Точка без слеша — любой символ, и первой совпадает единица. \\. — это именно точка."
+        },
+        {
+          "id": "regex-basics-04-q3",
+          "type": "output",
+          "code": "const text = \"one\\ntwo\\nthree\";\nconsole.log(text.match(/^\\w+/g), text.match(/^\\w+/gm));",
+          "options": [
+            "[\"one\"] [\"one\", \"two\", \"three\"]",
+            "[\"one\", \"two\", \"three\"] [\"one\", \"two\", \"three\"]",
+            "[\"one\"] [\"one\"]",
+            "[\"one\", \"two\", \"three\"] [\"one\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без флага m ^ означает только начало всего текста",
+            "С флагом m ^ срабатывает в начале каждой строки",
+            null
+          ],
+          "explanation": "Без m ^ — только начало всего текста, поэтому находится одно слово. С m ^ совпадает после каждого переноса строки."
+        },
+        {
+          "id": "regex-basics-04-q4",
+          "type": "fill",
+          "codeBefore": "const re = new RegExp(",
+          "codeAfter": ");\nconsole.log(re.test(\"a1\"), re.test(\"ab\")); // true false",
+          "options": ["\"\\\\d\"", "\"\\d\"", "\"/\\\\d/\"", "\"d\""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В обычной строке \\d превращается просто в d: получится /d/",
+            "Слеши в строке становятся частью шаблона",
+            "Шаблон /d/ ищет букву d, а не цифру"
+          ],
+          "explanation": "В строке обратный слеш нужно удвоить, чтобы он дошёл до регулярки. \"\\\\d\" даёт шаблон /\\d/."
+        },
+        {
+          "id": "regex-basics-04-q5",
+          "type": "trueFalse",
+          "code": "console.log(/^cat$/m.test(\"dog\\ncat\\nbird\"));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С флагом m ^ и $ срабатывают на границах каждой строки, а cat — целая строка"
+          ],
+          "explanation": "Флаг m заставляет ^ и $ работать для каждой строки текста. Средняя строка — ровно \"cat\"."
+        }
+      ]
+    },
+    {
+      "id": "regex-basics-05",
+      "topicId": "regex-basics",
+      "title": "lastIndex и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Регулярка с флагом `g` запоминает, где закончила поиск, в свойстве `lastIndex`. Следующий `test` продолжит искать **с этого места**."
+          },
+          {
+            "type": "code",
+            "code": "const re = /a/g;\nconsole.log(re.test(\"a\"), re.lastIndex); // true 1\nconsole.log(re.test(\"a\"), re.lastIndex); // false 0\nconsole.log(re.test(\"a\"));               // true"
+          },
+          {
+            "type": "text",
+            "text": "Если совпадения нет, `lastIndex` сбрасывается в 0. Поэтому вызовы чередуются: найдено, не найдено, снова найдено."
+          },
+          {
+            "type": "warning",
+            "text": "Для проверки через `test` флаг `g` не нужен. Если одна регулярка с `g` проверяет много строк, результаты будут зависеть от предыдущих вызовов."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-basics-05-q1",
+          "type": "output",
+          "code": "const re = /a/g;\nconsole.log(re.test(\"a\"), re.test(\"a\"), re.test(\"a\"));",
+          "options": ["true false true", "true true true", "true false false", "true true false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С флагом g test продолжает поиск с lastIndex, а не с начала строки",
+            "После неудачи lastIndex сбрасывается в 0, и поиск снова идёт с начала",
+            null
+          ],
+          "explanation": "Первый test находит a и ставит lastIndex = 1. Второй ищет с позиции 1, ничего не находит и сбрасывает lastIndex в 0. Третий снова находит."
+        },
+        {
+          "id": "regex-basics-05-q2",
+          "type": "output",
+          "code": "const re = /\\d/g;\nre.test(\"x5\");\nconsole.log(re.lastIndex);",
+          "options": ["2", "1", "0", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "lastIndex указывает на позицию после совпадения, а не на его начало",
+            "lastIndex сбрасывается в 0 только при неудаче, а здесь цифра нашлась",
+            "lastIndex есть у любой регулярки, по умолчанию он 0"
+          ],
+          "explanation": "Цифра 5 стоит под индексом 1, и lastIndex указывает на следующую позицию — 2."
+        },
+        {
+          "id": "regex-basics-05-q3",
+          "type": "fill",
+          "codeBefore": "const isNumber = s => /",
+          "codeAfter": "/.test(s);\nconsole.log(isNumber(\"42\"), isNumber(\"4a2\")); // true false",
+          "options": ["^\\d+$", "\\d+", "^\\d", "\\d+$"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без якорей хватит одной цифры в любом месте: 4a2 тоже пройдёт",
+            "Проверяется только первый символ: 4a2 начинается с цифры",
+            "Проверяется только конец: 4a2 заканчивается цифрой"
+          ],
+          "explanation": "Чтобы проверить строку целиком, нужны оба якоря: ^ в начале и $ в конце."
+        },
+        {
+          "id": "regex-basics-05-q4",
+          "type": "order",
+          "lines": [
+            "const input = \"  2024 \";",
+            "const clean = input.trim();",
+            "const isYear = /^\\d{4}$/.test(clean);",
+            "console.log(isYear); // true"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "explanation": "Сначала строку нужно получить и очистить от пробелов: иначе якоря ^ и $ не дадут совпадения. Потом проверяем и выводим результат."
+        },
+        {
+          "id": "regex-basics-05-q5",
+          "type": "output",
+          "code": "const re = /cat/gi;\nconst words = [\"Cat\", \"Cats\", \"dog\"];\nconsole.log(words.filter(w => re.test(w)));",
+          "options": ["[\"Cat\"]", "[\"Cat\", \"Cats\"]", "[]", "[\"Cats\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Из-за флага g второй test начал поиск с lastIndex = 3 и не нашёл cat",
+            "Первое слово подходит: флаг i не учитывает регистр",
+            null
+          ],
+          "explanation": "После \"Cat\" lastIndex стал 3, и в \"Cats\" поиск начался с буквы s. Без флага g результат был бы [\"Cat\", \"Cats\"]."
+        }
+      ]
+    },
+    {
+      "id": "regex-practice-01",
+      "topicId": "regex-practice",
+      "title": "Группы и $1",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Круглые скобки создают **группу**. Без флага `g` `match` кладёт текст групп в результат: `m[0]` — всё совпадение, `m[1]` — первая группа, `m[2]` — вторая."
+          },
+          {
+            "type": "code",
+            "code": "const m = \"2024-11-04\".match(/(\\d+)-(\\d+)-(\\d+)/);\nconsole.log(m[0]); // 2024-11-04\nconsole.log(m[1]); // 2024"
+          },
+          {
+            "type": "text",
+            "text": "В строке замены `replace` на группы ссылаются через `$1`, `$2` и так далее."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"John Smith\".replace(/(\\w+) (\\w+)/, \"$2 $1\"));\n// Smith John"
+          },
+          {
+            "type": "warning",
+            "text": "С флагом `g` `match` возвращает только совпадения целиком, группы теряются."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-practice-01-q1",
+          "type": "output",
+          "code": "const m = \"2024-11-04\".match(/(\\d+)-(\\d+)-(\\d+)/);\nconsole.log(m[1], m[3]);",
+          "options": ["2024 04", "2024-11-04 04", "11 04", "2024 11"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Всё совпадение лежит в m[0], а m[1] — первая группа",
+            "Группы нумеруются с 1: m[1] — первая группа",
+            null
+          ],
+          "explanation": "Группы нумеруются слева направо начиная с 1. m[1] — год, m[3] — день."
+        },
+        {
+          "id": "regex-practice-01-q2",
+          "type": "output",
+          "code": "console.log(\"John Smith\".replace(/(\\w+) (\\w+)/, \"$2 $1\"));",
+          "options": ["Smith John", "John Smith", "$2 $1", "Smith"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "replace переставил группы, исходная строка в результат не попала",
+            "В строке замены $1 и $2 заменяются текстом групп",
+            "В замене есть обе группы и пробел между ними"
+          ],
+          "explanation": "$1 — текст первой группы, $2 — второй. В строке замены они стоят в обратном порядке."
+        },
+        {
+          "id": "regex-practice-01-q3",
+          "type": "output",
+          "code": "const m = \"id: 42\".match(/id: (\\d+)/);\nconsole.log(m[0], m[1]);",
+          "options": ["id: 42 42", "42 42", "id: 42 id", "42 undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "m[0] — всё совпадение целиком, вместе с id:",
+            "m[1] — содержимое скобок, а в скобках \\d+",
+            "Группа есть, её текст лежит в m[1]"
+          ],
+          "explanation": "m[0] — всё найденное совпадение, а m[1] — только та часть, что в скобках."
+        },
+        {
+          "id": "regex-practice-01-q4",
+          "type": "fill",
+          "codeBefore": "const date = \"2024-11-04\";\nconsole.log(date.replace(/(\\d+)-(\\d+)-(\\d+)/, ",
+          "codeAfter": ")); // 04.11.2024",
+          "options": ["\"$3.$2.$1\"", "\"$1.$2.$3\"", "\"3.2.1\"", "\"${3}.${2}.${1}\""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Порядок групп останется прежним: 2024.11.04",
+            "Без $ это обычный текст: получится 3.2.1",
+            "${...} работает только в шаблонных строках, а в строке замены группы обозначаются $1"
+          ],
+          "explanation": "$3 — день, $2 — месяц, $1 — год. Расставляем их в нужном порядке через точку."
+        },
+        {
+          "id": "regex-practice-01-q5",
+          "type": "trueFalse",
+          "code": "console.log(\"a1 b2\".match(/(\\w)(\\d)/g));",
+          "options": [
+            "Выведет совпадения целиком: a1 и b2",
+            "Выведет содержимое групп: a, 1, b, 2"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "С флагом g match возвращает только совпадения целиком, группы в результат не попадают"
+          ],
+          "explanation": "С флагом g match собирает совпадения целиком и не возвращает группы. Для групп при глобальном поиске есть matchAll."
+        }
+      ]
+    },
+    {
+      "id": "regex-practice-02",
+      "topicId": "regex-practice",
+      "title": "Именованные группы и matchAll",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Группе можно дать имя: `(?<year>\\d{4})`. Текст группы лежит в `m.groups.year`, а в `replace` на неё ссылаются через `$<year>`."
+          },
+          {
+            "type": "code",
+            "code": "const m = \"2024-11\".match(/(?<year>\\d{4})-(?<month>\\d{2})/);\nconsole.log(m.groups.year);  // 2024\nconsole.log(m.groups.month); // 11"
+          },
+          {
+            "type": "text",
+            "text": "`matchAll` находит **все** совпадения и для каждого сохраняет группы. Он возвращает итератор: перебирай его в `for...of` или разверни в массив через `[...]`."
+          },
+          {
+            "type": "code",
+            "code": "for (const m of \"x1 y2\".matchAll(/(\\w)(\\d)/g)) {\n  console.log(m[1], m[2]);\n}\n// x 1\n// y 2"
+          },
+          {
+            "type": "warning",
+            "text": "`matchAll` работает только с флагом `g`. Без него — `TypeError`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-practice-02-q1",
+          "type": "output",
+          "code": "const m = \"2024-11\".match(/(?<year>\\d{4})-(?<month>\\d{2})/);\nconsole.log(m.groups.month, m.groups.year);",
+          "options": ["11 2024", "2024 11", "undefined undefined", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Порядок вывода задаёт console.log: сначала month, потом year",
+            "Именованные группы лежат в m.groups",
+            "Совпадение есть, поэтому m — не null"
+          ],
+          "explanation": "Именованные группы доступны в m.groups по своим именам. Выводим месяц, затем год."
+        },
+        {
+          "id": "regex-practice-02-q2",
+          "type": "output",
+          "code": "const text = \"a1 b2 c3\";\nfor (const m of text.matchAll(/([a-z])(\\d)/g)) {\n  console.log(m[2]);\n}",
+          "options": ["1 2 3", "a b c", "a1 b2 c3", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "m[1] — буква, а выводится вторая группа, m[2]",
+            "Совпадение целиком лежит в m[0]",
+            "matchAll перебирает все совпадения, а не только первое"
+          ],
+          "explanation": "matchAll даёт каждое совпадение вместе с группами. m[2] — вторая группа, цифра."
+        },
+        {
+          "id": "regex-practice-02-q3",
+          "type": "trueFalse",
+          "code": "const all = \"a1 b2\".matchAll(/\\d/);",
+          "options": ["Вернёт итератор с одним совпадением", "Вызовет TypeError"],
+          "correct": 1,
+          "optionExplanations": ["matchAll не работает без флага g, он сразу бросает ошибку", null],
+          "explanation": "matchAll ищет все совпадения, поэтому требует флаг g. Без него он бросает TypeError."
+        },
+        {
+          "id": "regex-practice-02-q4",
+          "type": "fill",
+          "codeBefore": "const s = \"Smith, John\";\nconsole.log(s.replace(/(?<last>\\w+), (?<first>\\w+)/, ",
+          "codeAfter": ")); // John Smith",
+          "options": [
+            "\"$<first> $<last>\"",
+            "\"$first $last\"",
+            "\"${first} ${last}\"",
+            "\"$<last> $<first>\""
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для имени группы нужны угловые скобки: $first — это просто текст",
+            "${...} работает только в шаблонных строках, а здесь обычная строка",
+            "Порядок останется прежним: Smith John"
+          ],
+          "explanation": "На именованную группу в строке замены ссылаются через $<имя>. Ставим сначала имя, потом фамилию."
+        },
+        {
+          "id": "regex-practice-02-q5",
+          "type": "output",
+          "code": "const prices = \"яблоки 120, груши 95\";\nconst nums = [...prices.matchAll(/(\\d+)/g)].map(m => Number(m[1]));\nconsole.log(nums);",
+          "options": ["[120, 95]", "[\"120\", \"95\"]", "[120]", "[12095]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Number превращает каждую строку в число",
+            "matchAll находит все совпадения, а не только первое",
+            null
+          ],
+          "explanation": "[...] разворачивает итератор в массив совпадений. Из каждого берём группу и превращаем её в число."
+        }
+      ]
+    },
+    {
+      "id": "regex-practice-03",
+      "topicId": "regex-practice",
+      "title": "replace с функцией и split",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Вторым аргументом `replace` можно передать **функцию**. Она получает совпадение, а за ним текст групп, и возвращает строку для замены."
+          },
+          {
+            "type": "code",
+            "code": "const s = \"price 10 and 20\";\nconsole.log(s.replace(/\\d+/g, n => n * 2));\n// price 20 and 40"
+          },
+          {
+            "type": "warning",
+            "text": "Функция тоже вызывается только для первого совпадения, если у регулярки нет флага `g`."
+          },
+          {
+            "type": "text",
+            "text": "`split` принимает и регулярку. Это удобно, когда разделители разные или вокруг них лишние пробелы."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"a, b;c\".split(/\\s*[,;]\\s*/));\n// [\"a\", \"b\", \"c\"]"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-practice-03-q1",
+          "type": "output",
+          "code": "console.log(\"price 10 and 20\".replace(/\\d+/g, n => n * 2));",
+          "options": [
+            "price 20 and 40",
+            "price 1010 and 2020",
+            "price 20 and 20",
+            "price NaN and NaN"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Умножение превращает строку \"10\" в число, а не повторяет её",
+            "Флаг g заменяет все совпадения",
+            "Строки из цифр при умножении превращаются в числа"
+          ],
+          "explanation": "Функция вызывается для каждого числа: n — строка \"10\", но умножение приводит её к числу."
+        },
+        {
+          "id": "regex-practice-03-q2",
+          "type": "output",
+          "code": "console.log(\"snake_case_name\".replace(/_(\\w)/g, (m, letter) => letter.toUpperCase()));",
+          "options": ["snakeCaseName", "snake_Case_Name", "snakeCase_name", "SNAKECASENAME"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Функция возвращает только букву, а подчёркивание входит в совпадение m и заменяется",
+            "Флаг g заменяет все совпадения, а не только первое",
+            "В верхний регистр переводится только буква из группы"
+          ],
+          "explanation": "Совпадение — подчёркивание с буквой. Функция возвращает только букву в верхнем регистре, поэтому подчёркивание исчезает."
+        },
+        {
+          "id": "regex-practice-03-q3",
+          "type": "output",
+          "code": "console.log(\"a, b;c  ,d\".split(/\\s*[,;]\\s*/));",
+          "options": [
+            "[\"a\", \"b\", \"c\", \"d\"]",
+            "[\"a\", \" b\", \"c  \", \"d\"]",
+            "[\"a, b;c  ,d\"]",
+            "[\"a\", \"b;c\", \"d\"]"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "\\s* по краям разделителя забирает пробелы",
+            null,
+            "[,;] — запятая или точка с запятой, оба разделителя работают"
+          ],
+          "explanation": "Разделитель — запятая или точка с запятой вместе с любыми пробелами вокруг. Пробелы уходят в разделитель, а не в элементы."
+        },
+        {
+          "id": "regex-practice-03-q4",
+          "type": "fill",
+          "codeBefore": "const words = \"one   two\\tthree\".split(",
+          "codeAfter": ");\nconsole.log(words.length); // 3",
+          "options": ["/\\s+/", "\" \"", "/\\s/", "\"\\s+\""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Между пробелами появятся пустые строки, а табуляция не разделитель: длина 4",
+            "Каждый пробельный символ — отдельный разделитель: между ними будут пустые строки",
+            "Это строка, а не регулярка: искать будут текст s+, и длина будет 1"
+          ],
+          "explanation": "\\s+ — один или несколько пробельных символов подряд, включая табуляцию. Поэтому слова разделяются без пустых строк."
+        },
+        {
+          "id": "regex-practice-03-q5",
+          "type": "trueFalse",
+          "code": "console.log(\"1 2 3\".replace(/\\d/, d => d * 10));",
+          "options": ["Выведет 10 20 30", "Выведет 10 2 3"],
+          "correct": 1,
+          "optionExplanations": [
+            "Без флага g функция вызывается только для первого совпадения",
+            null
+          ],
+          "explanation": "У регулярки нет флага g, поэтому заменяется только первая цифра."
+        }
+      ]
+    },
+    {
+      "id": "regex-practice-04",
+      "topicId": "regex-practice",
+      "title": "Жадные и ленивые квантификаторы",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Квантификаторы `+`, `*` и `{n,}` **жадные**: захватывают как можно больше символов, а потом отступают, если дальше шаблон не сходится."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"<b>hi</b>\".match(/<.+>/)[0]); // <b>hi</b>"
+          },
+          {
+            "type": "text",
+            "text": "Знак `?` после квантификатора делает его **ленивым**: `+?`, `*?` берут как можно меньше. `*?` может взять и ноль символов."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"<b>hi</b>\".match(/<.+?>/)[0]); // <b>"
+          },
+          {
+            "type": "tip",
+            "text": "Часто вместо ленивого квантификатора пишут класс-исключение: `<[^>]+>` — «всё, кроме `>`»."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-practice-04-q1",
+          "type": "output",
+          "code": "console.log(\"<a><b>\".match(/<.+>/)[0]);",
+          "options": ["<a><b>", "<a>", "<b>", "a"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "+ жадный: .+ захватывает всё до последнего >",
+            null,
+            "m[0] — всё совпадение вместе со скобками"
+          ],
+          "explanation": ".+ жадно доходит до конца строки, а потом отступает до последнего >. Поэтому совпадение — вся строка."
+        },
+        {
+          "id": "regex-practice-04-q2",
+          "type": "output",
+          "code": "console.log(\"<a><b>\".match(/<.+?>/g));",
+          "options": ["[\"<a>\", \"<b>\"]", "[\"<a><b>\"]", "[\"<a>\"]", "[\"a\", \"b\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "+? ленивый: останавливается на первом подходящем >",
+            "Флаг g находит все совпадения",
+            "match с флагом g возвращает совпадения целиком, вместе со скобками"
+          ],
+          "explanation": "Ленивый +? останавливается на первой >. С флагом g находятся оба тега."
+        },
+        {
+          "id": "regex-practice-04-q3",
+          "type": "output",
+          "code": "console.log(\"aaaa\".match(/a+?/)[0], \"aaaa\".match(/a{2,}/)[0]);",
+          "options": ["a aaaa", "aaaa aaaa", "a aa", "aaaa aa"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "+? ленивый: ему хватает одной a",
+            "{2,} жадный: берёт все a, сколько есть",
+            null
+          ],
+          "explanation": "Ленивый +? берёт минимум — одну a. {2,} без ? жадный и забирает все четыре."
+        },
+        {
+          "id": "regex-practice-04-q4",
+          "type": "fill",
+          "codeBefore": "const html = \"<p>Hi</p><p>JS</p>\";\nconsole.log(html.replace(/<",
+          "codeAfter": ">/g, \"\")); // HiJS",
+          "options": ["[^>]+", ".+", ".*", "\\w+"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Жадный .+ захватит всё от первой < до последней >: останется пустая строка",
+            "Жадный .* захватит всё от первой < до последней >: останется пустая строка",
+            "\\w не включает /, поэтому закрывающие теги останутся"
+          ],
+          "explanation": "[^>]+ — любые символы, кроме >, поэтому совпадение заканчивается на ближайшей >. Каждый тег удаляется отдельно."
+        },
+        {
+          "id": "regex-practice-04-q5",
+          "type": "trueFalse",
+          "code": "console.log(\"123abc\".match(/\\d*?/)[0].length);",
+          "options": ["Выведет 0", "Выведет 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "*? ленивый и может взять ноль символов, а пустое совпадение тоже подходит"
+          ],
+          "explanation": "*? берёт как можно меньше, а * разрешает ноль повторений. Пустое совпадение в начале строки уже подходит."
+        }
+      ]
+    },
+    {
+      "id": "regex-practice-05",
+      "topicId": "regex-practice",
+      "title": "Типичные задачи",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Простая проверка формата email: что-то, `@`, домен, точка и зона. Это не полная проверка по стандарту, но опечатки она ловит."
+          },
+          {
+            "type": "code",
+            "code": "const isEmail = s => /^[\\w.-]+@[\\w-]+\\.[a-z]{2,}$/i.test(s);\nconsole.log(isEmail(\"anna@mail.ru\")); // true\nconsole.log(isEmail(\"anna@mail\"));    // false"
+          },
+          {
+            "type": "text",
+            "text": "Числа из текста достают через `match` с флагом `g` и превращают в числа через `map(Number)`. `-?` разрешает минус, `(\\.\\d+)?` — дробную часть."
+          },
+          {
+            "type": "code",
+            "code": "console.log(\"t: -2.5, 10\".match(/-?\\d+(\\.\\d+)?/g).map(Number));\n// [-2.5, 10]"
+          },
+          {
+            "type": "warning",
+            "text": "`\\w` — только латиница, цифры и `_`. Для русских букв пиши класс `[а-яё]`. А `\\D` — всё, кроме цифр: `replace(/\\D/g, \"\")` оставит в строке одни цифры."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "regex-practice-05-q1",
+          "type": "output",
+          "code": "const isEmail = s => /^[\\w.-]+@[\\w-]+\\.[a-z]{2,}$/i.test(s);\nconsole.log(isEmail(\"anna.k@mail.ru\"), isEmail(\"anna@mail\"));",
+          "options": ["true false", "false false", "true true", "false true"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Точка входит в класс [\\w.-], поэтому anna.k подходит",
+            "После домена шаблон требует точку и зону, а в anna@mail их нет",
+            null
+          ],
+          "explanation": "В первом адресе есть все части: имя с точкой, @, домен и зона. Во втором нет точки с зоной после домена."
+        },
+        {
+          "id": "regex-practice-05-q2",
+          "type": "output",
+          "code": "const text = \"Температура: -5.5, завтра 3\";\nconsole.log(text.match(/-?\\d+(\\.\\d+)?/g).map(Number));",
+          "options": ["[-5.5, 3]", "[5.5, 3]", "[-5, 5, 3]", "[\"-5.5\", \"3\"]"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "-? захватывает минус перед числом",
+            "(\\.\\d+)? захватывает дробную часть вместе с числом",
+            "map(Number) превращает строки в числа"
+          ],
+          "explanation": "Шаблон берёт необязательный минус, цифры и необязательную дробную часть. map(Number) превращает строки в числа."
+        },
+        {
+          "id": "regex-practice-05-q3",
+          "type": "trueFalse",
+          "code": "console.log(/^\\w+$/.test(\"Привет\"));",
+          "options": ["Выведет true", "Выведет false"],
+          "correct": 1,
+          "optionExplanations": [
+            "\\w включает только латиницу, цифры и подчёркивание, русские буквы в него не входят",
+            null
+          ],
+          "explanation": "\\w — это [A-Za-z0-9_]. Русских букв в нём нет, поэтому строка не подходит."
+        },
+        {
+          "id": "regex-practice-05-q4",
+          "type": "order",
+          "lines": [
+            "const order = \"3 шт. по 250 руб.\";",
+            "const nums = order.match(/\\d+/g);",
+            "const [count, price] = nums.map(Number);",
+            "console.log(count * price); // 750"
+          ],
+          "shuffled": [2, 3, 0, 1],
+          "explanation": "Сначала строка, потом находим в ней числа, превращаем их в числа и раскладываем по переменным, а в конце считаем."
+        },
+        {
+          "id": "regex-practice-05-q5",
+          "type": "fill",
+          "codeBefore": "const phone = \"+7 (912) 345-67-89\";\nconsole.log(phone.replace(",
+          "codeAfter": ", \"\")); // 79123456789",
+          "options": ["/\\D/g", "/\\D/", "/\\d/g", "\"\\D\""],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без флага g удалится только первый символ +",
+            "\\d — цифры, а удалить нужно всё остальное",
+            "Это строка, а не регулярка: ищется текст D, а в номере его нет"
+          ],
+          "explanation": "\\D — любой символ, кроме цифры. С флагом g удаляются все такие символы, и остаются только цифры."
+        }
+      ]
+    }
+  ]
+}

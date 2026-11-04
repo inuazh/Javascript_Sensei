@@ -44,7 +44,7 @@ describe('runnableCode', () => {
     expect(runnable(q)).toBe('console.log(typeof true);');
   });
 
-  it('puts order lines in the correct order, but not steps written in prose', () => {
+  it('puts order lines in the correct order, but not steps in words', () => {
     const code: Question = {
       ...base,
       type: 'order',
@@ -57,6 +57,7 @@ describe('runnableCode', () => {
       type: 'order',
       lines: ['Выполняется синхронный код', 'Выполняются микрозадачи'],
       shuffled: [1, 0],
+      steps: true,
     };
     expect(runnable(prose)).toBeNull();
   });
