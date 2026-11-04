@@ -423,6 +423,20 @@ export function clipText(text: string, max: number = MAX_LINE_LENGTH): string {
 }
 
 /**
+ * `String(value)` that never throws. The sandbox can send objects whose
+ * `toString` is not callable (`{ "toString": 1 }`); String() would throw on
+ * them inside the app's message handler.
+ */
+function safeString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  try {
+    return String(value);
+  } catch {
+    return '';
+  }
+}
+
+/**
  * Console lines within the output limits: each line at most MAX_LINE_LENGTH, at
  * most MAX_LINES lines and MAX_OUTPUT_LENGTH characters in all, then a single `…`.
  * Same rules as the harness, so its output passes through unchanged.
@@ -431,7 +445,7 @@ export function limitLines(lines: readonly unknown[]): string[] {
   const kept: string[] = [];
   let length = 0;
   for (const raw of lines.slice(0, MAX_LINES + 1)) {
-    const line = clipText(String(raw));
+    const line = clipText(safeString(raw));
     if (kept.length >= MAX_LINES || length + line.length > MAX_OUTPUT_LENGTH) {
       kept.push(ELLIPSIS);
       break;
@@ -459,7 +473,10 @@ export function parseRunResult(data: unknown): RunResult | null {
   if (!r || typeof r !== 'object' || !Array.isArray(r.lines)) return null;
   let error: RunError | null = null;
   if (r.error && typeof r.error === 'object') {
-    error = { name: clipText(String(r.error.name)), message: clipText(String(r.error.message)) };
+    error = {
+      name: clipText(safeString(r.error.name)),
+      message: clipText(safeString(r.error.message)),
+    };
     if (r.error.inPromise === true) error.inPromise = true;
   }
   return {

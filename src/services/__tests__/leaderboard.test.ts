@@ -113,6 +113,43 @@ describe('leaderboard without auth', () => {
     expect(rankWeekly(await fetchWeek(20759)).map(p => p.id)).toEqual(['b', 'a']);
   });
 
+  it('drops malformed entries instead of crashing', async () => {
+    const { fetchAllTime, fetchWeek } = load('');
+    const good = { nickname: 'Ann', xp: 300, weekXp: 10, streak: 1 };
+    mockFetch({
+      'leaderboard.json': {
+        ok: good,
+        nul: null,
+        str: 'player',
+        arr: [1, 2],
+        longName: { ...good, nickname: 'a'.repeat(1_000_000) },
+        control: { ...good, nickname: 'Ann‮' },
+        reserved: { ...good, nickname: 'Admin' },
+        nickNum: { ...good, nickname: 42 },
+        xpString: { ...good, xp: '300' },
+        xpHuge: { ...good, xp: 1e300 },
+        xpNegative: { ...good, xp: -1 },
+        xpFraction: { ...good, xp: 1.5 },
+        noXp: { nickname: 'Ann' },
+        [`x${'y'.repeat(500)}`]: good,
+        badCounts: { ...good, weekXp: 1e9, streak: 'long' },
+      },
+      'weekly/20759.json': [null, good],
+    });
+    const players = await fetchAllTime();
+    expect(players.map(p => p.id)).toEqual(['ok', 'badCounts']);
+    expect(players[1]).toMatchObject({ xp: 300, weekXp: 0, streak: 0, level: 3 });
+    expect((await fetchWeek(20759)).map(p => p.id)).toEqual(['1']);
+  });
+
+  it('survives a response that is not an object', async () => {
+    const { fetchAllTime } = load('');
+    for (const body of [null, 42, 'text', true]) {
+      mockFetch({ 'leaderboard.json': body });
+      await expect(fetchAllTime()).resolves.toEqual([]);
+    }
+  });
+
   it('deletes the entry and this and last week’s weekly entries', async () => {
     const { deleteScore } = load('');
     const calls = mockFetch({ [DB]: null });

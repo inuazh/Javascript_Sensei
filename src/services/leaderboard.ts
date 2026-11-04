@@ -12,6 +12,7 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLevelInfo } from '../domain/levels';
+import { validateNickname } from '../domain/nickname';
 import { getAuth, isAuthEnabled } from './firebaseAuth';
 
 export const FIREBASE_DB_URL =
@@ -112,19 +113,38 @@ export async function deleteScore(id: string, week: number): Promise<boolean> {
   }
 }
 
-function toEntry(id: string, raw: Record<string, unknown>): PlayerEntry | null {
-  const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
-  const nickname = typeof raw.nickname === 'string' ? raw.nickname : null;
-  // Entries from the first app version have no nickname: hide them.
-  if (!nickname) return null;
-  const xp = num(raw.xp);
+/** Upper bounds of the database rules: anything beyond is not a real entry. */
+const MAX_XP = 1_000_000;
+const MAX_STREAK = 100_000;
+const MAX_ID_LENGTH = 128;
+
+/** A whole number in 0..max, or null. */
+function count(v: unknown, max: number): number | null {
+  return typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= max ? v : null;
+}
+
+/**
+ * The database is public: an entry may have been written by anything that
+ * passed (or predates) the rules. Only well-formed entries are shown, so a
+ * huge string or a wrong type cannot break the leaderboard screen.
+ */
+function toEntry(id: string, raw: unknown): PlayerEntry | null {
+  if (id.length === 0 || id.length > MAX_ID_LENGTH) return null;
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return null;
+  const r = raw as Record<string, unknown>;
+  // Entries from the first app version have no nickname; names the app itself
+  // would not accept (reserved, too long, control characters) are hidden too.
+  if (typeof r.nickname !== 'string' || validateNickname(r.nickname) !== null) return null;
+  if (r.nickname !== r.nickname.trim()) return null;
+  const xp = count(r.xp, MAX_XP);
+  if (xp === null) return null;
   return {
     id,
-    nickname,
+    nickname: r.nickname,
     xp,
-    weekXp: num(raw.weekXp),
+    weekXp: Math.min(count(r.weekXp, MAX_XP) ?? 0, xp),
     level: getLevelInfo(xp).level,
-    streak: num(raw.streak),
+    streak: count(r.streak, MAX_STREAK) ?? 0,
   };
 }
 
@@ -134,9 +154,10 @@ async function fetchList(path: string, orderBy: 'xp' | 'weekXp'): Promise<Player
     `${url(path)}?orderBy=${encodeURIComponent(`"${orderBy}"`)}&limitToLast=${FETCH_LIMIT}`,
   );
   if (!res.ok) throw new Error(`Leaderboard fetch failed: ${res.status}`);
-  const data = (await res.json()) as Record<string, Record<string, unknown>> | null;
-  if (!data) return [];
+  const data: unknown = await res.json();
+  if (typeof data !== 'object' || data === null) return [];
   return Object.entries(data)
+    .slice(0, FETCH_LIMIT)
     .map(([id, raw]) => toEntry(id, raw))
     .filter((e): e is PlayerEntry => e !== null);
 }

@@ -27,8 +27,22 @@ export const test = base.extend<{ pageErrors: string[] }>({
         if (network && firebaseFailed) return;
         errors.push(error.stack ?? message);
       });
+      // The app's own Content-Security-Policy (public/index.html) must not block
+      // anything the app needs. Violations inside the runner sandbox fire in its
+      // iframe and worker, not here. URLs with `csp-probe` are blocked on purpose.
+      await page.addInitScript(() => {
+        if (window !== window.top) return;
+        document.addEventListener('securitypolicyviolation', event => {
+          if (event.blockedURI.includes('csp-probe')) return;
+          const errors = ((window as { __cspViolations?: string[] }).__cspViolations ??= []);
+          errors.push(`CSP ${event.effectiveDirective} blocked ${event.blockedURI}`);
+        });
+      });
       await use(errors);
-      expect(errors, 'uncaught errors on the page').toEqual([]);
+      const violations = await page
+        .evaluate(() => (window as { __cspViolations?: string[] }).__cspViolations ?? [])
+        .catch(() => []);
+      expect([...errors, ...violations], 'uncaught errors on the page').toEqual([]);
     },
     { auto: true },
   ],
