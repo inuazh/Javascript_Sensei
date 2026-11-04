@@ -37,7 +37,7 @@ export default function ProfileScreen() {
   const nickname = useUserStore(s => s.settings.nickname);
   const level = getLevelInfo(progress.totalXp);
   const streak = viewStreak(progress.streak, today);
-  const lessons = Object.values(progress.lessons);
+  const lessons = Object.values(progress.lessons).filter(l => !l.skipped);
 
   const weeks = useMemo(() => {
     const start = addDays(weekStart(today), -7 * (HEATMAP_WEEKS - 1));

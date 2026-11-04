@@ -17,6 +17,7 @@ import {
   completeLesson,
   completeWorkout,
   initialProgress,
+  skipLessons,
   type LessonOutcome,
   type LessonResultInput,
   type ProgressState,
@@ -42,6 +43,8 @@ export interface Settings {
   soundEnabled: boolean;
   hapticsEnabled: boolean;
   reminder: ReminderSettings;
+  /** The placement test was taken or declined. */
+  placementDone: boolean;
 }
 
 export const DAILY_GOALS = [
@@ -59,6 +62,7 @@ export const defaultSettings: Settings = {
   soundEnabled: true,
   hapticsEnabled: true,
   reminder: { enabled: false, hour: 19, minute: 0 },
+  placementDone: false,
 };
 
 interface UserState {
@@ -68,6 +72,8 @@ interface UserState {
   updateSettings: (patch: Partial<Settings>) => void;
   completeLesson: (input: LessonResultInput) => LessonOutcome;
   completeWorkout: (input: WorkoutResultInput) => WorkoutOutcome;
+  /** Marks lessons as known after the placement test (no XP). */
+  applyPlacement: (lessonIds: string[]) => void;
   resetProgress: () => void;
 }
 
@@ -104,6 +110,12 @@ export const useUserStore = create<UserState>()(
         set({ progress: state });
         return outcome;
       },
+
+      applyPlacement: lessonIds =>
+        set(state => ({
+          progress: skipLessons(state.progress, lessonIds, new Date()),
+          settings: { ...state.settings, placementDone: true },
+        })),
 
       resetProgress: () => set({ progress: initialProgress }),
     }),
