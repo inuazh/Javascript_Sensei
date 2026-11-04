@@ -31,7 +31,7 @@ let nextId = 1;
 
 export const runCode: RunCode = (code, options) =>
   new Promise(resolve => {
-    if (!startRun) return resolve(failedToStart('Песочница для кода не запущена'));
+    if (!startRun) return resolve(failedToStart('песочница для кода не запущена'));
     startRun({ id: nextId++, html: buildRunnerHtml({ code, setup: options?.setup }), resolve });
   });
 
@@ -74,7 +74,7 @@ function RunnerPage({ run, onDone }: { run: Run; onDone: (run: Run, r: RunResult
     return () => clearTimeout(timer);
   }, []);
 
-  const crashed = () => finish(failedToStart('Песочница для кода остановилась'));
+  const crashed = () => finish(failedToStart('песочница для кода остановилась'));
 
   return (
     <WebView
@@ -101,7 +101,7 @@ function RunnerPage({ run, onDone }: { run: Run; onDone: (run: Run, r: RunResult
         const result = parseRunResult(event.nativeEvent.data);
         if (result) finish(result);
       }}
-      onError={() => finish(failedToStart('Не удалось запустить песочницу для кода'))}
+      onError={() => finish(failedToStart('не удалось запустить песочницу для кода'))}
       onRenderProcessGone={crashed}
       onContentProcessDidTerminate={crashed}
     />

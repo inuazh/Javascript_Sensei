@@ -81,15 +81,15 @@ function DailyCard({ today }: { today: string }) {
         </View>
         <Text style={Type.h3}>{questionTitle(question)}</Text>
         <Text style={Type.small}>
-          Одна попытка, одна задача для всех.
-          {streak > 0 ? ` Серия: ${streak}.` : ''}
+          одна попытка, одна задача для всех.
+          {streak > 0 ? ` серия: ${streak}.` : ''}
         </Text>
         <Button
-          title="Решить"
+          title="решить"
           icon="arrow-right"
           variant="secondary"
           onPress={open}
-          accessibilityHint={`Задача дня номер ${number}, одна попытка`}
+          accessibilityHint={`задача дня номер ${number}, одна попытка`}
           style={styles.dailyButton}
         />
       </Card>
@@ -102,7 +102,7 @@ function DailyCard({ today }: { today: string }) {
       <Pressable
         onPress={open}
         accessibilityRole="button"
-        accessibilityLabel={`Задача дня номер ${number} ${status}. Серия задач дня: ${streak}. Открыть результат`}
+        accessibilityLabel={`задача дня номер ${number} ${status}. серия задач дня: ${streak}. открыть результат`}
         style={styles.dailyDone}
       >
         <View style={[styles.dailyBadge, result.correct && styles.dailyBadgeSolved]}>
@@ -114,10 +114,10 @@ function DailyCard({ today }: { today: string }) {
         </View>
         <View style={styles.flex}>
           <Text style={Type.h3}>
-            Задача дня <Text style={styles.dailyInline}>#{number}</Text>
+            задача дня <Text style={styles.dailyInline}>#{number}</Text>
           </Text>
           <Text style={Type.small}>
-            {result.correct ? 'Решено' : 'Не в этот раз'} · серия {streak} · завтра новая
+            {result.correct ? 'решено' : 'не в этот раз'} · серия {streak} · завтра новая
           </Text>
         </View>
       </Pressable>
@@ -177,12 +177,12 @@ export default function HomeScreen() {
             color={Colors.warning}
             label={String(streak.days)}
             muted={streak.status !== 'done'}
-            accessibilityLabel={`Стрик: ${days(streak.days)}`}
+            accessibilityLabel={`стрик: ${days(streak.days)}`}
           />
           <Chip
             icon="lightning"
             label={String(progress.totalXp)}
-            accessibilityLabel={`Опыт: ${progress.totalXp} XP`}
+            accessibilityLabel={`опыт: ${progress.totalXp} XP`}
           />
         </View>
       </View>
@@ -194,7 +194,7 @@ export default function HomeScreen() {
             <Text style={{ color: goal >= 1 ? Colors.success : Colors.textPrimary }}>
               {Math.min(todayXp, dailyGoalXp)}
             </Text>
-            <Text style={styles.goalTotal}>/{dailyGoalXp} xp</Text>
+            <Text style={styles.goalTotal}>/{dailyGoalXp} XP</Text>
           </Text>
         </View>
         <ProgressBar
@@ -227,7 +227,7 @@ export default function HomeScreen() {
           <Text style={Type.h2}>{next.topic.title}</Text>
           <Text style={Type.small}>{next.lesson.title}</Text>
           <Button
-            title="Начать урок"
+            title="начать урок"
             icon="arrow-right"
             onPress={() => router.push(`/lesson/${next.lesson.id}`)}
             style={styles.continueButton}
@@ -236,9 +236,9 @@ export default function HomeScreen() {
       ) : (
         <Card tone="success">
           <Label>курс пройден</Label>
-          <Text style={Type.h2}>Все уроки пройдены</Text>
+          <Text style={Type.h2}>все уроки пройдены</Text>
           <Text style={Type.small}>
-            Новые разделы на подходе. Пока закрепляй знания в тренировке.
+            новые разделы на подходе. пока закрепляй знания в тренировке.
           </Text>
         </Card>
       )}
@@ -246,8 +246,8 @@ export default function HomeScreen() {
       {showPlacement && (
         <ActionRow
           icon="compass"
-          title="Уже знаешь основы?"
-          subtitle={`Тест на ${PLACEMENT_MINUTES}\u00a0минут засчитает то, что ты уже знаешь`}
+          title="уже знаешь основы?"
+          subtitle={`тест на ${PLACEMENT_MINUTES}\u00a0минут засчитает то, что ты уже знаешь`}
           onPress={() => router.push('/placement')}
         />
       )}
@@ -255,7 +255,7 @@ export default function HomeScreen() {
       {dueCount > 0 && (
         <ActionRow
           icon="repeat"
-          title="Пора повторить"
+          title="пора повторить"
           subtitle={`${dueCount} ${plural(dueCount, 'вопрос ждёт', 'вопроса ждут', 'вопросов ждут')} повторения`}
           onPress={() => router.push('/review')}
         />
@@ -263,8 +263,8 @@ export default function HomeScreen() {
 
       <ActionRow
         icon="search"
-        title="Справочник"
-        subtitle="Поиск по теории всех уроков"
+        title="справочник"
+        subtitle="поиск по теории всех уроков"
         onPress={() => router.push('/reference')}
       />
 

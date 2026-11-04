@@ -15,9 +15,9 @@ import { useGoBack } from '../../src/hooks/useGoBack';
 type Phase = 'theory' | 'quiz' | 'result';
 
 const RESULT_TITLE: Record<number, string> = {
-  3: 'Идеально',
-  2: 'Отлично',
-  1: 'Урок пройден',
+  3: 'идеально',
+  2: 'отлично',
+  1: 'урок пройден',
 };
 
 export default function LessonScreen() {
@@ -34,8 +34,8 @@ export default function LessonScreen() {
   if (!ref) {
     return (
       <Screen edges={['top', 'bottom']}>
-        <Text style={Type.h2}>Урок не найден</Text>
-        <Button title="Назад" onPress={goBack} />
+        <Text style={Type.h2}>урок не найден</Text>
+        <Button title="назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -73,15 +73,15 @@ export default function LessonScreen() {
         primary={
           next
             ? {
-                title: `Дальше: ${next.lesson.title}`,
+                title: `дальше: ${next.lesson.title}`,
                 onPress: () => router.replace(`/lesson/${next.lesson.id}`),
               }
-            : { title: 'На главную', onPress: close }
+            : { title: 'на главную', onPress: close }
         }
         secondary={
           outcome.stars < 3
-            ? { title: 'Пройти ещё раз', onPress: retry }
-            : { title: 'К карте курса', onPress: close }
+            ? { title: 'пройти ещё раз', onPress: retry }
+            : { title: 'к карте курса', onPress: close }
         }
       />
     );

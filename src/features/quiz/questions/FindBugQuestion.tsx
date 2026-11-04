@@ -22,8 +22,8 @@ function lineState(
 const STATE_LABEL: Record<LineState, string> = {
   idle: '',
   selected: '',
-  bug: ' — ошибка здесь',
-  wrong: ' — твой ответ',
+  bug: ', ошибка здесь',
+  wrong: ', твой ответ',
 };
 
 /** Tap the line with the bug. The answer is the 1-based line number. */
@@ -59,7 +59,7 @@ export function FindBugQuestion({
                   key={line}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: answer === line, disabled: revealed || blank }}
-                  accessibilityLabel={`Строка ${line}: ${blank ? 'пустая' : source}${STATE_LABEL[state]}`}
+                  accessibilityLabel={`строка ${line}: ${blank ? 'пустая' : source}${STATE_LABEL[state]}`}
                   disabled={revealed || blank}
                   onPress={() => onChange(line)}
                   style={({ pressed }) => [
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 10,
     letterSpacing: 1.4,
-    textTransform: 'uppercase',
     color: Colors.textMuted,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,

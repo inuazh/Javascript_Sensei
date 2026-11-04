@@ -104,12 +104,11 @@ export const Type = {
   body: { fontFamily: Fonts.sans, fontSize: 15, lineHeight: 23, color: Colors.textPrimary },
   small: { fontFamily: Fonts.sans, fontSize: 13, lineHeight: 19, color: Colors.textSecondary },
   mono: { fontFamily: Fonts.mono, fontSize: 13, color: Colors.textSecondary },
-  /** Small uppercase label, see <Label>. */
+  /** Small lowercase label, see <Label>. */
   caption: {
     fontFamily: Fonts.mono,
     fontSize: 11,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
+    letterSpacing: 1,
     color: Colors.textMuted,
   },
   /** Dot-matrix numerals. */

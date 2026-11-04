@@ -48,7 +48,7 @@ export function RunCode({ code, earlier = [] }: RunCodeProps) {
         onPress={run}
         disabled={running}
         accessibilityRole="button"
-        accessibilityLabel="Запустить код"
+        accessibilityLabel="запустить код"
         accessibilityState={{ busy: running, disabled: running }}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
       >
@@ -59,7 +59,7 @@ export function RunCode({ code, earlier = [] }: RunCodeProps) {
             <Icon name="play" size={14} color={Colors.textPrimary} />
           )}
         </View>
-        <Text style={styles.buttonText}>Запустить</Text>
+        <Text style={styles.buttonText}>запустить</Text>
       </Pressable>
       {result ? <ConsoleOutput result={result} /> : null}
     </View>
@@ -85,7 +85,7 @@ function ConsoleOutput({ result }: { result: RunResult }) {
       ) : null}
       {timedOut ? (
         <Text style={styles.note}>
-          {`Остановлено: код работал дольше ${RUN_TIMEOUT_MS / 1000} с`}
+          {`остановлено: код работал дольше ${RUN_TIMEOUT_MS / 1000} с`}
         </Text>
       ) : null}
       {empty && value !== undefined ? (
@@ -94,7 +94,7 @@ function ConsoleOutput({ result }: { result: RunResult }) {
           {value}
         </Text>
       ) : null}
-      {empty && value === undefined ? <Text style={styles.note}>Ничего не выведено</Text> : null}
+      {empty && value === undefined ? <Text style={styles.note}>ничего не выведено</Text> : null}
     </View>
   );
 }
@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 10,
     letterSpacing: 1.4,
-    textTransform: 'uppercase',
     color: Colors.textMuted,
     marginBottom: Spacing.xs,
   },

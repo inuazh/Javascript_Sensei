@@ -31,9 +31,9 @@ export { defaultSettings };
 export type { ExperienceLevel, ReminderSettings, Settings } from '../domain/settings';
 
 export const DAILY_GOALS = [
-  { xp: 50, title: 'Лёгкий', subtitle: '≈ 1 урок в день' },
-  { xp: 100, title: 'Нормальный', subtitle: '≈ 2 урока в день' },
-  { xp: 150, title: 'Серьёзный', subtitle: '≈ 3 урока в день' },
+  { xp: 50, title: 'лёгкий', subtitle: '≈ 1 урок в день' },
+  { xp: 100, title: 'нормальный', subtitle: '≈ 2 урока в день' },
+  { xp: 150, title: 'серьёзный', subtitle: '≈ 3 урока в день' },
 ] as const;
 
 interface UserState {

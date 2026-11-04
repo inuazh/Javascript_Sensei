@@ -48,7 +48,7 @@ async function scheduleReminders(
     if (!granted) return;
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-        name: 'Напоминания',
+        name: 'напоминания',
         importance: Notifications.AndroidImportance.DEFAULT,
       });
     }

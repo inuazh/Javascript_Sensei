@@ -49,23 +49,23 @@ export default function PlacementScreen() {
         contentStyle={styles.center}
         footer={
           <View style={styles.footer}>
-            <Button title="Пройти тест" icon="arrow-right" onPress={() => setPhase('quiz')} />
-            <Button title="Начать с первого урока" variant="ghost" onPress={decline} />
+            <Button title="пройти тест" icon="arrow-right" onPress={() => setPhase('quiz')} />
+            <Button title="начать с первого урока" variant="ghost" onPress={decline} />
           </View>
         }
       >
         <View style={styles.iconBox}>
           <Icon name="compass" size={32} color={Colors.accent} />
         </View>
-        <Text style={Type.h1}>Вводный тест</Text>
+        <Text style={Type.h1}>вводный тест</Text>
         <Text style={[Type.body, styles.muted]}>
-          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. Займёт около ${PLACEMENT_MINUTES}\u00a0минут.`}
+          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. займёт около ${PLACEMENT_MINUTES}\u00a0минут.`}
         </Text>
         <Text style={[Type.body, styles.muted]}>
-          Ответишь верно — раздел засчитается, и ты начнёшь с того, чего ещё не знаешь.
+          ответишь верно, и раздел засчитается, а ты начнёшь с того, чего ещё не знаешь.
         </Text>
         <Text style={Type.small}>
-          Засчитанные разделы можно пройти позже — за них тоже дадут XP.
+          засчитанные разделы можно пройти позже, за них тоже дадут XP.
         </Text>
       </Screen>
     );
@@ -77,20 +77,20 @@ export default function PlacementScreen() {
         edges={['top', 'bottom']}
         footer={
           <View style={styles.footer}>
-            <Button title="К урокам" icon="arrow-right" onPress={leave} />
+            <Button title="к урокам" icon="arrow-right" onPress={leave} />
           </View>
         }
       >
         <Text style={styles.score}>{`${passed.length}/${items.length}`}</Text>
         <Text style={Type.h1}>
           {passed.length > 0
-            ? `${plural(passed.length, 'Засчитан', 'Засчитаны', 'Засчитано')} ${passed.length} ${plural(passed.length, 'раздел', 'раздела', 'разделов')}`
-            : 'Начнём с основ'}
+            ? `${plural(passed.length, 'засчитан', 'засчитаны', 'засчитано')} ${passed.length} ${plural(passed.length, 'раздел', 'раздела', 'разделов')}`
+            : 'начнём с основ'}
         </Text>
         <Text style={Type.small}>
           {passed.length > 0
-            ? 'Эти разделы отмечены как знакомые. Курс продолжится с первого незнакомого.'
-            : 'Ничего страшного: основы быстро пролетят, а повторения закрепят знания.'}
+            ? 'эти разделы отмечены как знакомые. курс продолжится с первого незнакомого.'
+            : 'ничего страшного: основы быстро пролетят, а повторения закрепят знания.'}
         </Text>
         {passed.map(sectionId => (
           <View key={sectionId} style={styles.row}>
@@ -113,7 +113,7 @@ export default function PlacementScreen() {
   return (
     <QuizSession
       items={items.map(i => ({ question: i.question, lessonId: i.lessonId }))}
-      label="Вводный тест"
+      label="вводный тест"
       onExit={decline}
       onFinish={finish}
       shouldStop={shouldStopPlacement}

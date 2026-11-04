@@ -22,8 +22,8 @@ export default function ReferenceLessonScreen() {
   if (!ref || !theory) {
     return (
       <Screen edges={['top', 'bottom']}>
-        <Text style={Type.h2}>Теория не найдена</Text>
-        <Button title="Назад" onPress={goBack} />
+        <Text style={Type.h2}>теория не найдена</Text>
+        <Button title="назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -35,16 +35,16 @@ export default function ReferenceLessonScreen() {
       footer={
         <View style={styles.footer}>
           <Button
-            title="Пройти урок"
+            title="пройти урок"
             icon="arrow-right"
             onPress={() => router.push(`/lesson/${lesson.id}`)}
-            accessibilityHint={`Теория и ${lesson.questions.length} заданий`}
+            accessibilityHint={`теория и ${lesson.questions.length} заданий`}
           />
         </View>
       }
     >
       <BackButton />
-      <Label>{`справочник · ${number ? `${number} · ` : ''}${topic.title.toLowerCase()}`}</Label>
+      <Label>{`справочник · ${number ? `${number} · ` : ''}${topic.title}`}</Label>
       <Text style={Type.h1}>{lesson.title}</Text>
       <TheoryBlocks theory={theory} />
     </Screen>

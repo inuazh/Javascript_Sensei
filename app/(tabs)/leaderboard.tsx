@@ -61,11 +61,11 @@ function JoinCard({ outdated }: { outdated: boolean }) {
   return (
     <Card tone="accent" style={styles.join}>
       <Label>войти в рейтинг</Label>
-      <Text style={Type.h3}>Выбери ник</Text>
+      <Text style={Type.h3}>выбери ник</Text>
       <Text style={Type.small}>
         {outdated
-          ? 'Твой ник не подходит под новые правила рейтинга. Выбери другой, чтобы остаться в рейтинге.'
-          : 'В рейтинг попадут только ник, XP, уровень и стрик. Выйти можно в настройках.'}
+          ? 'твой ник не подходит под новые правила рейтинга. выбери другой, чтобы остаться в рейтинге.'
+          : 'в рейтинг попадут только ник, XP, уровень и стрик. выйти можно в настройках.'}
       </Text>
       <View style={styles.inputRow}>
         <Text style={styles.prompt}>$</Text>
@@ -87,7 +87,7 @@ function JoinCard({ outdated }: { outdated: boolean }) {
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button
-        title="Участвовать"
+        title="участвовать"
         icon="arrow-right"
         onPress={join}
         loading={saving}
@@ -123,7 +123,7 @@ function Row({
         </View>
       </View>
       <Text style={[styles.xp, isYou && { color: Colors.accent }]}>
-        {value} <Text style={styles.xpUnit}>xp</Text>
+        {value} <Text style={styles.xpUnit}>XP</Text>
       </Text>
     </View>
   );
@@ -176,7 +176,7 @@ export default function LeaderboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={Colors.accent} />
         }
       >
-        <Text style={Type.h1}>Рейтинг</Text>
+        <Text style={Type.h1}>рейтинг</Text>
         <View style={styles.tabs}>
           {(['week', 'all'] as const).map(m => (
             <Pressable
@@ -194,7 +194,7 @@ export default function LeaderboardScreen() {
         </View>
         {mode === 'week' && (
           <Label>
-            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой xp за неделю: ${myWeekXp}`}
+            {`сброс через ${daysLeft} ${plural(daysLeft, 'день', 'дня', 'дней')} · твой XP за неделю: ${myWeekXp}`}
           </Label>
         )}
 
@@ -214,7 +214,7 @@ export default function LeaderboardScreen() {
           myRank === 0 &&
           (mode === 'week' ? myWeekXp : totalXp) > 0 && (
             <Text style={[Type.small, styles.empty]}>
-              Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
+              твой результат ещё не попал в рейтинг. проверь интернет и потяни экран вниз, чтобы
               отправить ещё раз.
             </Text>
           )}
@@ -223,10 +223,10 @@ export default function LeaderboardScreen() {
         )}
         {error && (
           <Card tone="danger">
-            <Text style={Type.h3}>Не удалось загрузить рейтинг</Text>
-            <Text style={Type.small}>Проверь интернет и попробуй ещё раз.</Text>
+            <Text style={Type.h3}>не удалось загрузить рейтинг</Text>
+            <Text style={Type.small}>проверь интернет и попробуй ещё раз.</Text>
             <Button
-              title="Повторить"
+              title="повторить"
               variant="secondary"
               icon="refresh-cw"
               onPress={load}
@@ -237,8 +237,8 @@ export default function LeaderboardScreen() {
         {players !== null && ranked.length === 0 && !error && (
           <Text style={[Type.small, styles.empty]}>
             {mode === 'week'
-              ? 'На этой неделе ещё никто не занимался. Стань первым.'
-              : 'Пока пусто.'}
+              ? 'на этой неделе ещё никто не занимался. стань первым.'
+              : 'пока пусто.'}
           </Text>
         )}
         <View>

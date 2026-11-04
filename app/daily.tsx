@@ -39,9 +39,9 @@ export default function DailyScreen() {
   if (!found) {
     return (
       <Screen edges={['top', 'bottom']}>
-        <Text style={Type.h2}>Задачи на сегодня нет</Text>
-        <Text style={Type.small}>Загляни завтра.</Text>
-        <Button title="Назад" onPress={goBack} />
+        <Text style={Type.h2}>задачи на сегодня нет</Text>
+        <Text style={Type.small}>загляни завтра.</Text>
+        <Button title="назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -56,7 +56,7 @@ export default function DailyScreen() {
   return (
     <QuizSession
       items={items}
-      label={`Задача дня #${dailyNumber(day)}`}
+      label={`задача дня #${dailyNumber(day)}`}
       onExit={goBack}
       onAnswer={record}
       onFinish={() => setShowResult(true)}

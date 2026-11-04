@@ -75,7 +75,7 @@ export default function ReferenceScreen() {
       <View style={styles.head}>
         <BackButton />
         <Label>{`справочник · ${index.entries.length} ${plural(index.entries.length, 'урок', 'урока', 'уроков')}`}</Label>
-        <Text style={Type.h1}>Справочник</Text>
+        <Text style={Type.h1}>справочник</Text>
         <View style={styles.inputRow}>
           <Text style={styles.prompt}>$</Text>
           <TextInput
@@ -86,7 +86,7 @@ export default function ReferenceScreen() {
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyType="search"
-            accessibilityLabel="Поиск по теории"
+            accessibilityLabel="поиск по теории"
             style={styles.input}
           />
           {query ? (
@@ -94,7 +94,7 @@ export default function ReferenceScreen() {
               onPress={() => setQuery('')}
               hitSlop={12}
               accessibilityRole="button"
-              accessibilityLabel="Очистить поиск"
+              accessibilityLabel="очистить поиск"
             >
               <Icon name="x" size={18} color={Colors.textMuted} />
             </Pressable>
@@ -163,7 +163,7 @@ function LessonRow({ entry, onPress }: { entry: TheoryEntry; onPress: () => void
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Теория: ${entry.lessonTitle}`}
+      accessibilityLabel={`теория: ${entry.lessonTitle}`}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
       <Text style={styles.number}>{entry.number}</Text>
@@ -179,7 +179,7 @@ function HitRow({ hit, onPress }: { hit: TheoryHit; onPress: () => void }) {
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Теория: ${entry.lessonTitle}, тема «${entry.topicTitle}»`}
+      accessibilityLabel={`теория: ${entry.lessonTitle}, тема «${entry.topicTitle}»`}
       style={({ pressed }) => [styles.hit, pressed && styles.pressed]}
     >
       <Text style={styles.hitMeta} numberOfLines={1}>
@@ -223,9 +223,9 @@ function Empty() {
   return (
     <View style={styles.empty} accessibilityLiveRegion="polite">
       <Icon name="search" size={28} color={Colors.textDisabled} />
-      <Text style={Type.h3}>Ничего не нашлось</Text>
+      <Text style={Type.h3}>ничего не нашлось</Text>
       <Text style={[Type.small, styles.emptyHint]}>
-        Попробуй другое слово или его начало: «замык», «промис», «map».
+        попробуй другое слово или его начало: «замык», «промис», «map».
       </Text>
     </View>
   );

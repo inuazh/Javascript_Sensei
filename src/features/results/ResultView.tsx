@@ -93,7 +93,7 @@ export function ResultView({
       </Animated.View>
 
       <Card>
-        <Row label="xp" value={xp > 0 ? `+${xp}` : '0'} accent={xp > 0} />
+        <Row label="XP" value={xp > 0 ? `+${xp}` : '0'} accent={xp > 0} />
         {outcome.streakExtended && (
           <Row
             label="стрик"
@@ -116,7 +116,7 @@ export function ResultView({
 
       {xp === 0 && (
         <Text style={[Type.small, styles.center]}>
-          XP дают за новый материал и улучшение результата. Повторение тоже полезно.
+          XP дают за новый материал и улучшение результата. повторение тоже полезно.
         </Text>
       )}
 
