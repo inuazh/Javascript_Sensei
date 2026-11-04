@@ -2,18 +2,23 @@
  * Global leaderboard on Firebase Realtime Database (REST API).
  * Participation is opt-in: nothing is sent until the user picks a nickname.
  *
- * Data: /leaderboard/{playerId} = { nickname, xp, weekXp, week, level, streak, updatedAt }.
- * Weekly ranking uses the entries whose `week` is the current week.
+ * Data (see database.rules.json and docs/firebase.md):
+ *   /leaderboard/{playerId}      = { nickname, xp, streak, updatedAt }
+ *   /weekly/{week}/{playerId}    = { nickname, xp, streak, weekXp, week, updatedAt }
+ * `week` is weekNumber() of the Monday, so every week has its own list and
+ * old weeks never crowd out the current one. The level is derived from XP.
  * With Firebase auth configured, playerId is the anonymous user's uid and
- * database rules only let a user write their own entry (docs/firebase.md).
+ * database rules only let a user write or delete their own entries.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getLevelInfo } from '../domain/levels';
 import { getAuth, isAuthEnabled } from './firebaseAuth';
 
 export const FIREBASE_DB_URL =
   process.env.EXPO_PUBLIC_FIREBASE_DB_URL ??
   'https://javascript-sensei-default-rtdb.europe-west1.firebasedatabase.app';
 
+/** Must not exceed the `query.limitToLast` allowed by the database rules. */
 const FETCH_LIMIT = 200;
 const LEGACY_DEVICE_ID_KEY = 'js_sensei_device_id';
 
@@ -21,21 +26,20 @@ export interface PlayerEntry {
   id: string;
   nickname: string;
   xp: number;
+  /** XP this week; 0 in the all-time list. */
   weekXp: number;
-  /** Monday (YYYY-MM-DD) of the week `weekXp` belongs to. */
-  week: string;
   level: number;
   streak: number;
 }
 
-export const NICKNAME_RE = /^[\p{L}\p{N}_ .-]{3,20}$/u;
-
-export function validateNickname(raw: string): string | null {
-  const nickname = raw.trim();
-  if (nickname.length < 3) return 'Минимум 3 символа';
-  if (nickname.length > 20) return 'Максимум 20 символов';
-  if (!NICKNAME_RE.test(nickname)) return 'Только буквы, цифры, пробел, «_», «.» и «-»';
-  return null;
+export interface Score {
+  id: string;
+  nickname: string;
+  xp: number;
+  weekXp: number;
+  /** weekNumber() of the week `weekXp` belongs to. */
+  week: number;
+  streak: number;
 }
 
 /**
@@ -54,21 +58,58 @@ export async function createPlayerId(): Promise<string> {
   return `${random()}${random()}${Date.now().toString(36)}`;
 }
 
-export async function uploadScore(entry: PlayerEntry): Promise<void> {
-  const { id, ...data } = entry;
-  let query = '';
-  if (isAuthEnabled()) {
-    const auth = await getAuth();
-    if (auth.uid !== id) throw new Error('Player id does not match the signed-in user');
-    query = `?auth=${encodeURIComponent(auth.idToken)}`;
-  }
-  const res = await fetch(`${FIREBASE_DB_URL}/leaderboard/${encodeURIComponent(id)}.json${query}`, {
-    method: 'PUT',
+/** `?auth=…` for the signed-in user who owns `id`, or '' without auth. */
+async function authQuery(id: string): Promise<string> {
+  if (!isAuthEnabled()) return '';
+  const auth = await getAuth();
+  if (auth.uid !== id) throw new Error('Player id does not match the signed-in user');
+  return `?auth=${encodeURIComponent(auth.idToken)}`;
+}
+
+const entryPath = (id: string) => `leaderboard/${id}`;
+const weeklyPath = (week: number, id: string) => `weekly/${week}/${id}`;
+const url = (path: string) =>
+  `${FIREBASE_DB_URL}/${path.split('/').map(encodeURIComponent).join('/')}.json`;
+
+/**
+ * Writes the all-time entry and this week's entry in one atomic multi-path
+ * update: the rules check the weekly copy against the new all-time entry.
+ */
+export async function uploadScore(score: Score): Promise<void> {
+  const { id, nickname, xp, weekXp, week, streak } = score;
+  const query = await authQuery(id);
+  // Server time lets the database rules limit how fast XP can grow.
+  const updatedAt = { '.sv': 'timestamp' };
+  const entry = { nickname, xp, streak, updatedAt };
+  const body = {
+    [entryPath(id)]: entry,
+    // No XP this week (or progress was reset): no weekly entry.
+    [weeklyPath(week, id)]: weekXp > 0 ? { ...entry, weekXp, week } : null,
+  };
+  const res = await fetch(`${FIREBASE_DB_URL}/.json${query}`, {
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    // Server time lets the database rules limit how fast XP can grow.
-    body: JSON.stringify({ ...data, updatedAt: { '.sv': 'timestamp' } }),
+    body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`Leaderboard upload failed: ${res.status}`);
+}
+
+/**
+ * Deletes the player's all-time entry and the weekly entries of `week` and
+ * the week before (older weeks are not shown anywhere). Best effort:
+ * resolves to false if any request failed.
+ */
+export async function deleteScore(id: string, week: number): Promise<boolean> {
+  try {
+    const query = await authQuery(id);
+    const paths = [entryPath(id), weeklyPath(week, id), weeklyPath(week - 7, id)];
+    const results = await Promise.allSettled(
+      paths.map(path => fetch(`${url(path)}${query}`, { method: 'DELETE' })),
+    );
+    return results.every(r => r.status === 'fulfilled' && r.value.ok);
+  } catch {
+    return false;
+  }
 }
 
 function toEntry(id: string, raw: Record<string, unknown>): PlayerEntry | null {
@@ -76,28 +117,22 @@ function toEntry(id: string, raw: Record<string, unknown>): PlayerEntry | null {
   const nickname = typeof raw.nickname === 'string' ? raw.nickname : null;
   // Entries from the first app version have no nickname: hide them.
   if (!nickname) return null;
+  const xp = num(raw.xp);
   return {
     id,
     nickname,
-    xp: num(raw.xp),
+    xp,
     weekXp: num(raw.weekXp),
-    week: typeof raw.week === 'string' ? raw.week : '',
-    level: num(raw.level) || 1,
+    level: getLevelInfo(xp).level,
     streak: num(raw.streak),
   };
 }
 
-/**
- * Top players by `orderBy`. Ordering by weekXp needs a database index; without
- * it Firebase answers 400, and we fall back to the all-time order.
- */
-export async function fetchPlayers(orderBy: 'xp' | 'weekXp' = 'xp'): Promise<PlayerEntry[]> {
-  const query = (key: string) =>
-    fetch(
-      `${FIREBASE_DB_URL}/leaderboard.json?orderBy=${encodeURIComponent(`"${key}"`)}&limitToLast=${FETCH_LIMIT}`,
-    );
-  let res = await query(orderBy);
-  if (!res.ok && orderBy !== 'xp') res = await query('xp');
+/** The read rules only allow exactly these queries: ordered by one field, at most FETCH_LIMIT. */
+async function fetchList(path: string, orderBy: 'xp' | 'weekXp'): Promise<PlayerEntry[]> {
+  const res = await fetch(
+    `${url(path)}?orderBy=${encodeURIComponent(`"${orderBy}"`)}&limitToLast=${FETCH_LIMIT}`,
+  );
   if (!res.ok) throw new Error(`Leaderboard fetch failed: ${res.status}`);
   const data = (await res.json()) as Record<string, Record<string, unknown>> | null;
   if (!data) return [];
@@ -106,8 +141,18 @@ export async function fetchPlayers(orderBy: 'xp' | 'weekXp' = 'xp'): Promise<Pla
     .filter((e): e is PlayerEntry => e !== null);
 }
 
-export function rankWeekly(players: PlayerEntry[], week: string): PlayerEntry[] {
-  return players.filter(p => p.week === week && p.weekXp > 0).sort((a, b) => b.weekXp - a.weekXp);
+/** Top players of all time. */
+export function fetchAllTime(): Promise<PlayerEntry[]> {
+  return fetchList('leaderboard', 'xp');
+}
+
+/** Top players of `week` (a weekNumber()). */
+export function fetchWeek(week: number): Promise<PlayerEntry[]> {
+  return fetchList(`weekly/${week}`, 'weekXp');
+}
+
+export function rankWeekly(players: PlayerEntry[]): PlayerEntry[] {
+  return players.filter(p => p.weekXp > 0).sort((a, b) => b.weekXp - a.weekXp);
 }
 
 export function rankAllTime(players: PlayerEntry[]): PlayerEntry[] {

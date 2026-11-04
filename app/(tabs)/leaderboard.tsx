@@ -10,16 +10,17 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { addDays, daysBetween, weekStart } from '../../src/domain/dates';
+import { addDays, daysBetween, weekNumber, weekStart } from '../../src/domain/dates';
+import { NICKNAME_MAX, NICKNAME_MIN, validateNickname } from '../../src/domain/nickname';
 import { weeklyXp } from '../../src/domain/progress';
 import { plural } from '../../src/domain/reminders';
 import { useToday } from '../../src/hooks/useToday';
 import { publishScore } from '../../src/services/activity';
 import {
-  fetchPlayers,
+  fetchAllTime,
+  fetchWeek,
   rankAllTime,
   rankWeekly,
-  validateNickname,
   type PlayerEntry,
 } from '../../src/services/leaderboard';
 import { useUserStore } from '../../src/stores/useUserStore';
@@ -27,7 +28,7 @@ import { Button, Card, Colors, Fonts, Icon, Label, Radius, Spacing, Type } from 
 
 type Mode = 'week' | 'all';
 
-function JoinCard() {
+function JoinCard({ outdated }: { outdated: boolean }) {
   const updateSettings = useUserStore(s => s.updateSettings);
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +52,9 @@ function JoinCard() {
       <Label>войти в рейтинг</Label>
       <Text style={Type.h3}>Выбери ник</Text>
       <Text style={Type.small}>
-        В рейтинг попадут только ник, XP, уровень и стрик. Выйти можно в настройках.
+        {outdated
+          ? 'Твой ник не подходит под новые правила рейтинга. Выбери другой, чтобы остаться в рейтинге.'
+          : 'В рейтинг попадут только ник, XP, уровень и стрик. Выйти можно в настройках.'}
       </Text>
       <View style={styles.inputRow}>
         <Text style={styles.prompt}>$</Text>
@@ -63,7 +66,7 @@ function JoinCard() {
           }}
           placeholder="nickname"
           placeholderTextColor={Colors.textDisabled}
-          maxLength={20}
+          maxLength={NICKNAME_MAX}
           autoCapitalize="none"
           autoCorrect={false}
           style={styles.input}
@@ -77,7 +80,7 @@ function JoinCard() {
         icon="arrow-right"
         onPress={join}
         loading={saving}
-        disabled={nickname.trim().length < 3}
+        disabled={nickname.trim().length < NICKNAME_MIN}
       />
     </Card>
   );
@@ -126,14 +129,16 @@ export default function LeaderboardScreen() {
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const week = weekStart(today);
+  const weekId = weekNumber(today);
   const load = useCallback(async () => {
     setError(false);
     try {
-      setPlayers(await fetchPlayers(mode === 'week' ? 'weekXp' : 'xp'));
+      setPlayers(await (mode === 'week' ? fetchWeek(weekId) : fetchAllTime()));
     } catch {
       setError(true);
     }
-  }, [mode]);
+  }, [mode, weekId]);
 
   useEffect(() => {
     load();
@@ -146,13 +151,10 @@ export default function LeaderboardScreen() {
     setRefreshing(false);
   };
 
-  const week = weekStart(today);
   const daysLeft = daysBetween(today, addDays(week, 7));
-  const ranked = players
-    ? mode === 'week'
-      ? rankWeekly(players, week)
-      : rankAllTime(players)
-    : [];
+  const ranked = players ? (mode === 'week' ? rankWeekly(players) : rankAllTime(players)) : [];
+  // A nickname from an older version that the current rules reject must be replaced.
+  const joined = !!settings.nickname && validateNickname(settings.nickname) === null;
   const myRank = ranked.findIndex(p => p.id === settings.playerId) + 1;
 
   return (
@@ -185,8 +187,8 @@ export default function LeaderboardScreen() {
           </Label>
         )}
 
-        {!settings.nickname && <JoinCard />}
-        {settings.nickname && myRank > 0 && (
+        {!joined && <JoinCard outdated={!!settings.nickname} />}
+        {joined && myRank > 0 && (
           <Card tone="accent" style={styles.myRank}>
             <Text style={styles.myRankNumber}>#{myRank}</Text>
             <Text style={Type.small}>
@@ -195,11 +197,11 @@ export default function LeaderboardScreen() {
           </Card>
         )}
 
-        {settings.nickname &&
+        {joined &&
           players !== null &&
           !error &&
           myRank === 0 &&
-          progress.totalXp > 0 && (
+          (mode === 'week' ? weeklyXp(progress, today) : progress.totalXp) > 0 && (
             <Text style={[Type.small, styles.empty]}>
               Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
               отправить ещё раз.

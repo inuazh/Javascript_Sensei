@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import Constants from 'expo-constants';
-import { afterActivity } from '../src/services/activity';
+import { afterActivity, leaveLeaderboard } from '../src/services/activity';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ReminderSettings } from '../src/stores/useUserStore';
 import {
@@ -59,10 +59,21 @@ export default function SettingsScreen() {
     syncReminders(reminder, useUserStore.getState().progress);
   };
 
-  const leaveLeaderboard = () =>
-    Alert.alert('Выйти из рейтинга?', 'Твой ник перестанет обновляться в рейтинге.', [
+  const confirmLeave = () =>
+    Alert.alert('Выйти из рейтинга?', 'Твоя запись и ник будут удалены из рейтинга.', [
       { text: 'Отмена', style: 'cancel' },
-      { text: 'Выйти', style: 'destructive', onPress: () => updateSettings({ nickname: null }) },
+      {
+        text: 'Выйти',
+        style: 'destructive',
+        onPress: async () => {
+          if (!(await leaveLeaderboard())) {
+            Alert.alert(
+              'Запись не удалена',
+              'Не удалось связаться с сервером. Напиши на jssensei.app@gmail.com, и мы удалим её вручную.',
+            );
+          }
+        },
+      },
     ]);
 
   const confirmReset = () =>
@@ -136,7 +147,7 @@ export default function SettingsScreen() {
         {settings.nickname ? (
           <>
             <Text style={Type.body}>Ник: {settings.nickname}</Text>
-            <Pressable onPress={leaveLeaderboard} accessibilityRole="button">
+            <Pressable onPress={confirmLeave} accessibilityRole="button">
               <Text style={styles.danger}>Выйти из рейтинга</Text>
             </Pressable>
           </>

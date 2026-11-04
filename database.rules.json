@@ -3,34 +3,56 @@
     ".read": false,
     ".write": false,
     "leaderboard": {
-      ".read": true,
-      ".indexOn": ["xp", "weekXp"],
+      ".read": "query.orderByChild === 'xp' && query.limitToLast <= 200",
+      ".indexOn": ["xp"],
       "$uid": {
-        ".write": "auth != null && auth.uid === $uid",
-        ".validate": "newData.hasChildren(['nickname', 'xp', 'weekXp', 'week', 'level', 'streak', 'updatedAt'])",
+        ".write": "auth !== null && auth.uid === $uid",
+        ".validate": "newData.hasChildren(['nickname', 'xp', 'streak', 'updatedAt'])",
         "nickname": {
-          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 20"
+          ".validate": "newData.isString() && newData.val().matches(/^[0-9A-Za-zА-Яа-яЁё_.-][0-9A-Za-zА-Яа-яЁё_. -]{0,18}[0-9A-Za-zА-Яа-яЁё_.-]$/) && !(newData.val().matches(/[A-Za-z]/) && newData.val().matches(/[А-Яа-яЁё]/))"
         },
         "xp": {
-          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
-        },
-        "weekXp": {
-          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= newData.parent().child('xp').val()"
-        },
-        "week": {
-          ".validate": "newData.isString() && newData.val().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)"
-        },
-        "level": {
-          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1000"
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 1000000 && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
         },
         "streak": {
-          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+          ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && (newData.val() === 0 || newData.parent().child('xp').val() > 0) && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() <= data.val() + 1 + (now - data.parent().child('updatedAt').val()) / 86400000 : newData.val() <= 1 + (now - 1775001600000) / 86400000)"
         },
         "updatedAt": {
           ".validate": "newData.isNumber() && newData.val() === now"
         },
         "$other": {
           ".validate": false
+        }
+      }
+    },
+    "weekly": {
+      "$week": {
+        ".read": "query.orderByChild === 'weekXp' && query.limitToLast <= 200",
+        ".indexOn": ["weekXp"],
+        "$uid": {
+          ".write": "auth !== null && auth.uid === $uid",
+          ".validate": "newData.hasChildren(['nickname', 'xp', 'weekXp', 'week', 'streak', 'updatedAt']) && $week === newData.child('week').val() + ''",
+          "nickname": {
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('nickname').val()"
+          },
+          "xp": {
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('xp').val()"
+          },
+          "streak": {
+            ".validate": "newData.val() === newData.parent().parent().parent().parent().child('leaderboard').child($uid).child('streak').val()"
+          },
+          "weekXp": {
+            ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() > 0 && newData.val() <= newData.parent().child('xp').val() && (data.exists() && data.parent().child('updatedAt').isNumber() ? newData.val() - data.val() <= 1000 + (now - data.parent().child('updatedAt').val()) / 100 : newData.val() <= 20000)"
+          },
+          "week": {
+            ".validate": "newData.isNumber() && newData.val() % 7 === 4 && newData.val() * 86400000 > now - 8 * 86400000 && newData.val() * 86400000 < now + 86400000"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() === now"
+          },
+          "$other": {
+            ".validate": false
+          }
         }
       }
     }
