@@ -1,15 +1,17 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Theory, TheoryBlock } from '../../content/schema';
 import {
   Button,
   CodeBlock,
   Colors,
+  Fonts,
+  Icon,
+  Label,
   Radius,
   RichText,
   Screen,
   Spacing,
   Type,
-  alpha,
 } from '../../ui';
 
 function Block({ block }: { block: TheoryBlock }) {
@@ -20,15 +22,15 @@ function Block({ block }: { block: TheoryBlock }) {
       return <CodeBlock code={block.code} caption={block.caption} />;
     case 'tip':
     case 'warning': {
-      const color = block.type === 'tip' ? Colors.blue : Colors.orange;
+      const color = block.type === 'tip' ? Colors.info : Colors.warning;
       return (
-        <View
-          style={[
-            styles.callout,
-            { backgroundColor: alpha(color, 0.08), borderColor: alpha(color, 0.25) },
-          ]}
-        >
-          <Text style={styles.calloutIcon}>{block.type === 'tip' ? '💡' : '⚠️'}</Text>
+        <View style={[styles.callout, { borderLeftColor: color }]}>
+          <View style={styles.calloutHead}>
+            <Icon name={block.type === 'tip' ? 'info' : 'alert-triangle'} size={15} color={color} />
+            <Text style={[styles.calloutLabel, { color }]}>
+              {block.type === 'tip' ? 'совет' : 'осторожно'}
+            </Text>
+          </View>
           <RichText text={block.text} style={styles.calloutText} />
         </View>
       );
@@ -39,31 +41,31 @@ function Block({ block }: { block: TheoryBlock }) {
 interface TheoryViewProps {
   title: string;
   label: string;
-  color: string;
   theory: Theory;
   onStart: () => void;
   onClose: () => void;
 }
 
-export function TheoryView({ title, label, color, theory, onStart, onClose }: TheoryViewProps) {
+export function TheoryView({ title, label, theory, onStart, onClose }: TheoryViewProps) {
   return (
     <Screen
       edges={['top', 'bottom']}
       footer={
         <View style={styles.footer}>
-          <Button title="К практике →" onPress={onStart} color={color} />
+          <Button title="К практике" icon="arrow-right" onPress={onStart} />
         </View>
       }
     >
-      <Text
-        style={styles.close}
+      <Pressable
         onPress={onClose}
+        hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel="Закрыть"
+        style={styles.close}
       >
-        ✕
-      </Text>
-      <Text style={[Type.caption, { color }]}>{label}</Text>
+        <Icon name="x" size={22} color={Colors.textMuted} />
+      </Pressable>
+      <Label>{`теория · ${label.toLowerCase()}`}</Label>
       <Text style={Type.h1}>{title}</Text>
       {theory.blocks.map((block, i) => (
         <Block key={i} block={block} />
@@ -73,16 +75,19 @@ export function TheoryView({ title, label, color, theory, onStart, onClose }: Th
 }
 
 const styles = StyleSheet.create({
-  close: { fontSize: 20, color: Colors.textMuted, alignSelf: 'flex-start', padding: 4 },
+  close: { alignSelf: 'flex-start' },
   callout: {
-    flexDirection: 'row',
-    gap: Spacing.md,
+    backgroundColor: Colors.surface,
     borderWidth: 1,
+    borderColor: Colors.border,
+    borderLeftWidth: 3,
     borderRadius: Radius.lg,
     padding: Spacing.lg,
+    gap: Spacing.xs,
   },
-  calloutIcon: { fontSize: 18 },
-  calloutText: { flex: 1, fontSize: 14, lineHeight: 21 },
+  calloutHead: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  calloutLabel: { fontFamily: Fonts.monoBold, fontSize: 12 },
+  calloutText: { fontSize: 14, lineHeight: 21 },
   footer: {
     padding: Spacing.xl,
     paddingTop: Spacing.md,

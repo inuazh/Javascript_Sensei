@@ -9,3 +9,7 @@ export { CodeBlock } from './CodeBlock';
 export { RichText } from './RichText';
 export { OptionCard } from './OptionCard';
 export { TimePicker } from './TimePicker';
+export { Icon, type IconName } from './Icon';
+export { Label } from './Label';
+export { Logo } from './Logo';
+export { BackButton } from './BackButton';

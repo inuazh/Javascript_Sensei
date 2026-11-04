@@ -3,7 +3,7 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Question } from '../../content/schema';
 import { useFeedback } from '../../services/feedback';
-import { Button, Colors, ProgressBar, Spacing, Type } from '../../ui';
+import { Button, Colors, Fonts, Icon, Label, ProgressBar, Spacing, Type } from '../../ui';
 import { FeedbackPanel } from './FeedbackPanel';
 import { initQuiz, quizReducer, type QuizAnswer, type QuizItem } from './quizReducer';
 import { getQuestionType, questionTitle } from './registry';
@@ -22,7 +22,7 @@ interface QuizSessionProps {
 export function QuizSession({
   items,
   label,
-  color = Colors.yellow,
+  color = Colors.accent,
   onExit,
   onFinish,
   shouldStop,
@@ -87,7 +87,7 @@ export function QuizSession({
           accessibilityRole="button"
           accessibilityLabel="Закрыть"
         >
-          <Text style={styles.close}>✕</Text>
+          <Icon name="x" size={22} color={Colors.textMuted} />
         </Pressable>
         <ProgressBar value={progress} color={color} style={styles.progress} />
         <Text style={styles.counter}>
@@ -101,7 +101,7 @@ export function QuizSession({
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[Type.caption, { color }]}>{label}</Text>
+        <Label>{label.toLowerCase()}</Label>
         <Text style={styles.title}>{questionTitle(question)}</Text>
         <QuestionView
           key={question.id}
@@ -126,8 +126,9 @@ export function QuizSession({
       <View style={styles.footer}>
         {revealed ? (
           <Button
-            title={isLast ? 'Завершить' : 'Дальше →'}
-            variant={state.lastCorrect ? 'success' : 'primary'}
+            title={isLast ? 'Завершить' : 'Дальше'}
+            icon={isLast ? 'check' : 'arrow-right'}
+            variant="primary"
             onPress={next}
           />
         ) : (
@@ -148,12 +149,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     paddingVertical: Spacing.md,
   },
-  close: { fontSize: 20, color: Colors.textMuted, paddingHorizontal: 4 },
   progress: { flex: 1 },
   counter: {
+    fontFamily: Fonts.mono,
     color: Colors.textMuted,
     fontSize: 13,
-    fontWeight: '700',
     minWidth: 36,
     textAlign: 'right',
   },

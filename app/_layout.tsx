@@ -1,3 +1,16 @@
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
+import {
+  IBMPlexMono_400Regular,
+  IBMPlexMono_500Medium,
+  IBMPlexMono_700Bold,
+} from '@expo-google-fonts/ibm-plex-mono';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -25,17 +38,33 @@ function useNotificationNavigation() {
 }
 
 export default function RootLayout() {
-  const [ready, setReady] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
+    IBMPlexMono_400Regular,
+    IBMPlexMono_500Medium,
+    IBMPlexMono_700Bold,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    ...Feather.font,
+    ...MaterialCommunityIcons.font,
+  });
   useNotificationNavigation();
 
   useEffect(() => {
     waitForHydration().then(() => {
-      setReady(true);
-      SplashScreen.hideAsync().catch(() => {});
+      setHydrated(true);
       const { settings, progress } = useUserStore.getState();
       syncReminders(settings.reminder, progress);
     });
   }, []);
+
+  // A font that fails to load falls back to the system font rather than blocking the app.
+  const ready = hydrated && (fontsLoaded || !!fontError);
+  useEffect(() => {
+    if (ready) SplashScreen.hideAsync().catch(() => {});
+  }, [ready]);
 
   if (!ready) return null;
 

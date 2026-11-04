@@ -13,10 +13,10 @@ import { Button, Screen, Type, getSectionColor } from '../../src/ui';
 
 type Phase = 'theory' | 'quiz' | 'result';
 
-const RESULT_COPY: Record<number, { emoji: string; title: string }> = {
-  3: { emoji: '🏆', title: 'Идеально!' },
-  2: { emoji: '🎉', title: 'Отлично!' },
-  1: { emoji: '💪', title: 'Урок пройден' },
+const RESULT_TITLE: Record<number, string> = {
+  3: 'Идеально',
+  2: 'Отлично',
+  1: 'Урок пройден',
 };
 
 export default function LessonScreen() {
@@ -47,7 +47,6 @@ export default function LessonScreen() {
       <TheoryView
         title={lesson.title}
         label={topic.title}
-        color={color}
         theory={lesson.theory}
         onStart={() => setPhase('quiz')}
         onClose={close}
@@ -57,7 +56,6 @@ export default function LessonScreen() {
 
   if (phase === 'result' && outcome) {
     const next = getNextLesson(lesson.id);
-    const copy = RESULT_COPY[outcome.stars] ?? RESULT_COPY[1];
     const retry = () => {
       setOutcome(null);
       setAttempt(a => a + 1);
@@ -65,16 +63,16 @@ export default function LessonScreen() {
     };
     return (
       <ResultView
-        emoji={copy.emoji}
-        title={copy.title}
-        subtitle={`${outcome.correct} из ${lesson.questions.length} правильно · ${lesson.title}`}
+        score={`${outcome.correct}/${lesson.questions.length}`}
+        title={RESULT_TITLE[outcome.stars] ?? RESULT_TITLE[1]}
+        subtitle={lesson.title}
         stars={outcome.stars}
         outcome={outcome}
         totalXp={totalXp}
         primary={
           next
             ? {
-                title: `Дальше: ${next.lesson.title} →`,
+                title: `Дальше: ${next.lesson.title}`,
                 onPress: () => router.replace(`/lesson/${next.lesson.id}`),
               }
             : { title: 'На главную', onPress: close }

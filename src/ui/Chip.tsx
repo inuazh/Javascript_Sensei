@@ -1,30 +1,25 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Colors, Fonts, Radius, Spacing, alpha } from './theme';
+import { Icon, type IconName } from './Icon';
+import { Colors, Fonts, Radius, Spacing } from './theme';
 
-/** Small pill with an icon and a value, e.g. 🔥 5. */
+/** Compact stat: icon + monospace value, e.g. a flame and 13. */
 export function Chip({
   icon,
   label,
-  color = Colors.yellow,
+  color = Colors.accent,
   muted,
 }: {
-  icon?: string;
+  icon?: IconName;
   label: string;
   color?: string;
   muted?: boolean;
 }) {
   return (
-    <View
-      style={[
-        styles.chip,
-        {
-          backgroundColor: alpha(color, muted ? 0.04 : 0.1),
-          borderColor: alpha(color, muted ? 0.1 : 0.25),
-        },
-      ]}
-    >
-      {icon ? <Text style={[styles.icon, muted && styles.mutedIcon]}>{icon}</Text> : null}
-      <Text style={[styles.label, { color: muted ? Colors.textMuted : color }]}>{label}</Text>
+    <View style={styles.chip}>
+      {icon ? <Icon name={icon} size={15} color={muted ? Colors.textMuted : color} /> : null}
+      <Text style={[styles.label, { color: muted ? Colors.textMuted : Colors.textPrimary }]}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -33,13 +28,13 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
+    gap: 5,
     paddingHorizontal: Spacing.md,
     paddingVertical: 6,
-    borderRadius: Radius.pill,
+    borderRadius: Radius.md,
     borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
   },
-  icon: { fontSize: 13 },
-  mutedIcon: { opacity: 0.4 },
-  label: { fontFamily: Fonts.mono, fontSize: 13, fontWeight: '700' },
+  label: { fontFamily: Fonts.monoBold, fontSize: 13 },
 });

@@ -7,18 +7,21 @@ import { useFeedback } from '../../services/feedback';
 import {
   Button,
   Card,
-  Chip,
   Colors,
+  Fonts,
+  Icon,
+  type IconName,
+  Label,
   ProgressBar,
   Screen,
   Spacing,
   Stars,
   Type,
-  alpha,
 } from '../../ui';
 
 interface ResultViewProps {
-  emoji: string;
+  /** Big score line, e.g. "5/5". */
+  score: string;
   title: string;
   subtitle: string;
   stars?: number;
@@ -28,8 +31,17 @@ interface ResultViewProps {
   secondary?: { title: string; onPress: () => void };
 }
 
+function Row({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      <Text style={[styles.rowValue, accent && { color: Colors.accent }]}>{value}</Text>
+    </View>
+  );
+}
+
 export function ResultView({
-  emoji,
+  score,
   title,
   subtitle,
   stars,
@@ -38,16 +50,17 @@ export function ResultView({
   primary,
   secondary,
 }: ResultViewProps) {
-  const scale = useRef(new Animated.Value(0.4)).current;
+  const appear = useRef(new Animated.Value(0)).current;
   const feedback = useFeedback();
   useEffect(() => {
-    Animated.spring(scale, { toValue: 1, friction: 4, useNativeDriver: true }).start();
+    Animated.timing(appear, { toValue: 1, duration: 400, useNativeDriver: true }).start();
     feedback.celebrate();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run once on mount
 
   const level = getLevelInfo(totalXp);
   const levelUp = outcome.levelAfter > outcome.levelBefore;
   const goalProgress = outcome.todayXpAfter / outcome.dailyGoalXp;
+  const xp = outcome.xpEarned + outcome.achievementXp;
 
   return (
     <Screen
@@ -55,76 +68,67 @@ export function ResultView({
       contentStyle={styles.content}
       footer={
         <View style={styles.footer}>
-          <Button title={primary.title} onPress={primary.onPress} />
+          <Button title={primary.title} icon="arrow-right" onPress={primary.onPress} />
           {secondary ? (
             <Button title={secondary.title} variant="ghost" onPress={secondary.onPress} />
           ) : null}
         </View>
       }
     >
-      <Animated.Text style={[styles.emoji, { transform: [{ scale }] }]}>{emoji}</Animated.Text>
-      <Text style={[Type.h1, styles.center]}>{title}</Text>
-      <Text style={[Type.small, styles.center]}>{subtitle}</Text>
-      {stars !== undefined && (
-        <View style={styles.center}>
-          <Stars count={stars} size={30} />
-        </View>
-      )}
+      <Animated.View
+        style={[
+          styles.hero,
+          {
+            opacity: appear,
+            transform: [
+              { translateY: appear.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.score}>{score}</Text>
+        <Text style={Type.h2}>{title}</Text>
+        <Text style={[Type.small, styles.center]}>{subtitle}</Text>
+        {stars !== undefined && <Stars count={stars} size={26} />}
+      </Animated.View>
 
-      <View style={styles.chips}>
-        <Chip
-          icon="⚡"
-          label={`+${outcome.xpEarned + outcome.achievementXp} XP`}
-          muted={outcome.xpEarned + outcome.achievementXp === 0}
-        />
+      <Card>
+        <Row label="xp" value={xp > 0 ? `+${xp}` : '0'} accent={xp > 0} />
         {outcome.streakExtended && (
-          <Chip
-            icon="🔥"
-            color={Colors.orange}
-            label={`${outcome.streakDays} ${plural(outcome.streakDays, 'день', 'дня', 'дней')}`}
+          <Row
+            label="стрик"
+            value={`${outcome.streakDays} ${plural(outcome.streakDays, 'день', 'дня', 'дней')}`}
           />
         )}
-        {outcome.freezesEarned > 0 && <Chip icon="🧊" color={Colors.blue} label="+1 заморозка" />}
-      </View>
-
-      {outcome.xpEarned === 0 && outcome.achievementXp === 0 && (
-        <Text style={[Type.small, styles.center]}>
-          XP начисляется за новый материал и улучшение результата. Повторение без ошибок — тоже
-          польза!
-        </Text>
-      )}
-
-      <Card color={outcome.goalReached || goalProgress >= 1 ? Colors.green : undefined}>
-        <View style={styles.rowBetween}>
-          <Text style={Type.h3}>{goalProgress >= 1 ? '🎯 Цель дня выполнена' : '🎯 Цель дня'}</Text>
-          <Text style={styles.mono}>
-            {Math.min(outcome.todayXpAfter, outcome.dailyGoalXp)}/{outcome.dailyGoalXp} XP
+        {outcome.freezesEarned > 0 && <Row label="заморозка" value="+1" accent />}
+        <Row label="уровень" value={`${level.level} · ${level.title}`} accent={levelUp} />
+        <View style={styles.goalHead}>
+          <Text style={styles.rowLabel}>цель дня</Text>
+          <Text style={styles.rowValue}>
+            {Math.min(outcome.todayXpAfter, outcome.dailyGoalXp)}/{outcome.dailyGoalXp}
           </Text>
         </View>
         <ProgressBar
           value={goalProgress}
-          color={goalProgress >= 1 ? Colors.green : Colors.yellow}
-          style={styles.bar}
+          color={goalProgress >= 1 ? Colors.success : Colors.accent}
         />
       </Card>
 
-      {levelUp && (
-        <Card color={Colors.purple}>
-          <Text style={Type.h3}>🚀 Новый уровень: {level.level}</Text>
-          <Text style={Type.small}>Звание: {level.title}</Text>
-        </Card>
+      {xp === 0 && (
+        <Text style={[Type.small, styles.center]}>
+          XP дают за новый материал и улучшение результата. Повторение тоже полезно.
+        </Text>
       )}
 
+      {outcome.achievements.length > 0 && <Label>новые достижения</Label>}
       {outcome.achievements.map(a => (
-        <Card key={a.id} color={Colors.yellow} style={styles.achievement}>
-          <Text style={styles.achievementIcon}>{a.icon}</Text>
+        <Card key={a.id} tone="accent" style={styles.achievement}>
+          <Icon name={a.icon as IconName} size={24} color={Colors.accent} />
           <View style={styles.flex}>
             <Text style={Type.h3}>{a.title}</Text>
             <Text style={Type.small}>{a.description}</Text>
           </View>
-          {a.xpReward > 0 && (
-            <Text style={[styles.mono, { color: Colors.yellow }]}>+{a.xpReward}</Text>
-          )}
+          {a.xpReward > 0 && <Text style={styles.reward}>+{a.xpReward}</Text>}
         </Card>
       ))}
     </Screen>
@@ -133,20 +137,27 @@ export function ResultView({
 
 const styles = StyleSheet.create({
   content: { paddingTop: Spacing.xxxl },
-  emoji: { fontSize: 72, textAlign: 'center' },
-  center: { textAlign: 'center', alignItems: 'center' },
-  chips: { flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: Spacing.sm },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  mono: { fontWeight: '800', color: Colors.textSecondary },
-  bar: { marginTop: Spacing.md },
-  achievement: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    backgroundColor: alpha(Colors.yellow, 0.08),
+  hero: { alignItems: 'center', gap: Spacing.sm, marginBottom: Spacing.md },
+  score: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 64,
+    lineHeight: 72,
+    color: Colors.accent,
+    letterSpacing: -3,
   },
-  achievementIcon: { fontSize: 30 },
+  center: { textAlign: 'center' },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
+  rowLabel: { fontFamily: Fonts.mono, fontSize: 14, color: Colors.textMuted },
+  rowValue: { fontFamily: Fonts.monoBold, fontSize: 14, color: Colors.textPrimary },
+  goalHead: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 6,
+    paddingBottom: Spacing.sm,
+  },
+  achievement: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   flex: { flex: 1 },
+  reward: { fontFamily: Fonts.monoBold, color: Colors.accent },
   footer: {
     padding: Spacing.xl,
     paddingTop: Spacing.md,

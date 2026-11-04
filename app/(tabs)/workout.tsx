@@ -2,12 +2,21 @@ import { useRouter } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { getQuestion } from '../../src/content/repository';
 import { plural } from '../../src/domain/reminders';
-import { dueItems, weakItems } from '../../src/domain/review';
+import { BOX_INTERVALS, dueItems, weakItems } from '../../src/domain/review';
 import { XP } from '../../src/domain/rewards';
 import { questionPreview } from '../../src/features/quiz/registry';
 import { useToday } from '../../src/hooks/useToday';
 import { useUserStore } from '../../src/stores/useUserStore';
-import { Button, Card, Chip, Colors, Fonts, Screen, Spacing, Type } from '../../src/ui';
+import { Button, Card, Colors, Fonts, Icon, Label, Screen, Spacing, Type } from '../../src/ui';
+
+function Stat({ value, label }: { value: number; label: string }) {
+  return (
+    <View style={styles.stat}>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
 
 export default function WorkoutTab() {
   const router = useRouter();
@@ -15,34 +24,35 @@ export default function WorkoutTab() {
   const progress = useUserStore(s => s.progress);
   const due = dueItems(progress.review, today);
   const weak = weakItems(progress.review, 5);
-  const hasItems = Object.keys(progress.review).length > 0;
+  const total = Object.keys(progress.review).length;
   const doneToday = progress.lastWorkoutDay === today;
 
   return (
     <Screen>
       <Text style={Type.h1}>Тренировка</Text>
       <Text style={Type.small}>
-        Вопросы из пройденных уроков возвращаются через 2, 4, 8, 16 и 32 дня — так знания переходят
-        в долгую память. Ошибки повторяются в первую очередь.
+        Вопросы из пройденных уроков возвращаются через {BOX_INTERVALS.slice(1).join(', ')} дней.
+        Ошибки — в первую очередь.
       </Text>
 
-      <Card color={Colors.pink} style={styles.hero}>
-        <Text style={styles.heroIcon}>🧠</Text>
-        {hasItems ? (
+      <Card tone={due.length > 0 ? 'accent' : 'default'} style={styles.hero}>
+        <Label>{total > 0 ? 'на сегодня' : 'пока пусто'}</Label>
+        {total > 0 ? (
           <>
-            <Text style={Type.h2}>
+            <Text style={styles.big}>{due.length}</Text>
+            <Text style={Type.h3}>
               {due.length > 0
-                ? `${due.length} ${plural(due.length, 'вопрос', 'вопроса', 'вопросов')} на повторение`
-                : 'Всё повторено!'}
+                ? `${plural(due.length, 'вопрос', 'вопроса', 'вопросов')} на повторение`
+                : 'Всё повторено'}
             </Text>
-            <Text style={[Type.small, styles.center]}>
+            <Text style={Type.small}>
               {due.length > 0
-                ? `+${XP.perCorrectReview} XP за каждый верный ответ${doneToday ? '' : ` и +${XP.dailyWorkoutBonus} XP за первую тренировку дня`}`
-                : 'Можно потренироваться на самых свежих вопросах — без XP, зато с пользой.'}
+                ? `+${XP.perCorrectReview} xp за верный ответ${doneToday ? '' : `, +${XP.dailyWorkoutBonus} xp за первую тренировку дня`}`
+                : 'Можно потренироваться на свежих вопросах — без XP, но с пользой.'}
             </Text>
             <Button
               title={due.length > 0 ? 'Начать тренировку' : 'Свободная практика'}
-              color={Colors.pink}
+              icon="arrow-right"
               variant={due.length > 0 ? 'primary' : 'secondary'}
               onPress={() => router.push('/review')}
               style={styles.button}
@@ -50,14 +60,11 @@ export default function WorkoutTab() {
           </>
         ) : (
           <>
-            <Text style={Type.h2}>Здесь будут повторения</Text>
-            <Text style={[Type.small, styles.center]}>
-              Пройди первый урок — его вопросы появятся в тренировке.
-            </Text>
+            <Text style={Type.h3}>Здесь будут повторения</Text>
+            <Text style={Type.small}>Пройди первый урок — его вопросы появятся в тренировке.</Text>
             <Button
               title="К урокам"
               variant="secondary"
-              color={Colors.pink}
               onPress={() => router.push('/')}
               style={styles.button}
             />
@@ -66,26 +73,30 @@ export default function WorkoutTab() {
       </Card>
 
       <View style={styles.stats}>
-        <Chip icon="🛠️" color={Colors.green} label={`исправлено: ${progress.mistakesFixed}`} />
-        <Chip icon="🏋️" color={Colors.blue} label={`тренировок: ${progress.workoutsCompleted}`} />
+        <Stat value={total} label="в колоде" />
+        <Stat value={progress.mistakesFixed} label="исправлено" />
+        <Stat value={progress.workoutsCompleted} label="тренировок" />
       </View>
 
       {weak.length > 0 && (
         <>
-          <Text style={[Type.caption, styles.mt]}>Слабые места</Text>
+          <Label style={styles.mt}>слабые места</Label>
           {weak.map(item => {
             const found = getQuestion(item.questionId);
             if (!found) return null;
             return (
-              <Card key={item.questionId} style={styles.weak}>
+              <View key={item.questionId} style={styles.weak}>
                 <View style={styles.flex}>
                   <Text style={styles.weakTitle}>{found.lesson.title}</Text>
                   <Text style={styles.preview} numberOfLines={1}>
                     {questionPreview(found.question)}
                   </Text>
                 </View>
-                <Chip icon="✗" color={Colors.red} label={String(item.lapses)} />
-              </Card>
+                <View style={styles.lapses}>
+                  <Icon name="x" size={12} color={Colors.danger} />
+                  <Text style={styles.lapsesText}>{item.lapses}</Text>
+                </View>
+              </View>
             );
           })}
         </>
@@ -95,14 +106,39 @@ export default function WorkoutTab() {
 }
 
 const styles = StyleSheet.create({
-  hero: { alignItems: 'center', gap: Spacing.sm, padding: Spacing.xl },
-  heroIcon: { fontSize: 48 },
-  center: { textAlign: 'center' },
-  button: { alignSelf: 'stretch', marginTop: Spacing.md },
-  stats: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
+  hero: { gap: Spacing.xs, padding: Spacing.xl },
+  big: {
+    fontFamily: Fonts.monoBold,
+    fontSize: 56,
+    lineHeight: 64,
+    color: Colors.accent,
+    letterSpacing: -2,
+  },
+  button: { marginTop: Spacing.md },
+  stats: { flexDirection: 'row', gap: Spacing.sm },
+  stat: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+  },
+  statValue: { fontFamily: Fonts.monoBold, fontSize: 20, color: Colors.textPrimary },
+  statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mt: { marginTop: Spacing.sm },
-  weak: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, padding: Spacing.md },
+  weak: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
   flex: { flex: 1 },
-  weakTitle: { fontWeight: '700', color: Colors.textPrimary },
+  weakTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: Colors.textPrimary },
   preview: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted, marginTop: 2 },
+  lapses: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  lapsesText: { fontFamily: Fonts.monoBold, fontSize: 13, color: Colors.danger },
 });

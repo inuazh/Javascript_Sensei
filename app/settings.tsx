@@ -3,7 +3,18 @@ import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import Constants from 'expo-constants';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ReminderSettings } from '../src/stores/useUserStore';
-import { Card, Colors, OptionCard, Screen, Spacing, TimePicker, Type } from '../src/ui';
+import {
+  BackButton,
+  Card,
+  Colors,
+  Fonts,
+  Label,
+  OptionCard,
+  Screen,
+  Spacing,
+  TimePicker,
+  Type,
+} from '../src/ui';
 
 function ToggleRow({
   label,
@@ -20,7 +31,7 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ true: Colors.yellow, false: 'rgba(255,255,255,0.15)' }}
+        trackColor={{ true: Colors.accent, false: Colors.borderStrong }}
         thumbColor={Colors.textPrimary}
         accessibilityLabel={label}
       />
@@ -65,17 +76,10 @@ export default function SettingsScreen() {
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <Pressable
-        onPress={() => router.back()}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Назад"
-      >
-        <Text style={styles.back}>←</Text>
-      </Pressable>
+      <BackButton />
       <Text style={Type.h1}>Настройки</Text>
 
-      <Text style={Type.caption}>Цель дня</Text>
+      <Label>цель дня</Label>
       {DAILY_GOALS.map(g => (
         <OptionCard
           key={g.xp}
@@ -86,7 +90,7 @@ export default function SettingsScreen() {
         />
       ))}
 
-      <Text style={Type.caption}>Напоминания</Text>
+      <Label>напоминания</Label>
       <Card style={styles.gap}>
         <ToggleRow
           label="Напоминать заниматься"
@@ -105,7 +109,7 @@ export default function SettingsScreen() {
         )}
       </Card>
 
-      <Text style={Type.caption}>Обратная связь</Text>
+      <Label>звук и вибрация</Label>
       <Card style={styles.gap}>
         <ToggleRow
           label="Звуки"
@@ -119,7 +123,7 @@ export default function SettingsScreen() {
         />
       </Card>
 
-      <Text style={Type.caption}>Рейтинг</Text>
+      <Label>рейтинг</Label>
       <Card style={styles.gap}>
         {settings.nickname ? (
           <>
@@ -151,11 +155,10 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  back: { fontSize: 24, color: Colors.textSecondary },
   gap: { gap: Spacing.md },
   toggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  toggleLabel: { fontSize: 15, color: Colors.textPrimary },
-  link: { color: Colors.blue, fontSize: 15 },
-  danger: { color: Colors.danger, fontSize: 15, fontWeight: '600' },
+  toggleLabel: { fontFamily: Fonts.sans, fontSize: 15, color: Colors.textPrimary },
+  link: { fontFamily: Fonts.sans, color: Colors.info, fontSize: 15 },
+  danger: { fontFamily: Fonts.sansSemiBold, color: Colors.danger, fontSize: 15 },
   version: { textAlign: 'center' },
 });

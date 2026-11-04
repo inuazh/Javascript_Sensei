@@ -36,12 +36,12 @@ export default function ReviewScreen() {
     const perfect = outcome.correct === outcome.total;
     return (
       <ResultView
-        emoji={perfect ? '🧠' : '💪'}
-        title={perfect ? 'Всё помнишь!' : 'Тренировка завершена'}
+        score={`${outcome.correct}/${outcome.total}`}
+        title={perfect ? 'Всё помнишь' : 'Тренировка завершена'}
         subtitle={
           outcome.mistakesFixed > 0
-            ? `${outcome.correct} из ${outcome.total} правильно · исправлено ошибок: ${outcome.mistakesFixed}`
-            : `${outcome.correct} из ${outcome.total} правильно`
+            ? `Исправлено ошибок: ${outcome.mistakesFixed}`
+            : 'Повторение — мать учения'
         }
         outcome={outcome}
         totalXp={totalXp}
@@ -69,7 +69,7 @@ export default function ReviewScreen() {
     <QuizSession
       items={plan.items}
       label="Тренировка"
-      color={Colors.pink}
+      color={Colors.accent}
       onExit={() => router.back()}
       onFinish={finish}
     />

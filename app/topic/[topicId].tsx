@@ -3,23 +3,28 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { getSections, getTopicLessons } from '../../src/content/repository';
 import { useUserStore } from '../../src/stores/useUserStore';
 import {
+  BackButton,
   Button,
   Colors,
+  Fonts,
+  Icon,
+  Label,
   Radius,
   Screen,
   Spacing,
   Stars,
   Type,
-  alpha,
-  getSectionColor,
 } from '../../src/ui';
+
+const pad = (n: number) => String(n).padStart(2, '0');
 
 export default function TopicScreen() {
   const { topicId } = useLocalSearchParams<{ topicId: string }>();
   const router = useRouter();
   const lessonsProgress = useUserStore(s => s.progress.lessons);
 
-  const section = getSections().find(s => s.topics.some(t => t.id === topicId));
+  const sections = getSections();
+  const section = sections.find(s => s.topics.some(t => t.id === topicId));
   const topic = section?.topics.find(t => t.id === topicId);
   if (!section || !topic) {
     return (
@@ -30,25 +35,17 @@ export default function TopicScreen() {
     );
   }
 
-  const color = getSectionColor(section);
   const lessons = getTopicLessons(topic.id);
   const nextId = lessons.find(l => !(l.id in lessonsProgress))?.id;
+  const sectionNumber = sections.indexOf(section) + 1;
+  const topicNumber = section.topics.indexOf(topic) + 1;
 
   return (
     <Screen edges={['top', 'bottom']}>
-      <Pressable
-        onPress={() => router.back()}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Назад"
-      >
-        <Text style={styles.back}>←</Text>
-      </Pressable>
-      <Text style={[Type.caption, { color }]}>
-        {section.icon} {section.title}
-      </Text>
+      <BackButton />
+      <Label>{`${pad(sectionNumber)} · ${section.title.toLowerCase()}`}</Label>
       <Text style={Type.h1}>{topic.title}</Text>
-      <Text style={Type.small}>{topic.subtitle}</Text>
+      <Text style={styles.subtitle}>{topic.subtitle}</Text>
 
       <View style={styles.list}>
         {lessons.map((lesson, i) => {
@@ -61,35 +58,26 @@ export default function TopicScreen() {
               onPress={() => router.push(`/lesson/${lesson.id}`)}
               style={({ pressed }) => [
                 styles.lesson,
-                isNext && { borderColor: alpha(color, 0.5), backgroundColor: alpha(color, 0.07) },
+                isNext && styles.lessonNext,
                 pressed && styles.pressed,
               ]}
             >
-              <View
-                style={[
-                  styles.number,
-                  { backgroundColor: p ? alpha(color, 0.2) : 'rgba(255,255,255,0.05)' },
-                ]}
-              >
-                <Text
-                  style={[styles.numberText, { color: p || isNext ? color : Colors.textMuted }]}
-                >
-                  {p ? '✓' : i + 1}
-                </Text>
-              </View>
+              <Text style={[styles.number, (p || isNext) && { color: Colors.accent }]}>
+                {sectionNumber}.{topicNumber}.{i + 1}
+              </Text>
               <View style={styles.flex}>
                 <Text style={styles.title}>{lesson.title}</Text>
-                <Text style={Type.small}>
-                  {lesson.questions.length} вопросов{lesson.theory ? ' · 📖 теория' : ''}
+                <Text style={styles.meta}>
+                  {lesson.questions.length} заданий{lesson.theory ? ' · теория' : ''}
                   {p && p.attempts > 1 ? ` · попыток: ${p.attempts}` : ''}
                 </Text>
               </View>
               {p?.skipped ? (
-                <Text style={styles.known}>знакомо</Text>
+                <Text style={styles.meta}>знакомо</Text>
               ) : p ? (
                 <Stars count={p.stars} size={12} />
               ) : isNext ? (
-                <Text style={[styles.go, { color }]}>Начать</Text>
+                <Icon name="play" size={16} color={Colors.accent} />
               ) : null}
             </Pressable>
           );
@@ -100,29 +88,27 @@ export default function TopicScreen() {
 }
 
 const styles = StyleSheet.create({
-  back: { fontSize: 24, color: Colors.textSecondary },
+  subtitle: {
+    fontFamily: Fonts.mono,
+    fontSize: 13,
+    color: Colors.textMuted,
+    marginTop: -Spacing.sm,
+  },
   list: { gap: Spacing.sm, marginTop: Spacing.md },
   lesson: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
     padding: Spacing.lg,
-    borderRadius: Radius.lg,
+    borderRadius: Radius.xl,
     borderWidth: 1,
     borderColor: Colors.border,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: Colors.surface,
   },
-  pressed: { opacity: 0.75 },
-  number: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  numberText: { fontWeight: '800', fontSize: 15 },
+  lessonNext: { borderColor: Colors.accent },
+  pressed: { backgroundColor: Colors.surfaceRaised },
+  number: { width: 44, fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   flex: { flex: 1 },
-  title: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
-  go: { fontWeight: '800', fontSize: 14 },
-  known: { color: Colors.textMuted, fontWeight: '700', fontSize: 13 },
+  title: { fontFamily: Fonts.sansSemiBold, fontSize: 15, color: Colors.textPrimary },
+  meta: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted, marginTop: 2 },
 });

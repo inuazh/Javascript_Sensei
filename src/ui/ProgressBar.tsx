@@ -10,12 +10,7 @@ interface ProgressBarProps {
   style?: ViewStyle;
 }
 
-export function ProgressBar({
-  value,
-  color = Colors.yellow,
-  height = 10,
-  style,
-}: ProgressBarProps) {
+export function ProgressBar({ value, color = Colors.accent, height = 6, style }: ProgressBarProps) {
   const anim = useRef(new Animated.Value(0)).current;
   const clamped = Math.max(0, Math.min(1, value));
   useEffect(() => {
@@ -41,10 +36,6 @@ export function ProgressBar({
 }
 
 const styles = StyleSheet.create({
-  track: {
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: Radius.pill,
-    overflow: 'hidden',
-  },
-  fill: { height: '100%', borderRadius: Radius.pill },
+  track: { backgroundColor: Colors.border, borderRadius: Radius.sm, overflow: 'hidden' },
+  fill: { height: '100%', borderRadius: Radius.sm },
 });
