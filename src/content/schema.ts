@@ -106,6 +106,8 @@ export const OrderQuestionSchema = z.object({
   shuffled: z.array(z.number().int().min(0)),
   /** The lines are steps in words (a trace, a ranking), not code: nothing to run. */
   steps: z.boolean().optional(),
+  /** The code calls helpers that are not part of the question: hide «Запустить». */
+  noRun: z.boolean().optional(),
 });
 
 export const FindBugQuestionSchema = z.object({

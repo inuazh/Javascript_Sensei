@@ -26,7 +26,7 @@ function choice<Q extends ChoiceQuestionT>(
 
 /** Lines in the correct order, unless they are steps in words rather than code. */
 function orderCode(q: OrderQuestionT): string | null {
-  return q.steps ? null : q.lines.join('\n');
+  return q.steps || q.noRun ? null : q.lines.join('\n');
 }
 
 export const QUESTION_TYPES: QuestionRegistry = {

@@ -69,7 +69,7 @@
             null,
             "return просто вернёт объект ошибки как обычное значение: catch не сработает, и ничего не выведется",
             "catch — это блок после try, а не команда. Такой код — SyntaxError",
-            "reject — параметр промиса, а не ключевое слово. Такой код — SyntaxError"
+            "reject — обычно имя функции-параметра в new Promise, а не ключевое слово. Такой код — SyntaxError"
           ],
           "explanation": "Ошибку выбрасывают через throw: выполнение функции прерывается, и ошибку получает ближайший catch."
         },
@@ -123,7 +123,7 @@
           },
           {
             "type": "warning",
-            "text": "`return` внутри `try` не отменяет `finally`: сначала выполнится `finally`, и только потом функция вернёт значение. А `return` в самом `finally` перезапишет любой другой `return`."
+            "text": "`return` внутри `try` не отменяет `finally`: сначала выполнится `finally`, и только потом функция вернёт значение. А `return` в самом `finally` перезапишет результат `try` и `catch` и даже брошенную ошибку: она просто пропадёт."
           },
           {
             "type": "code",
@@ -225,7 +225,7 @@
           },
           {
             "type": "text",
-            "text": "Проброшенная ошибка летит наружу, к ближайшему внешнему `try`. Если его нет, программа падает с этой ошибкой."
+            "text": "Проброшенная ошибка летит наружу, к ближайшему внешнему `try/catch`. Если его нет, программа падает с этой ошибкой."
           },
           {
             "type": "code",
@@ -332,7 +332,7 @@
           },
           {
             "type": "text",
-            "text": "Промис с ошибкой ловят через `.catch()`. В `async`-функции работает обычный `try/catch`, но только если ждать промис через `await`."
+            "text": "Отклонённый промис ловят через `.catch()`. В `async`-функции работает обычный `try/catch`, но только если ждать промис через `await`."
           },
           {
             "type": "code",
@@ -438,7 +438,7 @@
           },
           {
             "type": "warning",
-            "text": "Значение для `return` вычисляется **до** `finally`. Если в `finally` изменить переменную, возвращаемое значение уже не поменяется."
+            "text": "Значение для `return` вычисляется **до** `finally`. Если в `finally` присвоить переменной новое значение, результат функции уже не поменяется."
           }
         ]
       },
@@ -510,7 +510,7 @@
         {
           "id": "try-catch-05-q5",
           "type": "order",
-          "title": "Собери цепочку промиса с обработкой ошибок",
+          "title": "Собери цепочку: catch ловит и ошибки из then, а «загрузка завершена» выводится последней",
           "lines": [
             "fetchData()",
             "  .then(data => console.log(data))",
@@ -518,7 +518,8 @@
             "  .finally(() => console.log(\"загрузка завершена\"));"
           ],
           "shuffled": [2, 3, 0, 1],
-          "explanation": "catch ставим после then, чтобы он ловил ошибки и загрузки, и обработки данных. finally — в конце цепочки: он сработает в любом случае."
+          "explanation": "catch ставим после then, чтобы он ловил ошибки и загрузки, и обработки данных. finally — в конце цепочки: он сработает в любом случае.",
+          "noRun": true
         }
       ]
     },
@@ -531,12 +532,11 @@
         "blocks": [
           {
             "type": "text",
-            "text": "Когда что-то идёт не так, JavaScript бросает объект ошибки, и его тип подсказывает причину. **TypeError** — операция не подходит значению: вызвать не-функцию, прочитать свойство у `null` или `undefined`, изменить `const`. **ReferenceError** — переменной с таким именем нет."
+            "text": "Когда что-то идёт не так, JavaScript бросает объект ошибки, и его тип подсказывает причину. **TypeError** — операция не подходит значению: вызвать не-функцию, прочитать свойство у `null` или `undefined`, присвоить новое значение `const`. **ReferenceError** — переменной с таким именем нет."
           },
           {
             "type": "code",
-            "code": "undefined.name;    // TypeError\n(5)();             // TypeError\nconsole.log(usr);  // ReferenceError",
-            "caption": "каждая строка — отдельный пример"
+            "code": "try { undefined.name; } catch (e) { console.log(e.name); } // TypeError\ntry { (5)(); } catch (e) { console.log(e.name); } // TypeError\ntry { usr; } catch (e) { console.log(e.name); } // ReferenceError"
           },
           {
             "type": "text",
@@ -645,8 +645,7 @@
           },
           {
             "type": "code",
-            "code": "new Array(-1);          // RangeError\n(3.14).toFixed(200);    // RangeError\n\"ab\".repeat(-1);        // RangeError",
-            "caption": "каждая строка — отдельный пример"
+            "code": "try { new Array(-1); } catch (e) { console.log(e.name); } // RangeError\ntry { (3.14).toFixed(200); } catch (e) { console.log(e.name); } // RangeError\ntry { \"ab\".repeat(-1); } catch (e) { console.log(e.name); } // RangeError"
           },
           {
             "type": "tip",
@@ -719,7 +718,7 @@
           "optionExplanations": [
             null,
             "Тип аргумента верный, а значение вне диапазона — это RangeError",
-            "Синтаксис кода правильный",
+            "Синтаксис кода в порядке: new Array(-1) бросает RangeError во время выполнения",
             "name конкретной ошибки — \"RangeError\", а не \"Error\": ошибка уйдёт в throw e"
           ],
           "explanation": "Отрицательная длина массива бросает RangeError, его и нужно перехватить."
@@ -928,7 +927,8 @@
             "}"
           ],
           "shuffled": [2, 4, 1, 3, 0],
-          "explanation": "Ошибку бросаем внутри try, а в catch проверяем её тип через instanceof и читаем своё поле status."
+          "explanation": "Ошибку бросаем внутри try, а в catch проверяем её тип через instanceof и читаем своё поле status.",
+          "noRun": true
         }
       ]
     },
@@ -1138,6 +1138,14 @@
           ],
           "shuffled": [2, 4, 0, 3, 1],
           "explanation": "Сначала копируем массив, потом добавляем элемент в копию и возвращаем её. Исходный cart не меняется."
+        },
+        {
+          "id": "common-bugs-01-q6",
+          "type": "findBug",
+          "code": "const steps = [\"старт\", \"середина\", \"финиш\"];\nconst backwards = steps.reverse();\nconsole.log(backwards.join(\" → \")); // ждём финиш → середина → старт\nconsole.log(steps[0]); // ждём старт",
+          "bugLine": 2,
+          "fixed": "const steps = [\"старт\", \"середина\", \"финиш\"];\nconst backwards = [...steps].reverse();\nconsole.log(backwards.join(\" → \")); // финиш → середина → старт\nconsole.log(steps[0]); // старт",
+          "explanation": "`reverse`, как и `sort`, переворачивает исходный массив и возвращает его же, поэтому steps тоже стал задом наперёд и `steps[0]` — «финиш». Переворачивай копию: `[...steps].reverse()` или `steps.toReversed()`."
         }
       ]
     },
@@ -1236,6 +1244,14 @@
           "correct": 0,
           "optionExplanations": [null, "== считает null и undefined равными друг другу"],
           "explanation": "Особое правило: null == undefined истинно. Но типы у них разные, поэтому === даёт false."
+        },
+        {
+          "id": "common-bugs-02-q6",
+          "type": "findBug",
+          "code": "function describeQty(qty) {\n  if (qty == \"\") return \"не указано\";\n  return \"штук: \" + qty;\n}\nconsole.log(describeQty(0)); // ждём штук: 0",
+          "bugLine": 2,
+          "fixed": "function describeQty(qty) {\n  if (qty === \"\") return \"не указано\";\n  return \"штук: \" + qty;\n}\nconsole.log(describeQty(0)); // штук: 0",
+          "explanation": "`==` приводит пустую строку к числу 0, поэтому `0 == \"\"` истинно, и для нуля код пишет «не указано». Сравнивай через `===`: тогда число 0 и строка \"\" не равны."
         }
       ]
     },
@@ -1349,6 +1365,14 @@
           ],
           "shuffled": [4, 1, 5, 2, 0, 3],
           "explanation": "map создаёт массив промисов, Promise.all ждёт их все, и только потом функция возвращает результат."
+        },
+        {
+          "id": "common-bugs-03-q6",
+          "type": "findBug",
+          "code": "const cart = [{ price: 100 }, { price: 250 }];\nconst total = cart.reduce((sum, item) => {\n  sum + item.price;\n}, 0);\nconsole.log(total); // ждём 350",
+          "bugLine": 3,
+          "fixed": "const cart = [{ price: 100 }, { price: 250 }];\nconst total = cart.reduce((sum, item) => {\n  return sum + item.price;\n}, 0);\nconsole.log(total); // 350",
+          "explanation": "Колбэк в фигурных скобках без `return` возвращает undefined, и reduce передаёт этот undefined дальше как sum. Поэтому код выводит undefined. Допиши `return` или убери скобки: `(sum, item) => sum + item.price`."
         }
       ]
     },
@@ -1369,7 +1393,7 @@
           },
           {
             "type": "text",
-            "text": "`parseInt` без второго аргумента сам угадывает систему счисления: строку с `0x` читает как шестнадцатеричную. А в `map(parseInt)` вторым аргументом попадает индекс элемента."
+            "text": "`parseInt` без второго аргумента читает строку как десятичную, но строку с `0x` — как шестнадцатеричную. А в `map(parseInt)` вторым аргументом попадает индекс элемента."
           },
           {
             "type": "code",
@@ -1420,7 +1444,7 @@
             null,
             "map передаёт индекс вторым аргументом, и parseInt принимает его за основание",
             "При основании 2 строка \"10\" — это двоичное число 2",
-            "Основание 0 означает «угадать», и \"10\" читается как 10"
+            "Основание 0 parseInt считает «не указано» и читает \"10\" как десятичное 10"
           ],
           "explanation": "map передаёт в parseInt ещё и индекс как основание: parseInt(\"10\", 0) — 10, parseInt(\"10\", 1) — NaN, parseInt(\"10\", 2) — 2."
         },
@@ -1450,6 +1474,14 @@
             "arr[arr.length] — за концом массива, последний элемент — arr[arr.length - 1]"
           ],
           "explanation": "Последний индекс — length - 1, то есть 2. Элемента с индексом 3 нет."
+        },
+        {
+          "id": "common-bugs-04-q6",
+          "type": "findBug",
+          "code": "const word = \"кот\";\nlet reversed = \"\";\nfor (let i = word.length; i >= 0; i--) {\n  reversed += word[i];\n}\nconsole.log(reversed); // ждём ток",
+          "bugLine": 3,
+          "fixed": "const word = \"кот\";\nlet reversed = \"\";\nfor (let i = word.length - 1; i >= 0; i--) {\n  reversed += word[i];\n}\nconsole.log(reversed); // ток",
+          "explanation": "Последний индекс — `word.length - 1`, а цикл начинает с `word.length`. На первом шаге `word[3]` — undefined, и он приклеивается к строке: выходит «undefinedток». Начинай с `word.length - 1`."
         }
       ]
     },
@@ -1462,7 +1494,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "Повторим ловушки. `sort` меняет исходный массив, а присваивание объекта копирует только ссылку. Объекты сравниваются по ссылке, а `==` приводит типы. `includes` и `indexOf` сравнивают строго: строка `\"2\"` не найдётся среди чисел."
+            "text": "Повторим ловушки. `sort` меняет исходный массив, а присваивание объекта копирует только ссылку. Объекты сравниваются по ссылке, а `==` приводит типы. `includes` и `indexOf` сравнивают без приведения типов: строка `\"2\"` не найдётся среди чисел."
           },
           {
             "type": "code",
@@ -1556,6 +1588,14 @@
             "await внутри колбэка задерживает только сам колбэк, а не forEach"
           ],
           "explanation": "forEach не ждёт промисы, которые возвращает async-колбэк, поэтому сообщение выводится сразу. Для ожидания нужен for...of с await или Promise.all."
+        },
+        {
+          "id": "common-bugs-05-q6",
+          "type": "findBug",
+          "code": "const cart = [{ id: 1, name: \"чай\" }, { id: 2, name: \"кофе\" }];\nconst toRemove = { id: 2, name: \"кофе\" };\nconst rest = cart.filter(item => item !== toRemove);\nconsole.log(rest.length); // ждём 1",
+          "bugLine": 3,
+          "fixed": "const cart = [{ id: 1, name: \"чай\" }, { id: 2, name: \"кофе\" }];\nconst toRemove = { id: 2, name: \"кофе\" };\nconst rest = cart.filter(item => item.id !== toRemove.id);\nconsole.log(rest.length); // 1",
+          "explanation": "toRemove — отдельный объект, хоть и с теми же полями. `!==` сравнивает объекты по ссылке, поэтому ни один товар не совпал и в корзине осталось 2. Сравнивай поле: `item.id !== toRemove.id`."
         }
       ]
     }

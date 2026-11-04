@@ -16,7 +16,7 @@ npm run build:rustore
 
 - **Пакет:** `com.jssensei.app`
 - **Иконка:** `docs/store/icon-512.png`
-- **Скриншоты** (1080×1920): `docs/store/screenshots/1-home.png` … `6-profile.png`
+- **Скриншоты** (1080×1920): `docs/store/screenshots/1-home.png` … `8-profile.png`
 - **Категория:** Образование
 - **Возрастной рейтинг:** 0+ (нет рекламы, покупок и пользовательского контента, кроме ника в рейтинге)
 
