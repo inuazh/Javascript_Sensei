@@ -37,7 +37,7 @@ const CHOICES: { id: Choice; title: string; subtitle: string; icon: IconName }[]
   {
     id: 'test',
     title: 'не уверен',
-    subtitle: `пройти тест, это около ${PLACEMENT_MINUTES}\u00a0минут`,
+    subtitle: `пройти тест на ${PLACEMENT_MINUTES}\u00a0минут`,
     icon: 'compass',
   },
 ];
