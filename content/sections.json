@@ -40,6 +40,34 @@
         { "id": "objects", "title": "Объекты", "subtitle": "ключи, деструктуризация", "order": 1 },
         { "id": "set-map", "title": "Set & Map", "subtitle": "уникальные коллекции", "order": 2 }
       ]
+    },
+    {
+      "id": "async",
+      "title": "Асинхронность",
+      "icon": "⏳",
+      "color": "#F472B6",
+      "order": 4,
+      "description": "Колбэки, промисы и async/await: как JavaScript ждёт результат и в каком порядке выполняет код.",
+      "topics": [
+        {
+          "id": "event-loop",
+          "title": "Колбэки и Event Loop",
+          "subtitle": "setTimeout, очередь задач",
+          "order": 0
+        },
+        {
+          "id": "promises",
+          "title": "Promise",
+          "subtitle": "then, catch, Promise.all",
+          "order": 1
+        },
+        {
+          "id": "async-await",
+          "title": "async/await",
+          "subtitle": "асинхронные функции",
+          "order": 2
+        }
+      ]
     }
   ]
 }
