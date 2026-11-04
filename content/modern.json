@@ -1076,7 +1076,7 @@
           "id": "optional-chaining-01-q2",
           "type": "output",
           "code": "const user = {};\nconsole.log(user.settings?.theme);\nconsole.log(user.settings.theme);",
-          "options": ["undefined TypeError", "undefined undefined", "TypeError", "undefined"],
+          "options": ["undefined\nTypeError", "undefined\nundefined", "TypeError", "undefined"],
           "correct": 0,
           "optionExplanations": [
             null,
