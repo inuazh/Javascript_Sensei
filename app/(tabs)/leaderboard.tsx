@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   tab: { flex: 1, paddingVertical: Spacing.sm, borderRadius: Radius.sm, alignItems: 'center' },
   tabActive: { backgroundColor: Colors.surfaceRaised },
   tabText: { fontFamily: Fonts.mono, fontSize: 13, color: Colors.textMuted },
-  tabTextActive: { fontFamily: Fonts.monoBold, color: Colors.accent },
+  tabTextActive: { fontFamily: Fonts.monoBold, color: Colors.textPrimary },
   join: { gap: Spacing.sm },
   inputRow: {
     flexDirection: 'row',
@@ -269,7 +269,12 @@ const styles = StyleSheet.create({
   },
   error: { fontFamily: Fonts.mono, color: Colors.danger, fontSize: 12 },
   myRank: { flexDirection: 'row', alignItems: 'baseline', gap: Spacing.md },
-  myRankNumber: { fontFamily: Fonts.monoBold, fontSize: 28, color: Colors.accent },
+  myRankNumber: {
+    fontFamily: Fonts.display,
+    fontSize: 44,
+    lineHeight: 48,
+    color: Colors.textPrimary,
+  },
   loader: { marginTop: Spacing.xxl },
   retry: { marginTop: Spacing.md },
   empty: { textAlign: 'center', marginTop: Spacing.xl },

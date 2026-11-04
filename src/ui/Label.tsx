@@ -1,7 +1,25 @@
-import { Text, type TextStyle } from 'react-native';
-import { Type } from './theme';
+import { StyleSheet, Text, View, type TextStyle } from 'react-native';
+import { Colors, Type } from './theme';
 
-/** Section label styled as a code comment: `// цель дня`. */
-export function Label({ children, style }: { children: string; style?: TextStyle }) {
-  return <Text style={[Type.caption, style]}>{`// ${children}`}</Text>;
+/** Small uppercase section label with an optional red indicator dot. */
+export function Label({
+  children,
+  style,
+  dot,
+}: {
+  children: string;
+  style?: TextStyle;
+  dot?: boolean;
+}) {
+  return (
+    <View style={styles.row}>
+      {dot ? <View style={styles.dot} /> : null}
+      <Text style={[Type.caption, style]}>{children}</Text>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent },
+});

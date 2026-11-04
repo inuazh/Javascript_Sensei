@@ -16,9 +16,14 @@ interface ButtonProps {
 }
 
 const FILL: Partial<Record<Variant, string>> = {
-  primary: Colors.accent,
-  success: Colors.success,
-  danger: Colors.danger,
+  primary: Colors.inverse,
+  success: Colors.inverse,
+  danger: Colors.accent,
+};
+const TEXT_ON_FILL: Partial<Record<Variant, string>> = {
+  primary: Colors.textOnInverse,
+  success: Colors.textOnInverse,
+  danger: Colors.textOnAccent,
 };
 
 export function Button({
@@ -35,7 +40,7 @@ export function Button({
   const textColor = disabled
     ? Colors.textDisabled
     : fill
-      ? Colors.textOnAccent
+      ? (TEXT_ON_FILL[variant] ?? Colors.textOnInverse)
       : variant === 'ghost'
         ? Colors.textSecondary
         : Colors.textPrimary;
@@ -69,19 +74,19 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 50,
+    minHeight: 54,
     paddingHorizontal: Spacing.xl,
-    borderRadius: Radius.md,
+    borderRadius: Radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   secondary: {
-    backgroundColor: Colors.surfaceRaised,
+    backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: Colors.borderStrong,
   },
-  disabled: { backgroundColor: Colors.surfaceRaised, borderColor: Colors.border },
+  disabled: { backgroundColor: Colors.surface, borderColor: Colors.surface },
   pressed: { opacity: 0.85 },
-  text: { fontFamily: Fonts.monoBold, fontSize: 15, letterSpacing: -0.2 },
+  text: { fontFamily: Fonts.sansSemiBold, fontSize: 16, letterSpacing: -0.2 },
 });

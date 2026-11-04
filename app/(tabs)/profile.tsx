@@ -127,8 +127,8 @@ export default function ProfileScreen() {
                       backgroundColor: cell.future
                         ? 'transparent'
                         : intensity(cell.xp) > 0
-                          ? alpha(Colors.success, 0.25 + intensity(cell.xp) * 0.75)
-                          : Colors.border,
+                          ? alpha(Colors.textPrimary, 0.25 + intensity(cell.xp) * 0.75)
+                          : Colors.dotOff,
                     },
                     cell.day === today && styles.cellToday,
                   ]}
@@ -153,7 +153,7 @@ export default function ProfileScreen() {
               <Icon
                 name={unlocked ? (a.icon as IconName) : 'lock'}
                 size={22}
-                color={unlocked ? Colors.accent : Colors.textDisabled}
+                color={unlocked ? Colors.textPrimary : Colors.textDisabled}
               />
               <Text
                 style={[styles.achievementTitle, unlocked && { color: Colors.textPrimary }]}
@@ -182,11 +182,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontFamily: Fonts.monoBold, fontSize: 22, color: Colors.textOnAccent },
+  avatarText: {
+    fontFamily: Fonts.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: Colors.textOnAccent,
+  },
   flex: { flex: 1 },
   level: { fontFamily: Fonts.mono, fontSize: 13, color: Colors.accent, marginTop: 2 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  xp: { fontFamily: Fonts.monoBold, fontSize: 24, color: Colors.textPrimary },
+  xp: { fontFamily: Fonts.display, fontSize: 40, lineHeight: 44, color: Colors.textPrimary },
   xpUnit: { fontSize: 14, color: Colors.textMuted },
   toNext: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
   bar: { marginTop: Spacing.md },
@@ -200,7 +205,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  statValue: { fontFamily: Fonts.monoBold, fontSize: 20, color: Colors.textPrimary },
+  statValue: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 32, color: Colors.textPrimary },
   statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mb: { marginBottom: Spacing.md },
   heatmap: { flexDirection: 'row', gap: 3 },
@@ -213,8 +218,8 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
   week: { flex: 1, gap: 3 },
-  cell: { aspectRatio: 1, borderRadius: 2, maxHeight: 14 },
-  cellToday: { borderWidth: 1, borderColor: Colors.accent },
+  cell: { aspectRatio: 1, borderRadius: 999, maxHeight: 14 },
+  cellToday: { backgroundColor: Colors.accent },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   achievement: {
     width: '31.8%',

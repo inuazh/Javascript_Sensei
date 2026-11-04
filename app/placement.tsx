@@ -134,10 +134,10 @@ const styles = StyleSheet.create({
   },
   muted: { color: Colors.textSecondary },
   score: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 56,
-    color: Colors.accent,
-    letterSpacing: -2,
+    fontFamily: Fonts.display,
+    fontSize: 72,
+    lineHeight: 80,
+    color: Colors.textPrimary,
     marginTop: Spacing.xl,
   },
   row: {

@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
   btn: {
     width: 48,
     height: 48,
-    borderRadius: Radius.md,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.surfaceRaised,
     borderWidth: 1,
     borderColor: Colors.border,
@@ -57,9 +57,10 @@ const styles = StyleSheet.create({
   },
   btnText: { fontFamily: Fonts.monoBold, fontSize: 22, color: Colors.textPrimary },
   time: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 36,
-    color: Colors.accent,
+    fontFamily: Fonts.display,
+    fontSize: 54,
+    lineHeight: 60,
+    color: Colors.textPrimary,
     minWidth: 120,
     textAlign: 'center',
   },

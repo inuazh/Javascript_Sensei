@@ -5,11 +5,11 @@ import { Colors, Radius, Spacing } from './theme';
 type Tone = 'default' | 'accent' | 'success' | 'danger' | 'info';
 
 const BORDER: Record<Tone, string> = {
-  default: Colors.border,
+  default: Colors.surface,
   accent: Colors.accent,
-  success: Colors.success,
+  success: Colors.borderStrong,
   danger: Colors.danger,
-  info: Colors.info,
+  info: Colors.borderStrong,
 };
 
 interface CardProps {
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderRadius: Radius.xl,
-    padding: Spacing.lg,
+    padding: Spacing.xl,
   },
   pressed: { backgroundColor: Colors.surfaceRaised },
 });

@@ -127,8 +127,8 @@ export default function HomeScreen() {
       </Card>
 
       {next ? (
-        <Card tone="accent" style={styles.continueCard}>
-          <Label>
+        <Card style={styles.continueCard}>
+          <Label dot>
             {Object.keys(progress.lessons).length === 0 ? 'начни отсюда' : 'продолжить'}
           </Label>
           <Text style={styles.continueMeta}>
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   chips: { flexDirection: 'row', gap: Spacing.sm },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  goalValue: { fontFamily: Fonts.monoBold, fontSize: 15 },
+  goalValue: { fontFamily: Fonts.display, fontSize: 30, lineHeight: 34 },
   goalTotal: { color: Colors.textMuted },
   goalBar: { marginVertical: Spacing.md },
   streakRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },

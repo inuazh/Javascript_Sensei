@@ -35,8 +35,8 @@ export default function WorkoutTab() {
         Ошибки — в первую очередь.
       </Text>
 
-      <Card tone={due.length > 0 ? 'accent' : 'default'} style={styles.hero}>
-        <Label>{total > 0 ? 'на сегодня' : 'пока пусто'}</Label>
+      <Card style={styles.hero}>
+        <Label dot={due.length > 0}>{total > 0 ? 'на сегодня' : 'пока пусто'}</Label>
         {total > 0 ? (
           <>
             <Text style={styles.big}>{due.length}</Text>
@@ -108,11 +108,10 @@ export default function WorkoutTab() {
 const styles = StyleSheet.create({
   hero: { gap: Spacing.xs, padding: Spacing.xl },
   big: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 56,
-    lineHeight: 64,
-    color: Colors.accent,
-    letterSpacing: -2,
+    fontFamily: Fonts.display,
+    fontSize: 80,
+    lineHeight: 88,
+    color: Colors.textPrimary,
   },
   button: { marginTop: Spacing.md },
   stats: { flexDirection: 'row', gap: Spacing.sm },
@@ -125,7 +124,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     backgroundColor: Colors.surface,
   },
-  statValue: { fontFamily: Fonts.monoBold, fontSize: 20, color: Colors.textPrimary },
+  statValue: { fontFamily: Fonts.display, fontSize: 28, lineHeight: 32, color: Colors.textPrimary },
   statLabel: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   mt: { marginTop: Spacing.sm },
   weak: {

@@ -23,7 +23,7 @@ function optionState(
 
 const STATE_COLOR: Record<OptionState, string> = {
   idle: Colors.border,
-  selected: Colors.accent,
+  selected: Colors.textPrimary,
   correct: Colors.success,
   wrong: Colors.danger,
   dimmed: Colors.border,

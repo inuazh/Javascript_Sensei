@@ -1,40 +1,46 @@
 /**
- * Design tokens. The look is a code editor: dark neutral surfaces, one accent
- * (JavaScript yellow), monospace headings, colour only where it means something
- * (success, error, info). Screens use these tokens, never literal values.
+ * Design tokens. Monochrome hardware look: true black, white type, a single
+ * red accent used sparingly, dot-matrix numerals, dotted progress, pill
+ * buttons and large rounded widgets. Screens use these tokens only.
  */
 
 export const Colors = {
-  background: '#0B0E14',
-  surface: '#11151C',
-  surfaceRaised: '#171C24',
-  codeBackground: '#0D1117',
-  border: '#1F2630',
-  borderStrong: '#2D3644',
-  overlay: 'rgba(0,0,0,0.7)',
+  background: '#000000',
+  surface: '#111111',
+  surfaceRaised: '#1C1C1C',
+  codeBackground: '#0A0A0A',
+  border: '#222222',
+  borderStrong: '#333333',
+  overlay: 'rgba(0,0,0,0.8)',
 
-  accent: '#F7DF1E',
-  textOnAccent: '#0B0E14',
+  /** The single accent. */
+  accent: '#D71921',
+  textOnAccent: '#FFFFFF',
+  /** Primary buttons and "on" states are white on black. */
+  inverse: '#FFFFFF',
+  textOnInverse: '#000000',
 
-  success: '#3FB950',
-  danger: '#F85149',
-  info: '#58A6FF',
-  warning: '#D29922',
+  success: '#FFFFFF',
+  danger: '#D71921',
+  info: '#BFBFBF',
+  warning: '#FF4D54',
 
-  textPrimary: '#E6EDF3',
-  textSecondary: '#9DA7B3',
-  textMuted: '#636E7B',
-  textDisabled: '#3B4450',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#A6A6A6',
+  textMuted: '#666666',
+  textDisabled: '#3A3A3A',
+
+  dotOff: '#262626',
 
   syntax: {
-    text: '#E6EDF3',
-    keyword: '#FF7B72',
-    string: '#A5D6FF',
-    number: '#79C0FF',
-    comment: '#6E7681',
-    function: '#D2A8FF',
-    punctuation: '#C9D1D9',
-    lineNumber: '#3B4450',
+    text: '#D4D4D4',
+    keyword: '#FFFFFF',
+    string: '#9E9E9E',
+    number: '#FF5A5F',
+    comment: '#555555',
+    function: '#FFFFFF',
+    punctuation: '#7A7A7A',
+    lineNumber: '#3A3A3A',
   },
 } as const;
 
@@ -44,12 +50,14 @@ export function alpha(hex: string, opacity: number): string {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${opacity})`;
 }
 
-/** Sections share the accent; they are told apart by number, not colour. */
+/** Sections share one look; they are told apart by number. */
 export function getSectionColor(_section: { id: string }): string {
-  return Colors.accent;
+  return Colors.textPrimary;
 }
 
 export const Fonts = {
+  /** Dot-matrix display face. Latin and digits only: never use it for Russian text. */
+  display: 'Doto_900Black',
   mono: 'IBMPlexMono_400Regular',
   monoMedium: 'IBMPlexMono_500Medium',
   monoBold: 'IBMPlexMono_700Bold',
@@ -70,32 +78,40 @@ export const Spacing = {
 } as const;
 
 export const Radius = {
-  sm: 6,
-  md: 8,
-  lg: 10,
-  xl: 12,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 22,
   pill: 999,
 } as const;
 
 export const Type = {
   h1: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 26,
-    lineHeight: 32,
-    letterSpacing: -0.8,
+    fontFamily: Fonts.sansBold,
+    fontSize: 30,
+    lineHeight: 34,
+    letterSpacing: -1,
     color: Colors.textPrimary,
   },
   h2: {
-    fontFamily: Fonts.monoBold,
-    fontSize: 20,
-    lineHeight: 26,
-    letterSpacing: -0.5,
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 22,
+    lineHeight: 27,
+    letterSpacing: -0.6,
     color: Colors.textPrimary,
   },
   h3: { fontFamily: Fonts.sansSemiBold, fontSize: 16, lineHeight: 22, color: Colors.textPrimary },
   body: { fontFamily: Fonts.sans, fontSize: 15, lineHeight: 23, color: Colors.textPrimary },
   small: { fontFamily: Fonts.sans, fontSize: 13, lineHeight: 19, color: Colors.textSecondary },
   mono: { fontFamily: Fonts.mono, fontSize: 13, color: Colors.textSecondary },
-  /** Section label rendered as a code comment, see <Label>. */
-  caption: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },
+  /** Small uppercase label, see <Label>. */
+  caption: {
+    fontFamily: Fonts.mono,
+    fontSize: 11,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: Colors.textMuted,
+  },
+  /** Dot-matrix numerals. */
+  display: { fontFamily: Fonts.display, color: Colors.textPrimary },
 } as const;

@@ -51,11 +51,7 @@ export function CodeBlock({ code, gap, caption, filename = 'main.js', style }: C
 
   return (
     <View style={[styles.block, style]}>
-      <View style={styles.tabBar}>
-        <View style={styles.tab}>
-          <Text style={styles.tabText}>{filename}</Text>
-        </View>
-      </View>
+      <Text style={styles.filename}>{filename}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} bounces={false}>
         <View style={styles.body}>
           {lines.map((line, n) => (
@@ -72,6 +68,7 @@ export function CodeBlock({ code, gap, caption, filename = 'main.js', style }: C
                       key={i}
                       style={{
                         color: TOKEN_COLORS[p.kind],
+                        fontFamily: p.kind === 'keyword' ? Fonts.monoBold : Fonts.mono,
                         fontStyle: p.kind === 'comment' ? 'italic' : 'normal',
                       }}
                     >
@@ -97,22 +94,15 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     overflow: 'hidden',
   },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+  filename: {
+    fontFamily: Fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    color: Colors.textMuted,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
   },
-  tab: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
-    borderRightWidth: 1,
-    borderRightColor: Colors.border,
-    backgroundColor: Colors.codeBackground,
-    borderTopWidth: 1,
-    borderTopColor: Colors.accent,
-  },
-  tabText: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textSecondary },
   body: { paddingVertical: Spacing.md, paddingRight: Spacing.lg },
   line: { flexDirection: 'row' },
   lineNumber: {
@@ -129,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: alpha(Colors.accent, 0.12),
     fontFamily: Fonts.monoBold,
   },
-  gapFilled: { color: Colors.textOnAccent, backgroundColor: Colors.accent },
+  gapFilled: { color: Colors.textOnInverse, backgroundColor: Colors.inverse },
   caption: {
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.sm,

@@ -9,6 +9,7 @@ import {
   IBMPlexMono_500Medium,
   IBMPlexMono_700Bold,
 } from '@expo-google-fonts/ibm-plex-mono';
+import { Doto_900Black } from '@expo-google-fonts/doto';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import * as Notifications from 'expo-notifications';
@@ -40,6 +41,7 @@ function useNotificationNavigation() {
 export default function RootLayout() {
   const [hydrated, setHydrated] = useState(false);
   const [fontsLoaded, fontError] = useFonts({
+    Doto_900Black,
     IBMPlexMono_400Regular,
     IBMPlexMono_500Medium,
     IBMPlexMono_700Bold,

@@ -20,7 +20,11 @@ export function OptionCard({ title, subtitle, icon, selected, onPress }: OptionC
     >
       {icon ? (
         <View style={styles.iconBox}>
-          <Icon name={icon} size={20} color={selected ? Colors.accent : Colors.textSecondary} />
+          <Icon
+            name={icon}
+            size={20}
+            color={selected ? Colors.textPrimary : Colors.textSecondary}
+          />
         </View>
       ) : null}
       <View style={styles.flex}>
@@ -42,15 +46,15 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: Radius.xl,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.surface,
     backgroundColor: Colors.surface,
   },
-  selected: { borderColor: Colors.accent },
+  selected: { borderColor: Colors.textPrimary },
   pressed: { backgroundColor: Colors.surfaceRaised },
   iconBox: {
     width: 40,
     height: 40,
-    borderRadius: Radius.md,
+    borderRadius: Radius.pill,
     backgroundColor: Colors.surfaceRaised,
     alignItems: 'center',
     justifyContent: 'center',
@@ -67,6 +71,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioOn: { borderColor: Colors.accent },
+  radioOn: { borderColor: Colors.textPrimary },
   dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.accent },
 });
