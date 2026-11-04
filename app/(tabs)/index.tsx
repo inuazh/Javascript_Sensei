@@ -247,7 +247,7 @@ export default function HomeScreen() {
         <ActionRow
           icon="compass"
           title="Уже знаешь основы?"
-          subtitle={`Тест на ${PLACEMENT_MINUTES} минут засчитает то, что ты уже знаешь`}
+          subtitle={`Тест на ${PLACEMENT_MINUTES}\u00a0минут засчитает то, что ты уже знаешь`}
           onPress={() => router.push('/placement')}
         />
       )}

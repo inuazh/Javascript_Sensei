@@ -59,7 +59,7 @@ export default function PlacementScreen() {
         </View>
         <Text style={Type.h1}>Вводный тест</Text>
         <Text style={[Type.body, styles.muted]}>
-          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. Займёт около ${PLACEMENT_MINUTES} минут.`}
+          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. Займёт около ${PLACEMENT_MINUTES}\u00a0минут.`}
         </Text>
         <Text style={[Type.body, styles.muted]}>
           Ответишь верно — раздел засчитается, и ты начнёшь с того, чего ещё не знаешь.
