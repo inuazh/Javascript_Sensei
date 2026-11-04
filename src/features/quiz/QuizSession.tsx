@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, BackHandler, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Question } from '../../content/schema';
 import { useFeedback } from '../../services/feedback';
@@ -39,6 +39,16 @@ export function QuizSession({
     if (finished) onFinish(state.answers);
   }, [finished]); // eslint-disable-line react-hooks/exhaustive-deps -- fire once
 
+  // Android back button asks before dropping the session, like the close button.
+  const exitRef = useRef<() => void>(onExit);
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      exitRef.current();
+      return true;
+    });
+    return () => sub.remove();
+  }, []);
+
   if (!item || finished) return null;
   const { question } = item;
   const def = getQuestionType(question);
@@ -75,6 +85,7 @@ export function QuizSession({
       { text: 'Выйти', style: 'destructive', onPress: onExit },
     ]);
   };
+  exitRef.current = confirmExit;
 
   const progress = (state.index + (revealed ? 1 : 0)) / items.length;
 

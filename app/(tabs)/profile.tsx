@@ -50,6 +50,7 @@ export default function ProfileScreen() {
   const level = getLevelInfo(progress.totalXp);
   const streak = viewStreak(progress.streak, today);
   const lessons = Object.values(progress.lessons).filter(l => !l.skipped);
+  const initial = nickname ? nickname.charAt(0).toUpperCase() : String(level.level);
 
   const weeks = useMemo(() => {
     const start = addDays(weekStart(today), -7 * (HEATMAP_WEEKS - 1));
@@ -67,8 +68,13 @@ export default function ProfileScreen() {
     <Screen>
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {nickname ? nickname.charAt(0).toUpperCase() : level.level}
+          <Text
+            style={[
+              styles.avatarText,
+              !/^[A-Za-z0-9]?$/.test(initial) && { fontFamily: Fonts.sansBold, fontSize: 24 },
+            ]}
+          >
+            {initial}
           </Text>
         </View>
         <View style={styles.flex}>

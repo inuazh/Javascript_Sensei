@@ -23,11 +23,19 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return asked.granted;
 }
 
+let queue: Promise<void> = Promise.resolve();
+
 /**
  * Replaces all scheduled reminders with a fresh plan. Call on app start,
  * after any learning activity and after reminder settings change.
  */
-export async function syncReminders(
+export function syncReminders(reminder: ReminderSettings, progress: ProgressState): Promise<void> {
+  // Runs one sync at a time: overlapping cancel-then-schedule runs would duplicate reminders.
+  queue = queue.then(() => scheduleReminders(reminder, progress));
+  return queue;
+}
+
+async function scheduleReminders(
   reminder: ReminderSettings,
   progress: ProgressState,
 ): Promise<void> {
@@ -45,7 +53,7 @@ export async function syncReminders(
     }
     for (const r of planReminders(progress, reminder, new Date())) {
       await Notifications.scheduleNotificationAsync({
-        content: { title: r.title, body: r.body, data: { url: '/' } },
+        content: { title: r.title, body: r.body },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date: r.date,

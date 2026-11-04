@@ -12,6 +12,13 @@ function tabIcon(name: IconName) {
   return TabIcon;
 }
 
+const ICONS = {
+  index: tabIcon('book-open'),
+  workout: tabIcon('repeat'),
+  leaderboard: tabIcon('bar-chart-2'),
+  profile: tabIcon('user'),
+};
+
 export default function TabsLayout() {
   const today = useToday();
   const dueCount = useUserStore(s => dueItems(s.progress.review, today).length);
@@ -27,21 +34,21 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: Colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'учёба', tabBarIcon: tabIcon('book-open') }} />
+      <Tabs.Screen name="index" options={{ title: 'учёба', tabBarIcon: ICONS.index }} />
       <Tabs.Screen
         name="workout"
         options={{
           title: 'повтор',
-          tabBarIcon: tabIcon('repeat'),
+          tabBarIcon: ICONS.workout,
           tabBarBadge: dueCount > 0 ? dueCount : undefined,
           tabBarBadgeStyle: styles.badge,
         }}
       />
       <Tabs.Screen
         name="leaderboard"
-        options={{ title: 'рейтинг', tabBarIcon: tabIcon('bar-chart-2') }}
+        options={{ title: 'рейтинг', tabBarIcon: ICONS.leaderboard }}
       />
-      <Tabs.Screen name="profile" options={{ title: 'профиль', tabBarIcon: tabIcon('user') }} />
+      <Tabs.Screen name="profile" options={{ title: 'профиль', tabBarIcon: ICONS.profile }} />
     </Tabs>
   );
 }

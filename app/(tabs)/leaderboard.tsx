@@ -129,11 +129,11 @@ export default function LeaderboardScreen() {
   const load = useCallback(async () => {
     setError(false);
     try {
-      setPlayers(await fetchPlayers());
+      setPlayers(await fetchPlayers(mode === 'week' ? 'weekXp' : 'xp'));
     } catch {
       setError(true);
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     load();
@@ -195,6 +195,16 @@ export default function LeaderboardScreen() {
           </Card>
         )}
 
+        {settings.nickname &&
+          players !== null &&
+          !error &&
+          myRank === 0 &&
+          progress.totalXp > 0 && (
+            <Text style={[Type.small, styles.empty]}>
+              Твой результат ещё не попал в рейтинг. Проверь интернет и потяни экран вниз, чтобы
+              отправить ещё раз.
+            </Text>
+          )}
         {players === null && !error && (
           <ActivityIndicator color={Colors.accent} style={styles.loader} />
         )}

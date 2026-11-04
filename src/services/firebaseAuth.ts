@@ -68,7 +68,13 @@ async function refresh(uid: string, refreshToken: string): Promise<Session> {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
   });
-  if (!res.ok) throw new Error(`Token refresh failed: ${res.status}`);
+  if (!res.ok) {
+    // 400 means the refresh token is invalid or the user is gone; anything
+    // else (5xx, network) is temporary and must not create a new identity.
+    throw Object.assign(new Error(`Token refresh failed: ${res.status}`), {
+      permanent: res.status === 400,
+    });
+  }
   const data = (await res.json()) as {
     id_token: string;
     refresh_token: string;
@@ -91,8 +97,9 @@ async function obtain(): Promise<Session> {
   if (stored?.refreshToken) {
     try {
       return await refresh(stored.uid, stored.refreshToken);
-    } catch {
-      // The account may have been deleted; start a new one.
+    } catch (e) {
+      if (!(e as { permanent?: boolean }).permanent) throw e;
+      // The account is gone; start a new one.
     }
   }
   return signUp();

@@ -87,10 +87,17 @@ function toEntry(id: string, raw: Record<string, unknown>): PlayerEntry | null {
   };
 }
 
-export async function fetchPlayers(): Promise<PlayerEntry[]> {
-  const res = await fetch(
-    `${FIREBASE_DB_URL}/leaderboard.json?orderBy=${encodeURIComponent('"xp"')}&limitToLast=${FETCH_LIMIT}`,
-  );
+/**
+ * Top players by `orderBy`. Ordering by weekXp needs a database index; without
+ * it Firebase answers 400, and we fall back to the all-time order.
+ */
+export async function fetchPlayers(orderBy: 'xp' | 'weekXp' = 'xp'): Promise<PlayerEntry[]> {
+  const query = (key: string) =>
+    fetch(
+      `${FIREBASE_DB_URL}/leaderboard.json?orderBy=${encodeURIComponent(`"${key}"`)}&limitToLast=${FETCH_LIMIT}`,
+    );
+  let res = await query(orderBy);
+  if (!res.ok && orderBy !== 'xp') res = await query('xp');
   if (!res.ok) throw new Error(`Leaderboard fetch failed: ${res.status}`);
   const data = (await res.json()) as Record<string, Record<string, unknown>> | null;
   if (!data) return [];

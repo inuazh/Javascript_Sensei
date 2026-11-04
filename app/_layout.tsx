@@ -12,8 +12,7 @@ import {
 import { Doto_900Black } from '@expo-google-fonts/doto';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
-import * as Notifications from 'expo-notifications';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -23,20 +22,6 @@ import { useUserStore, waitForHydration } from '../src/stores/useUserStore';
 import { Colors } from '../src/ui';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
-
-function useNotificationNavigation() {
-  useEffect(() => {
-    const open = (response: Notifications.NotificationResponse | null) => {
-      const url = response?.notification.request.content.data?.url;
-      if (typeof url === 'string') router.push(url as never);
-    };
-    Notifications.getLastNotificationResponseAsync()
-      .then(open)
-      .catch(() => {});
-    const sub = Notifications.addNotificationResponseReceivedListener(open);
-    return () => sub.remove();
-  }, []);
-}
 
 export default function RootLayout() {
   const [hydrated, setHydrated] = useState(false);
@@ -52,7 +37,6 @@ export default function RootLayout() {
     ...Feather.font,
     ...MaterialCommunityIcons.font,
   });
-  useNotificationNavigation();
 
   useEffect(() => {
     waitForHydration().then(() => {

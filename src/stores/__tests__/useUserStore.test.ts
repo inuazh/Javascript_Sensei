@@ -74,4 +74,15 @@ describe('useUserStore persistence', () => {
     expect(saved.state.progress.lessons['variables-01'].stars).toBe(2);
     expect(saved.state).not.toHaveProperty('completeLesson');
   });
+
+  it('does not hang when saved data is corrupt, and keeps a copy of it', async () => {
+    const { AsyncStorage } = load();
+    await AsyncStorage.clear();
+    await AsyncStorage.setItem('js-sensei-user', '{not json');
+    const { useUserStore, waitForHydration } = require('../useUserStore');
+    await waitForHydration();
+    expect(useUserStore.getState().settings.onboarded).toBe(false);
+    await new Promise(r => setTimeout(r, 0));
+    expect(await AsyncStorage.getItem('js-sensei-user.corrupt')).toBe('{not json');
+  });
 });

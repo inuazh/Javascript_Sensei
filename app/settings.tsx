@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import Constants from 'expo-constants';
+import { afterActivity } from '../src/services/activity';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ReminderSettings } from '../src/stores/useUserStore';
 import {
@@ -70,7 +71,14 @@ export default function SettingsScreen() {
       'Уроки, XP, стрик и достижения будут удалены. Это нельзя отменить.',
       [
         { text: 'Отмена', style: 'cancel' },
-        { text: 'Сбросить', style: 'destructive', onPress: resetProgress },
+        {
+          text: 'Сбросить',
+          style: 'destructive',
+          onPress: () => {
+            resetProgress();
+            afterActivity();
+          },
+        },
       ],
     );
 
