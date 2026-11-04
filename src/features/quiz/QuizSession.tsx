@@ -15,6 +15,8 @@ interface QuizSessionProps {
   color?: string;
   onExit: () => void;
   onFinish: (answers: QuizAnswer[]) => void;
+  /** Ends the session early, e.g. after too many mistakes in a placement test. */
+  shouldStop?: (answers: QuizAnswer[]) => boolean;
 }
 
 export function QuizSession({
@@ -23,6 +25,7 @@ export function QuizSession({
   color = Colors.yellow,
   onExit,
   onFinish,
+  shouldStop,
 }: QuizSessionProps) {
   const feedback = useFeedback();
   const scrollRef = useRef<ScrollView>(null);
@@ -40,7 +43,8 @@ export function QuizSession({
   const { question } = item;
   const def = getQuestionType(question);
   const revealed = state.phase === 'revealed';
-  const isLast = state.index + 1 >= items.length;
+  const stopping = revealed && !!shouldStop?.(state.answers);
+  const isLast = state.index + 1 >= items.length || stopping;
   const QuestionView = def.Component;
 
   const check = () => {
@@ -56,7 +60,7 @@ export function QuizSession({
     const nextItem = items[state.index + 1];
     dispatch({
       type: 'NEXT',
-      total: items.length,
+      total: stopping ? state.index + 1 : items.length,
       initialAnswer: nextItem
         ? getQuestionType(nextItem.question).initialAnswer(nextItem.question)
         : null,

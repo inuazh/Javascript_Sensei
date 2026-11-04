@@ -4,8 +4,11 @@
  *
  * Data: /leaderboard/{playerId} = { nickname, xp, weekXp, week, level, streak, updatedAt }.
  * Weekly ranking uses the entries whose `week` is the current week.
+ * With Firebase auth configured, playerId is the anonymous user's uid and
+ * database rules only let a user write their own entry (docs/firebase.md).
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, isAuthEnabled } from './firebaseAuth';
 
 export const FIREBASE_DB_URL =
   process.env.EXPO_PUBLIC_FIREBASE_DB_URL ??
@@ -23,7 +26,6 @@ export interface PlayerEntry {
   week: string;
   level: number;
   streak: number;
-  updatedAt: string;
 }
 
 export const NICKNAME_RE = /^[\p{L}\p{N}_ .-]{3,20}$/u;
@@ -36,8 +38,12 @@ export function validateNickname(raw: string): string | null {
   return null;
 }
 
-/** Reuses the id of the first app version so existing players keep their entry. */
+/**
+ * The player's id: the anonymous Firebase uid when auth is configured,
+ * otherwise the id of the first app version (so existing players keep their entry).
+ */
 export async function createPlayerId(): Promise<string> {
+  if (isAuthEnabled()) return (await getAuth()).uid;
   try {
     const legacy = await AsyncStorage.getItem(LEGACY_DEVICE_ID_KEY);
     if (legacy) return legacy;
@@ -50,10 +56,17 @@ export async function createPlayerId(): Promise<string> {
 
 export async function uploadScore(entry: PlayerEntry): Promise<void> {
   const { id, ...data } = entry;
-  const res = await fetch(`${FIREBASE_DB_URL}/leaderboard/${encodeURIComponent(id)}.json`, {
+  let query = '';
+  if (isAuthEnabled()) {
+    const auth = await getAuth();
+    if (auth.uid !== id) throw new Error('Player id does not match the signed-in user');
+    query = `?auth=${encodeURIComponent(auth.idToken)}`;
+  }
+  const res = await fetch(`${FIREBASE_DB_URL}/leaderboard/${encodeURIComponent(id)}.json${query}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+    // Server time lets the database rules limit how fast XP can grow.
+    body: JSON.stringify({ ...data, updatedAt: { '.sv': 'timestamp' } }),
   });
   if (!res.ok) throw new Error(`Leaderboard upload failed: ${res.status}`);
 }
@@ -71,7 +84,6 @@ function toEntry(id: string, raw: Record<string, unknown>): PlayerEntry | null {
     week: typeof raw.week === 'string' ? raw.week : '',
     level: num(raw.level) || 1,
     streak: num(raw.streak),
-    updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : '',
   };
 }
 

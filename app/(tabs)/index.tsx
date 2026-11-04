@@ -33,6 +33,12 @@ export default function HomeScreen() {
   const today = useToday();
   const progress = useUserStore(s => s.progress);
   const dailyGoalXp = useUserStore(s => s.settings.dailyGoalXp);
+  const showPlacement = useUserStore(
+    s =>
+      !s.settings.placementDone &&
+      s.settings.experience !== 'beginner' &&
+      Object.keys(s.progress.lessons).length === 0,
+  );
 
   const streak = viewStreak(progress.streak, today);
   const todayXp = todayActivity(progress, today).xp;
@@ -106,6 +112,21 @@ export default function HomeScreen() {
         </Card>
       )}
 
+      {showPlacement && (
+        <Card
+          color={Colors.blue}
+          onPress={() => router.push('/placement')}
+          style={styles.reviewCard}
+        >
+          <Text style={styles.reviewIcon}>🧭</Text>
+          <View style={styles.flex}>
+            <Text style={Type.h3}>Уже знаешь основы?</Text>
+            <Text style={Type.small}>Пройди вводный тест и пропусти знакомые темы</Text>
+          </View>
+          <Text style={[styles.arrow, { color: Colors.blue }]}>→</Text>
+        </Card>
+      )}
+
       {dueCount > 0 && (
         <Card color={Colors.pink} onPress={() => router.push('/review')} style={styles.reviewCard}>
           <Text style={styles.reviewIcon}>🧠</Text>
@@ -147,9 +168,12 @@ export default function HomeScreen() {
               const completed = topicLessons.filter(l => l.id in progress.lessons);
               const isDone = completed.length === topicLessons.length && topicLessons.length > 0;
               const isNext = next?.topic.id === topic.id;
-              const minStars = isDone
-                ? Math.min(...completed.map(l => progress.lessons[l.id].stars))
-                : 0;
+              const taken = completed.filter(l => !progress.lessons[l.id].skipped);
+              const allSkipped = isDone && taken.length === 0;
+              const minStars =
+                isDone && taken.length === completed.length
+                  ? Math.min(...taken.map(l => progress.lessons[l.id].stars))
+                  : 0;
               return (
                 <Pressable
                   key={topic.id}
@@ -182,7 +206,9 @@ export default function HomeScreen() {
                     <Text style={styles.topicTitle}>{topic.title}</Text>
                     <Text style={Type.small}>{topic.subtitle}</Text>
                   </View>
-                  {isDone ? (
+                  {allSkipped ? (
+                    <Text style={styles.topicCount}>знакомо</Text>
+                  ) : isDone && minStars > 0 ? (
                     <Stars count={minStars} size={11} />
                   ) : (
                     <Text style={styles.topicCount}>

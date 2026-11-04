@@ -60,7 +60,8 @@
       "router": {},
       "eas": {
         "projectId": "ded34d91-f4eb-4acf-b80d-9459cd1cd6a6"
-      }
+      },
+      "firebaseApiKey": ""
     }
   }
 }

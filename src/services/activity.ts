@@ -7,22 +7,28 @@ import { getLevelInfo } from '../domain/levels';
 import { weeklyXp } from '../domain/progress';
 import { viewStreak } from '../domain/streak';
 import { useUserStore } from '../stores/useUserStore';
-import { uploadScore } from './leaderboard';
+import { getAuth, isAuthEnabled } from './firebaseAuth';
+import { createPlayerId, uploadScore } from './leaderboard';
 import { syncReminders } from './notifications';
 
-export function publishScore(): Promise<void> {
-  const { settings, progress } = useUserStore.getState();
-  if (!settings.playerId || !settings.nickname) return Promise.resolve();
+export async function publishScore(): Promise<void> {
+  const { settings, progress, updateSettings } = useUserStore.getState();
+  if (!settings.nickname) return;
+  let playerId = settings.playerId;
+  // After auth is turned on, players move to their uid; the old entry stays unclaimed.
+  if (!playerId || (isAuthEnabled() && playerId !== (await getAuth()).uid)) {
+    playerId = await createPlayerId();
+    updateSettings({ playerId });
+  }
   const today = toDayKey(new Date());
   return uploadScore({
-    id: settings.playerId,
+    id: playerId,
     nickname: settings.nickname,
     xp: progress.totalXp,
     weekXp: weeklyXp(progress, today),
     week: weekStart(today),
     level: getLevelInfo(progress.totalXp).level,
     streak: viewStreak(progress.streak, today).days,
-    updatedAt: new Date().toISOString(),
   });
 }
 
