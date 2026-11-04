@@ -35,7 +35,7 @@ function isFrameMessage(data: unknown): data is FrameMessage {
 export const runCode: RunCode = (code, options) =>
   new Promise(resolve => {
     if (typeof document === 'undefined' || !document.body) {
-      return resolve(failedToStart('Браузер не дал запустить код'));
+      return resolve(failedToStart('браузер не дал запустить код'));
     }
     const origin = window.location.origin;
     const html = buildSandboxFrameHtml(
@@ -66,11 +66,11 @@ export const runCode: RunCode = (code, options) =>
       const data: unknown = event.data;
       if (!isFrameMessage(data)) return;
       if ('failed' in data) {
-        finish(failedToStart(clipText(String(data.failed)) || 'Не удалось запустить код'));
+        finish(failedToStart(clipText(String(data.failed)) || 'не удалось запустить код'));
         return;
       }
       const result = parseRunResult(data.result);
-      finish(result ?? failedToStart('Не удалось запустить код'));
+      finish(result ?? failedToStart('не удалось запустить код'));
     };
 
     window.addEventListener('message', onMessage);
@@ -79,7 +79,7 @@ export const runCode: RunCode = (code, options) =>
     try {
       document.body.appendChild(frame);
     } catch {
-      finish(failedToStart('Браузер не дал запустить код'));
+      finish(failedToStart('браузер не дал запустить код'));
     }
   });
 

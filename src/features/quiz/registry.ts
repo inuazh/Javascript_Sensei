@@ -30,11 +30,11 @@ function orderCode(q: OrderQuestionT): string | null {
 }
 
 export const QUESTION_TYPES: QuestionRegistry = {
-  output: choice('Что выведет код?', q => q.code),
-  trueFalse: choice('Верно или нет?', q => (q.code?.trim() ? q.code : null)),
-  fill: choice('Заполни пропуск', q => q.codeBefore + q.options[q.correct] + q.codeAfter),
+  output: choice('что выведет код?', q => q.code),
+  trueFalse: choice('верно или нет?', q => (q.code?.trim() ? q.code : null)),
+  fill: choice('заполни пропуск', q => q.codeBefore + q.options[q.correct] + q.codeAfter),
   order: {
-    defaultTitle: 'Расставь строки по порядку',
+    defaultTitle: 'расставь строки по порядку',
     Component: OrderQuestion,
     initialAnswer: q => q.shuffled,
     isCorrect: (_q, a: number[]) => a.every((lineIndex, i) => lineIndex === i),
@@ -42,11 +42,11 @@ export const QUESTION_TYPES: QuestionRegistry = {
     runnableCode: orderCode,
   },
   findBug: {
-    defaultTitle: 'Найди строку с ошибкой',
+    defaultTitle: 'найди строку с ошибкой',
     Component: FindBugQuestion,
     initialAnswer: () => null,
     isCorrect: (q, a: number) => a === q.bugLine,
-    correctAnswer: q => (q.fixed ? { code: q.fixed } : { text: `Строка ${q.bugLine}` }),
+    correctAnswer: q => (q.fixed ? { code: q.fixed } : { text: `строка ${q.bugLine}` }),
     // Run the buggy code: seeing the wrong output is the point of the question.
     runnableCode: q => q.code,
   },

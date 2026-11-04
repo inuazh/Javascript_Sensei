@@ -31,8 +31,8 @@ export default function TopicScreen() {
   if (!section || !topic) {
     return (
       <Screen edges={['top', 'bottom']}>
-        <Text style={Type.h2}>Тема не найдена</Text>
-        <Button title="Назад" onPress={goBack} />
+        <Text style={Type.h2}>тема не найдена</Text>
+        <Button title="назад" onPress={goBack} />
       </Screen>
     );
   }
@@ -45,7 +45,7 @@ export default function TopicScreen() {
   return (
     <Screen edges={['top', 'bottom']}>
       <BackButton />
-      <Label>{`${pad2(sectionNumber)} · ${section.title.toLowerCase()}`}</Label>
+      <Label>{`${pad2(sectionNumber)} · ${section.title}`}</Label>
       <Text style={Type.h1}>{topic.title}</Text>
       <Text style={styles.subtitle}>{topic.subtitle}</Text>
 
@@ -82,12 +82,12 @@ export default function TopicScreen() {
               {lesson.theory ? (
                 <Pressable
                   accessibilityRole="link"
-                  accessibilityLabel={`Теория урока «${lesson.title}»`}
+                  accessibilityLabel={`теория урока «${lesson.title}»`}
                   onPress={() => router.push(`/reference/${lesson.id}`)}
                   style={({ pressed }) => [styles.theory, pressed && styles.pressed]}
                 >
                   <Icon name="book-open" size={16} color={Colors.textSecondary} />
-                  <Text style={styles.theoryText}>Теория</Text>
+                  <Text style={styles.theoryText}>теория</Text>
                 </Pressable>
               ) : null}
             </View>

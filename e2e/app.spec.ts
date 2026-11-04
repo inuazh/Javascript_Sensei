@@ -13,12 +13,12 @@ import {
 } from './support';
 
 test('fresh user goes through onboarding to home', async ({ page }) => {
-  await completeOnboarding(page, 'Новичок');
+  await completeOnboarding(page, 'новичок');
 
   await expect(page).toHaveURL(/\/$/);
   await expect(startLessonButton(page)).toBeVisible();
   await expect(page.getByText('начни отсюда')).toBeVisible();
-  await expect(xpChip(page)).toHaveAttribute('aria-label', 'Опыт: 0 XP');
+  await expect(xpChip(page)).toHaveAttribute('aria-label', 'опыт: 0 XP');
 
   // Settings are persisted: a reload skips onboarding.
   await page.reload();
@@ -52,7 +52,7 @@ test('review: mistakes come back in the workout', async ({ page }) => {
   expect(mistakes).toBeGreaterThan(0);
   await leaveLessonResult(page);
 
-  await expect(page.getByRole('button', { name: /Пора повторить/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /пора повторить/ })).toBeVisible();
 
   // The tab badge counts the questions that are due.
   const reviewTab = page.getByRole('tab', { name: /повтор/ });
@@ -62,12 +62,12 @@ test('review: mistakes come back in the workout', async ({ page }) => {
   await expect(page.getByText('на сегодня')).toBeVisible();
   await expect(page.getByText(/^вопрос\S* на повторение$/)).toBeVisible();
 
-  await page.getByRole('button', { name: /Начать тренировку/ }).click();
+  await page.getByRole('button', { name: /начать тренировку/ }).click();
   await expect(page).toHaveURL(/\/review$/);
   await answerQuiz(page, 'first');
 
-  await expect(page.getByText(/^(Тренировка завершена|Всё помнишь)$/)).toBeVisible();
-  await page.getByRole('button', { name: /Готово/ }).click();
+  await expect(page.getByText(/^(тренировка завершена|всё помнишь)$/)).toBeVisible();
+  await page.getByRole('button', { name: /готово/ }).click();
   await expect(page).toHaveURL(/\/workout$/);
   await expect(page.getByText('тренировок')).toBeVisible();
 });
@@ -75,17 +75,18 @@ test('review: mistakes come back in the workout', async ({ page }) => {
 test('onboarding: an experienced user skips the basic sections without a test', async ({
   page,
 }) => {
-  await completeOnboarding(page, 'Есть опыт');
+  await completeOnboarding(page, 'есть опыт');
 
   await expect(page).toHaveURL(/\/$/);
   await expect(startLessonButton(page)).toBeVisible();
   // The course continues after the skipped sections, and no test is offered.
-  await expect(page.getByText('Функциональный стиль').first()).toBeVisible();
-  await expect(page.getByText('Уже знаешь основы?')).toHaveCount(0);
+  // Content titles are matched case-insensitively: their case belongs to content/.
+  await expect(page.getByText(/^функциональный стиль$/i).first()).toBeVisible();
+  await expect(page.getByText('уже знаешь основы?')).toHaveCount(0);
 });
 
 test('onboarding: an unsure user goes straight into the placement test', async ({ page }) => {
-  await completeOnboarding(page, 'Не уверен');
+  await completeOnboarding(page, 'не уверен');
 
   await expect(page).toHaveURL(/\/placement/);
   await expect(page.getByText('вводный тест')).toBeVisible();
@@ -131,11 +132,13 @@ test('persisted v0 state is migrated on load', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/$/);
   await expect(startLessonButton(page)).toBeVisible();
-  await expect(page.getByLabel('Стрик: 7 дней')).toBeVisible();
+  await expect(page.getByLabel('стрик: 7 дней')).toBeVisible();
   await expect(page.getByText('стрик 7 дней · сегодня засчитан')).toBeVisible();
-  await expect(page.getByText(/\/100 xp$/)).toBeVisible(); // 10 minutes → 100 XP goal
+  await expect(page.getByText(/\/100 XP$/)).toBeVisible(); // 10 minutes → 100 XP goal
   expect(await readXp(page)).toBeGreaterThan(0);
-  await expect(page.getByRole('button', { name: /^Переменные, пройдено 1 из \d+$/ })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /^переменные, пройдено 1 из \d+$/i }),
+  ).toBeVisible();
 
   // The migrated state is written back in the current format.
   await expect
@@ -194,14 +197,14 @@ test('profile: statistics by section open the weakest topic', async ({ page }) =
   await page.goto('/profile');
 
   await expect(page.getByText('по разделам')).toBeVisible();
-  await expect(page.getByLabel('Сильнее всего: Основы, 93%')).toBeVisible();
+  await expect(page.getByLabel(/^сильнее всего: основы, 93%$/i)).toBeVisible();
   await expect(page.getByText(/^ещё не начато: \d+ раздел/)).toBeVisible();
   await expect(
-    page.getByRole('button', { name: /^Основы: пройдено 3 из 15 уроков, точность 93%/ }),
+    page.getByRole('button', { name: /^основы: пройдено 3 из 15 уроков, точность 93%/i }),
   ).toBeVisible();
   // Async: 8 of 10 answers right; promises (3/5) is the weakest topic.
   const asyncRow = page.getByRole('button', {
-    name: /^Асинхронность: пройдено 2 из 15 уроков, точность 80%, в повторении 2, выучено 0, ошибок 3$/,
+    name: /^асинхронность: пройдено 2 из 15 уроков, точность 80%, в повторении 2, выучено 0, ошибок 3$/i,
   });
   await asyncRow.click();
   await expect(page).toHaveURL(/\/topic\/promises$/);
@@ -209,40 +212,40 @@ test('profile: statistics by section open the weakest topic', async ({ page }) =
   // Weak spots in the workout name their section.
   await page.goto('/workout');
   await expect(page.getByText('слабые места')).toBeVisible();
-  await expect(page.getByText(/^\d{2} · асинхронность$/).first()).toBeVisible();
+  await expect(page.getByText(/^\d{2} · асинхронность$/i).first()).toBeVisible();
 });
 
 test('reference: search the theory and open a lesson', async ({ page }) => {
   await completeOnboarding(page);
 
-  await page.getByRole('button', { name: /Справочник/ }).click();
+  await page.getByRole('button', { name: /справочник/ }).click();
   await expect(page).toHaveURL(/\/reference$/);
-  const search = page.getByRole('textbox', { name: 'Поиск по теории' });
+  const search = page.getByRole('textbox', { name: 'поиск по теории' });
   await search.fill('qwertyzzz');
-  await expect(page.getByText('Ничего не нашлось')).toBeVisible();
+  await expect(page.getByText('ничего не нашлось')).toBeVisible();
 
   await search.fill('замыкани');
   await expect(page.getByText(/^найдено: \d+ урок/)).toBeVisible();
-  // Lessons titled «Замыкания…» are ranked first.
+  // Lessons titled «замыкания…» are ranked first.
   const first = page
-    .getByRole('button', { name: /^Теория: / })
+    .getByRole('button', { name: /^теория: / })
     .filter({ visible: true })
     .first();
-  await expect(first).toHaveAccessibleName(/^Теория: Замыкания/);
+  await expect(first).toHaveAccessibleName(/^теория: замыкания/i);
   await first.click();
 
   await expect(page).toHaveURL(/\/reference\/[\w-]+$/);
   const lesson = getLesson(new URL(page.url()).pathname.split('/').pop()!);
-  expect(lesson.title).toMatch(/^Замыкания/);
+  expect(lesson.title).toMatch(/^замыкания/i);
   const visible = (text: string) => page.getByText(text).filter({ visible: true }).first();
   await expect(visible(lesson.title)).toBeVisible();
   const text = lesson.theory!.blocks.find(b => b.type === 'text')!.text!;
   await expect(visible(text.replace(/\*\*|`/g, '').slice(0, 40))).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Запустить код' }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: 'запустить код' }).first()).toBeVisible();
 
-  await page.getByRole('button', { name: 'Пройти урок' }).click();
+  await page.getByRole('button', { name: 'пройти урок' }).click();
   await expect(page).toHaveURL(new RegExp(`/lesson/${lesson.id}$`));
-  await expect(page.getByRole('button', { name: /К практике/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /к практике/ })).toBeVisible();
 });
 
 test('the page CSP only lets the app talk to its own origin and Firebase', async ({ page }) => {

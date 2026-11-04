@@ -48,25 +48,25 @@ function reminderText(
 ): { title: string; body: string } {
   if (dayOffset <= 1 && streakDays > 0 && isDeadline) {
     return {
-      title: `🔥 Стрик ${streakDays} ${plural(streakDays, 'день', 'дня', 'дней')} под угрозой`,
-      body: 'Один урок — и серия продолжается. Это пара минут.',
+      title: `🔥 стрик ${streakDays} ${plural(streakDays, 'день', 'дня', 'дней')} под угрозой`,
+      body: 'один урок, и серия продолжается. это пара минут.',
     };
   }
   if (dayOffset === 0 && dueCount > 0) {
     return {
-      title: '🧠 Пора повторить',
-      body: `${dueCount} ${plural(dueCount, 'вопрос ждёт', 'вопроса ждут', 'вопросов ждут')} повторения. Закрепим?`,
+      title: '🧠 пора повторить',
+      body: `${dueCount} ${plural(dueCount, 'вопрос ждёт', 'вопроса ждут', 'вопросов ждут')} повторения. закрепим?`,
     };
   }
   if (dayOffset >= 3) {
     return {
       title: '⚡ JavaScript скучает',
-      body: 'Вернись на 5 минут — продолжим с того же места.',
+      body: 'вернись на 5 минут, и продолжим с того же места.',
     };
   }
   return {
-    title: '⚡ Время JavaScript',
-    body: 'Пять минут практики сегодня — и знания не выветрятся.',
+    title: '⚡ время JavaScript',
+    body: 'пять минут практики сегодня, и знания не выветрятся.',
   };
 }
 

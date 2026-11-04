@@ -102,27 +102,27 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // ---------------------------------------------------------------- flows
 
-export type Experience = 'Новичок' | 'Знаю основы' | 'Есть опыт' | 'Не уверен';
+export type Experience = 'новичок' | 'знаю основы' | 'есть опыт' | 'не уверен';
 
 /** Goes through onboarding from the welcome screen, declining reminders. */
-export async function completeOnboarding(page: Page, experience: Experience = 'Новичок') {
+export async function completeOnboarding(page: Page, experience: Experience = 'новичок') {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Начать', exact: true }).click();
+  await page.getByRole('button', { name: 'начать', exact: true }).click();
 
-  await expect(page.getByText('Какой у тебя опыт?')).toBeVisible();
+  await expect(page.getByText('какой у тебя опыт?')).toBeVisible();
   await page.getByRole('radio', { name: new RegExp(escape(experience)) }).click();
-  await page.getByRole('button', { name: 'Дальше' }).click();
+  await page.getByRole('button', { name: 'дальше' }).click();
 
-  await expect(page.getByText('Цель на день')).toBeVisible();
-  await page.getByRole('radio', { name: /Лёгкий/ }).click();
-  await page.getByRole('button', { name: 'Дальше' }).click();
+  await expect(page.getByText('цель на день')).toBeVisible();
+  await page.getByRole('radio', { name: /лёгкий/ }).click();
+  await page.getByRole('button', { name: 'дальше' }).click();
 
-  await expect(page.getByText('Когда напомнить?')).toBeVisible();
-  await page.getByRole('button', { name: 'Не сейчас' }).click();
+  await expect(page.getByText('когда напомнить?')).toBeVisible();
+  await page.getByRole('button', { name: 'не сейчас' }).click();
 }
 
 export function startLessonButton(page: Page) {
-  return page.getByRole('button', { name: /Начать урок/ });
+  return page.getByRole('button', { name: /начать урок/ });
 }
 
 /** Opens the next lesson from home, skips the theory and returns the lesson. */
@@ -131,7 +131,7 @@ export async function openNextLesson(page: Page): Promise<ContentLesson> {
   await expect(page).toHaveURL(/\/lesson\/[\w-]+$/);
   const lessonId = new URL(page.url()).pathname.split('/').pop()!;
   const lesson = getLesson(lessonId);
-  await page.getByRole('button', { name: /К практике/ }).click();
+  await page.getByRole('button', { name: /к практике/ }).click();
   return lesson;
 }
 
@@ -170,30 +170,30 @@ export async function answerQuiz(
       await radios.first().click();
     }
 
-    await page.getByRole('button', { name: 'Проверить' }).click();
+    await page.getByRole('button', { name: 'проверить' }).click();
     // The feedback panel is announced politely to screen readers.
     const feedback = page.locator('[aria-live="polite"]').filter({ visible: true });
     await expect(feedback).toHaveCount(1);
-    const isCorrect = (await feedback.getByText('Не совсем', { exact: true }).count()) === 0;
+    const isCorrect = (await feedback.getByText('не совсем', { exact: true }).count()) === 0;
     if (question && mode === 'wrong') expect(isCorrect, `question ${question.id}`).toBe(false);
     if (isCorrect) correct++;
 
     const isLast = i === total - 1;
-    await page.getByRole('button', { name: isLast ? 'Завершить' : 'Дальше' }).click();
+    await page.getByRole('button', { name: isLast ? 'завершить' : 'дальше' }).click();
   }
   return correct;
 }
 
 /** From a lesson result screen back to home (next lesson → close). */
 export async function leaveLessonResult(page: Page) {
-  await page.getByRole('button', { name: /^Дальше: / }).click();
-  await page.getByRole('button', { name: 'Закрыть' }).click();
+  await page.getByRole('button', { name: /^дальше: / }).click();
+  await page.getByRole('button', { name: 'закрыть' }).click();
   await expect(startLessonButton(page)).toBeVisible();
   await expect(page).toHaveURL(/\/$/);
 }
 
 export function xpChip(page: Page) {
-  return page.getByLabel(/^Опыт: \d+ XP$/);
+  return page.getByLabel(/^опыт: \d+ XP$/);
 }
 
 export async function readXp(page: Page): Promise<number> {

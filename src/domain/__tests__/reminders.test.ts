@@ -14,7 +14,7 @@ describe('planReminders', () => {
     expect(plan).toHaveLength(6);
     expect(plan[0].date.getDate()).toBe(5);
     expect(plan[0].date.getHours()).toBe(19);
-    expect(plan[0].title).toContain('Стрик 4 дня под угрозой');
+    expect(plan[0].title).toContain('стрик 4 дня под угрозой');
   });
 
   it('reminds today when not active yet, but not in the past', () => {

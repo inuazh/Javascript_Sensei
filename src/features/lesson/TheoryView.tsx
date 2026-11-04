@@ -17,7 +17,7 @@ export function TheoryView({ title, label, theory, onStart, onClose }: TheoryVie
       edges={['top', 'bottom']}
       footer={
         <View style={styles.footer}>
-          <Button title="К практике" icon="arrow-right" onPress={onStart} />
+          <Button title="к практике" icon="arrow-right" onPress={onStart} />
         </View>
       }
     >
@@ -25,12 +25,12 @@ export function TheoryView({ title, label, theory, onStart, onClose }: TheoryVie
         onPress={onClose}
         hitSlop={12}
         accessibilityRole="button"
-        accessibilityLabel="Закрыть"
+        accessibilityLabel="закрыть"
         style={styles.close}
       >
         <Icon name="x" size={22} color={Colors.textMuted} />
       </Pressable>
-      <Label>{`теория · ${label.toLowerCase()}`}</Label>
+      <Label>{`теория · ${label}`}</Label>
       <Text style={Type.h1}>{title}</Text>
       <TheoryBlocks theory={theory} />
     </Screen>

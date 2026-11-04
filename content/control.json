@@ -9,7 +9,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "`if (условие) { ... }` выполняет блок, если условие истинно. Необязательная ветка `else` срабатывает во всех остальных случаях."
+            "text": "`if (условие) { ... }` выполняет блок, если условие истинно. необязательная ветка `else` срабатывает во всех остальных случаях."
           },
           {
             "type": "code",
@@ -17,7 +17,7 @@
           },
           {
             "type": "text",
-            "text": "Условие не обязано быть `true` или `false`: JavaScript приведёт его к boolean. Falsy-значения — `false`, `0`, `\"\"`, `null`, `undefined`, `NaN` — ведут в `else`."
+            "text": "условие не обязано быть `true` или `false`: JavaScript приведёт его к boolean. Falsy-значения (`false`, `0`, `\"\"`, `null`, `undefined`, `NaN`) ведут в `else`."
           },
           {
             "type": "code",
@@ -25,7 +25,7 @@
           },
           {
             "type": "tip",
-            "text": "`a || b || c` возвращает первое truthy-значение, а если все falsy — последнее. Поэтому `if (\"\" || 0 || null)` не выполнится."
+            "text": "`a || b || c` возвращает первое truthy-значение, а если все falsy, то последнее. поэтому `if (\"\" || 0 || null)` не выполнится."
           }
         ]
       },
@@ -33,56 +33,56 @@
         {
           "id": "conditions-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let age = 20;\nif (age >= 18) {\n  console.log(\"adult\");\n} else {\n  console.log(\"minor\");\n}",
           "options": ["minor", "adult", "Error", "undefined"],
           "correct": 1,
-          "explanation": "20 >= 18 — истина, выполняется ветка if и выводится 'adult'"
+          "explanation": "20 >= 18 истинно, поэтому выполняется ветка if и выводится 'adult'"
         },
         {
           "id": "conditions-01-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 0;\nif (x) {\n  console.log(\"truthy\");\n} else {\n  console.log(\"falsy\");\n}",
           "options": ["truthy", "falsy", "0", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "0 — falsy-значение, оно ведёт в else",
+            "0 это falsy-значение, оно ведёт в else",
             null,
-            "Выводится строка из выполненной ветки, а не значение x",
+            "выводится строка из выполненной ветки, а не значение x",
             null
           ],
-          "explanation": "0 — falsy-значение, поэтому выполняется ветка else"
+          "explanation": "0 это falsy-значение, поэтому выполняется ветка else"
         },
         {
           "id": "conditions-01-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let score = 75;\n",
           "codeAfter": " (score >= 60) {\n  console.log(\"passed\");\n}",
           "options": ["when", "if", "check", "unless"],
           "correct": 1,
           "optionExplanations": [
-            "when в JavaScript нет — SyntaxError",
+            "when в JavaScript нет, будет SyntaxError",
             null,
-            "check — не ключевое слово",
+            "check не ключевое слово",
             "unless есть в Ruby и Perl, но не в JavaScript"
           ],
-          "explanation": "if — ключевое слово для условного выполнения кода"
+          "explanation": "if это ключевое слово для условного выполнения кода"
         },
         {
           "id": "conditions-01-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "if (\"\" || 0 || null) {\n  console.log(\"yes\");\n}",
-          "options": ["Выведет yes", "Ничего не выведет"],
+          "options": ["выведет yes", "ничего не выведет"],
           "correct": 1,
-          "explanation": "Все три значения falsy, поэтому || возвращает последнее — null. Оно тоже falsy, и тело if не выполняется."
+          "explanation": "все три значения falsy, поэтому || возвращает последнее, то есть null. оно тоже falsy, и тело if не выполняется."
         },
         {
           "id": "conditions-01-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "let n = 7;",
             "if (n % 2 === 0) {",
@@ -90,7 +90,7 @@
             "} else { console.log(\"odd\"); }"
           ],
           "shuffled": [3, 0, 2, 1],
-          "explanation": "Сначала объявляем n, затем открываем if с условием, внутри — ветка для чётного, и в конце закрываем if веткой else. 7 % 2 = 1, поэтому выведется \"odd\"."
+          "explanation": "сначала объявляем n, затем открываем if с условием, внутри идёт ветка для чётного, и в конце закрываем if веткой else. 7 % 2 = 1, поэтому выведется \"odd\"."
         }
       ]
     },
@@ -103,7 +103,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "Цепочка `else if` проверяет условия сверху вниз и выполняет **только первую** истинную ветку. Если ни одна не подошла — выполняется `else`, а без него — ничего."
+            "text": "цепочка `else if` проверяет условия сверху вниз и выполняет **только первую** истинную ветку. если ни одна не подошла, выполняется `else`, а без него ничего."
           },
           {
             "type": "code",
@@ -111,7 +111,7 @@
           },
           {
             "type": "text",
-            "text": "Отдельные `if` подряд независимы: проверяется каждый, и могут сработать оба."
+            "text": "отдельные `if` подряд независимы: проверяется каждый, и могут сработать оба."
           },
           {
             "type": "code",
@@ -119,7 +119,7 @@
           },
           {
             "type": "warning",
-            "text": "Пишется именно `else if` — через пробел. `elseif` и `elif` из других языков дадут `SyntaxError`."
+            "text": "пишется именно `else if`, через пробел. `elseif` и `elif` из других языков дадут `SyntaxError`."
           }
         ]
       },
@@ -127,74 +127,77 @@
         {
           "id": "conditions-02-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let grade = 75;\nif (grade >= 90) {\n  console.log(\"A\");\n} else if (grade >= 75) {\n  console.log(\"B\");\n} else {\n  console.log(\"C\");\n}",
           "options": ["A", "B", "C", "undefined"],
           "correct": 1,
-          "explanation": "75 < 90, первое условие false; 75 >= 75, второе условие true — выводится 'B'"
+          "explanation": "75 < 90, первое условие false; 75 >= 75, второе условие true, поэтому выводится 'B'"
         },
         {
           "id": "conditions-02-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 5;\nif (x > 10) {\n  console.log(\"big\");\n} else if (x > 3) {\n  console.log(\"medium\");\n} else if (x > 1) {\n  console.log(\"small\");\n}",
           "options": ["big", "small", "medium", "Ничего"],
           "correct": 2,
           "optionExplanations": [
             null,
-            "5 > 1 тоже верно, но цепочка останавливается на первой истинной ветке — \"medium\"",
+            "5 > 1 тоже верно, но цепочка останавливается на первой истинной ветке, \"medium\"",
             null,
             null
           ],
-          "explanation": "5 > 10 false, 5 > 3 true — выполняется первая истинная ветка 'medium'"
+          "explanation": "5 > 10 false, 5 > 3 true, значит выполняется первая истинная ветка 'medium'"
         },
         {
           "id": "conditions-02-q3",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let n = 15;\nif (n > 10) {\n  console.log(\"big\");\n}\nif (n > 5) {\n  console.log(\"medium\");\n}",
-          "options": ["Выведет только 'big'", "Выведет 'big' и 'medium'"],
+          "options": ["выведет только 'big'", "выведет 'big' и 'medium'"],
           "correct": 1,
-          "optionExplanations": ["Это два отдельных if, а не else if — проверяются оба", null],
-          "explanation": "Это два независимых if, а не цепочка: проверяются оба, оба условия истинны, поэтому выводятся оба слова."
+          "optionExplanations": [
+            "это два отдельных if, а не else if, поэтому проверяются оба",
+            null
+          ],
+          "explanation": "это два независимых if, а не цепочка: проверяются оба, оба условия истинны, поэтому выводятся оба слова."
         },
         {
           "id": "conditions-02-q4",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let score = 80;\nif (score > 90) {\n  console.log(\"excellent\");\n} ",
           "codeAfter": " (score > 70) {\n  console.log(\"good\");\n}",
           "options": ["orif", "elif", "else if", "elseif"],
           "correct": 2,
           "optionExplanations": [
             null,
-            "elif — из Python, в JavaScript его нет",
+            "elif взят из Python, в JavaScript его нет",
             null,
-            "В JavaScript нужен пробел: else if"
+            "в JavaScript нужен пробел: else if"
           ],
-          "explanation": "Дополнительная ветка пишется двумя словами: else if. При score = 80 первое условие ложно, второе истинно — выведется \"good\"."
+          "explanation": "дополнительная ветка пишется двумя словами: else if. при score = 80 первое условие ложно, второе истинно, поэтому выведется \"good\"."
         },
         {
           "id": "conditions-02-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let temp = -5;\nif (temp > 20) {\n  console.log(\"hot\");\n} else if (temp > 0) {\n  console.log(\"warm\");\n} else {\n  console.log(\"cold\");\n}",
           "options": ["hot", "warm", "cold", "Error"],
           "correct": 2,
-          "explanation": "-5 не больше 20 и не больше 0 — ни одно условие не подошло, поэтому выполняется ветка else."
+          "explanation": "-5 не больше 20 и не больше 0: ни одно условие не подошло, поэтому выполняется ветка else."
         }
       ]
     },
     {
       "id": "conditions-03",
       "topicId": "conditions",
-      "title": "Тернарный оператор",
+      "title": "тернарный оператор",
       "order": 2,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "**Тернарный оператор** — короткий `if/else`, который возвращает значение: `условие ? еслиДа : еслиНет`."
+            "text": "**тернарный оператор** это короткий `if/else`, который возвращает значение: `условие ? еслиДа : еслиНет`."
           },
           {
             "type": "code",
@@ -202,7 +205,7 @@
           },
           {
             "type": "text",
-            "text": "Тернарники можно вкладывать: условия проверяются слева направо, как в цепочке `else if`."
+            "text": "тернарники можно вкладывать: условия проверяются слева направо, как в цепочке `else if`."
           },
           {
             "type": "code",
@@ -210,7 +213,7 @@
           },
           {
             "type": "tip",
-            "text": "Больше двух уровней вложенности читать тяжело — тогда лучше обычный `if`."
+            "text": "больше двух уровней вложенности читать тяжело: в таком случае лучше обычный `if`."
           }
         ]
       },
@@ -218,7 +221,7 @@
         {
           "id": "conditions-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let age = 16;\nlet status = age >= 18 ? \"adult\" : \"minor\";\nconsole.log(status);",
           "options": ["adult", "minor", "undefined", "Error"],
           "correct": 1,
@@ -227,46 +230,46 @@
         {
           "id": "conditions-03-q2",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let a = 5, b = 3;\nlet max = a > b ",
           "codeAfter": " a : b;\nconsole.log(max); // 5",
           "options": ["then", "?", "if", ":"],
           "correct": 1,
           "optionExplanations": [
-            "then в JavaScript нет — условие от двух значений отделяет ?",
+            "then в JavaScript нет, условие от двух значений отделяет ?",
             null,
-            "if — это инструкция, внутри выражения его не написать",
-            "Двоеточие разделяет два варианта, а перед ними нужен ?"
+            "if это инструкция, внутри выражения его не написать",
+            "двоеточие разделяет два варианта, а перед ними нужен ?"
           ],
-          "explanation": "Синтаксис тернарного оператора: условие ? еслиДа : еслиНет. 5 > 3, поэтому max = a = 5."
+          "explanation": "синтаксис тернарного оператора: условие ? еслида : еслинет. 5 > 3, поэтому max = a = 5."
         },
         {
           "id": "conditions-03-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let n = 0;\nconsole.log(n ? \"truthy\" : \"falsy\");",
           "options": ["truthy", "falsy", "0", "null"],
           "correct": 1,
-          "explanation": "0 — falsy, тернарный оператор возвращает 'falsy'"
+          "explanation": "0 это falsy, поэтому тернарный оператор возвращает 'falsy'"
         },
         {
           "id": "conditions-03-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let x = true ? false : true;\nconsole.log(x);",
-          "options": ["Выведет true", "Выведет false"],
+          "options": ["выведет true", "выведет false"],
           "correct": 1,
-          "optionExplanations": ["Условие true выбирает значение до двоеточия — а это false", null],
-          "explanation": "Условие true, значит возвращается значение до двоеточия — false."
+          "optionExplanations": ["условие true выбирает значение до двоеточия, а это false", null],
+          "explanation": "условие true, значит возвращается значение до двоеточия, то есть false."
         },
         {
           "id": "conditions-03-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let score = 85;\nlet msg = score >= 90 ? \"A\" : score >= 70 ? \"B\" : \"C\";\nconsole.log(msg);",
           "options": ["A", "B", "C", "Error"],
           "correct": 1,
-          "explanation": "85 < 90 — первое условие ложно, переходим ко второму: 85 >= 70 — истинно, возвращается 'B'."
+          "explanation": "85 < 90, поэтому первое условие ложно; переходим ко второму: 85 >= 70 истинно, возвращается 'B'."
         }
       ]
     },
@@ -279,7 +282,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "`switch` сравнивает значение с каждым `case` через **строгое** `===` и начинает выполнение с совпавшего. Если не совпал ни один, выполняется `default`."
+            "text": "`switch` сравнивает значение с каждым `case` через **строгое** `===` и начинает выполнение с совпавшего. если не совпал ни один, выполняется `default`."
           },
           {
             "type": "code",
@@ -287,7 +290,7 @@
           },
           {
             "type": "warning",
-            "text": "Без `break` выполнение «проваливается» в следующие `case` — даже если они не совпадают."
+            "text": "без `break` выполнение «проваливается» в следующие `case`, даже если они не совпадают."
           },
           {
             "type": "code",
@@ -295,7 +298,7 @@
           },
           {
             "type": "tip",
-            "text": "Из-за строгого сравнения строка `\"2\"` не совпадёт с `case 2`."
+            "text": "из-за строгого сравнения строка `\"2\"` не совпадёт с `case 2`."
           }
         ]
       },
@@ -303,7 +306,7 @@
         {
           "id": "conditions-04-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let day = 2;\nswitch (day) {\n  case 1: console.log(\"Mon\"); break;\n  case 2: console.log(\"Tue\"); break;\n  default: console.log(\"?\");\n}",
           "options": ["Mon", "Tue", "?", "Error"],
           "correct": 1,
@@ -312,48 +315,51 @@
         {
           "id": "conditions-04-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = 1;\nswitch (x) {\n  case 1: console.log(\"one\");\n  case 2: console.log(\"two\");\n  default: console.log(\"other\");\n}",
           "options": ["one", "one two other", "one two", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Без break выполнение продолжается в следующих case",
+            "без break выполнение продолжается в следующих case",
             null,
-            "default — тоже часть «провала», он выполнится",
+            "default тоже часть «провала», он выполнится",
             null
           ],
-          "explanation": "Без break происходит «провал» (fall-through): после совпавшего case 1 выполняются все следующие ветки, включая default."
+          "explanation": "без break происходит «провал» (fall-through): после совпавшего case 1 выполняются все следующие ветки, включая default."
         },
         {
           "id": "conditions-04-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let color = \"green\";\nswitch (color) {\n  case \"red\": console.log(\"red\"); break;\n  ",
           "codeAfter": ": console.log(\"unknown\");\n}\n// unknown",
           "options": ["else", "otherwise", "default", "fallback"],
           "correct": 2,
           "optionExplanations": [
-            "else внутри switch не работает — SyntaxError",
+            "else внутри switch не работает, будет SyntaxError",
             "otherwise: станет обычной меткой внутри case \"red\" и не выполнится",
             null,
             "fallback: станет обычной меткой внутри case \"red\" и не выполнится"
           ],
-          "explanation": "default выполняется, если ни один case не совпал. А otherwise: или fallback: JavaScript прочитает как метку внутри предыдущего case — до неё выполнение не дойдёт."
+          "explanation": "default выполняется, если ни один case не совпал. а otherwise: или fallback: JavaScript прочитает как метку внутри предыдущего case, и до неё выполнение не дойдёт."
         },
         {
           "id": "conditions-04-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "switch (\"2\") {\n  case 2: console.log(\"number\"); break;\n  case \"2\": console.log(\"string\"); break;\n}",
-          "options": ["Выведет 'number'", "Выведет 'string'"],
+          "options": ["выведет 'number'", "выведет 'string'"],
           "correct": 1,
-          "optionExplanations": ["case сравнивает строго (===), а \"2\" — строка, не число", null],
+          "optionExplanations": [
+            "case сравнивает строго (===), а \"2\" это строка, не число",
+            null
+          ],
           "explanation": "switch сравнивает через строгое ===: строка '2' не равна числу 2, поэтому срабатывает case \"2\"."
         },
         {
           "id": "conditions-04-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "const fruit = \"pear\";",
             "switch (fruit) {",
@@ -362,20 +368,20 @@
             "}"
           ],
           "shuffled": [3, 0, 4, 2, 1],
-          "explanation": "Объявляем fruit, открываем switch, затем case \"apple\" с break, default в конце и закрывающая скобка. Если поставить default перед case, \"pear\" провалится из default в case \"apple\" и выведется лишний 🍎."
+          "explanation": "объявляем fruit, открываем switch, затем case \"apple\" с break, default в конце и закрывающая скобка. если поставить default перед case, \"pear\" провалится из default в case \"apple\" и выведется лишний 🍎."
         }
       ]
     },
     {
       "id": "conditions-05",
       "topicId": "conditions",
-      "title": "Условия: закрепление",
+      "title": "условия: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Условия комбинируют логическими операторами: `&&` — «и», нужно, чтобы оба были истинны; `||` — «или», хватит одного."
+            "text": "условия комбинируют логическими операторами: `&&` значит «и», нужно, чтобы оба были истинны; `||` значит «или», хватит одного."
           },
           {
             "type": "code",
@@ -383,11 +389,11 @@
           },
           {
             "type": "text",
-            "text": "`x == null` — короткая проверка «`x` равен `null` или `undefined`». Любой объект, даже пустой `{}`, — truthy."
+            "text": "`x == null` это короткая проверка «`x` равен `null` или `undefined`». любой объект, даже пустой `{}`, считается truthy."
           },
           {
             "type": "warning",
-            "text": "Порядок веток важен: ставь самое строгое условие первым. В FizzBuzz проверка «делится и на 3, и на 5» должна идти раньше, чем «делится на 3»."
+            "text": "порядок веток важен: ставь самое строгое условие первым. в FizzBuzz проверка «делится и на 3, и на 5» должна идти раньше, чем «делится на 3»."
           }
         ]
       },
@@ -395,7 +401,7 @@
         {
           "id": "conditions-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let a = 5, b = 10;\nif (a > 3 && b > 5) {\n  console.log(\"both\");\n} else {\n  console.log(\"not both\");\n}",
           "options": ["not both", "both", "Error", "undefined"],
           "correct": 1,
@@ -404,16 +410,16 @@
         {
           "id": "conditions-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let x = null;\nif (x == null) {\n  console.log(\"empty\");\n}",
           "options": ["Ничего", "empty", "null", "Error"],
           "correct": 1,
-          "explanation": "x равен null, а null == null — true. Заодно x == null поймал бы и undefined."
+          "explanation": "x равен null, а null == null даёт true. заодно x == null поймал бы и undefined."
         },
         {
           "id": "conditions-05-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let role = \"admin\";\nlet canEdit = role === \"admin\" ",
           "codeAfter": " role === \"editor\";\nconsole.log(canEdit); // true",
           "options": ["&&", "||", "|", "!"],
@@ -421,47 +427,47 @@
           "optionExplanations": [
             "&& требует, чтобы оба условия были истинны, а role не может быть одновременно admin и editor",
             null,
-            "| — побитовое ИЛИ: true | false даст число 1, а не true",
-            "! — унарный оператор, между двумя условиями его не поставить"
+            "| это побитовое ИЛИ: true | false даст число 1, а не true",
+            "! это унарный оператор, между двумя условиями его не поставить"
           ],
-          "explanation": "|| — логическое ИЛИ: canEdit будет true, если роль admin ИЛИ editor."
+          "explanation": "|| это логическое ИЛИ: canEdit будет true, если роль admin ИЛИ editor."
         },
         {
           "id": "conditions-05-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let user = { name: \"Alice\" };\nif (user) {\n  console.log(\"exists\");\n}",
-          "options": ["Выведет 'exists'", "Ничего не выведет"],
+          "options": ["выведет 'exists'", "ничего не выведет"],
           "correct": 0,
-          "explanation": "Любой объект, даже пустой {}, — truthy-значение, поэтому тело if выполняется."
+          "explanation": "любой объект, даже пустой {}, является truthy-значением, поэтому тело if выполняется."
         },
         {
           "id": "conditions-05-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let n = 15;\nif (n % 3 === 0 && n % 5 === 0) {\n  console.log(\"FizzBuzz\");\n} else if (n % 3 === 0) {\n  console.log(\"Fizz\");\n} else if (n % 5 === 0) {\n  console.log(\"Buzz\");\n}",
           "options": ["Fizz", "Buzz", "FizzBuzz", "undefined"],
           "correct": 2,
           "optionExplanations": [
-            "Ветка Fizz тоже подошла бы, но до неё дело не дошло: первой проверяется FizzBuzz",
+            "ветка Fizz тоже подошла бы, но до неё дело не дошло: первой проверяется FizzBuzz",
             null,
             null,
             null
           ],
-          "explanation": "15 делится и на 3, и на 5 — первое условие истинно, выводится 'FizzBuzz'. До остальных веток дело не доходит."
+          "explanation": "15 делится и на 3, и на 5, поэтому первое условие истинно и выводится 'FizzBuzz'. до остальных веток дело не доходит."
         }
       ]
     },
     {
       "id": "loops-01",
       "topicId": "loops",
-      "title": "Цикл for",
+      "title": "цикл for",
       "order": 0,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "`for (начало; условие; шаг)`: начало выполняется один раз, условие проверяется **перед** каждой итерацией, шаг — после неё."
+            "text": "`for (начало; условие; шаг)`: начало выполняется один раз, условие проверяется **перед** каждой итерацией, а шаг выполняется после неё."
           },
           {
             "type": "code",
@@ -469,7 +475,7 @@
           },
           {
             "type": "text",
-            "text": "Шаг может быть любым: `i -= 2`, `i += 10`. Если условие ложно с самого начала, тело не выполнится ни разу."
+            "text": "шаг может быть любым: `i -= 2`, `i += 10`. если условие ложно с самого начала, тело не выполнится ни разу."
           },
           {
             "type": "code",
@@ -477,7 +483,7 @@
           },
           {
             "type": "warning",
-            "text": "Если шаг не приближает к выходу (например, `i--` при условии `i < 5`), цикл станет бесконечным."
+            "text": "если шаг не приближает к выходу (например, `i--` при условии `i < 5`), цикл станет бесконечным."
           }
         ]
       },
@@ -485,22 +491,22 @@
         {
           "id": "loops-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "for (let i = 0; i < 3; i++) {\n  console.log(i);\n}",
           "options": ["0 1 2", "1 2 3", "0 1 2 3", "1 2"],
           "correct": 0,
           "optionExplanations": [
             null,
-            "Счётчик начинается с 0",
-            "При i = 3 условие i < 3 уже ложно",
+            "счётчик начинается с 0",
+            "при i = 3 условие i < 3 уже ложно",
             null
           ],
-          "explanation": "i начинается с 0 и растёт, пока i < 3: выводятся 0, 1, 2. При i = 3 условие ложно."
+          "explanation": "i начинается с 0 и растёт, пока i < 3: выводятся 0, 1, 2. при i = 3 условие ложно."
         },
         {
           "id": "loops-01-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let sum = 0;\nfor (let i = 1; i <= 4; i++) {\n  sum += i;\n}\nconsole.log(sum);",
           "options": ["6", "10", "8", "4"],
           "correct": 1,
@@ -509,49 +515,49 @@
         {
           "id": "loops-01-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "for (let i = 0; i < 5; ",
           "codeAfter": ") {\n  console.log(i);\n}",
           "options": ["i++", "i--", "i+1", "i = i"],
           "correct": 0,
           "optionExplanations": [
             null,
-            "i будет уменьшаться и никогда не дойдёт до 5 — бесконечный цикл",
-            "i+1 вычисляет число, но не меняет i — бесконечный цикл",
-            "i не меняется — бесконечный цикл"
+            "i будет уменьшаться и никогда не дойдёт до 5, получится бесконечный цикл",
+            "i+1 вычисляет число, но не меняет i: получится бесконечный цикл",
+            "i не меняется, поэтому цикл бесконечный"
           ],
           "explanation": "i++ увеличивает счётчик на 1 после каждой итерации, и через 5 шагов условие i < 5 станет ложным."
         },
         {
           "id": "loops-01-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "for (let i = 5; i > 0; i -= 2) {\n  console.log(i);\n}",
           "options": ["5 4 3 2 1", "5 3 1", "5 3", "Error"],
           "correct": 1,
-          "explanation": "i начинается с 5 и уменьшается на 2: 5, 3, 1. Следующее значение -1 уже не проходит условие i > 0."
+          "explanation": "i начинается с 5 и уменьшается на 2: 5, 3, 1. следующее значение -1 уже не проходит условие i > 0."
         },
         {
           "id": "loops-01-q5",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "for (let i = 0; i < 0; i++) {\n  console.log(i);\n}",
-          "options": ["Выведет 0", "Ничего не выведет"],
+          "options": ["выведет 0", "ничего не выведет"],
           "correct": 1,
-          "explanation": "Условие 0 < 0 ложно с самого начала, поэтому тело цикла не выполняется ни разу."
+          "explanation": "условие 0 < 0 ложно с самого начала, поэтому тело цикла не выполняется ни разу."
         }
       ]
     },
     {
       "id": "loops-02",
       "topicId": "loops",
-      "title": "Цикл while",
+      "title": "цикл while",
       "order": 1,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "`while (условие) { ... }` повторяет тело, пока условие истинно. Условие проверяется **перед** каждой итерацией."
+            "text": "`while (условие) { ... }` повторяет тело, пока условие истинно. условие проверяется **перед** каждой итерацией."
           },
           {
             "type": "code",
@@ -559,7 +565,7 @@
           },
           {
             "type": "text",
-            "text": "Цикл останавливается на первом значении, при котором условие ложно: `16 < 20` — ещё шаг, `32 < 20` — стоп. А `while (true)` крутится, пока его не прервёт `break`."
+            "text": "цикл останавливается на первом значении, при котором условие ложно: при `16 < 20` он делает ещё шаг, а на `32 < 20` останавливается. а `while (true)` крутится, пока его не прервёт `break`."
           },
           {
             "type": "code",
@@ -567,7 +573,7 @@
           },
           {
             "type": "tip",
-            "text": "Меняй переменную из условия внутри тела — иначе цикл никогда не закончится."
+            "text": "меняй переменную из условия внутри тела, иначе цикл никогда не закончится."
           }
         ]
       },
@@ -575,14 +581,14 @@
         {
           "id": "loops-02-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let i = 3;\nwhile (i > 0) {\n  console.log(i);\n  i--;\n}",
           "options": ["3 2 1 0", "3 2 1", "2 1 0", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "При i = 0 условие i > 0 ложно, тело не выполняется",
+            "при i = 0 условие i > 0 ложно, тело не выполняется",
             null,
-            "Сначала выводится 3, а уменьшение идёт после вывода",
+            "сначала выводится 3, а уменьшение идёт после вывода",
             null
           ],
           "explanation": "while выполняется пока i > 0: 3, 2, 1; когда i = 0 условие false"
@@ -590,23 +596,23 @@
         {
           "id": "loops-02-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let n = 1;\nwhile (n < 20) {\n  n *= 2;\n}\nconsole.log(n);",
           "options": ["16", "32", "20", "10"],
           "correct": 1,
           "optionExplanations": ["16 < 20, поэтому цикл делает ещё один шаг", null, null, null],
-          "explanation": "n: 1 → 2 → 4 → 8 → 16 → 32. При 16 условие ещё истинно, при 32 — уже нет, цикл останавливается."
+          "explanation": "n: 1 → 2 → 4 → 8 → 16 → 32. при 16 условие ещё истинно, а при 32 уже нет, и цикл останавливается."
         },
         {
           "id": "loops-02-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "let x = 10;\n",
           "codeAfter": " (x > 0) {\n  x -= 3;\n}",
           "options": ["for", "do", "while", "loop"],
           "correct": 2,
           "optionExplanations": [
-            "У for в скобках три части через ;",
+            "у for в скобках три части через ;",
             "do требует тело и while после него: do { ... } while (...)",
             null,
             "loop в JavaScript нет"
@@ -618,14 +624,14 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let i = 0;\nwhile (true) {\n  i++;\n  if (i >= 3) break;\n}\nconsole.log(i);",
-          "options": ["Выведет 3", "Бесконечный цикл"],
+          "options": ["выведет 3", "бесконечный цикл"],
           "correct": 0,
           "explanation": "while (true) сам не остановится, но break выходит из цикла, когда i достигает 3."
         },
         {
           "id": "loops-02-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "let count = 0;",
             "while (count < 5) {",
@@ -634,7 +640,7 @@
             "console.log(count);"
           ],
           "shuffled": [2, 4, 0, 3, 1],
-          "explanation": "Инициализация, затем while с условием, тело с увеличением, закрывающая скобка и вывод. count растёт до 5."
+          "explanation": "инициализация, затем while с условием, тело с увеличением, закрывающая скобка и вывод. count растёт до 5."
         }
       ]
     },
@@ -647,7 +653,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "`do { ... } while (условие)` сначала выполняет тело, а потом проверяет условие. Поэтому тело выполнится **хотя бы раз**."
+            "text": "`do { ... } while (условие)` сначала выполняет тело, а потом проверяет условие. поэтому тело выполнится **хотя бы раз**."
           },
           {
             "type": "code",
@@ -671,14 +677,14 @@
         {
           "id": "loops-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let i = 5;\ndo {\n  console.log(i);\n  i++;\n} while (i < 5);",
           "options": ["Ничего", "5", "5 6", "Error"],
           "correct": 1,
           "optionExplanations": [
             "do...while выполняет тело хотя бы раз, ещё до проверки условия",
             null,
-            "После первого прохода i = 6, условие 6 < 5 ложно",
+            "после первого прохода i = 6, условие 6 < 5 ложно",
             null
           ],
           "explanation": "do...while выполняет тело хотя бы раз, затем проверяет условие: 5 < 5 = false, стоп"
@@ -686,7 +692,7 @@
         {
           "id": "loops-03-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "for (let i = 0; i < 5; i++) {\n  if (i === 3) break;\n  console.log(i);\n}",
           "options": ["0 1 2 3 4", "0 1 2 3", "0 1 2", "1 2 3"],
           "correct": 2,
@@ -701,7 +707,7 @@
         {
           "id": "loops-03-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "for (let i = 0; i < 5; i++) {\n  if (i % 2 === 0) continue;\n  console.log(i);\n}",
           "options": ["0 2 4", "1 3", "0 1 2 3 4", "1 2 3 4"],
           "correct": 1,
@@ -711,7 +717,7 @@
         {
           "id": "loops-03-q4",
           "type": "fill",
-          "title": "Заполни пропуск — пропустить итерацию",
+          "title": "заполни пропуск: пропустить итерацию",
           "codeBefore": "for (let i = 0; i < 5; i++) {\n  if (i === 2) ",
           "codeAfter": ";\n  console.log(i);\n}\n// 0 1 3 4",
           "options": ["break", "continue", "skip", "return"],
@@ -719,8 +725,8 @@
           "optionExplanations": [
             "break завершит весь цикл, и выведется только 0 1",
             null,
-            "skip в JavaScript нет — ReferenceError",
-            "return вне функции — SyntaxError"
+            "skip в JavaScript нет, будет ReferenceError",
+            "return вне функции даёт SyntaxError"
           ],
           "explanation": "continue пропускает текущую итерацию: при i = 2 вывод не выполняется, цикл продолжается с i = 3."
         },
@@ -729,9 +735,9 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let i = 0;\ndo {\n  i++;\n} while (false);\nconsole.log(i);",
-          "options": ["Выведет 1", "Выведет 0"],
+          "options": ["выведет 1", "выведет 0"],
           "correct": 0,
-          "explanation": "do...while сначала выполняет тело, потом проверяет условие. Тело выполнилось один раз, i = 1, затем while (false) завершает цикл."
+          "explanation": "do...while сначала выполняет тело, потом проверяет условие. тело выполнилось один раз, i = 1, затем while (false) завершает цикл."
         }
       ]
     },
@@ -744,7 +750,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "`for...of` перебирает **значения**: элементы массива, символы строки. `for...in` перебирает **ключи** объекта, а у массива — индексы."
+            "text": "`for...of` перебирает **значения**: элементы массива, символы строки. `for...in` перебирает **ключи** объекта, а у массива индексы."
           },
           {
             "type": "code",
@@ -752,11 +758,11 @@
           },
           {
             "type": "warning",
-            "text": "Обычный объект не итерируемый: `for...of` по нему вызовет `TypeError`. Для объектов используй `for...in` или `Object.keys()`."
+            "text": "обычный объект не итерируемый: `for...of` по нему вызовет `TypeError`. для объектов используй `for...in` или `Object.keys()`."
           },
           {
             "type": "tip",
-            "text": "Запомни: **of** — значения, **in** — ключи."
+            "text": "запомни: **of** перебирает значения, **in** ключи."
           }
         ]
       },
@@ -764,14 +770,14 @@
         {
           "id": "loops-04-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const arr = [10, 20, 30];\nfor (const val of arr) {\n  console.log(val);\n}",
           "options": ["0 1 2", "10 20 30", "[10, 20, 30]", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Индексы дал бы for...in, а for...of даёт значения",
+            "индексы дал бы for...in, а for...of даёт значения",
             null,
-            "val — каждый элемент по очереди, а не весь массив: console.log вызывается три раза",
+            "val по очереди принимает каждый элемент, а не весь массив: console.log вызывается три раза",
             null
           ],
           "explanation": "for...of перебирает значения итерируемого объекта"
@@ -779,12 +785,12 @@
         {
           "id": "loops-04-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const obj = { a: 1, b: 2 };\nfor (const key in obj) {\n  console.log(key);\n}",
           "options": ["1 2", "a b", "a: 1 b: 2", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Значения дал бы for...of по Object.values(obj), а for...in даёт ключи",
+            "значения дал бы for...of по Object.values(obj), а for...in даёт ключи",
             null,
             null,
             null
@@ -794,13 +800,13 @@
         {
           "id": "loops-04-q3",
           "type": "fill",
-          "title": "Заполни пропуск — перебор значений",
+          "title": "заполни пропуск: перебор значений",
           "codeBefore": "const nums = [1, 2, 3];\nfor (const n ",
           "codeAfter": " nums) {\n  console.log(n * 2);\n}\n// 2 4 6",
           "options": ["in", "of", "from", "at"],
           "correct": 1,
           "optionExplanations": [
-            "for...in переберёт индексы 0, 1, 2 — выведется 0 2 4",
+            "for...in переберёт индексы 0, 1, 2, и выведется 0 2 4",
             null,
             "from в цикле не используется",
             "at в цикле не используется"
@@ -810,43 +816,43 @@
         {
           "id": "loops-04-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "for (const ch of \"JS\") {\n  console.log(ch);\n}",
           "options": ["JS", "J\nS", "0 1", "Error"],
           "correct": 1,
           "optionExplanations": [
             "console.log вызывается для каждого символа отдельно, поэтому будет две строки вывода",
             null,
-            "Индексы дал бы for...in",
+            "индексы дал бы for...in",
             null
           ],
-          "explanation": "Строка итерируемая: for...of перебирает каждый символ"
+          "explanation": "строка итерируемая: for...of перебирает каждый символ"
         },
         {
           "id": "loops-04-q5",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const obj = { a: 1 };\nfor (const v of obj) {\n  console.log(v);\n}",
-          "options": ["Выведет 1", "Вызовет TypeError"],
+          "options": ["выведет 1", "вызовет TypeError"],
           "correct": 1,
           "optionExplanations": [
             "for...of работает только с итерируемыми объектами, обычный объект к ним не относится",
             null
           ],
-          "explanation": "Обычный объект не итерируемый — for...of по нему вызывает TypeError. Для объектов есть for...in и Object.keys()."
+          "explanation": "обычный объект не итерируемый, поэтому for...of по нему вызывает TypeError. для объектов есть for...in и Object.keys()."
         }
       ]
     },
     {
       "id": "loops-05",
       "topicId": "loops",
-      "title": "Циклы: закрепление",
+      "title": "циклы: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Если копишь результат в строку, `+=` склеивает: `\"\" + 1 + 2` → `\"12\"`. Для суммы начинай с числа `0`."
+            "text": "если копишь результат в строку, `+=` склеивает: `\"\" + 1 + 2` → `\"12\"`. для суммы начинай с числа `0`."
           },
           {
             "type": "code",
@@ -854,7 +860,7 @@
           },
           {
             "type": "text",
-            "text": "`break` выходит только из ближайшего цикла. Чтобы выйти из внешнего, пометь его **меткой** и напиши `break метка`."
+            "text": "`break` выходит только из ближайшего цикла. чтобы выйти из внешнего, пометь его **меткой** и напиши `break метка`."
           },
           {
             "type": "code",
@@ -862,7 +868,7 @@
           },
           {
             "type": "warning",
-            "text": "`sum =+ n` — не то же, что `+=`: это `sum = +n`, и сумма просто перезапишется."
+            "text": "`sum =+ n` не то же, что `+=`: это `sum = +n`, и сумма просто перезапишется."
           }
         ]
       },
@@ -870,81 +876,81 @@
         {
           "id": "loops-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let result = \"\";\nfor (let i = 1; i <= 4; i++) {\n  result += i;\n}\nconsole.log(result);",
           "options": ["10", "1234", "4321", "4"],
           "correct": 1,
           "optionExplanations": [
-            "Так было бы, если начать с числа 0, а result — пустая строка",
+            "так было бы, если начать с числа 0, а result здесь пустая строка",
             null,
             null,
-            "+= дописывает к строке, а не заменяет её — иначе осталось бы только последнее число"
+            "+= дописывает к строке, а не заменяет её, иначе осталось бы только последнее число"
           ],
-          "explanation": "result — строка, += конкатенирует: '1' + '2' + '3' + '4' = '1234'"
+          "explanation": "result это строка, и += конкатенирует: '1' + '2' + '3' + '4' = '1234'"
         },
         {
           "id": "loops-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "let i = 1;\nwhile (i <= 16) {\n  i *= 2;\n}\nconsole.log(i);",
           "options": ["16", "32", "8", "64"],
           "correct": 1,
-          "optionExplanations": ["16 <= 16 — ещё истинно, цикл делает шаг", null, null, null],
-          "explanation": "i: 1 → 2 → 4 → 8 → 16 → 32. При 16 условие 16 <= 16 ещё истинно, при 32 — ложно, выводится 32."
+          "optionExplanations": ["16 <= 16 ещё истинно, поэтому цикл делает шаг", null, null, null],
+          "explanation": "i: 1 → 2 → 4 → 8 → 16 → 32. при 16 условие 16 <= 16 ещё истинно, при 32 уже ложно, и выводится 32."
         },
         {
           "id": "loops-05-q3",
           "type": "fill",
-          "title": "Заполни пропуск — найти сумму",
+          "title": "заполни пропуск: найти сумму",
           "codeBefore": "const nums = [1, 2, 3, 4, 5];\nlet sum = 0;\nfor (const n of nums) {\n  sum ",
           "codeAfter": " n;\n}\nconsole.log(sum); // 15",
           "options": ["=+", "*=", "+=", "-="],
           "correct": 2,
           "optionExplanations": [
-            "=+ — это sum = +n: сумма каждый раз перезаписывается, в конце будет 5",
+            "=+ это sum = +n: сумма каждый раз перезаписывается, в конце будет 5",
             "0 * n всегда 0",
             null,
-            "Вычитание даст -15"
+            "вычитание даст -15"
           ],
-          "explanation": "+= накапливает сумму: sum = sum + n. Порядок символов важен: =+ означает присваивание с унарным плюсом."
+          "explanation": "+= накапливает сумму: sum = sum + n. порядок символов важен: =+ означает присваивание с унарным плюсом."
         },
         {
           "id": "loops-05-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "outer: for (let i = 0; i < 3; i++) {\n  for (let j = 0; j < 3; j++) {\n    if (j === 1) break outer;\n    console.log(i, j);\n  }\n}",
           "options": ["0 0\n1 0\n2 0", "0 0", "Ничего", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Так было бы с break без метки: он прервал бы только внутренний цикл, а внешний пошёл бы дальше",
+            "так было бы с break без метки: он прервал бы только внутренний цикл, а внешний пошёл бы дальше",
             null,
             "break outer срабатывает только при j === 1, а при j = 0 вывод успевает выполниться",
-            "Метка перед циклом — допустимый синтаксис, break outer к ней и обращается"
+            "метка перед циклом это допустимый синтаксис, break outer к ней и обращается"
           ],
-          "explanation": "break outer прерывает сразу внешний цикл с меткой outer. Успевает выполниться только вывод 0 0."
+          "explanation": "break outer прерывает сразу внешний цикл с меткой outer. успевает выполниться только вывод 0 0."
         },
         {
           "id": "loops-05-q5",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "let count = 0;\nfor (let i = 0; i < 100; i++) {\n  if (i % 7 === 0) count++;\n}\nconsole.log(count);",
-          "options": ["Выведет 15", "Выведет 14"],
+          "options": ["выведет 15", "выведет 14"],
           "correct": 0,
           "optionExplanations": [null, "0 тоже делится на 7, его легко забыть"],
-          "explanation": "Кратные 7 от 0 до 99: 0, 7, 14, …, 98 — это 98 / 7 + 1 = 15 чисел. Ноль тоже считается."
+          "explanation": "кратные 7 от 0 до 99: 0, 7, 14, …, 98, то есть 98 / 7 + 1 = 15 чисел. ноль тоже считается."
         }
       ]
     },
     {
       "id": "functions-01",
       "topicId": "functions",
-      "title": "Объявление функций",
+      "title": "объявление функций",
       "order": 0,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Функцию объявляют словом `function`: имя, параметры в скобках, тело в `{ }`. `return` возвращает результат и завершает функцию, а без `return` функция вернёт `undefined`."
+            "text": "функцию объявляют словом `function`: имя, параметры в скобках, тело в `{ }`. `return` возвращает результат и завершает функцию, а без `return` функция вернёт `undefined`."
           },
           {
             "type": "code",
@@ -952,7 +958,7 @@
           },
           {
             "type": "text",
-            "text": "Объявление `function` **поднимается**: функцию можно вызвать выше по коду. А функцию, сохранённую в переменную через `const`, до объявления вызвать нельзя — будет `ReferenceError`."
+            "text": "объявление `function` **поднимается**: функцию можно вызвать выше по коду. а функцию, сохранённую в переменную через `const`, до объявления вызвать нельзя, будет `ReferenceError`."
           },
           {
             "type": "code",
@@ -964,61 +970,61 @@
         {
           "id": "functions-01-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function greet(name) {\n  return \"Hello, \" + name;\n}\nconsole.log(greet(\"Alice\"));",
           "options": ["Hello, name", "Hello, Alice", "Alice", "undefined"],
           "correct": 1,
           "optionExplanations": [
-            "name — параметр, вместо него подставляется переданное значение",
+            "name это параметр, вместо него подставляется переданное значение",
             null,
             null,
             null
           ],
-          "explanation": "Функция принимает name='Alice' и возвращает 'Hello, Alice'"
+          "explanation": "функция принимает name='Alice' и возвращает 'Hello, Alice'"
         },
         {
           "id": "functions-01-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function add(a, b) {\n  return a + b;\n}\nconsole.log(add(3, 4));",
           "options": ["ab", "34", "7", "Error"],
           "correct": 2,
           "optionExplanations": [
-            "Складываются значения, а не имена параметров",
-            "Оба аргумента — числа, поэтому они складываются, а не склеиваются",
+            "складываются значения, а не имена параметров",
+            "оба аргумента числовые, поэтому они складываются, а не склеиваются",
             null,
             null
           ],
-          "explanation": "Функция возвращает сумму аргументов: 3 + 4 = 7"
+          "explanation": "функция возвращает сумму аргументов: 3 + 4 = 7"
         },
         {
           "id": "functions-01-q3",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function noReturn() {\n  let x = 5;\n}\nconsole.log(noReturn());",
           "options": ["5", "null", "undefined", "Error"],
           "correct": 2,
           "optionExplanations": [
-            "Переменная x внутри функции не возвращается сама",
-            "Без return функция возвращает undefined, а не null",
+            "переменная x внутри функции не возвращается сама",
+            "без return функция возвращает undefined, а не null",
             null,
             null
           ],
-          "explanation": "Функция без return возвращает undefined"
+          "explanation": "функция без return возвращает undefined"
         },
         {
           "id": "functions-01-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "sayHi();\nfunction sayHi() {\n  console.log(\"Hi!\");\n}",
-          "options": ["Вызовет ошибку", "Выведет 'Hi!'"],
+          "options": ["вызовет ошибку", "выведет 'Hi!'"],
           "correct": 1,
           "explanation": "Function declaration поднимается (hoisting) целиком, поэтому функцию можно вызвать до её объявления."
         },
         {
           "id": "functions-01-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "const square = function (n) {",
             "  return n * n;",
@@ -1026,20 +1032,20 @@
             "console.log(square(5));"
           ],
           "shuffled": [3, 0, 2, 1],
-          "explanation": "Функция сохранена в const и не поднимается, поэтому сначала её объявление: заголовок, return, закрывающая скобка. Только потом вызов — 25."
+          "explanation": "функция сохранена в const и не поднимается, поэтому сначала её объявление: заголовок, return, закрывающая скобка. только потом идёт вызов, результат 25."
         }
       ]
     },
     {
       "id": "functions-02",
       "topicId": "functions",
-      "title": "Параметры и аргументы",
+      "title": "параметры и аргументы",
       "order": 1,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Параметру можно задать **значение по умолчанию**: оно используется, если аргумент не передан. Значение по умолчанию может опираться на параметры левее."
+            "text": "параметру можно задать **значение по умолчанию**: оно используется, если аргумент не передан. значение по умолчанию может опираться на параметры левее."
           },
           {
             "type": "code",
@@ -1047,7 +1053,7 @@
           },
           {
             "type": "text",
-            "text": "Непереданный параметр без значения по умолчанию равен `undefined`, и арифметика с ним даёт `NaN`. **Rest-параметр** `...args` собирает все оставшиеся аргументы в массив."
+            "text": "непереданный параметр без значения по умолчанию равен `undefined`, и арифметика с ним даёт `NaN`. **Rest-параметр** `...args` собирает все оставшиеся аргументы в массив."
           },
           {
             "type": "code",
@@ -1059,29 +1065,29 @@
         {
           "id": "functions-02-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function greet(name = \"World\") {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet());",
           "options": ["Hello, !", "Hello, name!", "Hello, World!", "Error"],
           "correct": 2,
           "optionExplanations": [
-            "Аргумент не передан, поэтому используется значение по умолчанию",
-            "Подставляется значение параметра, а не его имя",
+            "аргумент не передан, поэтому используется значение по умолчанию",
+            "подставляется значение параметра, а не его имя",
             null,
             null
           ],
-          "explanation": "Параметр по умолчанию используется если аргумент не передан"
+          "explanation": "параметр по умолчанию используется если аргумент не передан"
         },
         {
           "id": "functions-02-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function sum(...nums) {\n  return nums.reduce((a, b) => a + b, 0);\n}\nconsole.log(sum(1, 2, 3, 4));",
           "options": ["0", "10", "1234", "Error"],
           "correct": 1,
           "optionExplanations": [
             null,
             null,
-            "Элементы — числа, reduce складывает их, а не склеивает",
+            "элементы числовые, поэтому reduce складывает их, а не склеивает",
             null
           ],
           "explanation": "...nums собирает все аргументы в массив, reduce суммирует: 1+2+3+4=10"
@@ -1089,31 +1095,31 @@
         {
           "id": "functions-02-q3",
           "type": "fill",
-          "title": "Заполни пропуск — параметры по умолчанию",
+          "title": "заполни пропуск: параметры по умолчанию",
           "codeBefore": "function power(base, ",
           "codeAfter": " = 2) {\n  return base ** exp;\n}\nconsole.log(power(3)); // 9",
           "options": ["exponent", "exp", "e", "n"],
           "correct": 1,
           "optionExplanations": [
-            "Внутри функции используется exp, а параметр назван exponent — ReferenceError",
+            "внутри функции используется exp, а параметр назван exponent: будет ReferenceError",
             null,
-            "Внутри функции используется exp — ReferenceError",
-            "Внутри функции используется exp — ReferenceError"
+            "внутри функции используется exp, поэтому будет ReferenceError",
+            "внутри функции используется exp, поэтому будет ReferenceError"
           ],
-          "explanation": "Имя параметра должно совпадать с тем, что используется в теле: exp. Значение по умолчанию 2 даёт 3 ** 2 = 9."
+          "explanation": "имя параметра должно совпадать с тем, что используется в теле: exp. значение по умолчанию 2 даёт 3 ** 2 = 9."
         },
         {
           "id": "functions-02-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function test(a, b, c) {\n  return a + b + c;\n}\nconsole.log(test(1, 2));",
           "options": ["Error", "3", "NaN", "undefined"],
           "correct": 2,
           "optionExplanations": [
-            "Лишние параметры не вызывают ошибку — они просто undefined",
+            "лишние параметры не вызывают ошибку, они просто undefined",
             "c не передан, но участвует в сложении",
             null,
-            "Сложение с undefined даёт NaN, а не undefined"
+            "сложение с undefined даёт NaN, а не undefined"
           ],
           "explanation": "c не передан, поэтому c = undefined. 1 + 2 + undefined = NaN."
         },
@@ -1122,22 +1128,22 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "function f(x = 10, y = x * 2) {\n  return y;\n}\nconsole.log(f());",
-          "options": ["Выведет 20", "Вызовет ошибку"],
+          "options": ["выведет 20", "вызовет ошибку"],
           "correct": 0,
-          "explanation": "Значения по умолчанию вычисляются слева направо, поэтому y может использовать x: y = 10 * 2 = 20."
+          "explanation": "значения по умолчанию вычисляются слева направо, поэтому y может использовать x: y = 10 * 2 = 20."
         }
       ]
     },
     {
       "id": "functions-03",
       "topicId": "functions",
-      "title": "Стрелочные функции",
+      "title": "стрелочные функции",
       "order": 2,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Стрелочная функция — короткая запись: `(параметры) => выражение`. Если параметр один, скобки можно опустить. Выражение после `=>` возвращается автоматически."
+            "text": "стрелочная функция это короткая запись: `(параметры) => выражение`. если параметр один, скобки можно опустить. выражение после `=>` возвращается автоматически."
           },
           {
             "type": "code",
@@ -1145,7 +1151,7 @@
           },
           {
             "type": "text",
-            "text": "Если после стрелки идут фигурные скобки, это тело функции — и нужен явный `return`."
+            "text": "если после стрелки идут фигурные скобки, это тело функции, и нужен явный `return`."
           },
           {
             "type": "code",
@@ -1153,7 +1159,7 @@
           },
           {
             "type": "warning",
-            "text": "Чтобы вернуть объект, оберни его в круглые скобки: `() => ({ key: \"value\" })`. Без них `{` примут за начало тела функции."
+            "text": "чтобы вернуть объект, оберни его в круглые скобки: `() => ({ key: \"value\" })`. без них `{` примут за начало тела функции."
           }
         ]
       },
@@ -1161,80 +1167,80 @@
         {
           "id": "functions-03-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const double = x => x * 2;\nconsole.log(double(7));",
           "options": ["7", "14", "undefined", "Error"],
           "correct": 1,
-          "explanation": "Стрелочная функция с одним параметром: x => x * 2; double(7) = 14"
+          "explanation": "стрелочная функция с одним параметром: x => x * 2; double(7) = 14"
         },
         {
           "id": "functions-03-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const add = (a, b) => a + b;\nconsole.log(add(3, 5));",
           "options": ["35", "8", "undefined", "Error"],
           "correct": 1,
           "optionExplanations": [
-            "Оба аргумента — числа, они складываются",
+            "оба аргумента числовые, поэтому они складываются",
             null,
-            "Без фигурных скобок стрелка сама возвращает результат выражения, return не нужен",
+            "без фигурных скобок стрелка сама возвращает результат выражения, return не нужен",
             null
           ],
-          "explanation": "Тело стрелочной функции без фигурных скобок — выражение, и его результат возвращается автоматически: 3 + 5 = 8."
+          "explanation": "тело стрелочной функции без фигурных скобок это выражение, и его результат возвращается автоматически: 3 + 5 = 8."
         },
         {
           "id": "functions-03-q3",
           "type": "fill",
-          "title": "Заполни пропуск — стрелочная функция",
+          "title": "заполни пропуск: стрелочная функция",
           "codeBefore": "const square = x ",
           "codeAfter": " x * x;\nconsole.log(square(4)); // 16",
           "options": ["=>", "->", "==>", ">>"],
           "correct": 0,
           "optionExplanations": [
             null,
-            "-> есть в других языках, в JavaScript стрелка — =>",
-            "Лишний знак равенства — SyntaxError",
-            ">> — это побитовый сдвиг, а не стрелка"
+            "-> есть в других языках, а в JavaScript стрелка пишется как =>",
+            "лишний знак равенства даёт SyntaxError",
+            ">> это побитовый сдвиг, а не стрелка"
           ],
-          "explanation": "Стрелочная функция записывается через =>."
+          "explanation": "стрелочная функция записывается через =>."
         },
         {
           "id": "functions-03-q4",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const getObj = () => ({ key: \"value\" });\nconsole.log(getObj().key);",
           "options": ["undefined", "value", "Error", "{}"],
           "correct": 1,
           "optionExplanations": [
-            "Скобки вокруг объекта как раз нужны, чтобы его вернуть",
+            "скобки вокруг объекта как раз нужны, чтобы его вернуть",
             null,
             null,
             null
           ],
-          "explanation": "Круглые скобки вокруг {} нужны, чтобы фигурные скобки прочитались как объект, а не как тело функции."
+          "explanation": "круглые скобки вокруг {} нужны, чтобы фигурные скобки прочитались как объект, а не как тело функции."
         },
         {
           "id": "functions-03-q5",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const f = () => {\n  return 42;\n};\nconsole.log(f());",
-          "options": ["Выведет 42", "Выведет undefined"],
+          "options": ["выведет 42", "выведет undefined"],
           "correct": 0,
           "optionExplanations": [null, "undefined было бы без return, а здесь он есть"],
-          "explanation": "С фигурными скобками нужен явный return — он есть, поэтому функция возвращает 42."
+          "explanation": "с фигурными скобками нужен явный return, и он есть, поэтому функция возвращает 42."
         }
       ]
     },
     {
       "id": "functions-04",
       "topicId": "functions",
-      "title": "Функции высшего порядка",
+      "title": "функции высшего порядка",
       "order": 3,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "Функции в JavaScript — обычные значения: их можно передавать в другие функции и возвращать из них. Такие функции называют **функциями высшего порядка**."
+            "text": "функции в JavaScript это обычные значения: их можно передавать в другие функции и возвращать из них. такие функции называют **функциями высшего порядка**."
           },
           {
             "type": "code",
@@ -1242,7 +1248,7 @@
           },
           {
             "type": "text",
-            "text": "Возвращённая функция помнит переменные, среди которых её создали."
+            "text": "возвращённая функция помнит переменные, среди которых её создали."
           },
           {
             "type": "code",
@@ -1250,7 +1256,7 @@
           },
           {
             "type": "tip",
-            "text": "Методы массивов вроде `map` — тоже функции высшего порядка: `[1, 2, 3].map(x => x * 2)` даёт `[2, 4, 6]`."
+            "text": "методы массивов вроде `map` тоже функции высшего порядка: `[1, 2, 3].map(x => x * 2)` даёт `[2, 4, 6]`."
           }
         ]
       },
@@ -1258,7 +1264,7 @@
         {
           "id": "functions-04-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function apply(fn, value) {\n  return fn(value);\n}\nconsole.log(apply(x => x * 3, 5));",
           "options": ["5", "3", "15", "Error"],
           "correct": 2,
@@ -1267,7 +1273,7 @@
         {
           "id": "functions-04-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function multiplier(factor) {\n  return n => n * factor;\n}\nconst triple = multiplier(3);\nconsole.log(triple(7));",
           "options": ["3", "7", "21", "Error"],
           "correct": 2,
@@ -1276,16 +1282,16 @@
         {
           "id": "functions-04-q3",
           "type": "fill",
-          "title": "Заполни пропуск",
+          "title": "заполни пропуск",
           "codeBefore": "function twice(fn) {\n  return x => fn(",
           "codeAfter": "(x));\n}\nconst inc = n => n + 1;\nconsole.log(twice(inc)(5)); // 7",
           "options": ["fn", "x", "twice", "fn()"],
           "correct": 0,
           "optionExplanations": [
             null,
-            "x — число, его нельзя вызвать: TypeError",
+            "x это число, его нельзя вызвать: TypeError",
             "twice(x) вернёт функцию, а не число",
-            "fn() вызовет inc без аргумента и вернёт NaN — его нельзя вызвать"
+            "fn() вызовет inc без аргумента и вернёт NaN, а NaN нельзя вызвать"
           ],
           "explanation": "twice возвращает функцию, которая применяет fn дважды: fn(fn(x)). inc(inc(5)) = 7."
         },
@@ -1294,15 +1300,15 @@
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const arr = [1, 2, 3];\nconst mapped = arr.map(function(x) { return x * 2; });\nconsole.log(mapped[1]);",
-          "options": ["Выведет 4", "Выведет 2"],
+          "options": ["выведет 4", "выведет 2"],
           "correct": 0,
-          "optionExplanations": [null, "2 — это arr[1], а mapped[1] = 2 * 2"],
-          "explanation": "map применяет функцию к каждому элементу: [2, 4, 6]. Элемент с индексом 1 — 4."
+          "optionExplanations": [null, "2 это arr[1], а mapped[1] = 2 * 2"],
+          "explanation": "map применяет функцию к каждому элементу: [2, 4, 6]. элемент с индексом 1 равен 4."
         },
         {
           "id": "functions-04-q5",
           "type": "order",
-          "title": "Расставь строки по порядку",
+          "title": "расставь строки по порядку",
           "lines": [
             "const compose = (f, g) => {",
             "  return x => f(g(x));",
@@ -1311,20 +1317,20 @@
             "console.log(incThenDouble(5));"
           ],
           "shuffled": [3, 0, 4, 2, 1],
-          "explanation": "compose сохранена в const, поэтому её объявление идёт первым. Затем создаём incThenDouble и вызываем: сначала g (5 + 1 = 6), потом f (6 * 2 = 12)."
+          "explanation": "compose сохранена в const, поэтому её объявление идёт первым. затем создаём incThenDouble и вызываем: сначала g (5 + 1 = 6), потом f (6 * 2 = 12)."
         }
       ]
     },
     {
       "id": "functions-05",
       "topicId": "functions",
-      "title": "Функции: закрепление",
+      "title": "функции: закрепление",
       "order": 4,
       "theory": {
         "blocks": [
           {
             "type": "text",
-            "text": "**Замыкание** — функция, которая помнит переменные внешней функции даже после того, как та завершилась."
+            "text": "**замыкание** это функция, которая помнит переменные внешней функции даже после того, как та завершилась."
           },
           {
             "type": "code",
@@ -1332,7 +1338,7 @@
           },
           {
             "type": "text",
-            "text": "**IIFE** — функция, которая вызывается сразу после создания: оберни её в скобки и поставь `()`."
+            "text": "**IIFE** это функция, которая вызывается сразу после создания: оберни её в скобки и поставь `()`."
           },
           {
             "type": "code",
@@ -1340,7 +1346,7 @@
           },
           {
             "type": "warning",
-            "text": "У стрелочных функций нет своего `arguments`. Вне обычной функции обращение к нему даст `ReferenceError`."
+            "text": "у стрелочных функций нет своего `arguments`. вне обычной функции обращение к нему даст `ReferenceError`."
           }
         ]
       },
@@ -1348,14 +1354,14 @@
         {
           "id": "functions-05-q1",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "const fn = function named() {\n  return \"hi\";\n};\nconsole.log(typeof fn);",
           "options": ["named", "function", "object", "string"],
           "correct": 1,
           "optionExplanations": [
-            "named — имя функции, а typeof возвращает тип",
+            "named это имя функции, а typeof возвращает тип",
             null,
-            "Функции — объекты, но typeof для них возвращает \"function\"",
+            "функции являются объектами, но typeof для них возвращает \"function\"",
             null
           ],
           "explanation": "typeof для любой функции возвращает 'function', как бы она ни была объявлена."
@@ -1363,16 +1369,16 @@
         {
           "id": "functions-05-q2",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function outer() {\n  let x = 10;\n  function inner() {\n    return x * 2;\n  }\n  return inner();\n}\nconsole.log(outer());",
           "options": ["undefined", "10", "20", "Error"],
           "correct": 2,
-          "explanation": "inner() видит переменную x из outer() — внутренние функции имеют доступ к внешней области: 10 * 2 = 20."
+          "explanation": "inner() видит переменную x из outer(), потому что внутренние функции имеют доступ к внешней области: 10 * 2 = 20."
         },
         {
           "id": "functions-05-q3",
           "type": "fill",
-          "title": "Заполни пропуск — IIFE",
+          "title": "заполни пропуск: IIFE",
           "codeBefore": "const result = (",
           "codeAfter": " => 42)();\nconsole.log(result);",
           "options": ["function", "()", "=>", "return"],
@@ -1380,38 +1386,38 @@
           "optionExplanations": [
             "function нельзя совместить со стрелкой",
             null,
-            "Перед => нужен список параметров",
-            "return — инструкция, внутри выражения её не написать"
+            "перед => нужен список параметров",
+            "return это инструкция, внутри выражения её не написать"
           ],
-          "explanation": "IIFE — функция, вызванная сразу после создания: (() => 42)(). Пустые скобки — список параметров стрелки."
+          "explanation": "IIFE это функция, вызванная сразу после создания: (() => 42)(). пустые скобки здесь задают список параметров стрелки."
         },
         {
           "id": "functions-05-q4",
           "type": "trueFalse",
           "title": "True или False?",
           "code": "const arrowFn = () => arguments;\narrowFn();",
-          "options": ["Вернёт объект arguments", "Вызовет ReferenceError"],
+          "options": ["вернёт объект arguments", "вызовет ReferenceError"],
           "correct": 1,
           "optionExplanations": [
-            "Так вела бы себя обычная функция, но у стрелочной своего arguments нет",
+            "так вела бы себя обычная функция, но у стрелочной своего arguments нет",
             null
           ],
-          "explanation": "У стрелочных функций нет своего arguments — он берётся из внешней обычной функции. Здесь внешней функции нет, поэтому ReferenceError."
+          "explanation": "у стрелочных функций нет своего arguments, он берётся из внешней обычной функции. здесь внешней функции нет, поэтому ReferenceError."
         },
         {
           "id": "functions-05-q5",
           "type": "output",
-          "title": "Что выведет код?",
+          "title": "что выведет код?",
           "code": "function counter() {\n  let n = 0;\n  return () => ++n;\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc());",
           "options": ["1 1 1", "0 1 2", "1 2 3", "undefined"],
           "correct": 2,
           "optionExplanations": [
             "n живёт в замыкании и не сбрасывается между вызовами",
-            "++n — префиксный: увеличивает и возвращает новое значение",
+            "++n это префиксная форма: увеличивает и возвращает новое значение",
             null,
             null
           ],
-          "explanation": "Каждый вызов inc() увеличивает одну и ту же n из замыкания: 1, 2, 3."
+          "explanation": "каждый вызов inc() увеличивает одну и ту же n из замыкания: 1, 2, 3."
         },
         {
           "id": "functions-05-q6",
@@ -1419,7 +1425,7 @@
           "code": "function counter() {\n  return () => {\n    let n = 0;\n    return ++n;\n  };\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc()); // ждём 1 2 3",
           "bugLine": 3,
           "fixed": "function counter() {\n  let n = 0;\n  return () => ++n;\n}\nconst inc = counter();\nconsole.log(inc(), inc(), inc()); // 1 2 3",
-          "explanation": "`let n = 0` стоит внутри возвращаемой функции, поэтому n создаётся заново при каждом вызове inc() и код выводит 1 1 1. Чтобы счётчик помнил значение между вызовами, объяви n в counter(): тогда её сохранит замыкание."
+          "explanation": "`let n = 0` стоит внутри возвращаемой функции, поэтому n создаётся заново при каждом вызове inc() и код выводит 1 1 1. чтобы счётчик помнил значение между вызовами, объяви n в counter(): тогда её сохранит замыкание."
         }
       ]
     }

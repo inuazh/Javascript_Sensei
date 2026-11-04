@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontSize: 10,
     letterSpacing: 1.4,
-    textTransform: 'uppercase',
     color: Colors.textMuted,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,

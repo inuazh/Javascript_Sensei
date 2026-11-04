@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, type TextStyle } from 'react-native';
 import { Colors, Type } from './theme';
 
-/** Small uppercase section label with an optional red indicator dot. */
+/** Small lowercase section label with an optional red indicator dot. */
 export function Label({
   children,
   style,

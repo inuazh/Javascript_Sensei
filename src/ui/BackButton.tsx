@@ -10,7 +10,7 @@ export function BackButton({ onPress }: { onPress?: () => void }) {
       onPress={onPress ?? goBack}
       hitSlop={12}
       accessibilityRole="button"
-      accessibilityLabel="Назад"
+      accessibilityLabel="назад"
       style={styles.button}
     >
       <Icon name="arrow-left" size={22} color={Colors.textSecondary} />

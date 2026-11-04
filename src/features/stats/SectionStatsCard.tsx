@@ -22,7 +22,7 @@ function rowLabel(s: SectionStats): string {
 
 function Insight({ insight }: { insight: StatsInsight }) {
   const { section } = insight;
-  const label = insight.kind === 'weakest' ? 'Подтянуть' : 'Сильнее всего';
+  const label = insight.kind === 'weakest' ? 'подтянуть' : 'сильнее всего';
   return (
     <Text
       style={styles.insight}
@@ -45,7 +45,7 @@ function SectionRow({ stats, onPress }: { stats: SectionStats; onPress: () => vo
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={rowLabel(stats)}
-      accessibilityHint={topic ? `Открыть тему «${topic}»` : 'Открыть раздел'}
+      accessibilityHint={topic ? `открыть тему «${topic}»` : 'открыть раздел'}
       style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
       <Text style={styles.number}>{pad2(stats.number)}</Text>
@@ -66,7 +66,7 @@ function SectionRow({ stats, onPress }: { stats: SectionStats; onPress: () => vo
       <View style={styles.accuracy}>
         {stats.low && <View style={styles.marker} />}
         {stats.percent === null ? (
-          <Text style={styles.noData}>—</Text>
+          <Text style={styles.noData}>-</Text>
         ) : (
           <Text style={styles.percent}>
             {stats.percent}
@@ -92,7 +92,7 @@ export function SectionStatsCard({ lessons, review }: Pick<ProgressState, 'lesso
       <Label style={styles.mb}>по разделам</Label>
       {insight && <Insight insight={insight} />}
       {started.length === 0 ? (
-        <Text style={Type.small}>Пройди первый урок — здесь появится статистика по разделам.</Text>
+        <Text style={Type.small}>пройди первый урок, и здесь появится статистика по разделам.</Text>
       ) : (
         <View>
           {started.map(s => (

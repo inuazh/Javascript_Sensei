@@ -87,10 +87,10 @@ export function QuizSession({
   const confirmExit = () => {
     if (state.answers.length === 0 || !confirmExitAfterAnswer) return onExit();
     confirmAction({
-      title: 'Прервать?',
-      message: 'Прогресс этой сессии не сохранится.',
-      confirmText: 'Выйти',
-      cancelText: 'Остаться',
+      title: 'прервать?',
+      message: 'прогресс этой сессии не сохранится.',
+      confirmText: 'выйти',
+      cancelText: 'остаться',
       onConfirm: onExit,
     });
   };
@@ -105,7 +105,7 @@ export function QuizSession({
           onPress={confirmExit}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Закрыть"
+          accessibilityLabel="закрыть"
         >
           <Icon name="x" size={22} color={Colors.textMuted} />
         </Pressable>
@@ -121,7 +121,7 @@ export function QuizSession({
         contentContainerStyle={styles.body}
         showsVerticalScrollIndicator={false}
       >
-        <Label>{label.toLowerCase()}</Label>
+        <Label>{label}</Label>
         <Text style={styles.title}>{questionTitle(question)}</Text>
         <QuestionView
           key={question.id}
@@ -147,13 +147,13 @@ export function QuizSession({
       <View style={styles.footer}>
         {revealed ? (
           <Button
-            title={isLast ? 'Завершить' : 'Дальше'}
+            title={isLast ? 'завершить' : 'дальше'}
             icon={isLast ? 'check' : 'arrow-right'}
             variant="primary"
             onPress={next}
           />
         ) : (
-          <Button title="Проверить" onPress={check} disabled={state.answer === null} />
+          <Button title="проверить" onPress={check} disabled={state.answer === null} />
         )}
       </View>
     </SafeAreaView>

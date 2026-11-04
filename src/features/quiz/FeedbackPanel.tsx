@@ -12,7 +12,7 @@ interface FeedbackPanelProps {
   runnableCode: string | null;
 }
 
-const PRAISE = ['Верно', 'Точно', 'В точку', 'Правильно', 'Отлично'];
+const PRAISE = ['верно', 'точно', 'в точку', 'правильно', 'отлично'];
 
 export function FeedbackPanel({
   correct,
@@ -27,11 +27,11 @@ export function FeedbackPanel({
     <View accessibilityLiveRegion="polite" style={[styles.panel, { borderLeftColor: color }]}>
       <View style={styles.titleRow}>
         <Icon name={correct ? 'check-circle' : 'x-circle'} size={18} color={color} />
-        <Text style={[styles.title, { color }]}>{correct ? praise : 'Не совсем'}</Text>
+        <Text style={[styles.title, { color }]}>{correct ? praise : 'не совсем'}</Text>
       </View>
       {!correct && correctAnswer.text ? (
         <Text style={styles.answer}>
-          Правильный ответ: <Text style={styles.answerValue}>{correctAnswer.text}</Text>
+          правильный ответ: <Text style={styles.answerValue}>{correctAnswer.text}</Text>
         </Text>
       ) : null}
       {!correct && correctAnswer.code ? <CodeBlock code={correctAnswer.code} /> : null}
