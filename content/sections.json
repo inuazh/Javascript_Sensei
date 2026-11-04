@@ -164,6 +164,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "strings",
+      "title": "Строки и регулярки",
+      "icon": "🔤",
+      "color": "#FFFFFF",
+      "order": 11,
+      "description": "Методы строк и регулярные выражения: как искать, вырезать и заменять текст.",
+      "topics": [
+        {
+          "id": "string-methods",
+          "title": "Методы строк",
+          "subtitle": "slice, includes, replace",
+          "order": 0
+        },
+        {
+          "id": "regex-basics",
+          "title": "Регулярные выражения",
+          "subtitle": "test, match, флаги",
+          "order": 1
+        },
+        {
+          "id": "regex-practice",
+          "title": "Регулярки на практике",
+          "subtitle": "группы, replace, split",
+          "order": 2
+        }
+      ]
     }
   ]
 }
