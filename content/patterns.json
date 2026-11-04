@@ -43,6 +43,7 @@
         {
           "id": "timing-patterns-01-q2",
           "type": "trueFalse",
+          "title": "Как сработает save?",
           "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst save = debounce(text => console.log(text), 500);\nsave(\"a\");\nsave(\"ab\");\nsave(\"abc\");",
           "options": [
             "save сработает сразу на \"a\"",
@@ -111,7 +112,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "**Throttle** пропускает не больше одного вызова за `ms` миллисекунд. Первый вызов срабатывает сразу, а все, что пришли следом, отбрасываются, пока не пройдёт `ms`."
+            "text": "**Throttle** пропускает не больше одного вызова за `ms` миллисекунд. Первый вызов срабатывает сразу, а все следующие отбрасываются, пока не пройдёт `ms`."
           },
           {
             "type": "code",
@@ -310,7 +311,7 @@
           },
           {
             "type": "warning",
-            "text": "Если вызвать просто `fn(...args)`, `this` внутри будет не объектом, а глобальным `window`. А если обёртку сделать стрелкой, `this` возьмётся из вызова `debounce`, а не из `counter.inc()`."
+            "text": "Если вызвать просто `fn(...args)`, `this` внутри будет не объектом: в нестрогом режиме — глобальный объект (`window`), в строгом — `undefined`. А если обёртку сделать стрелкой, `this` возьмётся из вызова `debounce`, а не из `counter.inc()`."
           },
           {
             "type": "text",
@@ -335,7 +336,7 @@
             "В нестрогом режиме this — глобальный объект, чтение его свойства не падает",
             "Таймер сработает через 100 мс, и console.log выполнится"
           ],
-          "explanation": "fn(...args) вызывает функцию без объекта, поэтому this внутри — глобальный window, а у него нет свойства login."
+          "explanation": "fn(...args) вызывает функцию без объекта, поэтому this внутри в нестрогом режиме — глобальный объект, а у него нет свойства login."
         },
         {
           "id": "timing-patterns-04-q2",
@@ -358,7 +359,7 @@
           "code": "function debounce(fn, ms) {\n  let timer;\n  return (...args) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst btn = { label: \"OK\", click: debounce(function () { console.log(this.label); }, 100) };\nbtn.click(); // ждём OK",
           "bugLine": 3,
           "fixed": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst btn = { label: \"OK\", click: debounce(function () { console.log(this.label); }, 100) };\nbtn.click(); // OK",
-          "explanation": "У стрелки нет своего this: она берёт его из debounce, а debounce вызвана без объекта. Поэтому this — глобальный объект и выводится undefined. Обёртка через function получает this из вызова btn.click()."
+          "explanation": "У стрелки нет своего this: она берёт его из debounce, а debounce вызвана без объекта. Поэтому this в нестрогом режиме — глобальный объект, и выводится undefined. Обёртка через function получает this из вызова btn.click()."
         },
         {
           "id": "timing-patterns-04-q4",
@@ -468,7 +469,7 @@
         {
           "id": "timing-patterns-05-q5",
           "type": "trueFalse",
-          "title": "Событие scroll приходит каждые 100 мс в течение 3 секунд. Сколько раз сработает throttle(update, 1000)?",
+          "title": "Событие scroll приходит каждые 100 мс в течение 3 секунд. Сколько раз выполнится update, если обработчик — throttle(update, 1000)?",
           "options": ["Около 3 раз: примерно раз в секунду", "Один раз, после окончания скролла"],
           "correct": 0,
           "optionExplanations": [null, "Одно срабатывание после окончания событий дал бы debounce"],
@@ -527,7 +528,8 @@
         {
           "id": "memoization-01-q3",
           "type": "trueFalse",
-          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst a = memoize(n => n * 10);\nconst b = memoize(n => n * 10);\na(1);\n// возьмёт ли b(1) ответ из кэша?",
+          "title": "Возьмёт ли b(1) ответ из кэша?",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst a = memoize(n => n * 10);\nconst b = memoize(n => n * 10);\na(1);\nb(1);",
           "options": ["Нет: у каждой обёртки свой Map", "Да: кэш общий для одинаковых функций"],
           "correct": 0,
           "optionExplanations": [
@@ -576,7 +578,7 @@
         "blocks": [
           {
             "type": "text",
-            "text": "`Map` сравнивает ключи через `===`. Если аргументов несколько, из них делают один ключ-строку, например через `JSON.stringify(args)`."
+            "text": "`Map` сравнивает ключи почти как `===`: примитивы по значению, объекты по ссылке. Если аргументов несколько, из них делают один ключ-строку, например через `JSON.stringify(args)`."
           },
           {
             "type": "code",
@@ -761,7 +763,7 @@
           "options": ["Один раз", "Столько же, сколько без кэша"],
           "correct": 0,
           "optionExplanations": [null, "Кэш и нужен, чтобы повторные вызовы не считали заново"],
-          "explanation": "Перед вычислением fib(n) проверяет кэш. Значение, посчитанное один раз, дальше берётся из Map, поэтому вызовов становится n + 1 вместо экспоненциального числа."
+          "explanation": "Перед вычислением fib(n) проверяет кэш. Значение, посчитанное один раз, дальше берётся из Map, поэтому настоящих вычислений n + 1 вместо экспоненциального числа."
         }
       ]
     },
@@ -827,6 +829,7 @@
         {
           "id": "memoization-04-q3",
           "type": "trueFalse",
+          "title": "Что верно про мемоизированный random?",
           "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst random = memoize(max => Math.floor(Math.random() * max));\nconsole.log(random(100) === random(100));",
           "options": [
             "random(100) каждый раз вернёт новое случайное число",
@@ -890,7 +893,7 @@
           },
           {
             "type": "warning",
-            "text": "Ключ WeakMap — только объект: `cache.set(\"id\", 1)` бросит `TypeError`. У WeakMap нет `size` и её нельзя перебрать."
+            "text": "Ключ WeakMap — только объект: `cache.set(\"id\", 1)` бросит `TypeError`. У WeakMap нет `size` и методов перебора."
           }
         ]
       },
@@ -1040,6 +1043,7 @@
         {
           "id": "observer-01-q5",
           "type": "order",
+          "title": "Собери: создай emitter, подпишись и отправь событие",
           "lines": [
             "const bus = new EventEmitter();",
             "bus.on(\"msg\", text => console.log(text));",
@@ -1317,7 +1321,7 @@
             "count внутри модуля недоступна снаружи: присваивание создало другую переменную",
             null
           ],
-          "explanation": "Снаружи переменной count из модуля не видно. Присваивание создаёт отдельную глобальную count, а inc увеличивает свою, приватную."
+          "explanation": "Снаружи переменной count из модуля не видно. Присваивание в нестрогом режиме создаёт отдельную глобальную count, а inc увеличивает свою, приватную."
         },
         {
           "id": "observer-04-q5",
