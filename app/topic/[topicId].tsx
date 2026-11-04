@@ -52,34 +52,42 @@ export default function TopicScreen() {
           const p = lessonsProgress[lesson.id];
           const isNext = lesson.id === nextId;
           return (
-            <Pressable
-              key={lesson.id}
-              accessibilityRole="button"
-              onPress={() => router.push(`/lesson/${lesson.id}`)}
-              style={({ pressed }) => [
-                styles.lesson,
-                isNext && styles.lessonNext,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={[styles.number, (p || isNext) && { color: Colors.accent }]}>
-                {sectionNumber}.{topicNumber}.{i + 1}
-              </Text>
-              <View style={styles.flex}>
-                <Text style={styles.title}>{lesson.title}</Text>
-                <Text style={styles.meta}>
-                  {lesson.questions.length} заданий{lesson.theory ? ' · теория' : ''}
-                  {p && p.attempts > 1 ? ` · попыток: ${p.attempts}` : ''}
+            <View key={lesson.id} style={[styles.lesson, isNext && styles.lessonNext]}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push(`/lesson/${lesson.id}`)}
+                style={({ pressed }) => [styles.lessonMain, pressed && styles.pressed]}
+              >
+                <Text style={[styles.number, (p || isNext) && { color: Colors.accent }]}>
+                  {sectionNumber}.{topicNumber}.{i + 1}
                 </Text>
-              </View>
-              {p?.skipped ? (
-                <Text style={styles.meta}>знакомо</Text>
-              ) : p ? (
-                <Stars count={p.stars} size={12} />
-              ) : isNext ? (
-                <Icon name="play" size={16} color={Colors.accent} />
+                <View style={styles.flex}>
+                  <Text style={styles.title}>{lesson.title}</Text>
+                  <Text style={styles.meta}>
+                    {lesson.questions.length} заданий
+                    {p && p.attempts > 1 ? ` · попыток: ${p.attempts}` : ''}
+                  </Text>
+                </View>
+                {p?.skipped ? (
+                  <Text style={styles.meta}>знакомо</Text>
+                ) : p ? (
+                  <Stars count={p.stars} size={12} />
+                ) : isNext ? (
+                  <Icon name="play" size={16} color={Colors.accent} />
+                ) : null}
+              </Pressable>
+              {lesson.theory ? (
+                <Pressable
+                  accessibilityRole="link"
+                  accessibilityLabel={`Теория урока «${lesson.title}»`}
+                  onPress={() => router.push(`/reference/${lesson.id}`)}
+                  style={({ pressed }) => [styles.theory, pressed && styles.pressed]}
+                >
+                  <Icon name="book-open" size={16} color={Colors.textSecondary} />
+                  <Text style={styles.theoryText}>Теория</Text>
+                </Pressable>
               ) : null}
-            </Pressable>
+            </View>
           );
         })}
       </View>
@@ -97,14 +105,28 @@ const styles = StyleSheet.create({
   list: { gap: Spacing.sm, marginTop: Spacing.md },
   lesson: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    padding: Spacing.lg,
     borderRadius: Radius.xl,
     borderWidth: 1,
     borderColor: Colors.border,
     backgroundColor: Colors.surface,
+    overflow: 'hidden',
   },
+  lessonMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    padding: Spacing.lg,
+  },
+  theory: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    paddingHorizontal: Spacing.md,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.border,
+  },
+  theoryText: { fontFamily: Fonts.mono, fontSize: 11, color: Colors.textSecondary },
   lessonNext: { borderColor: Colors.accent },
   pressed: { backgroundColor: Colors.surfaceRaised },
   number: { width: 44, fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },

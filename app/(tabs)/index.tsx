@@ -250,6 +250,13 @@ export default function HomeScreen() {
         />
       )}
 
+      <ActionRow
+        icon="search"
+        title="Справочник"
+        subtitle="Поиск по теории всех уроков"
+        onPress={() => router.push('/reference')}
+      />
+
       <Label style={styles.mapTitle}>карта курса</Label>
       {sections.map((section, sIndex) => {
         const lessons = getSectionLessons(section.id);

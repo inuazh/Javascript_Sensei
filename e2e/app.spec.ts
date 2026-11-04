@@ -2,6 +2,7 @@ import {
   answerQuiz,
   completeOnboarding,
   expect,
+  getLesson,
   getTopicTitle,
   leaveLessonResult,
   openNextLesson,
@@ -203,4 +204,37 @@ test('profile: statistics by section open the weakest topic', async ({ page }) =
   await page.goto('/workout');
   await expect(page.getByText('слабые места')).toBeVisible();
   await expect(page.getByText('07 · асинхронность').first()).toBeVisible();
+});
+
+test('reference: search the theory and open a lesson', async ({ page }) => {
+  await completeOnboarding(page);
+
+  await page.getByRole('button', { name: /Справочник/ }).click();
+  await expect(page).toHaveURL(/\/reference$/);
+  const search = page.getByRole('textbox', { name: 'Поиск по теории' });
+  await search.fill('qwertyzzz');
+  await expect(page.getByText('Ничего не нашлось')).toBeVisible();
+
+  await search.fill('замыкани');
+  await expect(page.getByText(/^найдено: \d+ урок/)).toBeVisible();
+  // Lessons titled «Замыкания…» are ranked first.
+  const first = page
+    .getByRole('button', { name: /^Теория: / })
+    .filter({ visible: true })
+    .first();
+  await expect(first).toHaveAccessibleName(/^Теория: Замыкания/);
+  await first.click();
+
+  await expect(page).toHaveURL(/\/reference\/[\w-]+$/);
+  const lesson = getLesson(new URL(page.url()).pathname.split('/').pop()!);
+  expect(lesson.title).toMatch(/^Замыкания/);
+  const visible = (text: string) => page.getByText(text).filter({ visible: true }).first();
+  await expect(visible(lesson.title)).toBeVisible();
+  const text = lesson.theory!.blocks.find(b => b.type === 'text')!.text!;
+  await expect(visible(text.replace(/\*\*|`/g, '').slice(0, 40))).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Запустить код' }).first()).toBeVisible();
+
+  await page.getByRole('button', { name: 'Пройти урок' }).click();
+  await expect(page).toHaveURL(new RegExp(`/lesson/${lesson.id}$`));
+  await expect(page.getByRole('button', { name: /К практике/ })).toBeVisible();
 });
