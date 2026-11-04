@@ -14,6 +14,7 @@ module.exports = defineConfig([
       '.claude/**',
       'dist-*/**',
       'playwright-report/**',
+      'test-results/**',
     ],
   },
 ]);

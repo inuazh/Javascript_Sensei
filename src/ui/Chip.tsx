@@ -8,14 +8,21 @@ export function Chip({
   label,
   color = Colors.accent,
   muted,
+  accessibilityLabel,
 }: {
   icon?: IconName;
   label: string;
   color?: string;
   muted?: boolean;
+  /** Spoken description, e.g. "Стрик: 3 дня"; the bare value means little on its own. */
+  accessibilityLabel?: string;
 }) {
   return (
-    <View style={styles.chip}>
+    <View
+      style={styles.chip}
+      accessible={!!accessibilityLabel}
+      accessibilityLabel={accessibilityLabel}
+    >
       {icon ? <Icon name={icon} size={15} color={muted ? Colors.textMuted : color} /> : null}
       <Text style={[styles.label, { color: muted ? Colors.textMuted : Colors.textPrimary }]}>
         {label}

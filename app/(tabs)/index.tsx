@@ -166,8 +166,13 @@ export default function HomeScreen() {
             color={Colors.warning}
             label={String(streak.days)}
             muted={streak.status !== 'done'}
+            accessibilityLabel={`Стрик: ${days(streak.days)}`}
           />
-          <Chip icon="lightning" label={String(progress.totalXp)} />
+          <Chip
+            icon="lightning"
+            label={String(progress.totalXp)}
+            accessibilityLabel={`Опыт: ${progress.totalXp} XP`}
+          />
         </View>
       </View>
 
