@@ -276,6 +276,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "patterns",
+      "title": "Паттерны",
+      "icon": "◇",
+      "color": "#FFFFFF",
+      "order": 22,
+      "description": "Debounce, throttle, мемоизация и наблюдатель — приёмы, которые решают частые задачи в реальном коде.",
+      "topics": [
+        {
+          "id": "timing-patterns",
+          "title": "Debounce и throttle",
+          "subtitle": "контроль частоты вызовов",
+          "order": 0
+        },
+        {
+          "id": "memoization",
+          "title": "Мемоизация и кэш",
+          "subtitle": "запоминание результатов",
+          "order": 1
+        },
+        {
+          "id": "observer",
+          "title": "Наблюдатель и модуль",
+          "subtitle": "события, подписки, инкапсуляция",
+          "order": 2
+        }
+      ]
     }
   ]
 }

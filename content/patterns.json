@@ -1,0 +1,1433 @@
+{
+  "lessons": [
+    {
+      "id": "timing-patterns-01",
+      "topicId": "timing-patterns",
+      "title": "Debounce: ждём паузу",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Некоторые события приходят очень часто: каждая буква в поле поиска, каждый сдвиг при скролле. Если на каждое отправлять запрос, их будут десятки. **Debounce** вызывает функцию, только когда вызовы **затихли** на `ms` миллисекунд."
+          },
+          {
+            "type": "code",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst search = debounce(q => console.log(\"ищем:\", q), 300);\nsearch(\"j\");\nsearch(\"js\");\nsearch(\"js promise\");\n// через 300 мс: ищем: js promise"
+          },
+          {
+            "type": "text",
+            "text": "Каждый вызов отменяет прошлый таймер через `clearTimeout` и ставит новый. Сработает только таймер **последнего** вызова: его уже никто не отменит."
+          },
+          {
+            "type": "tip",
+            "text": "Debounce подходит, когда важен только итог: поиск по мере ввода, автосохранение, пересчёт раскладки после изменения размера окна."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "timing-patterns-01-q1",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(1);\nlog(2);\nlog(3);",
+          "options": ["3", "1 2 3", "1", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Вызовы 1 и 2 отменены через clearTimeout: их таймеры так и не сработали",
+            "Debounce ждёт паузу и берёт последний вызов, а не первый",
+            "Последний таймер никто не отменил: через 100 мс он сработает"
+          ],
+          "explanation": "Каждый вызов отменяет таймер предыдущего. Дожил до конца только таймер последнего вызова, поэтому функция сработала один раз — с аргументом 3."
+        },
+        {
+          "id": "timing-patterns-01-q2",
+          "type": "trueFalse",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst save = debounce(text => console.log(text), 500);\nsave(\"a\");\nsave(\"ab\");\nsave(\"abc\");",
+          "options": [
+            "save сработает сразу на \"a\"",
+            "save сработает один раз, через 500 мс после \"abc\""
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Сразу при первом вызове срабатывает throttle, а не debounce",
+            null
+          ],
+          "explanation": "Debounce ничего не вызывает сразу: он ждёт, пока вызовы затихнут на 500 мс, и вызывает функцию с аргументами последнего вызова."
+        },
+        {
+          "id": "timing-patterns-01-q3",
+          "type": "fill",
+          "codeBefore": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(",
+          "codeAfter": ");\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(1);\nlog(2);\nlog(3); // 3",
+          "options": ["timer", "fn", "ms", "args"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "fn — функция, а не номер таймера: clearTimeout(fn) ничего не отменит",
+            "ms — задержка, а не номер таймера",
+            "args — массив аргументов, clearTimeout ничего не найдёт по нему"
+          ],
+          "explanation": "Отменять нужно таймер прошлого вызова, а его номер лежит в timer. С любым другим значением clearTimeout ничего не отменит, и выведутся все три числа."
+        },
+        {
+          "id": "timing-patterns-01-q4",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(\"a\");\nsetTimeout(() => log(\"b\"), 50);\nsetTimeout(() => log(\"c\"), 300);",
+          "options": ["b c", "c", "a b c", "a c"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Между \"b\" и \"c\" прошло больше 100 мс: таймер \"b\" успел сработать",
+            "\"a\" отменён: \"b\" пришёл раньше, чем прошло 100 мс",
+            "\"a\" отменён вызовом \"b\" через 50 мс"
+          ],
+          "explanation": "\"b\" пришёл через 50 мс и отменил \"a\", а затем 100 мс было тихо — сработал \"b\". Вызов \"c\" случился уже после паузы и сработал отдельно."
+        },
+        {
+          "id": "timing-patterns-01-q5",
+          "type": "order",
+          "title": "Собери функцию debounce",
+          "lines": [
+            "function debounce(fn, ms) {",
+            "  let timer;",
+            "  return function (...args) {",
+            "    clearTimeout(timer);",
+            "    timer = setTimeout(() => fn(...args), ms);",
+            "  };",
+            "}"
+          ],
+          "shuffled": [4, 0, 6, 3, 1, 5, 2],
+          "explanation": "timer объявляется один раз, снаружи обёртки, чтобы все вызовы видели один таймер. Внутри сначала отменяем старый таймер, потом ставим новый: в обратном порядке отменился бы только что поставленный."
+        }
+      ]
+    },
+    {
+      "id": "timing-patterns-02",
+      "topicId": "timing-patterns",
+      "title": "Throttle: не чаще раза в N мс",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Throttle** пропускает не больше одного вызова за `ms` миллисекунд. Первый вызов срабатывает сразу, а все, что пришли следом, отбрасываются, пока не пройдёт `ms`."
+          },
+          {
+            "type": "code",
+            "code": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst onScroll = throttle(y => console.log(\"scroll\", y), 100);\nonScroll(10);\nonScroll(20);\nonScroll(30);\n// scroll 10"
+          },
+          {
+            "type": "text",
+            "text": "Debounce ждёт, пока события **закончатся**, а throttle срабатывает **регулярно**, пока они идут. Поэтому throttle берут для скролла и движения мыши, а debounce — для ввода в поиске."
+          },
+          {
+            "type": "warning",
+            "text": "Такой простой throttle теряет вызовы, пришедшие во время паузы: в примере `20` и `30` пропали навсегда. Если важно итоговое значение, нужен вариант, который запоминает последние аргументы и вызывает их в конце паузы."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "timing-patterns-02-q1",
+          "type": "output",
+          "code": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst log = throttle(x => console.log(x), 100);\nlog(1);\nlog(2);\nlog(3);",
+          "options": ["1", "3", "1 2 3", "1 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Последний вызов запоминает debounce, а этот throttle выполняет первый",
+            "Вызовы 2 и 3 пришли, пока waiting было true",
+            "Простой throttle не запоминает отброшенные вызовы"
+          ],
+          "explanation": "Первый вызов прошёл сразу и закрыл throttle на 100 мс. Вызовы 2 и 3 пришли в это время и были отброшены."
+        },
+        {
+          "id": "timing-patterns-02-q2",
+          "type": "output",
+          "code": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst log = throttle(x => console.log(x), 100);\nlog(\"a\");\nsetTimeout(() => log(\"b\"), 50);\nsetTimeout(() => log(\"c\"), 150);",
+          "options": ["a c", "a b c", "a", "c"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "\"b\" пришёл через 50 мс, когда throttle ещё закрыт",
+            "К 150 мс waiting снова false: \"c\" проходит",
+            "Throttle выполняет первый вызов сразу, не дожидаясь паузы"
+          ],
+          "explanation": "\"a\" прошёл сразу и закрыл throttle до 100 мс. \"b\" на 50 мс отброшен, а к 150 мс пауза закончилась, поэтому \"c\" сработал."
+        },
+        {
+          "id": "timing-patterns-02-q3",
+          "type": "trueFalse",
+          "title": "Что подойдёт, чтобы отправить запрос, когда пользователь перестал печатать?",
+          "options": ["debounce", "throttle"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Throttle срабатывает и во время набора, а нужен запрос после паузы"
+          ],
+          "explanation": "Нужен один запрос после того, как ввод затих — это ровно поведение debounce. Throttle отправлял бы запросы регулярно прямо во время набора."
+        },
+        {
+          "id": "timing-patterns-02-q4",
+          "type": "fill",
+          "codeBefore": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (",
+          "codeAfter": ") return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst log = throttle(x => console.log(x), 100);\nlog(1);\nlog(2);\nlog(3); // 1",
+          "options": ["waiting", "!waiting", "ms", "args"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Тогда выход сработает, когда паузы нет: первый же вызов ничего не выведет",
+            "ms = 100 всегда истинно: функция не вызовется ни разу",
+            "args — массив, а массив всегда истинен: функция не вызовется ни разу"
+          ],
+          "explanation": "Выходим, пока идёт пауза, то есть пока waiting равно true. Так первый вызов проходит, а остальные отбрасываются."
+        },
+        {
+          "id": "timing-patterns-02-q5",
+          "type": "findBug",
+          "code": "function throttle(fn, ms) {\n  return function (...args) {\n    let waiting = false;\n    if (waiting) return;\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n    fn(...args);\n  };\n}\n[1, 2, 3].forEach(throttle(x => console.log(x), 100)); // ждём только 1",
+          "bugLine": 3,
+          "fixed": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n    fn(...args);\n  };\n}\n[1, 2, 3].forEach(throttle(x => console.log(x), 100)); // 1",
+          "explanation": "waiting объявлена внутри обёртки, поэтому каждый вызов получает новую переменную со значением false и никогда не видит паузу. Флаг должен жить снаружи, в замыкании, чтобы его делили все вызовы."
+        }
+      ]
+    },
+    {
+      "id": "timing-patterns-03",
+      "topicId": "timing-patterns",
+      "title": "Сколько раз сработает",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Чтобы посчитать срабатывания, нарисуй шкалу времени. У debounce каждая **серия** вызовов, где паузы меньше `ms`, даёт одно срабатывание — с аргументами **последнего** вызова серии."
+          },
+          {
+            "type": "code",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(1); // 0 мс\nsetTimeout(() => log(2), 50); // 50 мс: отменит 1\nsetTimeout(() => log(3), 300); // 300 мс: новая серия\n// 2 (на 150 мс), 3 (на 400 мс)"
+          },
+          {
+            "type": "text",
+            "text": "Throttle пропускает первый вызов, отбрасывает всё в течение `ms`, а потом снова пропускает первый пришедший."
+          },
+          {
+            "type": "code",
+            "code": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst log = throttle(x => console.log(x), 100);\nlog(1); // 0 мс: проходит\nsetTimeout(() => log(2), 50); // 50 мс: отброшен\nsetTimeout(() => log(3), 120); // 120 мс: проходит\n// 1, 3"
+          },
+          {
+            "type": "tip",
+            "text": "Debounce берёт аргументы **последнего** вызова серии, throttle — **первого**."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "timing-patterns-03-q1",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(1);\nsetTimeout(() => log(2), 50);\nsetTimeout(() => log(3), 80);",
+          "options": ["3", "1 3", "1 2 3", "2 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "\"1\" отменён вызовом на 50 мс, до срабатывания оставалось ещё 50 мс",
+            "Debounce не вызывает функцию на каждый вызов",
+            "Таймер \"2\" отменён вызовом на 80 мс"
+          ],
+          "explanation": "Между вызовами меньше 100 мс, значит, это одна серия. Сработает только последний вызов, на 180 мс."
+        },
+        {
+          "id": "timing-patterns-03-q2",
+          "type": "output",
+          "code": "function throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst log = throttle(x => console.log(x), 100);\nfor (let t = 0; t <= 120; t += 30) {\n  setTimeout(() => log(t), t);\n}",
+          "options": ["0 120", "0", "0 90", "0 30 60 90 120"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "К 120 мс пауза уже закончилась, и этот вызов проходит",
+            "На 90 мс пауза ещё идёт: она закончится на 100 мс",
+            "Throttle и нужен, чтобы отбросить лишние вызовы"
+          ],
+          "explanation": "Вызовы идут на 0, 30, 60, 90 и 120 мс. Первый проходит и закрывает throttle до 100 мс, поэтому 30, 60 и 90 отброшены, а 120 снова проходит."
+        },
+        {
+          "id": "timing-patterns-03-q3",
+          "type": "trueFalse",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(\"a\");\nlog(\"b\");\nlog(\"c\");",
+          "options": ["Выведет a", "Выведет c"],
+          "correct": 1,
+          "optionExplanations": [
+            "Первый вызов пропускает throttle, а debounce берёт последний",
+            null
+          ],
+          "explanation": "Каждый следующий вызов отменяет таймер предыдущего вместе с его аргументами. Остаётся таймер последнего вызова, поэтому функция получит \"c\"."
+        },
+        {
+          "id": "timing-patterns-03-q4",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst log = debounce(x => console.log(x), 100);\nlog(\"a\");\nlog(\"b\");\nsetTimeout(() => {\n  log(\"c\");\n  log(\"d\");\n}, 500);",
+          "options": ["b d", "d", "a c", "a b c d"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Таймер \"b\" сработает на 100 мс, задолго до вызова \"c\"",
+            "Из серии debounce берёт последний вызов, а не первый",
+            "Внутри серии вызовы отменяют друг друга"
+          ],
+          "explanation": "Это две серии: в момент 0 и через 500 мс, а между ними пауза больше 100 мс. Каждая серия срабатывает один раз со своим последним вызовом."
+        },
+        {
+          "id": "timing-patterns-03-q5",
+          "type": "order",
+          "title": "Расставь события по времени: throttle на 100 мс, вызовы A, B и C на 0, 50 и 150 мс",
+          "lines": [
+            "0 мс: выводится A",
+            "50 мс: B отброшен",
+            "100 мс: пауза закончилась",
+            "150 мс: выводится C"
+          ],
+          "shuffled": [2, 0, 3, 1],
+          "steps": true,
+          "explanation": "A сразу проходит и закрывает throttle на 100 мс. B приходит внутри паузы и пропадает. На 100 мс таймер сбрасывает waiting, поэтому C на 150 мс снова проходит."
+        }
+      ]
+    },
+    {
+      "id": "timing-patterns-04",
+      "topicId": "timing-patterns",
+      "title": "Потерянный this и аргументы",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Если обёрнутую функцию вызывают как метод, `this` надо передать дальше. Обёртка пишется через `function`, чтобы получить `this` от места вызова, а стрелка в `setTimeout` берёт этот `this` из обёртки. Вызываем через `fn.apply(this, args)`."
+          },
+          {
+            "type": "code",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\n\nconst counter = {\n  count: 0,\n  inc: debounce(function () {\n    this.count++;\n    console.log(this.count);\n  }, 100),\n};\ncounter.inc(); // через 100 мс: 1"
+          },
+          {
+            "type": "warning",
+            "text": "Если вызвать просто `fn(...args)`, `this` внутри будет не объектом, а глобальным `window`. А если обёртку сделать стрелкой, `this` возьмётся из вызова `debounce`, а не из `counter.inc()`."
+          },
+          {
+            "type": "text",
+            "text": "Второй частый баг — потерять аргументы: `setTimeout(fn, ms)` вызовет `fn` без них."
+          },
+          {
+            "type": "code",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return function () {\n    clearTimeout(timer);\n    timer = setTimeout(fn, ms);\n  };\n}\n\nconst greet = debounce(user => console.log(\"Привет,\", user), 100);\ngreet(\"Аня\"); // через 100 мс: Привет, undefined"
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "timing-patterns-04-q1",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\nconst user = {\n  login: \"anna\",\n  hi: debounce(function () {\n    console.log(this.login);\n  }, 100),\n};\nuser.hi();",
+          "options": ["undefined", "anna", "TypeError", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Объект user знает только обёртка, а fn вызвана как обычная функция",
+            "В нестрогом режиме this — глобальный объект, чтение его свойства не падает",
+            "Таймер сработает через 100 мс, и console.log выполнится"
+          ],
+          "explanation": "fn(...args) вызывает функцию без объекта, поэтому this внутри — глобальный window, а у него нет свойства login."
+        },
+        {
+          "id": "timing-patterns-04-q2",
+          "type": "fill",
+          "codeBefore": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.",
+          "codeAfter": "(this, args), ms);\n  };\n}\n\nconst cart = {\n  total: 0,\n  add: debounce(function (n) {\n    this.total += n;\n    console.log(this.total);\n  }, 100),\n};\ncart.add(5); // 5",
+          "options": ["apply", "call", "bind", "this"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "call передаст массив [5] одним аргументом: 0 + [5] даст строку \"05\"",
+            "bind возвращает новую функцию и не вызывает её: ничего не выведется",
+            "У функции нет свойства this: fn.this — undefined, вызов даст TypeError"
+          ],
+          "explanation": "apply принимает this и массив аргументов, а args — как раз массив. call ждёт аргументы по одному, а bind только создаёт новую функцию, но не вызывает её."
+        },
+        {
+          "id": "timing-patterns-04-q3",
+          "type": "findBug",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return (...args) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst btn = { label: \"OK\", click: debounce(function () { console.log(this.label); }, 100) };\nbtn.click(); // ждём OK",
+          "bugLine": 3,
+          "fixed": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst btn = { label: \"OK\", click: debounce(function () { console.log(this.label); }, 100) };\nbtn.click(); // OK",
+          "explanation": "У стрелки нет своего this: она берёт его из debounce, а debounce вызвана без объекта. Поэтому this — глобальный объект и выводится undefined. Обёртка через function получает this из вызова btn.click()."
+        },
+        {
+          "id": "timing-patterns-04-q4",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function () {\n    clearTimeout(timer);\n    timer = setTimeout(fn, ms);\n  };\n}\n\nconst greet = debounce(user => console.log(\"Привет,\", user), 100);\ngreet(\"Аня\");",
+          "options": ["Привет, undefined", "Привет, Аня", "TypeError", "Ничего"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Обёртка не объявляет параметров и не передаёт аргументы дальше",
+            "Вызов функции без аргументов не ошибка: параметр просто undefined",
+            "Таймер не отменён, он сработает через 100 мс"
+          ],
+          "explanation": "setTimeout(fn, ms) вызывает fn без аргументов, а \"Аня\" обёртка никуда не передала. Параметр user остаётся undefined."
+        },
+        {
+          "id": "timing-patterns-04-q5",
+          "type": "trueFalse",
+          "title": "Зачем обёртку в debounce пишут через function, а не стрелкой?",
+          "options": [
+            "Чтобы получить this от места вызова",
+            "Потому что стрелку нельзя вернуть из функции"
+          ],
+          "correct": 0,
+          "optionExplanations": [null, "Стрелку можно вернуть из функции, как любое значение"],
+          "explanation": "Обычная функция получает this от того, как её вызвали: counter.inc() даёт this = counter. У стрелки своего this нет, она взяла бы его из вызова debounce."
+        }
+      ]
+    },
+    {
+      "id": "timing-patterns-05",
+      "topicId": "timing-patterns",
+      "title": "Закрепление: debounce и throttle",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Debounce** ждёт паузу и срабатывает один раз после серии — с последними аргументами. **Throttle** срабатывает сразу, а потом не чаще раза в `ms`."
+          },
+          {
+            "type": "code",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\n\nconst a = debounce(x => console.log(\"a\", x), 100);\nconst b = debounce(x => console.log(\"b\", x), 100);\na(1);\nb(1); // b не отменяет a: у каждой обёртки свой timer\n// a 1\n// b 1"
+          },
+          {
+            "type": "warning",
+            "text": "`let timer` должен быть **снаружи** возвращаемой функции. Если объявить его внутри, каждый вызов получит свою пустую переменную, и `clearTimeout` ничего не отменит."
+          },
+          {
+            "type": "tip",
+            "text": "Выбирай по задаче: нужен один итог после ввода (поиск, автосохранение) — debounce. Нужны регулярные обновления во время события (скролл, перетаскивание) — throttle."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "timing-patterns-05-q1",
+          "type": "findBug",
+          "code": "function debounce(fn, ms) {\n  return function (...args) {\n    let timer;\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst log = debounce(x => console.log(x), 100);\nlog(1);\nlog(2); // ждём только 2",
+          "bugLine": 3,
+          "fixed": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\nconst log = debounce(x => console.log(x), 100);\nlog(1);\nlog(2); // 2",
+          "explanation": "timer создаётся заново при каждом вызове и всегда undefined, поэтому clearTimeout не видит прошлый таймер. Переменная должна жить в замыкании debounce, общая для всех вызовов."
+        },
+        {
+          "id": "timing-patterns-05-q2",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn.apply(this, args), ms);\n  };\n}\n\nconst a = debounce(x => console.log(\"a\", x), 100);\nconst b = debounce(x => console.log(\"b\", x), 100);\na(1);\nb(1);\na(2);",
+          "options": ["b 1 a 2", "a 2 b 1", "a 2", "a 1 b 1 a 2"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Таймер a(2) поставлен позже таймера b(1), а задержка у них одинаковая",
+            "b — отдельная обёртка: a(2) не может отменить её таймер",
+            "a(1) отменён вызовом a(2)"
+          ],
+          "explanation": "У a и b свои таймеры. a(2) отменил только a(1) и поставил новый таймер — уже после таймера b(1), поэтому b сработает первым."
+        },
+        {
+          "id": "timing-patterns-05-q3",
+          "type": "output",
+          "code": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\nfunction throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst d = debounce(x => console.log(\"d\" + x), 100);\nconst t = throttle(x => console.log(\"t\" + x), 100);\nfor (let i = 1; i <= 3; i++) {\n  d(i);\n  t(i);\n}",
+          "options": ["t1 d3", "d3 t1", "t1 t2 t3 d3", "d1 t1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Throttle срабатывает синхронно, а debounce — только через 100 мс",
+            "t2 и t3 пришли, пока throttle закрыт",
+            "Debounce берёт последний вызов серии, а не первый"
+          ],
+          "explanation": "Throttle выполняет первый вызов сразу, прямо в цикле, — t1. Debounce ждёт 100 мс после последнего вызова и выводит d3."
+        },
+        {
+          "id": "timing-patterns-05-q4",
+          "type": "fill",
+          "codeBefore": "function debounce(fn, ms) {\n  let timer;\n  return function (...args) {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\nfunction throttle(fn, ms) {\n  let waiting = false;\n  return function (...args) {\n    if (waiting) return;\n    fn(...args);\n    waiting = true;\n    setTimeout(() => (waiting = false), ms);\n  };\n}\n\nconst autosave = text => console.log(\"сохранено:\", text);\nconst save = ",
+          "codeAfter": "(autosave, 1000);\nsave(\"a\");\nsave(\"ab\");\nsave(\"abc\"); // сохранено: abc",
+          "options": ["debounce", "throttle", "setTimeout", "clearTimeout"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "throttle сохранил бы сразу первый вызов — \"a\"",
+            "setTimeout возвращает номер таймера, а не функцию: save(\"a\") даст TypeError",
+            "clearTimeout возвращает undefined: save(\"a\") даст TypeError"
+          ],
+          "explanation": "Сохранить нужно один раз и последний текст — значит, ждём паузу: это debounce."
+        },
+        {
+          "id": "timing-patterns-05-q5",
+          "type": "trueFalse",
+          "title": "Событие scroll приходит каждые 100 мс в течение 3 секунд. Сколько раз сработает throttle(update, 1000)?",
+          "options": ["Около 3 раз: примерно раз в секунду", "Один раз, после окончания скролла"],
+          "correct": 0,
+          "optionExplanations": [null, "Одно срабатывание после окончания событий дал бы debounce"],
+          "explanation": "Throttle пропускает первый вызов и дальше не больше одного в секунду, пока события идут. За 3 секунды это примерно 3 срабатывания."
+        }
+      ]
+    },
+    {
+      "id": "memoization-01",
+      "topicId": "memoization",
+      "title": "memoize через Map",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Мемоизация** — запоминание результатов. Если функцию уже вызывали с таким аргументом, ответ берётся из кэша, без нового вычисления. Подходит для **чистых** функций: их результат зависит только от аргументов."
+          },
+          {
+            "type": "code",
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst square = memoize(n => {\n  console.log(\"считаю\", n);\n  return n * n;\n});\nconsole.log(square(4)); // считаю 4, потом 16\nconsole.log(square(4)); // 16 — из кэша"
+          },
+          {
+            "type": "text",
+            "text": "Кэш живёт в замыкании: у каждой функции, которую вернул `memoize`, свой собственный `Map`."
+          },
+          {
+            "type": "warning",
+            "text": "Проверяй `cache.has(n)`, а не `if (cache.get(n))`. Иначе результаты `0`, `\"\"`, `false` и `undefined` будут считаться заново при каждом вызове."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "memoization-01-q1",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet calls = 0;\nconst double = memoize(n => {\n  calls++;\n  return n * 2;\n});\ndouble(2);\ndouble(2);\ndouble(3);\ndouble(2);\nconsole.log(calls);",
+          "options": ["2", "4", "3", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Повторные вызовы с тем же аргументом возвращаются из кэша",
+            "Аргумент 2 считался только в первый раз",
+            "Аргумент 3 новый, для него функция вызывается"
+          ],
+          "explanation": "Настоящих вычислений два: для 2 и для 3. Повторные вызовы с 2 берут ответ из кэша и не трогают calls."
+        },
+        {
+          "id": "memoization-01-q2",
+          "type": "findBug",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return n => {\n    if (cache.get(n)) return cache.get(n);\n    cache.set(n, fn(n));\n    return cache.get(n);\n  };\n}\nconst isOdd = memoize(n => { console.log(\"считаю\"); return n % 2; });\nisOdd(4); isOdd(4); // ждём «считаю» один раз",
+          "bugLine": 4,
+          "fixed": "function memoize(fn) {\n  const cache = new Map();\n  return n => {\n    if (cache.has(n)) return cache.get(n);\n    cache.set(n, fn(n));\n    return cache.get(n);\n  };\n}\nconst isOdd = memoize(n => { console.log(\"считаю\"); return n % 2; });\nisOdd(4); isOdd(4); // считаю",
+          "explanation": "Для 4 результат 0, а 0 — ложное значение. Проверка cache.get(n) решает, что в кэше пусто, и считает снова. cache.has(n) проверяет само наличие ключа."
+        },
+        {
+          "id": "memoization-01-q3",
+          "type": "trueFalse",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst a = memoize(n => n * 10);\nconst b = memoize(n => n * 10);\na(1);\n// возьмёт ли b(1) ответ из кэша?",
+          "options": ["Нет: у каждой обёртки свой Map", "Да: кэш общий для одинаковых функций"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "memoize не сравнивает функции между собой: кэш создаётся при каждом вызове memoize"
+          ],
+          "explanation": "Каждый вызов memoize создаёт новый Map в своём замыкании. b ничего не знает о том, что считала a."
+        },
+        {
+          "id": "memoization-01-q4",
+          "type": "fill",
+          "codeBefore": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.",
+          "codeAfter": "(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst diff = memoize(n => {\n  console.log(\"считаю\");\n  return n - n;\n});\nconsole.log(diff(5), diff(5));\n// считаю\n// 0 0",
+          "options": ["has", "get", "set", "delete"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Результат 0 ложный: get(n) даст 0, и функция посчитает снова",
+            "set без значения запишет undefined и вернёт Map, а он истинный: функция не посчитает ни разу",
+            "При втором вызове delete удалит запись и вернёт true: результатом станет undefined"
+          ],
+          "explanation": "has проверяет, есть ли ключ, независимо от значения. Здесь результат 0, и проверка через get сочла бы его отсутствующим."
+        },
+        {
+          "id": "memoization-01-q5",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst square = memoize(n => {\n  console.log(\"считаю\", n);\n  return n * n;\n});\nconsole.log(square(3));\nconsole.log(square(3));",
+          "options": ["считаю 3 9 9", "считаю 3 9 считаю 3 9", "9 9", "считаю 3 9"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Второй вызов с тем же аргументом не выполняет fn",
+            "Первый вызов честно выполняет fn и печатает «считаю 3»",
+            "Второй console.log тоже выводит результат — 9 из кэша"
+          ],
+          "explanation": "В первый раз функция выполняется и печатает «считаю 3». Во второй ответ 9 берётся из кэша, и fn не вызывается."
+        }
+      ]
+    },
+    {
+      "id": "memoization-02",
+      "topicId": "memoization",
+      "title": "Ключ из нескольких аргументов",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "`Map` сравнивает ключи через `===`. Если аргументов несколько, из них делают один ключ-строку, например через `JSON.stringify(args)`."
+          },
+          {
+            "type": "code",
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (...args) {\n    const key = JSON.stringify(args);\n    if (!cache.has(key)) cache.set(key, fn(...args));\n    return cache.get(key);\n  };\n}\n\nconst add = memoize((a, b) => {\n  console.log(\"считаю\");\n  return a + b;\n});\nadd(1, 2); // считаю\nadd(1, 2); // из кэша\nadd(2, 1); // считаю — другой ключ"
+          },
+          {
+            "type": "warning",
+            "text": "Если ключ — только первый аргумент, `add(1, 2)` и `add(1, 5)` получат один ответ. А склейка `args.join(\"\")` путает `(1, 23)` и `(12, 3)`: обе дают строку \"123\"."
+          },
+          {
+            "type": "warning",
+            "text": "Сам массив `args` ключом не подойдёт: каждый вызов создаёт новый массив, а `[1, 2] !== [1, 2]`. В кэш попадёт новая запись, но найти её уже не получится."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "memoization-02-q1",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return (...args) => {\n    const key = args[0];\n    if (!cache.has(key)) cache.set(key, fn(...args));\n    return cache.get(key);\n  };\n}\nconst add = memoize((a, b) => a + b);\nconsole.log(add(1, 2), add(1, 5));",
+          "options": ["3 3", "3 6", "6 6", "3 undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Ключ не учитывает b: вызов (1, 5) получает ответ от (1, 2)",
+            "Первый вызов честно считает 1 + 2",
+            "Ключ 1 уже есть в кэше, и для него хранится 3"
+          ],
+          "explanation": "Ключ — только первый аргумент, а он в обоих вызовах 1. Второй вызов находит в кэше ответ для (1, 2)."
+        },
+        {
+          "id": "memoization-02-q2",
+          "type": "output",
+          "code": "let calls = 0;\nfunction memoize(fn) {\n  const cache = new Map();\n  return (...args) => {\n    if (!cache.has(args)) cache.set(args, fn(...args));\n    return cache.get(args);\n  };\n}\nconst add = memoize((a, b) => {\n  calls++;\n  return a + b;\n});\nadd(1, 2);\nadd(1, 2);\nconsole.log(calls);",
+          "options": ["2", "1", "0", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Массивы [1, 2] из двух вызовов — разные объекты: [1, 2] !== [1, 2]",
+            "Функция вызывается каждый раз, когда ключа нет в кэше",
+            "Массив может быть ключом Map, ошибки нет"
+          ],
+          "explanation": "args — новый массив при каждом вызове, а Map сравнивает объекты по ссылке. Ключа из первого вызова второй не находит и считает снова."
+        },
+        {
+          "id": "memoization-02-q3",
+          "type": "fill",
+          "codeBefore": "function memoize(fn) {\n  const cache = new Map();\n  return function (...args) {\n    const key = ",
+          "codeAfter": ";\n    if (!cache.has(key)) cache.set(key, fn(...args));\n    return cache.get(key);\n  };\n}\n\nlet calls = 0;\nconst sum = memoize((a, b) => {\n  calls++;\n  return a + b;\n});\nconsole.log(sum(1, 23), sum(12, 3), sum(1, 5), sum(1, 23), calls); // 24 15 6 24 3",
+          "options": ["JSON.stringify(args)", "args", "args[0]", "args.join(\"\")"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Новый массив при каждом вызове: кэш не сработает, calls будет 4",
+            "Вызов (1, 5) получит ответ от (1, 23): ключ у них один",
+            "(1, 23) и (12, 3) дают одну строку \"123\" — второй вызов вернёт 24"
+          ],
+          "explanation": "JSON.stringify даёт разные строки для разных наборов аргументов: \"[1,23]\" и \"[12,3]\". Одинаковые аргументы дают одинаковую строку, и кэш срабатывает."
+        },
+        {
+          "id": "memoization-02-q4",
+          "type": "trueFalse",
+          "code": "const cache = new Map();\ncache.set([1, 2], \"результат\");\nconsole.log(cache.get([1, 2]));",
+          "options": ["Выведет результат", "Выведет undefined"],
+          "correct": 1,
+          "optionExplanations": [
+            "Одинаковое содержимое не делает массивы одним ключом: [1, 2] !== [1, 2]",
+            null
+          ],
+          "explanation": "В set и в get — два разных массива. Map сравнивает объекты по ссылке, поэтому второй массив не находит запись, созданную для первого."
+        },
+        {
+          "id": "memoization-02-q5",
+          "type": "order",
+          "title": "Собери memoize для нескольких аргументов",
+          "lines": [
+            "function memoize(fn) {",
+            "  const cache = new Map();",
+            "  return function (...args) {",
+            "    const key = JSON.stringify(args);",
+            "    if (!cache.has(key)) cache.set(key, fn(...args));",
+            "    return cache.get(key);",
+            "  };",
+            "}"
+          ],
+          "shuffled": [3, 7, 1, 5, 0, 6, 4, 2],
+          "explanation": "Map создаётся один раз, снаружи обёртки. В обёртке сначала строим ключ, потом при необходимости считаем, и в конце возвращаем значение из кэша."
+        }
+      ]
+    },
+    {
+      "id": "memoization-03",
+      "topicId": "memoization",
+      "title": "Мемоизация рекурсии",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Наивный Фибоначчи считает одно и то же много раз: `fib(5)` дважды вызывает `fib(3)` и трижды `fib(2)`. Число вызовов растёт экспоненциально."
+          },
+          {
+            "type": "code",
+            "code": "let calls = 0;\nfunction fib(n) {\n  calls++;\n  if (n < 2) return n;\n  return fib(n - 1) + fib(n - 2);\n}\nconsole.log(fib(10), calls); // 55 177"
+          },
+          {
+            "type": "text",
+            "text": "Если рекурсия сначала заглядывает в кэш, каждое значение считается **один раз**:"
+          },
+          {
+            "type": "code",
+            "code": "const memo = new Map();\nlet calls = 0;\nfunction fib(n) {\n  if (memo.has(n)) return memo.get(n);\n  calls++;\n  const result = n < 2 ? n : fib(n - 1) + fib(n - 2);\n  memo.set(n, result);\n  return result;\n}\nconsole.log(fib(10), calls); // 55 11"
+          },
+          {
+            "type": "warning",
+            "text": "`const fast = memoize(fib)` ускорит только повторный `fast(10)`. Внутри `fib` вызывает саму себя, а не `fast`, поэтому промежуточные значения в кэш не попадут."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "memoization-03-q1",
+          "type": "output",
+          "code": "let calls = 0;\nfunction fib(n) {\n  calls++;\n  if (n < 2) return n;\n  return fib(n - 1) + fib(n - 2);\n}\nfib(5);\nconsole.log(calls);",
+          "options": ["15", "5", "6", "8"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Без кэша одни и те же n вычисляются много раз",
+            "По одному вызову на каждое n от 0 до 5 было бы только с кэшем",
+            "8 — это fib(6), а не число вызовов"
+          ],
+          "explanation": "Каждый вызов рождает ещё два, и одни и те же значения считаются заново: fib(3) — дважды, fib(2) — трижды, fib(1) — пять раз. Всего 15 вызовов."
+        },
+        {
+          "id": "memoization-03-q2",
+          "type": "output",
+          "code": "const memo = new Map();\nlet calls = 0;\nfunction fib(n) {\n  if (memo.has(n)) return memo.get(n);\n  calls++;\n  const result = n < 2 ? n : fib(n - 1) + fib(n - 2);\n  memo.set(n, result);\n  return result;\n}\nfib(6);\nconsole.log(calls);",
+          "options": ["7", "6", "25", "13"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Значения n от 0 до 6 включительно — их семь",
+            "25 вызовов было бы без кэша",
+            null
+          ],
+          "explanation": "calls растёт только при настоящем вычислении. С кэшем каждое n от 0 до 6 считается один раз — это 7 значений."
+        },
+        {
+          "id": "memoization-03-q3",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet calls = 0;\nfunction fib(n) {\n  calls++;\n  return n < 2 ? n : fib(n - 1) + fib(n - 2);\n}\nconst fast = memoize(fib);\nfast(5);\nfast(5);\nconsole.log(calls);",
+          "options": ["15", "6", "30", "1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Внутри fib вызывает fib, а не fast: промежуточные значения не кэшируются",
+            "Второй вызов fast(5) берётся из кэша",
+            "Первый вызов fast(5) запускает всю рекурсию fib"
+          ],
+          "explanation": "Первый fast(5) запускает обычную fib, а она рекурсивно вызывает саму себя без кэша — 15 вызовов. Второй fast(5) берёт ответ из кэша и ничего не добавляет."
+        },
+        {
+          "id": "memoization-03-q4",
+          "type": "fill",
+          "codeBefore": "const memo = new Map();\nlet calls = 0;\nfunction fib(n) {\n  if (memo.has(n)) return memo.get(n);\n  calls++;\n  const result = n < 2 ? n : fib(n - 1) + fib(n - 2);\n  memo.set(n, ",
+          "codeAfter": ");\n  return result;\n}\nconsole.log(fib(10), calls); // 55 11",
+          "options": ["result", "n", "fib(n)", "calls"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В кэше окажется само n, и следующие вызовы получат неверные числа",
+            "fib(n) внутри fib(n) снова идёт в функцию, ответа в кэше ещё нет — бесконечная рекурсия, RangeError",
+            "В кэше окажется счётчик вызовов вместо ответа"
+          ],
+          "explanation": "В кэш кладём посчитанный ответ для n. Тогда следующие вызовы с тем же n получат правильное значение."
+        },
+        {
+          "id": "memoization-03-q5",
+          "type": "trueFalse",
+          "title": "Сколько раз мемоизированная fib(n) вычисляет каждое значение от 0 до n?",
+          "options": ["Один раз", "Столько же, сколько без кэша"],
+          "correct": 0,
+          "optionExplanations": [null, "Кэш и нужен, чтобы повторные вызовы не считали заново"],
+          "explanation": "Перед вычислением fib(n) проверяет кэш. Значение, посчитанное один раз, дальше берётся из Map, поэтому вызовов становится n + 1 вместо экспоненциального числа."
+        }
+      ]
+    },
+    {
+      "id": "memoization-04",
+      "topicId": "memoization",
+      "title": "Когда кэш вреден",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Мемоизация обещает: «при тех же аргументах ответ тот же». Для **нечистых** функций это неправда. Если результат зависит от внешней переменной, времени или случайности, кэш вернёт устаревший ответ."
+          },
+          {
+            "type": "code",
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet rate = 90;\nconst toRub = memoize(usd => usd * rate);\nconsole.log(toRub(10)); // 900\nrate = 100;\nconsole.log(toRub(10)); // 900 — устаревший ответ"
+          },
+          {
+            "type": "warning",
+            "text": "Побочные эффекты тоже пропадут: мемоизированная функция, которая что-то логирует или отправляет, сработает только на первый вызов с этим аргументом."
+          },
+          {
+            "type": "tip",
+            "text": "Если без внешнего значения не обойтись, добавь его в ключ кэша или не мемоизируй функцию. И помни: кэш занимает память, а для дешёвых функций вроде `n => n * 2` он не даёт выигрыша."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "memoization-04-q1",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet discount = 0;\nconst price = memoize(p => p - discount);\nconsole.log(price(100));\ndiscount = 20;\nconsole.log(price(100), price(200));",
+          "options": ["100 100 180", "100 80 180", "100 100 200", "100 80 200"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Для 100 ответ берётся из кэша, а там значение со скидкой 0",
+            "price(200) — новый аргумент, он считается с текущей скидкой 20",
+            null
+          ],
+          "explanation": "price(100) уже есть в кэше со старой скидкой, поэтому снова 100. price(200) вызывается впервые и считается уже со скидкой 20."
+        },
+        {
+          "id": "memoization-04-q2",
+          "type": "output",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst greet = memoize(user => console.log(\"Привет, \" + user));\ngreet(\"Аня\");\ngreet(\"Аня\");\ngreet(\"Боб\");",
+          "options": [
+            "Привет, Аня Привет, Боб",
+            "Привет, Аня Привет, Аня Привет, Боб",
+            "Привет, Аня",
+            "Ничего"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Повторный вызов с тем же аргументом берётся из кэша: console.log не выполнится",
+            "\"Боб\" — новый аргумент, для него функция вызывается",
+            "Первые вызовы для каждого аргумента выполняются как обычно"
+          ],
+          "explanation": "Второй greet(\"Аня\") находит в кэше undefined и не вызывает функцию, поэтому лог пропадает. Мемоизация убирает побочные эффекты при повторных вызовах."
+        },
+        {
+          "id": "memoization-04-q3",
+          "type": "trueFalse",
+          "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst random = memoize(max => Math.floor(Math.random() * max));\nconsole.log(random(100) === random(100));",
+          "options": [
+            "random(100) каждый раз вернёт новое случайное число",
+            "random(100) всегда вернёт то же число, что и в первый раз"
+          ],
+          "correct": 1,
+          "optionExplanations": [
+            "Повторный вызов с тем же аргументом не выполняет функцию: ответ берётся из кэша",
+            null
+          ],
+          "explanation": "После первого вызова ответ для 100 лежит в кэше, и Math.random больше не вызывается. Мемоизировать случайность бессмысленно."
+        },
+        {
+          "id": "memoization-04-q4",
+          "type": "findBug",
+          "code": "const cache = new Map();\nlet rate = 90;\nfunction toRub(usd) {\n  const key = usd;\n  if (!cache.has(key)) cache.set(key, usd * rate);\n  return cache.get(key);\n}\nconsole.log(toRub(10)); // 900\nrate = 100;\nconsole.log(toRub(10)); // ждём 1000",
+          "bugLine": 4,
+          "fixed": "const cache = new Map();\nlet rate = 90;\nfunction toRub(usd) {\n  const key = usd + \":\" + rate;\n  if (!cache.has(key)) cache.set(key, usd * rate);\n  return cache.get(key);\n}\nconsole.log(toRub(10)); // 900\nrate = 100;\nconsole.log(toRub(10)); // 1000",
+          "explanation": "Результат зависит и от usd, и от rate, а ключ учитывает только usd. После смены курса старый ключ находится в кэше и возвращает 900. В ключ нужно включить всё, от чего зависит ответ."
+        },
+        {
+          "id": "memoization-04-q5",
+          "type": "fill",
+          "codeBefore": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst fast = memoize(",
+          "codeAfter": ");\nconsole.log(fast(3), fast(3)); // 9 9",
+          "options": [
+            "n => n * n",
+            "n => n * Math.random()",
+            "n => Date.now() % n",
+            "n => { n * n; }"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Случайное число закэшируется: будут два одинаковых, но не 9",
+            "Ответ зависит от времени, а не только от n — это не 9",
+            "Фигурные скобки без return: функция вернёт undefined, и выведется undefined undefined"
+          ],
+          "explanation": "n * n — чистая функция: ответ зависит только от аргумента, поэтому кэш безопасен и даёт 9 9."
+        }
+      ]
+    },
+    {
+      "id": "memoization-05",
+      "topicId": "memoization",
+      "title": "WeakMap и закрепление",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Объект можно сделать ключом `Map` напрямую: объекты сравниваются **по ссылке**. Но `Map` держит ключи, пока жив кэш, и объект не удалится из памяти, даже если он больше нигде не нужен."
+          },
+          {
+            "type": "text",
+            "text": "**WeakMap** принимает ключами только объекты и не мешает сборщику мусора: когда на объект не осталось других ссылок, запись исчезает сама."
+          },
+          {
+            "type": "code",
+            "code": "const cache = new WeakMap();\nfunction fullName(user) {\n  if (cache.has(user)) return cache.get(user);\n  console.log(\"считаю\");\n  const result = user.first + \" \" + user.last;\n  cache.set(user, result);\n  return result;\n}\nconst u = { first: \"Анна\", last: \"Ли\" };\nfullName(u); // считаю\nfullName(u); // из кэша\nfullName({ first: \"Анна\", last: \"Ли\" }); // считаю — другой объект"
+          },
+          {
+            "type": "warning",
+            "text": "Ключ WeakMap — только объект: `cache.set(\"id\", 1)` бросит `TypeError`. У WeakMap нет `size` и её нельзя перебрать."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "memoization-05-q1",
+          "type": "output",
+          "code": "const cache = new WeakMap();\ncache.set(\"user\", 1);\nconsole.log(cache.get(\"user\"));",
+          "options": ["TypeError", "1", "undefined", "user"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В WeakMap нельзя положить значение по строковому ключу",
+            "Ошибка случится раньше — уже на cache.set",
+            null
+          ],
+          "explanation": "Ключами WeakMap могут быть только объекты. Строка в set сразу вызывает TypeError, до console.log дело не доходит."
+        },
+        {
+          "id": "memoization-05-q2",
+          "type": "output",
+          "code": "const cache = new WeakMap();\nlet calls = 0;\nfunction area(rect) {\n  if (!cache.has(rect)) {\n    calls++;\n    cache.set(rect, rect.w * rect.h);\n  }\n  return cache.get(rect);\n}\nconst r = { w: 2, h: 3 };\narea(r);\narea(r);\narea({ w: 2, h: 3 });\nconsole.log(calls);",
+          "options": ["2", "1", "3", "6"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Объект { w: 2, h: 3 } в третьем вызове — новый, его нет в кэше",
+            "Второй вызов с тем же r берётся из кэша",
+            "6 — это площадь, а не число вычислений"
+          ],
+          "explanation": "Дважды передан один и тот же объект r — второй раз ответ из кэша. Третий вызов получает новый объект: содержимое то же, но ссылка другая, поэтому снова вычисление."
+        },
+        {
+          "id": "memoization-05-q3",
+          "type": "trueFalse",
+          "code": "const cache = new WeakMap();\ncache.set({}, 1);\nconsole.log(cache.size);",
+          "options": ["Выведет 1", "Выведет undefined"],
+          "correct": 1,
+          "optionExplanations": ["size есть у Map, но не у WeakMap", null],
+          "explanation": "У WeakMap нет свойства size: записи могут исчезнуть в любой момент, когда сборщик мусора удалит ключ. Обращение к несуществующему свойству даёт undefined."
+        },
+        {
+          "id": "memoization-05-q4",
+          "type": "findBug",
+          "code": "function area(rect) {\n  const cache = new WeakMap();\n  if (!cache.has(rect)) {\n    console.log(\"считаю\");\n    cache.set(rect, rect.w * rect.h);\n  }\n  return cache.get(rect);\n}\nconst r = { w: 2, h: 3 };\narea(r); area(r); // ждём «считаю» один раз",
+          "bugLine": 2,
+          "fixed": "const cache = new WeakMap();\nfunction area(rect) {\n  if (!cache.has(rect)) {\n    console.log(\"считаю\");\n    cache.set(rect, rect.w * rect.h);\n  }\n  return cache.get(rect);\n}\nconst r = { w: 2, h: 3 };\narea(r); area(r); // считаю",
+          "explanation": "Кэш создаётся заново при каждом вызове area и сразу теряется. Он должен жить снаружи функции, чтобы переживать вызовы."
+        },
+        {
+          "id": "memoization-05-q5",
+          "type": "output",
+          "code": "const cache = new Map();\nconst a = { id: 1 };\nconst b = { id: 1 };\ncache.set(a, \"A\");\nconsole.log(cache.get(a), cache.get(b), cache.has({ id: 1 }));",
+          "options": ["A undefined false", "A A true", "A undefined true", "A A false"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Map сравнивает объекты по ссылке, а не по содержимому",
+            "{ id: 1 } в has — новый объект, такого ключа нет",
+            "b — отдельный объект, по нему ничего не записано"
+          ],
+          "explanation": "Ключ — конкретный объект a. b и литерал { id: 1 } — другие объекты с тем же содержимым, Map их не находит."
+        }
+      ]
+    },
+    {
+      "id": "observer-01",
+      "topicId": "observer",
+      "title": "Свой EventEmitter",
+      "order": 0,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Наблюдатель** (observer): объект хранит список подписчиков и оповещает их о событиях. Отправитель не знает, кто его слушает, поэтому части программы связаны слабо."
+          },
+          {
+            "type": "code",
+            "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"login\", user => console.log(\"Привет,\", user));\nbus.on(\"login\", user => console.log(\"Лог:\", user));\nbus.emit(\"login\", \"Аня\");\n// Привет, Аня\n// Лог: Аня"
+          },
+          {
+            "type": "text",
+            "text": "`on` кладёт обработчик в массив по имени события, `emit` вызывает их все и передаёт аргументы. Если на событие никто не подписан, `emit` просто ничего не делает."
+          },
+          {
+            "type": "tip",
+            "text": "Обработчики вызываются **синхронно**, прямо внутри `emit`. И получают только события, отправленные **после** подписки: прошлые не повторяются."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "observer-01-q1",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"save\", () => console.log(\"A\"));\nbus.emit(\"save\");\nconsole.log(\"после\");",
+          "options": ["A после", "после A", "после", "A"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "emit не откладывает обработчики: они вызываются прямо внутри emit",
+            "Обработчик подписан до emit и будет вызван",
+            "Строка console.log(\"после\") тоже выполняется"
+          ],
+          "explanation": "emit сразу, синхронно вызывает все обработчики. Только когда они отработают, выполнится следующая строка."
+        },
+        {
+          "id": "observer-01-q2",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"save\", () => console.log(\"сохранено\"));\nbus.emit(\"load\");",
+          "options": ["Ничего", "сохранено", "TypeError", "undefined"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Обработчик подписан на \"save\", а отправлено событие \"load\"",
+            "Для неизвестного события emit берёт пустой массив через || []",
+            "emit ничего не выводит сам по себе"
+          ],
+          "explanation": "На \"load\" никто не подписан: this.events.load нет, и emit перебирает пустой массив."
+        },
+        {
+          "id": "observer-01-q3",
+          "type": "fill",
+          "codeBefore": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(",
+          "codeAfter": "));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"sum\", (a, b) => console.log(a + b));\nbus.emit(\"sum\", 2, 3); // 5",
+          "options": ["...args", "args", "name", "this"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Обработчик получит массив целиком: a = [2, 3], b = undefined",
+            "Имя события обработчику не нужно: a станет \"sum\"",
+            "Обработчик получит сам emitter вместо чисел"
+          ],
+          "explanation": "args — массив [2, 3]. Spread раскладывает его на отдельные аргументы, и обработчик получает a = 2, b = 3."
+        },
+        {
+          "id": "observer-01-q4",
+          "type": "trueFalse",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.emit(\"ready\");\nbus.on(\"ready\", () => console.log(\"готово\"));",
+          "options": ["Выведет готово", "Ничего не выведет"],
+          "correct": 1,
+          "optionExplanations": [
+            "Emitter не запоминает отправленные события: позднего подписчика никто не вызовет",
+            null
+          ],
+          "explanation": "В момент emit подписчиков ещё нет. Emitter не хранит прошлые события, поэтому подписка после emit их не получает."
+        },
+        {
+          "id": "observer-01-q5",
+          "type": "order",
+          "lines": [
+            "const bus = new EventEmitter();",
+            "bus.on(\"msg\", text => console.log(text));",
+            "bus.emit(\"msg\", \"привет\"); // привет"
+          ],
+          "shuffled": [2, 0, 1],
+          "noRun": true,
+          "explanation": "Сначала создаём emitter, потом подписываемся и только после этого отправляем событие. Если отправить раньше подписки, обработчик ничего не получит."
+        }
+      ]
+    },
+    {
+      "id": "observer-02",
+      "topicId": "observer",
+      "title": "Отписка",
+      "order": 1,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Подписчик должен уметь отписаться, иначе обработчики копятся: лишние вызовы и утечка памяти. `off` удаляет обработчик **по ссылке**."
+          },
+          {
+            "type": "code",
+            "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nconst onTick = () => console.log(\"tick\");\nbus.on(\"tick\", onTick);\nbus.emit(\"tick\"); // tick\nbus.off(\"tick\", onTick);\nbus.emit(\"tick\"); // ничего"
+          },
+          {
+            "type": "warning",
+            "text": "Анонимную функцию отписать нельзя: `off(\"tick\", () => ...)` передаёт **новую** функцию, она не равна подписанной. Сохраняй обработчик в переменную."
+          },
+          {
+            "type": "tip",
+            "text": "Удобно, когда `on` возвращает функцию отписки: `return () => this.off(name, handler);`. Тогда `const stop = bus.on(...)`, а потом просто `stop()`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "observer-02-q1",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"tick\", () => console.log(\"tick\"));\nbus.emit(\"tick\");\nbus.off(\"tick\", () => console.log(\"tick\"));\nbus.emit(\"tick\");",
+          "options": ["tick tick", "tick", "Ничего", "TypeError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Две одинаково записанные стрелки — разные функции, off не находит подписанную",
+            "Первый emit точно вызывает обработчик",
+            "Если обработчик не найден, filter просто ничего не удаляет"
+          ],
+          "explanation": "В off передана новая стрелка. Она выглядит так же, но это другой объект, поэтому filter ничего не удалил."
+        },
+        {
+          "id": "observer-02-q2",
+          "type": "fill",
+          "codeBefore": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n    return () => this.",
+          "codeAfter": "(name, handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nconst stop = bus.on(\"x\", () => console.log(\"x\"));\nbus.emit(\"x\");\nstop();\nbus.emit(\"x\"); // x",
+          "options": ["off", "on", "emit", "events"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "on подпишет обработчик второй раз: после stop() будет ещё два \"x\"",
+            "emit не отписывает, а вызывает обработчики: выведется лишний \"x\"",
+            "events — объект, а не функция: stop() даст TypeError"
+          ],
+          "explanation": "Функция отписки вызывает off с тем же handler. Стрелка видит this из метода on, поэтому this — наш emitter."
+        },
+        {
+          "id": "observer-02-q3",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nconst f = () => console.log(\"f\");\nbus.on(\"a\", f);\nbus.on(\"a\", f);\nbus.emit(\"a\");\nbus.off(\"a\", f);\nbus.emit(\"a\");",
+          "options": ["f f", "f f f", "f f f f", "f"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "filter удаляет все копии f, а не одну",
+            "После off обработчиков не осталось",
+            "f подписана дважды: первый emit вызывает её два раза"
+          ],
+          "explanation": "Одна и та же f подписана дважды, поэтому первый emit выводит \"f\" два раза. filter убирает все элементы, равные f, — после off не остаётся ни одного."
+        },
+        {
+          "id": "observer-02-q4",
+          "type": "findBug",
+          "code": "let handlers = [];\nconst on = h => handlers.push(h);\nconst off = h => (handlers = handlers.filter(x => x === h));\nconst emit = () => handlers.forEach(h => h());\nconst a = () => console.log(\"A\");\nconst b = () => console.log(\"B\");\non(a); on(b);\noff(a);\nemit(); // ждём B",
+          "bugLine": 3,
+          "fixed": "let handlers = [];\nconst on = h => handlers.push(h);\nconst off = h => (handlers = handlers.filter(x => x !== h));\nconst emit = () => handlers.forEach(h => h());\nconst a = () => console.log(\"A\");\nconst b = () => console.log(\"B\");\non(a); on(b);\noff(a);\nemit(); // B",
+          "explanation": "filter оставляет элементы, для которых условие истинно. С === остаётся только удаляемый a, а все остальные пропадают. Нужно оставить всех, кто не равен h: x !== h."
+        },
+        {
+          "id": "observer-02-q5",
+          "type": "trueFalse",
+          "title": "Компонент подписался на событие и был удалён, не отписавшись. Будет ли его обработчик вызываться дальше?",
+          "options": [
+            "Да: emitter хранит ссылку на обработчик",
+            "Нет: обработчик удалится вместе с компонентом"
+          ],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Пока ссылка на функцию лежит в массиве emitter, она жива и будет вызвана"
+          ],
+          "explanation": "Массив в emitter держит ссылку на функцию, и она продолжит вызываться и удерживать в памяти всё, что замкнула. Поэтому при удалении компонента отписывайся."
+        }
+      ]
+    },
+    {
+      "id": "observer-03",
+      "topicId": "observer",
+      "title": "Порядок обработчиков и once",
+      "order": 2,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Обработчики вызываются **в порядке подписки**. `emit` синхронный: код после него выполнится, когда отработают все обработчики."
+          },
+          {
+            "type": "text",
+            "text": "`once` подписывает обработчик на одно срабатывание: подписывается **обёртка**, которая сначала отписывает себя, а потом вызывает обработчик."
+          },
+          {
+            "type": "code",
+            "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n  once(name, handler) {\n    const wrapper = (...args) => {\n      this.off(name, wrapper);\n      handler(...args);\n    };\n    this.on(name, wrapper);\n  }\n}\n\nconst bus = new EventEmitter();\nbus.once(\"ready\", () => console.log(\"готово\"));\nbus.emit(\"ready\"); // готово\nbus.emit(\"ready\"); // ничего"
+          },
+          {
+            "type": "warning",
+            "text": "Отписывать нужно `wrapper`, а не `handler`: в массиве лежит именно обёртка. По той же причине в этой реализации `bus.off(\"ready\", handler)` не снимет подписку, сделанную через `once`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "observer-03-q1",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n}\n\nconst bus = new EventEmitter();\nbus.on(\"e\", () => console.log(1));\nbus.on(\"e\", () => console.log(2));\nconsole.log(0);\nbus.emit(\"e\");\nconsole.log(3);",
+          "options": ["0 1 2 3", "0 3 1 2", "0 2 1 3", "1 2 0 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "emit не откладывает обработчики: они выполняются сразу",
+            "Обработчики хранятся в массиве и вызываются по порядку подписки",
+            "on только сохраняет обработчик, вызывает его emit"
+          ],
+          "explanation": "Подписка ничего не вызывает. emit синхронно вызывает обработчики в порядке подписки, и только потом выполняется console.log(3)."
+        },
+        {
+          "id": "observer-03-q2",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n  once(name, handler) {\n    const wrapper = (...args) => {\n      this.off(name, wrapper);\n      handler(...args);\n    };\n    this.on(name, wrapper);\n  }\n}\n\nconst bus = new EventEmitter();\nbus.once(\"x\", () => console.log(\"once\"));\nbus.on(\"x\", () => console.log(\"on\"));\nbus.emit(\"x\");\nbus.emit(\"x\");",
+          "options": ["once on on", "once on once on", "once on", "on on"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Обёртка once отписалась при первом вызове",
+            "Обычный on остаётся подписанным и срабатывает при каждом emit",
+            "once срабатывает один раз — на первый emit"
+          ],
+          "explanation": "При первом emit срабатывают оба обработчика, и once отписывается. Во втором emit остаётся только обычный on."
+        },
+        {
+          "id": "observer-03-q3",
+          "type": "findBug",
+          "code": "let handlers = [];\nconst on = h => handlers.push(h);\nconst off = h => (handlers = handlers.filter(x => x !== h));\nconst emit = () => handlers.forEach(h => h());\nfunction once(h) {\n  const wrapper = () => { off(h); h(); };\n  on(wrapper);\n}\nonce(() => console.log(\"hi\"));\nemit(); emit(); // ждём hi один раз",
+          "bugLine": 6,
+          "fixed": "let handlers = [];\nconst on = h => handlers.push(h);\nconst off = h => (handlers = handlers.filter(x => x !== h));\nconst emit = () => handlers.forEach(h => h());\nfunction once(h) {\n  const wrapper = () => { off(wrapper); h(); };\n  on(wrapper);\n}\nonce(() => console.log(\"hi\"));\nemit(); emit(); // hi",
+          "explanation": "В массиве лежит wrapper, а off(h) ищет сам обработчик и ничего не находит. Обёртка остаётся подписанной и срабатывает при каждом emit. Отписывать нужно wrapper."
+        },
+        {
+          "id": "observer-03-q4",
+          "type": "fill",
+          "codeBefore": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n  once(name, handler) {\n    const wrapper = (...args) => {\n      this.off(name, wrapper);\n      handler(...args);\n    };\n    this.",
+          "codeAfter": "(name, wrapper);\n  }\n}\n\nconst bus = new EventEmitter();\nbus.once(\"go\", () => console.log(\"go\"));\nconsole.log(\"подписка\");\nbus.emit(\"go\");\nbus.emit(\"go\");\n// подписка\n// go",
+          "options": ["on", "off", "emit", "once"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "off ничего не подпишет: \"go\" не выведется ни разу",
+            "emit отправит событие, но обёртку никто не подписал: \"go\" не выведется ни разу",
+            "once будет вызывать сам себя бесконечно — RangeError"
+          ],
+          "explanation": "once должен подписать обёртку, то есть вызвать on. Обёртка сработает на первый emit и отпишет себя."
+        },
+        {
+          "id": "observer-03-q5",
+          "type": "output",
+          "code": "class EventEmitter {\n  constructor() {\n    this.events = {};\n  }\n  on(name, handler) {\n    if (!this.events[name]) this.events[name] = [];\n    this.events[name].push(handler);\n  }\n  off(name, handler) {\n    const list = this.events[name] || [];\n    this.events[name] = list.filter(h => h !== handler);\n  }\n  emit(name, ...args) {\n    (this.events[name] || []).forEach(h => h(...args));\n  }\n  once(name, handler) {\n    const wrapper = (...args) => {\n      this.off(name, wrapper);\n      handler(...args);\n    };\n    this.on(name, wrapper);\n  }\n}\n\nconst bus = new EventEmitter();\nconst handler = () => console.log(\"hi\");\nbus.once(\"x\", handler);\nbus.off(\"x\", handler);\nbus.emit(\"x\");",
+          "options": ["hi", "Ничего", "TypeError", "hi hi"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "В массиве лежит wrapper, а off сравнивает с handler — ничего не удаляется",
+            "Если обработчик не найден, filter просто ничего не удаляет",
+            "Обёртка подписана один раз и вызывается один раз"
+          ],
+          "explanation": "once подписал не handler, а обёртку. off(handler) ищет в массиве сам handler, не находит его, и обёртка срабатывает при emit."
+        }
+      ]
+    },
+    {
+      "id": "observer-04",
+      "topicId": "observer",
+      "title": "Модуль через замыкание",
+      "order": 3,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "**Модуль**: функция создаёт приватные переменные и возвращает объект только с нужными методами. Снаружи до переменных не добраться, только через эти методы."
+          },
+          {
+            "type": "code",
+            "code": "const counter = (function () {\n  let count = 0;\n  return {\n    inc() {\n      count++;\n    },\n    get value() {\n      return count;\n    },\n  };\n})();\ncounter.inc();\ncounter.inc();\nconsole.log(counter.value); // 2\nconsole.log(counter.count); // undefined"
+          },
+          {
+            "type": "text",
+            "text": "Запись `(function () { ... })()` сразу вызывает функцию (IIFE), и получается один объект-модуль. Сейчас ту же роль играют ES-модули, но приём с замыканием встречается повсюду."
+          },
+          {
+            "type": "warning",
+            "text": "Если вернуть `{ count }`, в объект попадёт **копия** значения на момент возврата, и `count++` внутри её не изменит. Чтобы читать актуальное значение, нужен метод или геттер: `get value() { return count; }`."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "observer-04-q1",
+          "type": "output",
+          "code": "const counter = (function () {\n  let count = 0;\n  return {\n    inc() {\n      return ++count;\n    },\n  };\n})();\ncounter.count = 100;\nconsole.log(counter.inc(), counter.count);",
+          "options": ["1 100", "101 101", "101 100", "1 1"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Свойство объекта и переменная в замыкании — разные вещи",
+            "inc увеличивает переменную из замыкания, а она равна 0",
+            "inc не трогает свойство count объекта"
+          ],
+          "explanation": "counter.count = 100 создаёт новое свойство объекта, а не меняет приватную переменную. inc работает с count из замыкания."
+        },
+        {
+          "id": "observer-04-q2",
+          "type": "output",
+          "code": "const store = (function () {\n  let total = 0;\n  return {\n    total,\n    add(n) {\n      total += n;\n    },\n  };\n})();\nstore.add(5);\nconsole.log(store.total);",
+          "options": ["0", "5", "undefined", "NaN"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Свойство получило копию числа, а не ссылку на переменную",
+            "Свойство total есть: { total } — это { total: total }",
+            "Свойство total не меняется вообще, в нём по-прежнему 0"
+          ],
+          "explanation": "В свойство total скопировалось значение 0 в момент return. add меняет переменную в замыкании, а свойство объекта остаётся 0."
+        },
+        {
+          "id": "observer-04-q3",
+          "type": "fill",
+          "codeBefore": "const store = (function () {\n  let total = 0;\n  return {\n    ",
+          "codeAfter": " total() {\n      return total;\n    },\n    add(n) {\n      total += n;\n    },\n  };\n})();\nstore.add(5);\nconsole.log(store.total); // 5",
+          "options": ["get", "set", "static", "function"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Сеттер обязан принимать ровно один параметр — SyntaxError",
+            "static бывает только в классах — SyntaxError",
+            "Внутри объектного литерала нельзя писать function имя() — SyntaxError"
+          ],
+          "explanation": "Геттер выглядит как свойство, но при каждом чтении вызывает функцию и возвращает текущее значение переменной из замыкания."
+        },
+        {
+          "id": "observer-04-q4",
+          "type": "trueFalse",
+          "code": "const counter = (function () {\n  let count = 0;\n  return { inc: () => ++count };\n})();\ncount = 10;\nconsole.log(counter.inc());",
+          "options": ["Выведет 11", "Выведет 1"],
+          "correct": 1,
+          "optionExplanations": [
+            "count внутри модуля недоступна снаружи: присваивание создало другую переменную",
+            null
+          ],
+          "explanation": "Снаружи переменной count из модуля не видно. Присваивание создаёт отдельную глобальную count, а inc увеличивает свою, приватную."
+        },
+        {
+          "id": "observer-04-q5",
+          "type": "order",
+          "title": "Собери модуль кошелька",
+          "lines": [
+            "const wallet = (function () {",
+            "  let balance = 0;",
+            "  return {",
+            "    deposit: n => (balance += n),",
+            "  };",
+            "})();",
+            "console.log(wallet.deposit(50)); // 50"
+          ],
+          "shuffled": [5, 2, 0, 6, 3, 1, 4],
+          "explanation": "Функция-модуль сначала объявляет приватную переменную, затем возвращает объект с методом и сразу вызывается через (). Только после этого wallet готов к использованию."
+        }
+      ]
+    },
+    {
+      "id": "observer-05",
+      "topicId": "observer",
+      "title": "Фабрики и классы",
+      "order": 4,
+      "theory": {
+        "blocks": [
+          {
+            "type": "text",
+            "text": "Модуль создаёт **один** объект. Если нужно много — делают **фабрику**: обычную функцию, которая при каждом вызове создаёт новое замыкание и возвращает объект."
+          },
+          {
+            "type": "code",
+            "code": "function createCounter() {\n  let count = 0;\n  return { inc: () => ++count };\n}\nconst a = createCounter();\nconst b = createCounter();\na.inc();\na.inc();\nconsole.log(a.inc(), b.inc()); // 3 1"
+          },
+          {
+            "type": "text",
+            "text": "Класс делает похожее через `new` и `this`. В фабрике состояние по-настоящему приватное, а методы-стрелки не зависят от `this`. В классе методы общие, лежат в прототипе, но теряют `this`, если взять метод отдельно от объекта."
+          },
+          {
+            "type": "code",
+            "code": "class Counter {\n  count = 0;\n  inc() {\n    return ++this.count;\n  }\n}\nconst { inc } = new Counter();\ninc(); // TypeError: this — undefined"
+          },
+          {
+            "type": "warning",
+            "text": "Состояние фабрики объявляй **внутри** неё. Переменная снаружи будет одна на все созданные объекты."
+          }
+        ]
+      },
+      "questions": [
+        {
+          "id": "observer-05-q1",
+          "type": "output",
+          "code": "function createCounter() {\n  let count = 0;\n  return { inc: () => ++count };\n}\nconst a = createCounter();\nconst b = createCounter();\na.inc();\nconsole.log(a.inc(), b.inc());",
+          "options": ["2 1", "2 3", "1 1", "3 3"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У a и b разные замыкания, общего счётчика нет",
+            "a.inc() вызывается во второй раз, его count уже 1",
+            null
+          ],
+          "explanation": "Каждый вызов createCounter создаёт свою переменную count. a дважды увеличил свою до 2, а у b своя — после inc она 1."
+        },
+        {
+          "id": "observer-05-q2",
+          "type": "trueFalse",
+          "code": "function createUser(login) {\n  return { hi: () => \"Привет, \" + login };\n}\nconst { hi } = createUser(\"anna\");\nconsole.log(hi());",
+          "options": ["Выведет Привет, anna", "Вызовет TypeError"],
+          "correct": 0,
+          "optionExplanations": [null, "Ошибку дал бы метод, который читает this, а здесь его нет"],
+          "explanation": "hi не использует this: login берётся из замыкания. Поэтому метод работает, даже если его взять отдельно от объекта."
+        },
+        {
+          "id": "observer-05-q3",
+          "type": "output",
+          "code": "class User {\n  constructor(login) {\n    this.login = login;\n  }\n  hi() {\n    return \"Привет, \" + this.login;\n  }\n}\nconst { hi } = new User(\"anna\");\nconsole.log(hi());",
+          "options": ["TypeError", "Привет, anna", "Привет, undefined", "ReferenceError"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "Деструктуризация копирует ссылку на функцию, связь с объектом теряется",
+            "В классах строгий режим: this не становится window, он undefined",
+            "Все переменные объявлены, проблема в this"
+          ],
+          "explanation": "Метод взяли отдельно от объекта, и при вызове hi() this не задан. Код класса всегда в строгом режиме, поэтому this — undefined, а чтение undefined.login бросает TypeError."
+        },
+        {
+          "id": "observer-05-q4",
+          "type": "findBug",
+          "code": "let count = 0;\nfunction createCounter() {\n  return { inc: () => ++count };\n}\nconst a = createCounter();\nconst b = createCounter();\na.inc();\nconsole.log(b.inc()); // ждём 1",
+          "bugLine": 1,
+          "fixed": "function createCounter() {\n  let count = 0;\n  return { inc: () => ++count };\n}\nconst a = createCounter();\nconst b = createCounter();\na.inc();\nconsole.log(b.inc()); // 1",
+          "explanation": "count объявлена снаружи фабрики, поэтому одна на все счётчики: a и b увеличивают одну переменную. Состояние нужно объявить внутри createCounter, тогда у каждого вызова оно своё."
+        },
+        {
+          "id": "observer-05-q5",
+          "type": "fill",
+          "codeBefore": "function createStore() {\n  let state = 0;\n  const listeners = [];\n  return {\n    subscribe(fn) {\n      listeners.push(fn);\n    },\n    inc() {\n      state++;\n      listeners.forEach(fn => fn(",
+          "codeAfter": "));\n    },\n  };\n}\n\nconst store = createStore();\nstore.subscribe(v => console.log(\"state:\", v));\nstore.inc();\nstore.inc();\n// state: 1\n// state: 2",
+          "options": ["state", "this.state", "store.state", "listeners"],
+          "correct": 0,
+          "optionExplanations": [
+            null,
+            "У возвращённого объекта нет свойства state: будет undefined",
+            "state — переменная в замыкании, а не свойство store: будет undefined",
+            "Подписчик получит массив функций вместо числа"
+          ],
+          "explanation": "state — приватная переменная из замыкания фабрики, к ней обращаются по имени. Свойства state у объекта нет."
+        }
+      ]
+    }
+  ]
+}
