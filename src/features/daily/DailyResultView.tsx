@@ -128,8 +128,8 @@ export function DailyResultView({ day, results, outcome, onDone }: DailyResultVi
         </Text>
         <Text style={[Type.small, styles.center]}>
           {correct
-            ? 'с первой попытки. завтра будет новая задача.'
-            : 'вопрос добавлен в повторение. завтра будет новая задача.'}
+            ? 'с первой попытки. завтра будет новая задача'
+            : 'вопрос добавлен в повторение. завтра будет новая задача'}
         </Text>
       </Animated.View>
 

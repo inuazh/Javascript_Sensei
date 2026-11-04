@@ -64,8 +64,8 @@ function JoinCard({ outdated }: { outdated: boolean }) {
       <Text style={Type.h3}>выбери ник</Text>
       <Text style={Type.small}>
         {outdated
-          ? 'твой ник не подходит под новые правила рейтинга. выбери другой, чтобы остаться в рейтинге.'
-          : 'в рейтинг попадут только ник, XP, уровень и стрик. выйти можно в настройках.'}
+          ? 'твой ник не подходит под новые правила рейтинга. выбери другой, чтобы остаться в рейтинге'
+          : 'в рейтинг попадут только ник, XP, уровень и стрик. выйти можно в настройках'}
       </Text>
       <View style={styles.inputRow}>
         <Text style={styles.prompt}>$</Text>
@@ -215,7 +215,7 @@ export default function LeaderboardScreen() {
           (mode === 'week' ? myWeekXp : totalXp) > 0 && (
             <Text style={[Type.small, styles.empty]}>
               твой результат ещё не попал в рейтинг. проверь интернет и потяни экран вниз, чтобы
-              отправить ещё раз.
+              отправить ещё раз
             </Text>
           )}
         {players === null && !error && (
@@ -224,7 +224,7 @@ export default function LeaderboardScreen() {
         {error && (
           <Card tone="danger">
             <Text style={Type.h3}>не удалось загрузить рейтинг</Text>
-            <Text style={Type.small}>проверь интернет и попробуй ещё раз.</Text>
+            <Text style={Type.small}>проверь интернет и попробуй ещё раз</Text>
             <Button
               title="повторить"
               variant="secondary"
@@ -236,9 +236,7 @@ export default function LeaderboardScreen() {
         )}
         {players !== null && ranked.length === 0 && !error && (
           <Text style={[Type.small, styles.empty]}>
-            {mode === 'week'
-              ? 'на этой неделе ещё никто не занимался. стань первым.'
-              : 'пока пусто.'}
+            {mode === 'week' ? 'на этой неделе ещё никто не занимался. стань первым' : 'пока пусто'}
           </Text>
         )}
         <View>

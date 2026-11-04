@@ -8,7 +8,7 @@ export default function NotFoundScreen() {
   return (
     <Screen edges={['top', 'bottom']}>
       <Text style={Type.h2}>страница не найдена</Text>
-      <Text style={Type.small}>возможно, ссылка устарела.</Text>
+      <Text style={Type.small}>возможно, ссылка устарела</Text>
       <Button title="на главную" onPress={() => router.replace('/')} />
     </Screen>
   );

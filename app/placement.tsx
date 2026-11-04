@@ -59,14 +59,12 @@ export default function PlacementScreen() {
         </View>
         <Text style={Type.h1}>вводный тест</Text>
         <Text style={[Type.body, styles.muted]}>
-          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. займёт около ${PLACEMENT_MINUTES}\u00a0минут.`}
+          {`${items.length} ${plural(items.length, 'вопрос', 'вопроса', 'вопросов')}, по одному на раздел. займёт около ${PLACEMENT_MINUTES}\u00a0минут`}
         </Text>
         <Text style={[Type.body, styles.muted]}>
-          ответишь верно, и раздел засчитается, а ты начнёшь с того, чего ещё не знаешь.
+          ответишь верно, и раздел засчитается, а ты начнёшь с того, чего ещё не знаешь
         </Text>
-        <Text style={Type.small}>
-          засчитанные разделы можно пройти позже, за них тоже дадут XP.
-        </Text>
+        <Text style={Type.small}>засчитанные разделы можно пройти позже, за них тоже дадут XP</Text>
       </Screen>
     );
   }
@@ -89,8 +87,8 @@ export default function PlacementScreen() {
         </Text>
         <Text style={Type.small}>
           {passed.length > 0
-            ? 'эти разделы отмечены как знакомые. курс продолжится с первого незнакомого.'
-            : 'ничего страшного: основы быстро пролетят, а повторения закрепят знания.'}
+            ? 'эти разделы отмечены как знакомые. курс продолжится с первого незнакомого'
+            : 'ничего страшного: основы быстро пролетят, а повторения закрепят знания'}
         </Text>
         {passed.map(sectionId => (
           <View key={sectionId} style={styles.row}>

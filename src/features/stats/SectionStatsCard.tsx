@@ -92,7 +92,7 @@ export function SectionStatsCard({ lessons, review }: Pick<ProgressState, 'lesso
       <Label style={styles.mb}>по разделам</Label>
       {insight && <Insight insight={insight} />}
       {started.length === 0 ? (
-        <Text style={Type.small}>пройди первый урок, и здесь появится статистика по разделам.</Text>
+        <Text style={Type.small}>пройди первый урок, и здесь появится статистика по разделам</Text>
       ) : (
         <View>
           {started.map(s => (

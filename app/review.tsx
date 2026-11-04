@@ -54,7 +54,7 @@ export default function ReviewScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>пока нечего повторять</Text>
-        <Text style={Type.small}>пройди пару уроков, и вопросы из них появятся в тренировке.</Text>
+        <Text style={Type.small}>пройди пару уроков, и вопросы из них появятся в тренировке</Text>
         <Button title="назад" onPress={goBack} />
       </Screen>
     );

@@ -238,7 +238,7 @@ export default function HomeScreen() {
           <Label>курс пройден</Label>
           <Text style={Type.h2}>все уроки пройдены</Text>
           <Text style={Type.small}>
-            новые разделы на подходе. пока закрепляй знания в тренировке.
+            новые разделы на подходе. пока закрепляй знания в тренировке
           </Text>
         </Card>
       )}
