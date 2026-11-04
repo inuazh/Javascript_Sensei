@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import type { ChoiceQuestion as ChoiceQuestionT, Question } from '../../content/schema';
 import { ChoiceQuestion } from './questions/ChoiceQuestion';
+import { FindBugQuestion } from './questions/FindBugQuestion';
 import { OrderQuestion } from './questions/OrderQuestion';
 import type { QuestionRegistry, QuestionTypeDef, QuestionViewProps } from './types';
 
@@ -25,6 +26,13 @@ export const QUESTION_TYPES: QuestionRegistry = {
     initialAnswer: q => q.shuffled,
     isCorrect: (_q, a: number[]) => a.every((lineIndex, i) => lineIndex === i),
     correctAnswer: q => ({ code: q.lines.join('\n') }),
+  },
+  findBug: {
+    defaultTitle: 'Найди строку с ошибкой',
+    Component: FindBugQuestion,
+    initialAnswer: () => null,
+    isCorrect: (q, a: number) => a === q.bugLine,
+    correctAnswer: q => (q.fixed ? { code: q.fixed } : { text: `Строка ${q.bugLine}` }),
   },
 };
 
