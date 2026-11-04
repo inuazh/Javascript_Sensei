@@ -164,6 +164,34 @@
           "order": 2
         }
       ]
+    },
+    {
+      "id": "modern",
+      "title": "Современный синтаксис",
+      "icon": "✨",
+      "color": "#FFFFFF",
+      "order": 10,
+      "description": "Деструктуризация, spread и rest, ?. и ?? — приёмы, которые делают код короче и понятнее.",
+      "topics": [
+        {
+          "id": "destructuring",
+          "title": "Деструктуризация",
+          "subtitle": "объекты, массивы, значения по умолчанию",
+          "order": 0
+        },
+        {
+          "id": "spread-rest",
+          "title": "Spread и rest",
+          "subtitle": "... в массивах, объектах и функциях",
+          "order": 1
+        },
+        {
+          "id": "optional-chaining",
+          "title": "?. и ??",
+          "subtitle": "безопасный доступ и значения по умолчанию",
+          "order": 2
+        }
+      ]
     }
   ]
 }
