@@ -209,4 +209,69 @@ describe('useUserStore persistence', () => {
     await new Promise(r => setTimeout(r, 0));
     expect(await AsyncStorage.getItem('js-sensei-user.corrupt')).toBe('{not json');
   });
+
+  it('saves an unfinished lesson, restores it after a reload and drops it when finished', async () => {
+    let { AsyncStorage } = load();
+    await AsyncStorage.clear();
+    let store = require('../useUserStore');
+    await store.waitForHydration();
+    const lesson = {
+      id: 'variables-01',
+      questions: [1, 2, 3, 4, 5].map(i => ({ id: `variables-01-q${i}` })),
+    };
+    const answers = [true, false].map((correct, i) => ({
+      questionId: `variables-01-q${i + 1}`,
+      lessonId: 'variables-01',
+      correct,
+    }));
+    store.useUserStore.getState().saveLessonSession(lesson, answers);
+    await new Promise(r => setTimeout(r, 0));
+
+    // A reload: a fresh store hydrates from what was written.
+    const written = await AsyncStorage.getItem('js-sensei-user');
+    ({ AsyncStorage } = load());
+    await AsyncStorage.setItem('js-sensei-user', written!);
+    store = require('../useUserStore');
+    await store.waitForHydration();
+    const { resumeLessonSession } = require('../../domain/lessonSession');
+    const session = store.useUserStore.getState().lessonSession;
+    expect(session).toMatchObject({ lessonId: 'variables-01', index: 2 });
+    expect(resumeLessonSession(session, lesson, new Date())).toEqual(answers);
+
+    // Leaving another lesson keeps it; leaving this one or finishing it drops it.
+    store.useUserStore.getState().clearLessonSession('variables-02');
+    expect(store.useUserStore.getState().lessonSession).not.toBeNull();
+    store.useUserStore.getState().completeLesson({ lessonId: 'variables-01', answers });
+    expect(store.useUserStore.getState().lessonSession).toBeNull();
+    await new Promise(r => setTimeout(r, 0));
+    const saved = JSON.parse((await AsyncStorage.getItem('js-sensei-user')) ?? '{}');
+    expect(saved.state.lessonSession).toBeNull();
+    expect(saved.state.progress.lessons['variables-01']).toBeDefined();
+
+    store.useUserStore.getState().saveLessonSession(lesson, answers);
+    store.useUserStore.getState().clearLessonSession('variables-01');
+    expect(store.useUserStore.getState().lessonSession).toBeNull();
+  });
+
+  it('loads progress with a damaged lesson session and drops only the session', async () => {
+    const { AsyncStorage } = load();
+    await AsyncStorage.clear();
+    await AsyncStorage.setItem(
+      'js-sensei-user',
+      JSON.stringify({
+        version: 1,
+        state: {
+          settings: { onboarded: true },
+          progress: { totalXp: 40 },
+          lessonSession: { lessonId: 'variables-01', questionIds: 5, answers: [null], index: 'x' },
+        },
+      }),
+    );
+    const { useUserStore, waitForHydration } = require('../useUserStore');
+    await waitForHydration();
+    const state = useUserStore.getState();
+    expect(state.lessonSession).toBeNull();
+    expect(state.progress.totalXp).toBe(40);
+    expect(state.settings.onboarded).toBe(true);
+  });
 });

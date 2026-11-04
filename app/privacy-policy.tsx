@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SUPPORT_EMAIL } from '../src/services/support';
 import { BackButton, Colors, Fonts } from '../src/ui';
 
 export default function PrivacyPolicyScreen() {
@@ -67,7 +68,7 @@ export default function PrivacyPolicyScreen() {
           датой
         </Section>
 
-        <Section title="9. контакт">по вопросам конфиденциальности: jssensei.app@gmail.com</Section>
+        <Section title="9. контакт">по вопросам конфиденциальности: {SUPPORT_EMAIL}</Section>
 
         <View style={{ height: 40 }} />
       </ScrollView>

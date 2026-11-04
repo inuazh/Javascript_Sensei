@@ -1,16 +1,12 @@
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
-import {
-  IBMPlexMono_400Regular,
-  IBMPlexMono_500Medium,
-  IBMPlexMono_700Bold,
-} from '@expo-google-fonts/ibm-plex-mono';
-import { Doto_900Black } from '@expo-google-fonts/doto';
-import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+// Deep imports: each package's index requires every weight, which would bundle them all.
+import { Doto_900Black } from '@expo-google-fonts/doto/900Black';
+import { IBMPlexMono_400Regular } from '@expo-google-fonts/ibm-plex-mono/400Regular';
+import { IBMPlexMono_700Bold } from '@expo-google-fonts/ibm-plex-mono/700Bold';
+import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
+import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
+import { Inter_700Bold } from '@expo-google-fonts/inter/700Bold';
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -29,10 +25,8 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Doto_900Black,
     IBMPlexMono_400Regular,
-    IBMPlexMono_500Medium,
     IBMPlexMono_700Bold,
     Inter_400Regular,
-    Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
     ...Feather.font,

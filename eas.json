@@ -13,6 +13,7 @@
     },
     "preview": {
       "environment": "preview",
+      "channel": "preview",
       "distribution": "internal",
       "android": {
         "buildType": "apk"
@@ -20,12 +21,14 @@
     },
     "production": {
       "environment": "production",
+      "channel": "production",
       "android": {
         "buildType": "app-bundle"
       }
     },
     "rustore": {
       "environment": "production",
+      "channel": "production",
       "distribution": "store",
       "autoIncrement": true,
       "android": {

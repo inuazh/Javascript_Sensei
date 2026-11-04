@@ -1,6 +1,12 @@
 import { compareDays, parseDayKey } from '../dates';
 import { MIGRATIONS, STORE_VERSION, migratePersistedState } from '../migrations';
-import { sanitizePersistedState, sanitizeProgress, sanitizeSettings } from '../persistence';
+import type { LessonSession } from '../lessonSession';
+import {
+  sanitizeLessonSession,
+  sanitizePersistedState,
+  sanitizeProgress,
+  sanitizeSettings,
+} from '../persistence';
 import { initialProgress, type ProgressState } from '../progress';
 import { defaultSettings, type Settings } from '../settings';
 
@@ -55,14 +61,25 @@ const validProgress: ProgressState = {
   daily: { '2026-11-02': { questionId: 'variables-01-q1', correct: true } },
 };
 
+const validSession: LessonSession = {
+  lessonId: 'variables-01',
+  questionIds: ['variables-01-q1', 'variables-01-q2', 'variables-01-q3'],
+  answers: [
+    { questionId: 'variables-01-q1', correct: true },
+    { questionId: 'variables-01-q2', correct: false },
+  ],
+  index: 2,
+  savedAt: '2026-11-04T10:00:00.000Z',
+};
+
 describe('sanitizePersistedState', () => {
   it('keeps a valid state exactly as it is', () => {
-    const state = { settings: validSettings, progress: validProgress };
+    const state = { settings: validSettings, progress: validProgress, lessonSession: validSession };
     expect(sanitizePersistedState(JSON.parse(JSON.stringify(state)))).toEqual(state);
   });
 
   it('returns defaults for anything that is not a state', () => {
-    const defaults = { settings: defaultSettings, progress: initialProgress };
+    const defaults = { settings: defaultSettings, progress: initialProgress, lessonSession: null };
     for (const raw of [undefined, null, 42, 'state', [], [{ settings: {} }]]) {
       expect(sanitizePersistedState(raw)).toEqual(defaults);
     }
@@ -193,6 +210,64 @@ describe('sanitizePersistedState', () => {
     const { progress } = sanitizePersistedState(raw);
     expect(Object.keys(progress.lessons)).toEqual([]);
     expect(({} as Record<string, unknown>).stars).toBeUndefined();
+  });
+});
+
+describe('sanitizeLessonSession', () => {
+  it('keeps a valid session', () => {
+    expect(sanitizeLessonSession(JSON.parse(JSON.stringify(validSession)))).toEqual(validSession);
+  });
+
+  it('is null when there is no session, as in states saved before sessions existed', () => {
+    expect(sanitizePersistedState({ settings: validSettings, progress: validProgress })).toEqual({
+      settings: validSettings,
+      progress: validProgress,
+      lessonSession: null,
+    });
+  });
+
+  it('drops a session with any broken part instead of repairing it', () => {
+    const broken: unknown[] = [
+      undefined,
+      null,
+      'variables-01',
+      [validSession],
+      { ...validSession, lessonId: '' },
+      { ...validSession, lessonId: 7 },
+      { ...validSession, questionIds: [] },
+      { ...validSession, questionIds: 'variables-01-q1' },
+      { ...validSession, questionIds: ['variables-01-q1', 2, 'variables-01-q3'] },
+      { ...validSession, answers: [] },
+      { ...validSession, answers: {} },
+      { ...validSession, answers: [validSession.answers[0], null], index: 2 },
+      { ...validSession, answers: [validSession.answers[0], { questionId: 'x', correct: 'yes' }] },
+      // Answers must follow the questions in order.
+      { ...validSession, answers: [...validSession.answers].reverse() },
+      // More answers than questions.
+      {
+        ...validSession,
+        questionIds: ['variables-01-q1'],
+        answers: validSession.answers,
+      },
+      { ...validSession, index: 1 },
+      { ...validSession, index: '2' },
+      { ...validSession, savedAt: 'yesterday' },
+      { ...validSession, savedAt: 0 },
+    ];
+    for (const raw of broken) expect(sanitizeLessonSession(raw)).toBeNull();
+  });
+
+  it('keeps the rest of the state when the session is broken', () => {
+    const state = sanitizePersistedState({
+      settings: validSettings,
+      progress: validProgress,
+      lessonSession: { lessonId: 'variables-01', answers: 'oops' },
+    });
+    expect(state).toEqual({
+      settings: validSettings,
+      progress: validProgress,
+      lessonSession: null,
+    });
   });
 });
 

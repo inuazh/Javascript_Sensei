@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Text } from 'react-native';
 import { getLessonRef, getNextLesson } from '../../src/content/repository';
+import { resumeLessonSession } from '../../src/domain/lessonSession';
 import type { LessonOutcome } from '../../src/domain/progress';
 import { TheoryView } from '../../src/features/lesson/TheoryView';
 import { QuizSession } from '../../src/features/quiz/QuizSession';
@@ -27,9 +28,24 @@ export default function LessonScreen() {
   const ref = useMemo(() => (lessonId ? getLessonRef(lessonId) : undefined), [lessonId]);
   const completeLesson = useUserStore(s => s.completeLesson);
   const totalXp = useUserStore(s => s.progress.totalXp);
-  const [phase, setPhase] = useState<Phase>(() => (ref?.lesson.theory ? 'theory' : 'quiz'));
+  const saveLessonSession = useUserStore(s => s.saveLessonSession);
+  const clearLessonSession = useUserStore(s => s.clearLessonSession);
+  // Answers of an unfinished attempt (a reload, the app killed): continue at
+  // the next question and skip the theory, which was already read.
+  const [resumed] = useState(() =>
+    ref ? resumeLessonSession(useUserStore.getState().lessonSession, ref.lesson, new Date()) : null,
+  );
+  const [phase, setPhase] = useState<Phase>(() =>
+    ref?.lesson.theory && !resumed ? 'theory' : 'quiz',
+  );
   const [outcome, setOutcome] = useState<(LessonOutcome & { correct: number }) | null>(null);
   const [attempt, setAttempt] = useState(0);
+
+  // A saved session of this lesson that cannot be continued (old, or the
+  // content changed) is dropped, so it does not linger in storage.
+  useEffect(() => {
+    if (lessonId && !resumed) clearLessonSession(lessonId);
+  }, [lessonId, resumed, clearLessonSession]);
 
   if (!ref) {
     return (
@@ -87,6 +103,11 @@ export default function LessonScreen() {
     );
   }
 
+  const exit = () => {
+    clearLessonSession(lesson.id);
+    close();
+  };
+
   const finish = (answers: QuizAnswer[]) => {
     const result = completeLesson({ lessonId: lesson.id, answers });
     afterActivity();
@@ -99,8 +120,10 @@ export default function LessonScreen() {
       key={attempt}
       items={lesson.questions.map(question => ({ question, lessonId: lesson.id }))}
       label={`${topic.title} · ${lesson.title}`}
-      onExit={close}
+      onExit={exit}
       onFinish={finish}
+      onAnswer={(_answer, answers) => saveLessonSession(lesson, answers)}
+      initialAnswers={attempt === 0 ? (resumed ?? undefined) : undefined}
     />
   );
 }
