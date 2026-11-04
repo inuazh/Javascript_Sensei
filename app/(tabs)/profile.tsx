@@ -84,7 +84,9 @@ export default function ProfileScreen() {
           </Text>
         </View>
         <View style={styles.flex}>
-          <Text style={Type.h2}>{nickname ?? 'ученик'}</Text>
+          <Text style={Type.h2} numberOfLines={1}>
+            {nickname ?? 'ученик'}
+          </Text>
           <Text style={styles.level}>
             lvl {level.level} · {level.title}
           </Text>

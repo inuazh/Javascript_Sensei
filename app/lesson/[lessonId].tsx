@@ -10,6 +10,7 @@ import { ResultView } from '../../src/features/results/ResultView';
 import { afterActivity } from '../../src/services/activity';
 import { useUserStore } from '../../src/stores/useUserStore';
 import { Button, Screen, Type, getSectionColor } from '../../src/ui';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 type Phase = 'theory' | 'quiz' | 'result';
 
@@ -22,6 +23,7 @@ const RESULT_TITLE: Record<number, string> = {
 export default function LessonScreen() {
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
   const router = useRouter();
+  const goBack = useGoBack();
   const ref = useMemo(() => (lessonId ? getLessonRef(lessonId) : undefined), [lessonId]);
   const completeLesson = useUserStore(s => s.completeLesson);
   const totalXp = useUserStore(s => s.progress.totalXp);
@@ -33,14 +35,14 @@ export default function LessonScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>Урок не найден</Text>
-        <Button title="Назад" onPress={() => router.back()} />
+        <Button title="Назад" onPress={goBack} />
       </Screen>
     );
   }
 
   const { lesson, topic, section } = ref;
   const color = getSectionColor(section);
-  const close = () => router.back();
+  const close = goBack;
 
   if (phase === 'theory' && lesson.theory) {
     return (

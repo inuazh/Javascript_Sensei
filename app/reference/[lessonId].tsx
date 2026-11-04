@@ -5,11 +5,13 @@ import { getLessonRef } from '../../src/content/repository';
 import { TheoryBlocks } from '../../src/features/lesson/TheoryBlocks';
 import { getTheoryIndex } from '../../src/features/reference/theoryIndex';
 import { BackButton, Button, Colors, Label, Screen, Spacing, Type } from '../../src/ui';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 /** Read-only theory of one lesson, opened from «Справочник» or a topic. */
 export default function ReferenceLessonScreen() {
   const { lessonId } = useLocalSearchParams<{ lessonId: string }>();
   const router = useRouter();
+  const goBack = useGoBack();
   const ref = useMemo(() => (lessonId ? getLessonRef(lessonId) : undefined), [lessonId]);
   const number = useMemo(
     () => getTheoryIndex().entries.find(e => e.lessonId === lessonId)?.number,
@@ -21,7 +23,7 @@ export default function ReferenceLessonScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>Теория не найдена</Text>
-        <Button title="Назад" onPress={() => router.back()} />
+        <Button title="Назад" onPress={goBack} />
       </Screen>
     );
   }

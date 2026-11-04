@@ -82,7 +82,7 @@ export default function PlacementScreen() {
         <Text style={styles.score}>{`${passed.length}/${items.length}`}</Text>
         <Text style={Type.h1}>
           {passed.length > 0
-            ? `Засчитано ${passed.length} ${plural(passed.length, 'тема', 'темы', 'тем')}`
+            ? `${plural(passed.length, 'Засчитана', 'Засчитаны', 'Засчитано')} ${passed.length} ${plural(passed.length, 'тема', 'темы', 'тем')}`
             : 'Начнём с основ'}
         </Text>
         <Text style={Type.small}>

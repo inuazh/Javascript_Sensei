@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import { requestNotificationPermission, syncReminders } from '../src/services/notifications';
 import { DAILY_GOALS, useUserStore, type ExperienceLevel } from '../src/stores/useUserStore';
 import {
@@ -35,6 +35,16 @@ export default function OnboardingScreen() {
   const [experience, setExperience] = useState<ExperienceLevel>('beginner');
   const [goal, setGoal] = useState<number>(DAILY_GOALS[0].xp);
   const [time, setTime] = useState({ hour: 19, minute: 0 });
+
+  // Android back returns to the previous step instead of closing the app.
+  useEffect(() => {
+    if (step === 0) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      setStep(s => s - 1);
+      return true;
+    });
+    return () => sub.remove();
+  }, [step]);
 
   const finish = async (withReminder: boolean) => {
     const enabled = withReminder && (await requestNotificationPermission());

@@ -1,16 +1,13 @@
 import React from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
 import { BackButton, Colors, Fonts } from '../src/ui';
 
 export default function PrivacyPolicyScreen() {
-  const router = useRouter();
-
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
-        <BackButton onPress={() => router.back()} />
+        <BackButton />
         <Text style={styles.title}>Политика конфиденциальности</Text>
         <View style={{ width: 22 }} />
       </View>

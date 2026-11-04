@@ -17,10 +17,12 @@ import {
   Type,
   pad2,
 } from '../../src/ui';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function TopicScreen() {
   const { topicId } = useLocalSearchParams<{ topicId: string }>();
   const router = useRouter();
+  const goBack = useGoBack();
   const lessonsProgress = useUserStore(s => s.progress.lessons);
 
   const sections = getSections();
@@ -30,7 +32,7 @@ export default function TopicScreen() {
     return (
       <Screen edges={['top', 'bottom']}>
         <Text style={Type.h2}>Тема не найдена</Text>
-        <Button title="Назад" onPress={() => router.back()} />
+        <Button title="Назад" onPress={goBack} />
       </Screen>
     );
   }
