@@ -304,7 +304,7 @@
           },
           {
             "type": "code",
-            "code": "// O(n · m): includes перебирает b для каждого элемента a\nfunction commonSlow(a, b) {\n  return a.filter(x => b.includes(x));\n}\n\n// O(n + m): Set строится один раз, has — в среднем O(1)\nfunction commonFast(a, b) {\n  const setB = new Set(b);\n  return a.filter(x => setB.has(x));\n}\n\nconsole.log(commonFast([1, 2, 3], [2, 3, 4])); // [2, 3]"
+            "code": "// O(n · m): includes перебирает b для каждого элемента a\nfunction commonSlow(a, b) {\n  return a.filter(x => b.includes(x));\n}\n\n// O(n + m): Set строится один раз, has в среднем O(1)\nfunction commonFast(a, b) {\n  const setB = new Set(b);\n  return a.filter(x => setB.has(x));\n}\n\nconsole.log(commonFast([1, 2, 3], [2, 3, 4])); // [2, 3]"
           },
           {
             "type": "warning",

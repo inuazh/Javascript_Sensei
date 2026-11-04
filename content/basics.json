@@ -282,7 +282,7 @@
           },
           {
             "type": "code",
-            "code": "let _private = 1;  // можно\nlet $price = 9.99; // можно\nlet user2 = \"Ann\"; // можно\n// let 2user = \"Ann\";    — SyntaxError\n// let user-name = \"Ann\"; — SyntaxError"
+            "code": "let _private = 1;  // можно\nlet $price = 9.99; // можно\nlet user2 = \"Ann\"; // можно\n// let 2user = \"Ann\";   , SyntaxError\n// let user-name = \"Ann\";, SyntaxError"
           },
           {
             "type": "text",
@@ -935,7 +935,7 @@
           },
           {
             "type": "code",
-            "code": "console.log(17 % 5);  // 2\nconsole.log(10 % 2);  // 0 — число чётное\nconsole.log(2 ** 10); // 1024"
+            "code": "console.log(17 % 5);  // 2\nconsole.log(10 % 2);  // 0, число чётное\nconsole.log(2 ** 10); // 1024"
           },
           {
             "type": "text",

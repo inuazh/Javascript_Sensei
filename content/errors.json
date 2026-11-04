@@ -221,7 +221,7 @@
           },
           {
             "type": "code",
-            "code": "function readConfig(json) {\n  try {\n    return JSON.parse(json);\n  } catch (e) {\n    if (e instanceof SyntaxError) return {};\n    throw e; // чужая ошибка — дальше\n  }\n}\nconsole.log(readConfig(\"oops\")); // {}"
+            "code": "function readConfig(json) {\n  try {\n    return JSON.parse(json);\n  } catch (e) {\n    if (e instanceof SyntaxError) return {};\n    throw e; // чужая ошибка, пробрасываем дальше\n  }\n}\nconsole.log(readConfig(\"oops\")); // {}"
           },
           {
             "type": "text",

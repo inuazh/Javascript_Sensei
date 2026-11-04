@@ -114,7 +114,7 @@
           },
           {
             "type": "code",
-            "code": "const arr = [\"a\", \"b\"];\nfor (const i in arr) console.log(i); // 0, 1 — это строки \"0\" и \"1\"\nfor (const v of arr) console.log(v); // a, b"
+            "code": "const arr = [\"a\", \"b\"];\nfor (const i in arr) console.log(i); // 0, 1: это строки \"0\" и \"1\"\nfor (const v of arr) console.log(v); // a, b"
           },
           {
             "type": "text",
@@ -1014,7 +1014,7 @@
           },
           {
             "type": "code",
-            "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function* ticks() {\n  for (let i = 1; i <= 3; i++) {\n    await wait(100);\n    yield i;\n  }\n}\nasync function main() {\n  for await (const t of ticks()) console.log(t);\n}\nmain(); // 1, 2, 3 — каждое через 100 мс"
+            "code": "const wait = ms => new Promise(r => setTimeout(r, ms));\n\nasync function* ticks() {\n  for (let i = 1; i <= 3; i++) {\n    await wait(100);\n    yield i;\n  }\n}\nasync function main() {\n  for await (const t of ticks()) console.log(t);\n}\nmain(); // 1, 2, 3, каждое через 100 мс"
           },
           {
             "type": "warning",
@@ -1107,7 +1107,7 @@
           },
           {
             "type": "code",
-            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  for await (const v of [wait(200, \"A\"), wait(100, \"B\")]) {\n    console.log(v);\n  }\n}\nmain(); // A, B — порядок массива, а не порядок готовности"
+            "code": "const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));\n\nasync function main() {\n  for await (const v of [wait(200, \"A\"), wait(100, \"B\")]) {\n    console.log(v);\n  }\n}\nmain(); // A, B, порядок массива, а не порядок готовности"
           },
           {
             "type": "text",

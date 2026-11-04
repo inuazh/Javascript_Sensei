@@ -223,7 +223,7 @@
           },
           {
             "type": "code",
-            "code": "function makeCounter() {\n  let count = 0;\n  return () => ++count;\n}\n\nconst next = makeCounter();\nconsole.log(next()); // 1\nconsole.log(next()); // 2\nconsole.log(makeCounter()()); // 1 — новый счётчик"
+            "code": "function makeCounter() {\n  let count = 0;\n  return () => ++count;\n}\n\nconst next = makeCounter();\nconsole.log(next()); // 1\nconsole.log(next()); // 2\nconsole.log(makeCounter()()); // 1, новый счётчик"
           },
           {
             "type": "text",
@@ -1075,7 +1075,7 @@
           },
           {
             "type": "code",
-            "code": "const animal = { eats: true };\nconst rabbit = Object.create(animal); // прототип rabbit — animal\nrabbit.jumps = true;\n\nconsole.log(rabbit.jumps); // true — своё свойство\nconsole.log(rabbit.eats);  // true — из прототипа\nconsole.log(Object.getPrototypeOf(rabbit) === animal); // true"
+            "code": "const animal = { eats: true };\nconst rabbit = Object.create(animal); // прототип rabbit это animal\nrabbit.jumps = true;\n\nconsole.log(rabbit.jumps); // true, своё свойство\nconsole.log(rabbit.eats);  // true, из прототипа\nconsole.log(Object.getPrototypeOf(rabbit) === animal); // true"
           },
           {
             "type": "text",

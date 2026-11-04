@@ -493,7 +493,7 @@
           },
           {
             "type": "code",
-            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst square = memoize(n => {\n  console.log(\"считаю\", n);\n  return n * n;\n});\nconsole.log(square(4)); // считаю 4, потом 16\nconsole.log(square(4)); // 16 — из кэша"
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nconst square = memoize(n => {\n  console.log(\"считаю\", n);\n  return n * n;\n});\nconsole.log(square(4)); // считаю 4, потом 16\nconsole.log(square(4)); // 16, из кэша"
           },
           {
             "type": "text",
@@ -585,7 +585,7 @@
           },
           {
             "type": "code",
-            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (...args) {\n    const key = JSON.stringify(args);\n    if (!cache.has(key)) cache.set(key, fn(...args));\n    return cache.get(key);\n  };\n}\n\nconst add = memoize((a, b) => {\n  console.log(\"считаю\");\n  return a + b;\n});\nadd(1, 2); // считаю\nadd(1, 2); // из кэша\nadd(2, 1); // считаю — другой ключ"
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (...args) {\n    const key = JSON.stringify(args);\n    if (!cache.has(key)) cache.set(key, fn(...args));\n    return cache.get(key);\n  };\n}\n\nconst add = memoize((a, b) => {\n  console.log(\"считаю\");\n  return a + b;\n});\nadd(1, 2); // считаю\nadd(1, 2); // из кэша\nadd(2, 1); // считаю, другой ключ"
           },
           {
             "type": "warning",
@@ -783,7 +783,7 @@
           },
           {
             "type": "code",
-            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet rate = 90;\nconst toRub = memoize(usd => usd * rate);\nconsole.log(toRub(10)); // 900\nrate = 100;\nconsole.log(toRub(10)); // 900 — устаревший ответ"
+            "code": "function memoize(fn) {\n  const cache = new Map();\n  return function (n) {\n    if (cache.has(n)) return cache.get(n);\n    const result = fn(n);\n    cache.set(n, result);\n    return result;\n  };\n}\n\nlet rate = 90;\nconst toRub = memoize(usd => usd * rate);\nconsole.log(toRub(10)); // 900\nrate = 100;\nconsole.log(toRub(10)); // 900, устаревший ответ"
           },
           {
             "type": "warning",
@@ -892,7 +892,7 @@
           },
           {
             "type": "code",
-            "code": "const cache = new WeakMap();\nfunction fullName(user) {\n  if (cache.has(user)) return cache.get(user);\n  console.log(\"считаю\");\n  const result = user.first + \" \" + user.last;\n  cache.set(user, result);\n  return result;\n}\nconst u = { first: \"Анна\", last: \"Ли\" };\nfullName(u); // считаю\nfullName(u); // из кэша\nfullName({ first: \"Анна\", last: \"Ли\" }); // считаю — другой объект"
+            "code": "const cache = new WeakMap();\nfunction fullName(user) {\n  if (cache.has(user)) return cache.get(user);\n  console.log(\"считаю\");\n  const result = user.first + \" \" + user.last;\n  cache.set(user, result);\n  return result;\n}\nconst u = { first: \"Анна\", last: \"Ли\" };\nfullName(u); // считаю\nfullName(u); // из кэша\nfullName({ first: \"Анна\", last: \"Ли\" }); // считаю, другой объект"
           },
           {
             "type": "warning",
@@ -1365,7 +1365,7 @@
           },
           {
             "type": "code",
-            "code": "class Counter {\n  count = 0;\n  inc() {\n    return ++this.count;\n  }\n}\nconst { inc } = new Counter();\ninc(); // TypeError: this — undefined"
+            "code": "class Counter {\n  count = 0;\n  inc() {\n    return ++this.count;\n  }\n}\nconst { inc } = new Counter();\ninc(); // TypeError: this равен undefined"
           },
           {
             "type": "warning",

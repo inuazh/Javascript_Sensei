@@ -322,7 +322,7 @@
           },
           {
             "type": "code",
-            "code": "console.log(Boolean(\"0\"));   // true — непустая строка\nconsole.log(Boolean(\" \"));   // true\nconsole.log(Boolean([]));    // true — любой объект\nconsole.log(Boolean({}));    // true"
+            "code": "console.log(Boolean(\"0\"));   // true, непустая строка\nconsole.log(Boolean(\" \"));   // true\nconsole.log(Boolean([]));    // true, любой объект\nconsole.log(Boolean({}));    // true"
           },
           {
             "type": "text",
@@ -932,7 +932,7 @@
           },
           {
             "type": "code",
-            "code": "function demo() {\n  // тут уже: a === undefined,\n  // run — готовая функция,\n  // b — в TDZ\n  var a = 1;\n  let b = 2;\n  function run() {}\n}"
+            "code": "function demo() {\n  // тут уже: a === undefined,\n  // run уже готовая функция,\n  // b в TDZ\n  var a = 1;\n  let b = 2;\n  function run() {}\n}"
           },
           {
             "type": "tip",
@@ -1236,7 +1236,7 @@
           },
           {
             "type": "code",
-            "code": "const a = { n: 1 };\nconst b = a;\nb.n = 2;\nconsole.log(a.n);       // 2\nconsole.log({} === {}); // false — разные объекты"
+            "code": "const a = { n: 1 };\nconst b = a;\nb.n = 2;\nconsole.log(a.n);       // 2\nconsole.log({} === {}); // false, разные объекты"
           },
           {
             "type": "text",
@@ -1244,7 +1244,7 @@
           },
           {
             "type": "code",
-            "code": "function change(obj) {\n  obj.n = 10;     // меняет исходный объект\n  obj = { n: 20 }; // теперь obj — другой объект\n}\nconst x = { n: 1 };\nchange(x);\nconsole.log(x.n); // 10"
+            "code": "function change(obj) {\n  obj.n = 10;     // меняет исходный объект\n  obj = { n: 20 }; // теперь obj это другой объект\n}\nconst x = { n: 1 };\nchange(x);\nconsole.log(x.n); // 10"
           },
           {
             "type": "warning",
@@ -1344,7 +1344,7 @@
           },
           {
             "type": "code",
-            "code": "class User {\n  name = \"Аня\";\n  hi() {\n    return this.name;\n  }\n}\nconst u = new User();\nconsole.log(u.hi()); // Аня\nconst hi = u.hi;\nhi(); // TypeError: this — undefined"
+            "code": "class User {\n  name = \"Аня\";\n  hi() {\n    return this.name;\n  }\n}\nconst u = new User();\nconsole.log(u.hi()); // Аня\nconst hi = u.hi;\nhi(); // TypeError: this равен undefined"
           },
           {
             "type": "warning",
@@ -1360,7 +1360,7 @@
           },
           {
             "type": "code",
-            "code": "function greet() {\n  return this.name;\n}\nconst bound = greet.bind({ name: \"Аня\" });\nconsole.log(bound()); // Аня\nconst again = bound.bind({ name: \"Боб\" });\nconsole.log(again()); // Аня — второй bind не сработал"
+            "code": "function greet() {\n  return this.name;\n}\nconst bound = greet.bind({ name: \"Аня\" });\nconsole.log(bound()); // Аня\nconst again = bound.bind({ name: \"Боб\" });\nconsole.log(again()); // Аня, второй bind не сработал"
           }
         ]
       },
@@ -1451,7 +1451,7 @@
           },
           {
             "type": "code",
-            "code": "console.log(typeof null);      // object — историческая ошибка\nconsole.log(typeof []);        // object\nconsole.log(typeof class {});  // function\nconsole.log(typeof NaN);       // number\nconsole.log(typeof undeclared); // undefined, без ошибки"
+            "code": "console.log(typeof null);      // object, историческая ошибка\nconsole.log(typeof []);        // object\nconsole.log(typeof class {});  // function\nconsole.log(typeof NaN);       // number\nconsole.log(typeof undeclared); // undefined, без ошибки"
           },
           {
             "type": "tip",
