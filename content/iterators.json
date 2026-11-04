@@ -526,7 +526,7 @@
           "id": "generators-01-q1",
           "type": "output",
           "code": "function* gen() {\n  console.log(\"старт\");\n  yield 1;\n}\nconst it = gen();\nconsole.log(\"после вызова\");",
-          "options": ["после вызова", "старт после вызова", "старт", "после вызова старт"],
+          "options": ["после вызова", "старт\nпосле вызова", "старт", "после вызова\nстарт"],
           "correct": 0,
           "optionExplanations": [
             null,
@@ -1386,10 +1386,10 @@
           "type": "output",
           "code": "const fetchPage = p => {\n  console.log(\"запрос\", p);\n  return new Promise(r => setTimeout(() => r([p]), 100));\n};\nasync function* gen() {\n  for (let p = 1; p <= 2; p++) {\n    const items = await fetchPage(p);\n    yield* items;\n  }\n}\nasync function main() {\n  for await (const x of gen()) console.log(\"получил\", x);\n}\nmain();",
           "options": [
-            "запрос 1 получил 1 запрос 2 получил 2",
-            "запрос 1 запрос 2 получил 1 получил 2",
-            "получил 1 запрос 1 получил 2 запрос 2",
-            "запрос 1 получил 1 получил 2 запрос 2"
+            "запрос 1\nполучил 1\nзапрос 2\nполучил 2",
+            "запрос 1\nзапрос 2\nполучил 1\nполучил 2",
+            "получил 1\nзапрос 1\nполучил 2\nзапрос 2",
+            "запрос 1\nполучил 1\nполучил 2\nзапрос 2"
           ],
           "correct": 0,
           "optionExplanations": [
@@ -1464,7 +1464,7 @@
           "id": "async-iteration-05-q3",
           "type": "output",
           "code": "async function* gen() {\n  yield 1;\n  console.log(\"после yield\");\n  yield 2;\n}\nasync function main() {\n  for await (const x of gen()) {\n    console.log(x);\n    break;\n  }\n  console.log(\"конец\");\n}\nmain();",
-          "options": ["1 конец", "1 после yield конец", "1 2 конец", "1"],
+          "options": ["1\nконец", "1\nпосле yield\nконец", "1\n2\nконец", "1"],
           "correct": 0,
           "optionExplanations": [
             null,
