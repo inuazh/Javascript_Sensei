@@ -14,10 +14,13 @@ import {
   type LegacyUserState,
 } from '../domain/migrations';
 import {
+  completeDaily,
   completeLesson,
   completeWorkout,
   initialProgress,
   skipLessons,
+  type DailyOutcome,
+  type DailyResultInput,
   type LessonOutcome,
   type LessonResultInput,
   type ProgressState,
@@ -72,6 +75,7 @@ interface UserState {
   updateSettings: (patch: Partial<Settings>) => void;
   completeLesson: (input: LessonResultInput) => LessonOutcome;
   completeWorkout: (input: WorkoutResultInput) => WorkoutOutcome;
+  completeDaily: (input: DailyResultInput) => DailyOutcome;
   /** Marks lessons as known after the placement test (no XP). */
   applyPlacement: (lessonIds: string[]) => void;
   resetProgress: () => void;
@@ -112,6 +116,17 @@ export const useUserStore = create<UserState>()(
         return outcome;
       },
 
+      completeDaily: input => {
+        const { settings, progress } = get();
+        const { state, outcome } = completeDaily(progress, input, {
+          now: new Date(),
+          content: getContentIndex(),
+          dailyGoalXp: settings.dailyGoalXp,
+        });
+        set({ progress: state });
+        return outcome;
+      },
+
       applyPlacement: lessonIds =>
         set(state => ({
           progress: skipLessons(state.progress, lessonIds, new Date()),
@@ -142,7 +157,8 @@ export const useUserStore = create<UserState>()(
       onRehydrateStorage: () => (_state, error) => {
         if (error) handleHydrationError(error);
       },
-      // New settings keys added later get their defaults.
+      // Keys added later (settings, or progress fields such as `daily`) get their
+      // defaults, so adding a field with a default needs no version bump.
       merge: (persisted, current) => {
         const p = (persisted ?? {}) as Partial<PersistedState>;
         return {

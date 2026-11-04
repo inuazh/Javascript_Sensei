@@ -4,6 +4,8 @@
  * no store or async loading is needed.
  */
 import { SECTION_FILES, loadSectionDefs } from '../../content';
+import { pickDailyQuestionId } from '../domain/daily';
+import type { DayKey } from '../domain/dates';
 import type { ContentIndex } from '../domain/progress';
 import type { Lesson, Question, SectionDef, Topic } from './schema';
 
@@ -107,4 +109,13 @@ export function getContentIndex(): ContentIndex {
       lessonIds: getSectionLessons(s.id).map(l => l.id),
     })),
   };
+}
+
+/** «Задача дня» for `day`: the same question on every device with this content. */
+export function getDailyQuestion(day: DayKey): { question: Question; lesson: Lesson } | undefined {
+  const candidates = getLessonPath().flatMap(({ lesson }) =>
+    lesson.questions.map(q => ({ id: q.id, type: q.type })),
+  );
+  const id = pickDailyQuestionId(candidates, day);
+  return id ? getQuestion(id) : undefined;
 }
