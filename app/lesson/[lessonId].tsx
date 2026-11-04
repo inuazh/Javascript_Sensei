@@ -97,7 +97,9 @@ export default function LessonScreen() {
         secondary={
           outcome.stars < 3
             ? { title: 'пройти ещё раз', onPress: retry }
-            : { title: 'к карте курса', onPress: close }
+            : next
+              ? { title: 'к карте курса', onPress: close }
+              : undefined
         }
       />
     );

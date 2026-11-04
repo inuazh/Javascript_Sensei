@@ -194,7 +194,10 @@ export default function HomeScreen() {
             <Text style={{ color: goal >= 1 ? Colors.success : Colors.textPrimary }}>
               {Math.min(todayXp, dailyGoalXp)}
             </Text>
-            <Text style={styles.goalTotal}>/{dailyGoalXp} XP</Text>
+            <Text style={styles.goalTotal}>
+              /{dailyGoalXp}
+              <Text style={styles.goalUnit}> XP</Text>
+            </Text>
           </Text>
         </View>
         <ProgressBar
@@ -219,7 +222,7 @@ export default function HomeScreen() {
       {next ? (
         <Card style={styles.continueCard}>
           <Label dot>
-            {Object.keys(progress.lessons).length === 0 ? 'начни отсюда' : 'продолжить'}
+            {Object.values(progress.lessons).every(l => l.skipped) ? 'начни отсюда' : 'продолжить'}
           </Label>
           <Text style={styles.continueMeta}>
             {pad2(sections.findIndex(s => s.id === next.section.id) + 1)} · {next.section.title}
@@ -343,11 +346,20 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  chips: { flexDirection: 'row', gap: Spacing.sm },
+  // Big numbers on a narrow screen move the chips under the logo instead of off screen.
+  header: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    rowGap: Spacing.sm,
+  },
+  chips: { flexDirection: 'row', gap: Spacing.sm, marginLeft: 'auto' },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   goalValue: { fontFamily: Fonts.display, fontSize: 30, lineHeight: 34 },
   goalTotal: { color: Colors.textMuted },
+  // Smaller unit, as on the profile: «150/150 XP» in the display font does not fit 320px.
+  goalUnit: { fontSize: 14 },
   goalBar: { marginVertical: Spacing.md },
   streakRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
   streakText: { fontFamily: Fonts.mono, fontSize: 12, color: Colors.textMuted },

@@ -10,6 +10,11 @@ export const XP = {
   lessonCompleted: 10,
   perfectLesson: 10,
   perCorrectReview: 5,
+  /**
+   * Review answers per day that can earn XP. Without a cap, failing a replayed
+   * lesson on purpose and fixing it in a workout would farm XP without limit.
+   */
+  paidReviewsPerDay: 20,
   dailyWorkoutBonus: 20,
   /** Solving «Задача дня». */
   dailyChallenge: 15,

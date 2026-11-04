@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { BackHandler, StyleSheet, Text, View } from 'react-native';
 import { getLevelPlacement } from '../src/content/repository';
@@ -47,6 +47,7 @@ const STEPS = 4;
 export default function OnboardingScreen() {
   const updateSettings = useUserStore(s => s.updateSettings);
   const applyPlacement = useUserStore(s => s.applyPlacement);
+  const onboarded = useUserStore(s => s.settings.onboarded);
   const [step, setStep] = useState(0);
   const [choice, setChoice] = useState<Choice>('beginner');
   const [goal, setGoal] = useState<number>(DAILY_GOALS[0].xp);
@@ -98,6 +99,9 @@ export default function OnboardingScreen() {
       ) : null}
     </View>
   );
+
+  // A deep link must not run onboarding again over existing progress.
+  if (onboarded && step === 0) return <Redirect href="/(tabs)" />;
 
   if (step === 0) {
     return (

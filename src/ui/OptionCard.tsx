@@ -14,7 +14,7 @@ export function OptionCard({ title, subtitle, icon, selected, onPress }: OptionC
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      accessibilityState={{ checked: selected, selected }}
       onPress={onPress}
       style={({ pressed }) => [styles.card, selected && styles.selected, pressed && styles.pressed]}
     >

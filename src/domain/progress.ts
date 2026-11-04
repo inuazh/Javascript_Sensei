@@ -254,7 +254,8 @@ export function completeLesson(
 
   const lesson: LessonProgress = previous
     ? {
-        bestCorrect: Math.max(previous.bestCorrect, correct),
+        // Within the current total: a content update may have removed questions.
+        bestCorrect: Math.min(total, Math.max(previous.bestCorrect, correct)),
         total,
         stars: Math.max(previous.stars, stars) as Stars,
         attempts: previous.attempts + 1,
@@ -309,8 +310,10 @@ export function completeWorkout(
   const fixed = correct.filter(a => (state.review[a.questionId]?.box ?? 1) === 0).length;
   // The daily bonus is for reviewing what was due, not for free practice.
   const firstWorkoutToday = state.lastWorkoutDay !== today && input.dueIds.length > 0;
+  const paidLeft = Math.max(0, XP.paidReviewsPerDay - (state.activity[today]?.reviews ?? 0));
   const xpEarned =
-    correctDue * XP.perCorrectReview + (firstWorkoutToday ? XP.dailyWorkoutBonus : 0);
+    Math.min(correctDue, paidLeft) * XP.perCorrectReview +
+    (firstWorkoutToday ? XP.dailyWorkoutBonus : 0);
 
   const updated = addActivity(
     {
@@ -318,7 +321,8 @@ export function completeWorkout(
       review: applyReviewAnswers(state.review, input.answers, today),
       workoutsCompleted: state.workoutsCompleted + 1,
       mistakesFixed: state.mistakesFixed + fixed,
-      lastWorkoutDay: today,
+      // The day the bonus was claimed: free practice must not use it up.
+      lastWorkoutDay: input.dueIds.length > 0 ? today : state.lastWorkoutDay,
     },
     today,
     { xp: xpEarned, reviews: input.answers.length },
@@ -358,12 +362,25 @@ export function completeDaily(
   const daily = state.daily ?? {};
   const previous = daily[input.day];
   if (previous) {
-    const { outcome } = finishActivity(state, state, 0, ctx);
+    // Nothing is saved, so nothing new is reported: no achievements, streak or level change.
+    const level = getLevelInfo(state.totalXp).level;
+    const todayXp = todayActivity(state, today).xp;
     return {
       state,
       outcome: {
-        ...outcome,
+        xpEarned: 0,
+        achievementXp: 0,
+        achievements: [],
+        levelBefore: level,
+        levelAfter: level,
+        streakDays: viewStreak(state.streak, today).days,
         streakExtended: false,
+        freezesUsed: 0,
+        freezesEarned: 0,
+        dailyGoalXp: ctx.dailyGoalXp,
+        todayXpBefore: todayXp,
+        todayXpAfter: todayXp,
+        goalReached: false,
         correct: previous.correct,
         dailyStreak: dailyStreak(daily, input.day),
         alreadyDone: true,

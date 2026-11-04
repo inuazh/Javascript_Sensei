@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { ACHIEVEMENTS } from '../../src/domain/achievements';
 import { addDays, weekStart } from '../../src/domain/dates';
@@ -27,6 +27,9 @@ import {
 } from '../../src/ui';
 
 const HEATMAP_WEEKS = 15;
+/** Narrower grids get two achievement columns: three would cut the titles. */
+const THREE_COLUMNS_MIN_WIDTH = 300;
+const GRID_GAP = Spacing.sm;
 const DAY_LABELS = ['пн', '', 'ср', '', 'пт', '', 'вс'];
 
 function intensity(xp: number): number {
@@ -56,7 +59,8 @@ export default function ProfileScreen() {
   const level = getLevelInfo(progress.totalXp);
   const streak = viewStreak(progress.streak, today);
   const lessons = Object.values(progress.lessons).filter(l => !l.skipped);
-  const initial = nickname ? nickname.charAt(0) : String(level.level);
+  // The first code point, not UTF-16 unit: half an emoji from an older nickname renders as «�».
+  const initial = (nickname && Array.from(nickname.trim())[0]) || String(level.level);
 
   const weeks = useMemo(() => {
     const start = addDays(weekStart(today), -7 * (HEATMAP_WEEKS - 1));
@@ -69,6 +73,14 @@ export default function ProfileScreen() {
   }, [progress.activity, today]);
 
   const unlockedCount = ACHIEVEMENTS.filter(a => a.id in progress.achievements).length;
+  // Tile width from the measured grid: a percentage plus the gaps overflowed the row
+  // below 348px, so a 360px phone got two tiles and an empty third of the row.
+  const [gridWidth, setGridWidth] = useState(0);
+  const onGridLayout = (e: LayoutChangeEvent) => setGridWidth(e.nativeEvent.layout.width);
+  const columns = gridWidth >= THREE_COLUMNS_MIN_WIDTH ? 3 : 2;
+  const tileWidth = gridWidth
+    ? Math.floor((gridWidth - GRID_GAP * (columns - 1)) / columns)
+    : undefined;
 
   return (
     <Screen>
@@ -156,7 +168,7 @@ export default function ProfileScreen() {
       <SectionStatsCard lessons={progress.lessons} review={progress.review} />
 
       <Label>{`достижения · ${unlockedCount}/${ACHIEVEMENTS.length}`}</Label>
-      <View style={styles.grid}>
+      <View style={styles.grid} onLayout={onGridLayout}>
         {ACHIEVEMENTS.map(a => {
           const unlocked = a.id in progress.achievements;
           return (
@@ -164,7 +176,11 @@ export default function ProfileScreen() {
               key={a.id}
               accessible
               accessibilityLabel={`${a.title}: ${a.description}${unlocked ? ', получено' : ''}`}
-              style={[styles.achievement, unlocked ? styles.unlocked : styles.locked]}
+              style={[
+                styles.achievement,
+                tileWidth !== undefined && { width: tileWidth },
+                unlocked ? styles.unlocked : styles.locked,
+              ]}
             >
               <Icon
                 name={unlocked ? (a.icon as IconName) : 'lock'}
@@ -224,9 +240,9 @@ const styles = StyleSheet.create({
   week: { flex: 1, gap: 3 },
   cell: { aspectRatio: 1, borderRadius: 999, maxHeight: 14 },
   cellToday: { backgroundColor: Colors.accent },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
   achievement: {
-    width: '31.8%',
+    width: '30%',
     padding: Spacing.md,
     borderRadius: Radius.xl,
     borderWidth: 1,

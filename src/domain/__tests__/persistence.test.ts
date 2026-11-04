@@ -281,6 +281,20 @@ describe('day keys from storage', () => {
     }
   });
 
+  it('rejects dates that do not exist in the calendar', () => {
+    // '2026-02-30' sorts before '2026-03-01' but means March 2nd to daysBetween:
+    // as a streak day it made `missed` negative and handed out extra freezes.
+    for (const bad of ['2026-02-29', '2026-02-30', '2026-04-31', '2026-11-31']) {
+      expect(parseDayKey(bad)).toBeNull();
+    }
+    expect(parseDayKey('2028-02-29')).toBe('2028-02-29');
+    expect(parseDayKey('2026-12-31')).toBe('2026-12-31');
+    const { streak } = sanitizeProgress({
+      streak: { current: 3, longest: 3, lastActiveDay: '2026-02-30', freezes: 2 },
+    });
+    expect(streak.lastActiveDay).toBeNull();
+  });
+
   it('compares padded keys in calendar order', () => {
     expect(compareDays('2026-09-30', '2026-10-01')).toBeLessThan(0);
     expect(compareDays('2027-01-01', '2026-12-31')).toBeGreaterThan(0);

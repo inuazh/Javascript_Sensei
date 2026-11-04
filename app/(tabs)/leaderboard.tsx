@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -142,12 +142,17 @@ export default function LeaderboardScreen() {
 
   const week = weekStart(today);
   const weekId = weekNumber(today);
+  // Only the latest request may update the list: after a quick switch between the
+  // tabs a slower earlier answer would show the other tab's players.
+  const request = useRef(0);
   const load = useCallback(async () => {
+    const id = ++request.current;
     setError(false);
     try {
-      setPlayers(await (mode === 'week' ? fetchWeek(weekId) : fetchAllTime()));
+      const result = await (mode === 'week' ? fetchWeek(weekId) : fetchAllTime());
+      if (id === request.current) setPlayers(result);
     } catch {
-      setError(true);
+      if (id === request.current) setError(true);
     }
   }, [mode, weekId]);
 
@@ -183,7 +188,11 @@ export default function LeaderboardScreen() {
               key={m}
               accessibilityRole="tab"
               accessibilityState={{ selected: mode === m }}
-              onPress={() => setMode(m)}
+              onPress={() => {
+                if (m === mode) return;
+                setMode(m);
+                setPlayers(null);
+              }}
               style={[styles.tab, mode === m && styles.tabActive]}
             >
               <Text style={[styles.tabText, mode === m && styles.tabTextActive]}>

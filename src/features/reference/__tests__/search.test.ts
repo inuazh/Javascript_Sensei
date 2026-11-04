@@ -1,5 +1,6 @@
 import type { Lesson, SectionDef, TheoryBlock } from '../../../content/schema';
 import {
+  normalizeQuery,
   buildTheoryIndex,
   makeSnippet,
   normalize,
@@ -126,6 +127,12 @@ describe('searchTheory', () => {
     expect(ids(searchTheory(index, 'через let'))).toEqual(['variables-01']);
     expect(ids(searchTheory(index, '`const`: значение'))).toEqual(['variables-03']);
     expect(ids(searchTheory(index, '**именованное**'))).toEqual(['variables-01']);
+  });
+
+  it('keeps a lone ** in the query: it is the exponent operator', () => {
+    expect(normalizeQuery('2 ** 10')).toBe('2 ** 10');
+    expect(normalizeQuery('**')).toBe('**');
+    expect(normalizeQuery('**жирный** `код`')).toBe('жирный код');
   });
 
   it('ranks lesson titles, then topic titles, then the theory text', () => {

@@ -32,7 +32,9 @@ export function parseDayKey(value: unknown): DayKey | null {
   if (!m) return null;
   const mo = Number(m[2]);
   const d = Number(m[3]);
-  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  // Days past the month's end ('2026-02-30') would sort apart from the day they mean.
+  const daysInMonth = new Date(Date.UTC(Number(m[1]), mo, 0)).getUTCDate();
+  if (mo < 1 || mo > 12 || d < 1 || d > daysInMonth) return null;
   return `${m[1]}-${pad2(mo)}-${pad2(d)}`;
 }
 
